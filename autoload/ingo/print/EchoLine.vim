@@ -8,7 +8,7 @@
 "
 " $Header: /usr/home/gary/.vim/autoload/RCS/ShowLine.vim,v 1.1 2002/08/15 20:03:36 gary Exp $
 
-function! s:EchoLinePart( lineNum, startCol, endCol, additionalHighlighting )
+function! EchoLine#EchoLinePart( lineNum, startCol, endCol, additionalHighlighting )
 "*******************************************************************************
 "* PURPOSE:
 "   Display the current buffer's a:lineNum in the command line, using that
@@ -26,9 +26,33 @@ function! s:EchoLinePart( lineNum, startCol, endCol, additionalHighlighting )
 "* RETURN VALUES: 
 "   none
 "*******************************************************************************
+    let l:cmd = ''
+    let l:prev_group = ' '    " Something that won't match any syntax group name.
+
+    let l:column = (a:startCol == 0 ? 1 : a:startCol)
+    let l:endCol = (a:endCol == 0 ? strlen(getline(a:lineNum)) : a:endCol)
+
+    if l:column == l:endCol
+	let l:cmd .= 'echon "'
+    endif
+
+    while l:column <= l:endCol
+	let l:group = synIDattr(synID(a:lineNum, l:column, 1), 'name')
+	if l:group != l:prev_group
+	    let l:cmd .= (empty(l:cmd) ? '' : '"|')
+	    let l:cmd .= 'echohl ' . (empty(l:group) ? 'NONE' : l:group) . '|echon "'
+	    let l:prev_group = l:group
+	endif
+	let l:cmd .= escape( strpart(getline(a:lineNum), l:column - 1, 1), '"\' )
+	let l:column += 1
+    endwhile
+
+    let l:cmd .= '"|echohl NONE'
+    "DEBUG call input('CMD='.l:cmd)
+    exe l:cmd
 endfunction
 
-function! s:EchoLine( lineNum, centerCol, prefix, additionalHighlighting )
+function! EchoLine#EchoLine( lineNum, centerCol, prefix, additionalHighlighting )
 "*******************************************************************************
 "* PURPOSE:
 "   Display (part of) the current buffer's a:lineNum in the command line without
