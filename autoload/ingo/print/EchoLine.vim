@@ -42,8 +42,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 
     let l:column = (a:startCol == 0 ? 1 : a:startCol)
 
-    let l:virtCol = s:VirtStartCol(a:lineNum, l:column)
-    let l:virtStartCol = l:virtCol
+    let l:virtStartCol = s:VirtStartCol(a:lineNum, l:column)
 
     let l:endCol = (a:endCol == 0 ? strlen(l:line) : a:endCol)
 
@@ -51,7 +50,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 	let l:cmd .= 'echon "'
     endif
 
-    while l:column <= l:endCol && (a:maxLength <= 0 || (l:virtCol - l:virtStartCol < a:maxLength))
+    while l:column <= l:endCol && (a:maxLength <= 0 || (virtcol([a:lineNum, l:column + 1]) - l:virtStartCol <= a:maxLength))
 	let l:group = synIDattr(synID(a:lineNum, l:column, 1), 'name')
 	if l:group != l:prev_group
 	    let l:cmd .= (empty(l:cmd) ? '' : '"|')
@@ -60,20 +59,16 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 	endif
 	let l:char = escape( strpart(l:line, l:column - 1, 1), '"\' )
 	if l:char == "\t"
-	    let l:width = EchoWithoutScrolling#GetTabReplacement(l:virtCol, &l:tabstop)
-	    if a:maxLength > 0 && l:virtCol + l:width - l:virtStartCol > a:maxLength
-		let l:width = l:virtStartCol + a:maxLength - l:virtCol
-	    endif
+	    let l:width = EchoWithoutScrolling#GetTabReplacement(s:VirtStartCol(a:lineNum, l:column), &l:tabstop)
 	    let l:cmd .= repeat('.', l:width)
-	    let l:virtCol += l:width
 	else
 	    let l:cmd .= l:char
-	    let l:virtCol = s:VirtStartCol(a:lineNum, l:column + 1)
 	endif
 	let l:column += 1
     endwhile
+    "echomsg '**** last col added' l:column - 1
 
-    let l:cmd .= '"|echohl NONE'
+    let l:cmd .= 'X"|echohl NONE'
     "DEBUG call input('CMD='.l:cmd)
     exe l:cmd
 endfunction
