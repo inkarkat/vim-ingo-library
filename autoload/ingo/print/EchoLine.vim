@@ -58,7 +58,7 @@ function! s:IsMoreToRead( column )
     " set. We need to determine whether the next character would still fit. 
     let l:isMore =  (GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1 <= s:maxLength)
 
-echomsg 'at column' a:column strpart(getline(s:lineNum), a:column - 1, 1) 'will have length' (GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1) (l:isMore ? 'do it' : 'stop')
+"****D echomsg 'at column' a:column strpart(getline(s:lineNum), a:column - 1, 1) 'will have length' (GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1) (l:isMore ? 'do it' : 'stop')
 
     return l:isMore
 endfunction
@@ -104,7 +104,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 	let l:cmd .= 'echon "'
     endif
 
-echomsg 'start at virtstartcol' s:virtStartCol
+"****D echomsg 'start at virtstartcol' s:virtStartCol
     while s:IsMoreToRead( l:column )
 	let l:group = synIDattr(synID(a:lineNum, l:column, 1), 'name')
 	if l:group != l:prev_group
@@ -121,13 +121,14 @@ echomsg 'start at virtstartcol' s:virtStartCol
 	endif
 	let l:column += strlen(l:char)
     endwhile
-    echomsg '**** from' s:virtStartCol 'last col added' l:column - 1 | echomsg ''
+"****D echomsg '**** from' s:virtStartCol 'last col added' l:column - 1 | echomsg ''
 
     if a:maxLength > 0 && GetCharacter(l:line, l:column) == "\t"
 	" The line has been truncated before a <Tab> character, so the maximum
 	" length has not been used up. As there may be a highlighting prolonged
 	" by the <Tab>, we still want to fill up the maximum length. 
 	let l:width = s:virtStartCol + a:maxLength - VirtStartCol(a:lineNum, l:column)
+	if empty(l:cmd) | let l:cmd .= 'echon "' | endif
 	let l:cmd .= repeat('.', l:width) 
     endif
 
