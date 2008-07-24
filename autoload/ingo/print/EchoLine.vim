@@ -8,7 +8,7 @@
 "
 " $Header: /usr/home/gary/.vim/autoload/RCS/ShowLine.vim,v 1.1 2002/08/15 20:03:36 gary Exp $
 
-function! EchoLine#EchoLinePart( lineNum, startCol, endCol, additionalHighlighting )
+function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additionalHighlighting )
 "*******************************************************************************
 "* PURPOSE:
 "   Display the current buffer's a:lineNum in the command line, using that
@@ -19,31 +19,52 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, additionalHighlighti
 "* EFFECTS / POSTCONDITIONS:
 "   :echo's to the command line. 
 "* INPUTS:
-"   a:lineNum	line number in current buffer to be displayed
-"   a:startCol	column number from where to start displaying (0: column 1)
-"   a:endCol	last column number to be displayed (0: line's last column)
+"   a:lineNum	Line number in current buffer to be displayed
+"   a:startCol	Column number from where to start displaying (0: column 1)
+"   a:endCol	Last column number to be displayed (0: line's last column)
+"   a:maxLength	Maximum number of characters to be displayed; this can be
+"		different from (a:endCol - a:startCol) if the line contains
+"		<Tab> characters, and is useful to avoid the "Hit ENTER" prompt.
+"		(0: unlimited length)
 "   a:additionalHighlighting	
 "* RETURN VALUES: 
 "   none
 "*******************************************************************************
     let l:cmd = ''
     let l:prev_group = ' '    " Something that won't match any syntax group name.
+    let l:line = getline(a:lineNum)
 
     let l:column = (a:startCol == 0 ? 1 : a:startCol)
-    let l:endCol = (a:endCol == 0 ? strlen(getline(a:lineNum)) : a:endCol)
+    " To calculate the virtual start column, all tabs before the start column
+    " must be rendered. 
+    let l:virtCol = strlen(EchoWithoutScrolling#RenderTabs( strpart(l:line, 0, l:column - 1), &l:tabstop, 1 )) + 1
+    let l:virtStartCol = l:virtCol
+
+    let l:endCol = (a:endCol == 0 ? strlen(l:line) : a:endCol)
 
     if l:column == l:endCol
 	let l:cmd .= 'echon "'
     endif
 
-    while l:column <= l:endCol
+    while l:column <= l:endCol && (a:maxLength <= 0 || (l:virtCol - l:virtStartCol < a:maxLength))
 	let l:group = synIDattr(synID(a:lineNum, l:column, 1), 'name')
 	if l:group != l:prev_group
 	    let l:cmd .= (empty(l:cmd) ? '' : '"|')
 	    let l:cmd .= 'echohl ' . (empty(l:group) ? 'NONE' : l:group) . '|echon "'
 	    let l:prev_group = l:group
 	endif
-	let l:cmd .= escape( strpart(getline(a:lineNum), l:column - 1, 1), '"\' )
+	let l:char = escape( strpart(l:line, l:column - 1, 1), '"\' )
+	if l:char == "\t"
+	    let l:width = EchoWithoutScrolling#GetTabReplacement(l:virtCol, &l:tabstop)
+	    if a:maxLength > 0 && l:virtCol + l:width - l:virtStartCol > a:maxLength
+		let l:width = l:virtStartCol + a:maxLength - l:virtCol
+	    endif
+	    let l:cmd .= repeat('.', l:width)
+	    let l:virtCol += l:width
+	else
+	    let l:cmd .= l:char
+	    let l:virtCol += 1
+	endif
 	let l:column += 1
     endwhile
 
