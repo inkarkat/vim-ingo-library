@@ -8,13 +8,22 @@
 "
 " $Header: /usr/home/gary/.vim/autoload/RCS/ShowLine.vim,v 1.1 2002/08/15 20:03:36 gary Exp $
 
-function! s:VirtStartCol( lineNum, column )
+function! VirtStartCol( lineNum, column )
     " As virtcol() returns the end position of a <Tab>, we need to decrement the
     " start column, then increment the result, because we're interested in the
     " start column. 
-    return virtcol([a:lineNum, a:column - 1]) + 1
+    "return virtcol([a:lineNum, a:column - 1]) + 1
+    return GetVirtStartColOfCurrentCharacter(a:lineNum, a:column)
 endfunction
 
+function! GetVirtStartColOfCurrentCharacter( lineNum, column )
+    let l:currentVirtCol = GetVirtColOfCurrentCharacter(a:lineNum, a:column)
+    let l:offset = 1
+    while virtcol([a:lineNum, a:column - l:offset]) == l:currentVirtCol
+	let l:offset += 1
+    endwhile
+    return virtcol([a:lineNum, a:column - l:offset]) + 1
+endfunction
 function! GetVirtColOfCurrentCharacter( lineNum, column )
     " virtcol() only returns the (end) virtual column of the current character
     " if the column points to the first byte of a multi-byte character. If we're
@@ -47,11 +56,15 @@ function! s:IsMoreToRead( column )
 
     " The end column has not been reached yet, but a maximum length has been
     " set. We need to determine whether the next character would still fit. 
-    let l:isMore =  (GetVirtColOfNextCharacter(s:lineNum, a:column) - s:virtStartCol + 1 <= s:maxLength)
+    let l:isMore =  (GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1 <= s:maxLength)
 
-echomsg 'at column' a:column strpart(getline(s:lineNum), a:column - 1, 1) 'will have length' (GetVirtColOfNextCharacter(s:lineNum, a:column) - s:virtStartCol + 1) (l:isMore ? 'do it' : 'stop')
+echomsg 'at column' a:column strpart(getline(s:lineNum), a:column - 1, 1) 'will have length' (GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1) (l:isMore ? 'do it' : 'stop')
 
     return l:isMore
+endfunction
+
+function! GetCharacter( line, column )
+    return matchstr( a:line, '\%' . a:column . 'c.' )
 endfunction
 
 function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additionalHighlighting )
@@ -82,7 +95,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 
     let l:column = (a:startCol == 0 ? 1 : a:startCol)
 
-    let s:virtStartCol = s:VirtStartCol(a:lineNum, l:column)
+    let s:virtStartCol = VirtStartCol(a:lineNum, l:column)
     let s:endCol = (a:endCol == 0 ? strlen(l:line) : a:endCol)
     let s:lineNum = a:lineNum
     let s:maxLength = a:maxLength
@@ -99,22 +112,22 @@ echomsg 'start at virtstartcol' s:virtStartCol
 	    let l:cmd .= 'echohl ' . (empty(l:group) ? 'NONE' : l:group) . '|echon "'
 	    let l:prev_group = l:group
 	endif
-	let l:char = escape( strpart(l:line, l:column - 1, 1), '"\' )
+	let l:char = GetCharacter(l:line, l:column)
 	if l:char == "\t"
-	    let l:width = EchoWithoutScrolling#GetTabReplacement(s:VirtStartCol(a:lineNum, l:column), &l:tabstop)
+	    let l:width = EchoWithoutScrolling#GetTabReplacement(VirtStartCol(a:lineNum, l:column), &l:tabstop)
 	    let l:cmd .= repeat('.', l:width)
 	else
-	    let l:cmd .= l:char
+	    let l:cmd .= escape(l:char, '"\')
 	endif
-	let l:column += 1
+	let l:column += strlen(l:char)
     endwhile
     echomsg '**** from' s:virtStartCol 'last col added' l:column - 1 | echomsg ''
 
-    if a:maxLength > 0 && strpart(l:line, l:column - 1, 1) == "\t"
+    if a:maxLength > 0 && GetCharacter(l:line, l:column) == "\t"
 	" The line has been truncated before a <Tab> character, so the maximum
 	" length has not been used up. As there may be a highlighting prolonged
 	" by the <Tab>, we still want to fill up the maximum length. 
-	let l:width = s:virtStartCol + a:maxLength - s:VirtStartCol(a:lineNum, l:column)
+	let l:width = s:virtStartCol + a:maxLength - VirtStartCol(a:lineNum, l:column)
 	let l:cmd .= repeat('.', l:width) 
     endif
 
