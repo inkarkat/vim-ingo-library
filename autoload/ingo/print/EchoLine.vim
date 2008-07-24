@@ -8,6 +8,12 @@
 "
 " $Header: /usr/home/gary/.vim/autoload/RCS/ShowLine.vim,v 1.1 2002/08/15 20:03:36 gary Exp $
 
+function! s:VirtStartCol( lineNum, column )
+    " As virtcol() returns the end position of a <Tab>, we need to decrement the
+    " start column, then increment the result, because we're interested in the
+    " start column. 
+    return virtcol([a:lineNum, a:column - 1]) + 1
+endfunction
 function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additionalHighlighting )
 "*******************************************************************************
 "* PURPOSE:
@@ -35,9 +41,8 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
     let l:line = getline(a:lineNum)
 
     let l:column = (a:startCol == 0 ? 1 : a:startCol)
-    " To calculate the virtual start column, all tabs before the start column
-    " must be rendered. 
-    let l:virtCol = strlen(EchoWithoutScrolling#RenderTabs( strpart(l:line, 0, l:column - 1), &l:tabstop, 1 )) + 1
+
+    let l:virtCol = s:VirtStartCol(a:lineNum, l:column)
     let l:virtStartCol = l:virtCol
 
     let l:endCol = (a:endCol == 0 ? strlen(l:line) : a:endCol)
@@ -63,7 +68,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 	    let l:virtCol += l:width
 	else
 	    let l:cmd .= l:char
-	    let l:virtCol += 1
+	    let l:virtCol = s:VirtStartCol(a:lineNum, l:column + 1)
 	endif
 	let l:column += 1
     endwhile
