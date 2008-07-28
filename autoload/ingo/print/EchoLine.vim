@@ -1,20 +1,28 @@
-" Display the given line(s) from the current file in the command area (i.e.,
-" echo), using that line's syntax highlighting (i.e., WYSIWYG).
+" TODO: summary
 "
-" If no line number is given, display the current line.
+" DESCRIPTION:
+"   Display the given line(s) from the current file in the command line (i.e.
+"   via :echo), using that line's syntax highlighting (WYSIWYG).
+" USAGE:
+" INSTALLATION:
+" DEPENDENCIES:
+" CONFIGURATION:
+" INTEGRATION:
+" LIMITATIONS:
+" ASSUMPTIONS:
+" KNOWN PROBLEMS:
+" TODO:
 "
-" Regardless of how many line numbers are given, only the first &cmdheight
-" lines are shown (i.e., don't cause scrolling, and a "more" message).
+" Copyright: (C) 2008 by Ingo Karkat
+"   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
-" $Header: /usr/home/gary/.vim/autoload/RCS/ShowLine.vim,v 1.1 2002/08/15 20:03:36 gary Exp $
+" Maintainer:	Ingo Karkat <ingo@karkat.de>
+"
+" REVISION	DATE		REMARKS 
+"	001	00-Jan-2008	file creation
 
-function! VirtStartCol( lineNum, column )
-    " As virtcol() returns the end position of a <Tab>, we need to decrement the
-    " start column, then increment the result, because we're interested in the
-    " start column. 
-    "return virtcol([a:lineNum, a:column - 1]) + 1
-    return GetVirtStartColOfCurrentCharacter(a:lineNum, a:column)
-endfunction
+" Avoid installing when in unsupported VIM version. 
+if v:version < 700 | finish | endif
 
 function! GetVirtStartColOfCurrentCharacter( lineNum, column )
     let l:currentVirtCol = GetVirtColOfCurrentCharacter(a:lineNum, a:column)
@@ -67,6 +75,10 @@ function! GetCharacter( line, column )
     return matchstr( a:line, '\%' . a:column . 'c.' )
 endfunction
 
+function! s:GetTabReplacement( column, tabstop )
+    return a:tabstop - (a:column - 1) % a:tabstop
+endfunction 
+
 function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additionalHighlighting )
 "*******************************************************************************
 "* PURPOSE:
@@ -95,7 +107,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 
     let l:column = (a:startCol == 0 ? 1 : a:startCol)
 
-    let s:virtStartCol = VirtStartCol(a:lineNum, l:column)
+    let s:virtStartCol = GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
     let s:endCol = (a:endCol == 0 ? strlen(l:line) : a:endCol)
     let s:lineNum = a:lineNum
     let s:maxLength = a:maxLength
@@ -114,7 +126,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 	endif
 	let l:char = GetCharacter(l:line, l:column)
 	if l:char == "\t"
-	    let l:width = EchoWithoutScrolling#GetTabReplacement(VirtStartCol(a:lineNum, l:column), &l:tabstop)
+	    let l:width = s:GetTabReplacement(GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
 	    let l:cmd .= repeat('.', l:width)
 	else
 	    let l:cmd .= escape(l:char, '"\')
@@ -127,8 +139,10 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 	" The line has been truncated before a <Tab> character, so the maximum
 	" length has not been used up. As there may be a highlighting prolonged
 	" by the <Tab>, we still want to fill up the maximum length. 
-	let l:width = s:virtStartCol + a:maxLength - VirtStartCol(a:lineNum, l:column)
-	if empty(l:cmd) | let l:cmd .= 'echon "' | endif
+	let l:width = s:virtStartCol + a:maxLength - GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
+	if empty(l:cmd)
+	    let l:cmd .= 'echon "'
+	endif
 	let l:cmd .= repeat('.', l:width) 
     endif
 
@@ -231,3 +245,5 @@ function! ShowLine(...)
     "DEBUG call input('CMD='.cmd)
     exe cmd
 endfunction
+
+" vim: set sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
