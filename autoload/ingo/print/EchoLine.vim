@@ -24,15 +24,15 @@
 " Avoid installing when in unsupported VIM version. 
 if v:version < 700 | finish | endif
 
-function! GetVirtStartColOfCurrentCharacter( lineNum, column )
-    let l:currentVirtCol = GetVirtColOfCurrentCharacter(a:lineNum, a:column)
+function! s:GetVirtStartColOfCurrentCharacter( lineNum, column )
+    let l:currentVirtCol = s:GetVirtColOfCurrentCharacter(a:lineNum, a:column)
     let l:offset = 1
     while virtcol([a:lineNum, a:column - l:offset]) == l:currentVirtCol
 	let l:offset += 1
     endwhile
     return virtcol([a:lineNum, a:column - l:offset]) + 1
 endfunction
-function! GetVirtColOfCurrentCharacter( lineNum, column )
+function! s:GetVirtColOfCurrentCharacter( lineNum, column )
     " virtcol() only returns the (end) virtual column of the current character
     " if the column points to the first byte of a multi-byte character. If we're
     " pointing to the middle or end of a multi-byte character, the end virtual
@@ -46,14 +46,36 @@ function! GetVirtColOfCurrentCharacter( lineNum, column )
     endwhile
     return virtcol([a:lineNum, a:column - l:offset])
 endfunction
-function! GetVirtColOfNextCharacter( lineNum, column )
-    let l:currentVirtCol = GetVirtColOfCurrentCharacter(a:lineNum, a:column)
+function! s:GetVirtColOfNextCharacter( lineNum, column )
+    let l:currentVirtCol = s:GetVirtColOfCurrentCharacter(a:lineNum, a:column)
     let l:offset = 1
     while virtcol([a:lineNum, a:column + l:offset]) == l:currentVirtCol
 	let l:offset += 1
     endwhile
     return virtcol([a:lineNum, a:column + l:offset])
 endfunction
+
+function! s:GetCharacter( line, column )
+"*******************************************************************************
+"* PURPOSE:
+"   Retrieve a (full, in case of multi-byte) character from a:line, a:column. 
+"   strpart(getline(a:line), a:column, 1) can only deal with single-byte chars. 
+"* ASSUMPTIONS / PRECONDITIONS:
+"   none
+"* EFFECTS / POSTCONDITIONS:
+"   none
+"* INPUTS:
+"
+"* RETURN VALUES: 
+"   Character, or empty string if the position is invalid. 
+"*******************************************************************************
+    return matchstr( a:line, '\%' . a:column . 'c.' )
+endfunction
+
+function! s:GetTabReplacement( column, tabstop )
+    return a:tabstop - (a:column - 1) % a:tabstop
+endfunction 
+
 function! s:IsMoreToRead( column )
     if a:column > s:endCol 
 	return 0
@@ -64,21 +86,12 @@ function! s:IsMoreToRead( column )
 
     " The end column has not been reached yet, but a maximum length has been
     " set. We need to determine whether the next character would still fit. 
-    let l:isMore =  (GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1 <= s:maxLength)
+    let l:isMore =  (s:GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1 <= s:maxLength)
 
-"****D echomsg 'at column' a:column strpart(getline(s:lineNum), a:column - 1, 1) 'will have length' (GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1) (l:isMore ? 'do it' : 'stop')
+"****D echomsg 'at column' a:column strpart(getline(s:lineNum), a:column - 1, 1) 'will have length' (s:GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1) (l:isMore ? 'do it' : 'stop')
 
     return l:isMore
 endfunction
-
-function! GetCharacter( line, column )
-    return matchstr( a:line, '\%' . a:column . 'c.' )
-endfunction
-
-function! s:GetTabReplacement( column, tabstop )
-    return a:tabstop - (a:column - 1) % a:tabstop
-endfunction 
-
 function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additionalHighlighting )
 "*******************************************************************************
 "* PURPOSE:
@@ -107,7 +120,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 
     let l:column = (a:startCol == 0 ? 1 : a:startCol)
 
-    let s:virtStartCol = GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
+    let s:virtStartCol = s:GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
     let s:endCol = (a:endCol == 0 ? strlen(l:line) : a:endCol)
     let s:lineNum = a:lineNum
     let s:maxLength = a:maxLength
@@ -124,9 +137,9 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 	    let l:cmd .= 'echohl ' . (empty(l:group) ? 'NONE' : l:group) . '|echon "'
 	    let l:prev_group = l:group
 	endif
-	let l:char = GetCharacter(l:line, l:column)
+	let l:char = s:GetCharacter(l:line, l:column)
 	if l:char == "\t"
-	    let l:width = s:GetTabReplacement(GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
+	    let l:width = s:GetTabReplacement(s:GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
 	    let l:cmd .= repeat('.', l:width)
 	else
 	    let l:cmd .= escape(l:char, '"\')
@@ -135,11 +148,11 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
     endwhile
 "****D echomsg '**** from' s:virtStartCol 'last col added' l:column - 1 | echomsg ''
 
-    if a:maxLength > 0 && GetCharacter(l:line, l:column) == "\t"
+    if a:maxLength > 0 && s:GetCharacter(l:line, l:column) == "\t"
 	" The line has been truncated before a <Tab> character, so the maximum
 	" length has not been used up. As there may be a highlighting prolonged
 	" by the <Tab>, we still want to fill up the maximum length. 
-	let l:width = s:virtStartCol + a:maxLength - GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
+	let l:width = s:virtStartCol + a:maxLength - s:GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
 	if empty(l:cmd)
 	    let l:cmd .= 'echon "'
 	endif
@@ -172,6 +185,22 @@ function! EchoLine#EchoLine( lineNum, centerCol, prefix, additionalHighlighting 
 "* RETURN VALUES: 
 "   none
 "*******************************************************************************
+
+    let l:maxLength = EchoWithoutScrolling#MaxLength() - EchoWithoutScrolling#DetermineVirtColNum(a:prefix)
+    let l:line = getline(line('.'))
+
+    " The a:centerCol is specified in buffer columns, but the l:maxLength is in
+    " screen space. To (more or less) bridge this mismatch, a constant factor of
+    " 0 < (# of chars / bytes) <= 100 is assumed. 
+    let l:numOfChars = strlen(substitute(EchoWithoutScrolling#RenderTabs(l:line, &tabstop, 1), '.', 'x', 'g'))
+    let l:lengthToColFactor = 100 * l:numOfChars / strlen(l:line)
+"****D echomsg '****' l:lengthToColFactor
+
+    " Attention: columns start with 1, byteidx() starts with 0!
+    let l:startCol = byteidx( l:line, max([1, (a:centerCol * l:lengthToColFactor / 100) - (l:maxLength / 2)]) - 1 ) + 1
+
+    echon a:prefix
+    call EchoLine#EchoLinePart( a:lineNum, l:startCol, 0, l:maxLength, a:additionalHighlighting )
 endfunction
 
 function! ShowLine(...)
