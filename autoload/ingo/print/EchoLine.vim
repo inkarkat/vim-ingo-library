@@ -92,6 +92,23 @@ function! s:IsMoreToRead( column )
 
     return l:isMore
 endfunction
+function! s:IsInside( startCol, endCol, column )
+    return a:column >= a:startCol && a:column <= a:endCol
+endfunction
+function! s:GetAdditionalHighlightGroup( highlightings, column )
+    for h in a:highlightings
+	if s:IsInside( h[0], h[1], a:column )
+	    return h[2]
+	endif
+    endfor
+endfunction
+function! s:GetHighlighting( line, column, highlightings )
+    let l:group = s:GetAdditionalHighlightGroup( a:highlightings, a:column )
+    if empty(l:group)
+	let l:group = synIDattr(synID(a:line, a:column, 1), 'name')
+    endif
+    return l:group
+endfunction
 function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additionalHighlighting )
 "*******************************************************************************
 "* PURPOSE:
@@ -111,6 +128,11 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 "		<Tab> characters, and is useful to avoid the "Hit ENTER" prompt.
 "		(0: unlimited length)
 "   a:additionalHighlighting	
+"		List of additional highlightings that should be layered on top
+"		of the line's highlighting. Each list element consists of
+"		[ startCol, endCol, highlightGroup ]. In case there is overlap
+"		in the ranges, the first element that specifies a highlight
+"		group for a column wins. 
 "* RETURN VALUES: 
 "   none
 "*******************************************************************************
@@ -131,7 +153,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 
 "****D echomsg 'start at virtstartcol' s:virtStartCol
     while s:IsMoreToRead( l:column )
-	let l:group = synIDattr(synID(a:lineNum, l:column, 1), 'name')
+	let l:group = s:GetHighlighting(a:lineNum, l:column, a:additionalHighlighting)
 	if l:group != l:prev_group
 	    let l:cmd .= (empty(l:cmd) ? '' : '"|')
 	    let l:cmd .= 'echohl ' . (empty(l:group) ? 'NONE' : l:group) . '|echon "'
