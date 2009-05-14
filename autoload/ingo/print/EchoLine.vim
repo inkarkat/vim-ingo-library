@@ -1,8 +1,12 @@
-" EchoLine.vim
+" EchoLine.vim: :echo a line from the buffer with the original syntax
+" highlighting. 
 "
 " DESCRIPTION:
-"   Display the given line(s) from the current file in the command line (i.e.
-"   via :echo), using that line's syntax highlighting (WYSIWYG).
+"   Display the given line from the current buffer in the command line (i.e. via
+"   :echo), using that line's syntax highlighting (i.e. as it is highlighted in
+"   the buffer itself). 
+"   If the line is longer than the available width in the command line, the
+"   output is truncated so that no hit-enter prompt appears. 
 "
 " USAGE:
 " INSTALLATION:
@@ -16,16 +20,17 @@
 " KNOWN PROBLEMS:
 " TODO:
 "
-" Copyright: (C) 2008 by Ingo Karkat
+" Copyright: (C) 2008-2009 by Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
+" Source: Based on ShowLine.vim (vimscript #381) by Gary Holloway
 "
 " REVISION	DATE		REMARKS 
-"	001	00-Jan-2008	file creation
-
-" Avoid installing when in unsupported VIM version. 
-if v:version < 700 | finish | endif
+"	003	15-May-2009	Cleanup. 
+"	002	04-Aug-2008	Added s:GetCharacter(). 
+"				Finished implementation. 
+"	001	23-Jul-2008	file creation
 
 function! s:GetVirtStartColOfCurrentCharacter( lineNum, column )
     let l:currentVirtCol = s:GetVirtColOfCurrentCharacter(a:lineNum, a:column)
@@ -234,78 +239,6 @@ function! EchoLine#EchoLine( lineNum, centerCol, prefix, additionalHighlighting 
 
     echon a:prefix
     call EchoLine#EchoLinePart( a:lineNum, l:startCol, 0, l:maxLength, a:additionalHighlighting )
-endfunction
-
-function! ShowLine(...)
-    " This makes sure we start (subsequent) echo's on the first line in the
-    " command-line area.
-    "
-    echo ''
-
-    let cmd	  = ''
-    let prev_group = ' x '    " Something that won't match any syntax group name.
-
-    if a:0 == 0
-	call ShowLine(line("."))
-	return
-    endif
-
-    let argn = 1
-    let show = 0
-    while argn <= a:0 "{
-	if a:{argn} > 0
-	    let show = show + 1
-	endif
-	let argn = argn + 1
-    endwhile "}
-    if &cmdheight < show && show <= 5
-	let &cmdheight = show
-    endif
-
-    let argn  = 1
-    let shown = 0
-    while argn <= a:0 "{
-	if a:{argn} > 0 "{
-	    if shown > 0
-		let cmd = cmd . '\n'
-	    endif
-
-	    let shown  = shown + 1
-	    let length = strlen(getline(a:{argn}))
-	    let column = 1
-
-	    if length == 0
-		let cmd = cmd . 'echon "'
-	    endif
-
-	    while column <= length "{
-		let group = synIDattr(synID(a:{argn}, column, 1), 'name')
-		if group != prev_group
-		    if cmd != ''
-			let cmd = cmd . '"|'
-		    endif
-		    let cmd = cmd . 'echohl ' . (group == '' ? 'NONE' : group) . '|echon "'
-		    let prev_group = group
-		endif
-		let char = strpart(getline(a:{argn}), column - 1, 1)
-		if char == '"' || char == "\\"
-		    let char = '\' . char
-		endif
-		let cmd = cmd . char
-		let column = column + 1
-	    endwhile "}
-
-	    if shown == &cmdheight
-		break
-	    endif
-	endif "}
-
-	let argn = argn + 1
-    endwhile "}
-
-    let cmd = cmd . '"|echohl None'
-    "DEBUG call input('CMD='.cmd)
-    exe cmd
 endfunction
 
 " vim: set sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
