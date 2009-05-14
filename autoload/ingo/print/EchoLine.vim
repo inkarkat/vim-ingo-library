@@ -19,6 +19,8 @@
 " ASSUMPTIONS:
 " KNOWN PROBLEMS:
 " TODO:
+"   - <Tab> are currently always rendered as ......; maybe use the settings from
+"     'listchars'. 
 "
 " Copyright: (C) 2008-2009 by Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
@@ -28,6 +30,9 @@
 "
 " REVISION	DATE		REMARKS 
 "	003	15-May-2009	Cleanup. 
+"				BF: Now translating <CR> and <LF> characters
+"				into printable characters instead of letting
+"				:echo break the line. 
 "	002	04-Aug-2008	Added s:GetCharacter(). 
 "				Finished implementation. 
 "	001	23-Jul-2008	file creation
@@ -165,13 +170,21 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 	let l:group = s:GetHighlighting(a:lineNum, l:column)
 	if l:group != l:prev_group
 	    let l:cmd .= (empty(l:cmd) ? '' : '"|')
-	    let l:cmd .= 'echohl ' . (empty(l:group) ? 'NONE' : l:group) . '|echon "'
+	    let l:cmd .= 'echohl ' . (empty(l:group) ? 'None' : l:group) . '|echon "'
 	    let l:prev_group = l:group
 	endif
 	let l:char = s:GetCharacter(l:line, l:column)
 	if l:char == "\t"
 	    let l:width = s:GetTabReplacement(s:GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
 	    let l:cmd .= repeat('.', l:width)
+
+	" The :echo command observes embedded line breaks (in contrast to
+	" :echomsg), which would mess up a single-line message that contains
+	" embedded \n = <CR> = ^M or <LF> = ^@.
+	elseif l:char == "\<CR>"
+	    let l:cmd .= '^M'
+	elseif l:char == "\<LF>"
+	    let l:cmd .= '^@'
 	else
 	    let l:cmd .= escape(l:char, '"\')
 	endif
