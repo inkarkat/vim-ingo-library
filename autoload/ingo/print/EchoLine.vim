@@ -1,11 +1,14 @@
-" TODO: summary
+" EchoLine.vim
 "
 " DESCRIPTION:
 "   Display the given line(s) from the current file in the command line (i.e.
 "   via :echo), using that line's syntax highlighting (WYSIWYG).
+"
 " USAGE:
 " INSTALLATION:
 " DEPENDENCIES:
+"   - EchoWithoutScrolling.vim autoload script
+"
 " CONFIGURATION:
 " INTEGRATION:
 " LIMITATIONS:
