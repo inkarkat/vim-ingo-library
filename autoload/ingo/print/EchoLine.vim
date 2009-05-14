@@ -95,15 +95,15 @@ endfunction
 function! s:IsInside( startCol, endCol, column )
     return a:column >= a:startCol && a:column <= a:endCol
 endfunction
-function! s:GetAdditionalHighlightGroup( highlightings, column )
-    for h in a:highlightings
+function! s:GetAdditionalHighlightGroup( column )
+    for h in s:additionalHighlighting
 	if s:IsInside( h[0], h[1], a:column )
 	    return h[2]
 	endif
     endfor
 endfunction
-function! s:GetHighlighting( line, column, highlightings )
-    let l:group = s:GetAdditionalHighlightGroup( a:highlightings, a:column )
+function! s:GetHighlighting( line, column )
+    let l:group = s:GetAdditionalHighlightGroup( a:column )
     if empty(l:group)
 	let l:group = synIDattr(synID(a:line, a:column, 1), 'name')
     endif
@@ -120,9 +120,9 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 "* EFFECTS / POSTCONDITIONS:
 "   :echo's to the command line. 
 "* INPUTS:
-"   a:lineNum	Line number in current buffer to be displayed
-"   a:startCol	Column number from where to start displaying (0: column 1)
-"   a:endCol	Last column number to be displayed (0: line's last column)
+"   a:lineNum	Line number in current buffer to be displayed. 
+"   a:startCol	Column number from where to start displaying (0: column 1). 
+"   a:endCol	Last column number to be displayed (0: line's last column). 
 "   a:maxLength	Maximum number of characters to be displayed; this can be
 "		different from (a:endCol - a:startCol) if the line contains
 "		<Tab> characters, and is useful to avoid the "Hit ENTER" prompt.
@@ -146,6 +146,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
     let s:endCol = (a:endCol == 0 ? strlen(l:line) : a:endCol)
     let s:lineNum = a:lineNum
     let s:maxLength = a:maxLength
+    let s:additionalHighlighting = a:additionalHighlighting
 
     if l:column == s:endCol
 	let l:cmd .= 'echon "'
@@ -153,7 +154,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 
 "****D echomsg 'start at virtstartcol' s:virtStartCol
     while s:IsMoreToRead( l:column )
-	let l:group = s:GetHighlighting(a:lineNum, l:column, a:additionalHighlighting)
+	let l:group = s:GetHighlighting(a:lineNum, l:column)
 	if l:group != l:prev_group
 	    let l:cmd .= (empty(l:cmd) ? '' : '"|')
 	    let l:cmd .= 'echohl ' . (empty(l:group) ? 'NONE' : l:group) . '|echon "'
@@ -181,7 +182,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 	let l:cmd .= repeat('.', l:width) 
     endif
 
-    let l:cmd .= '"|echohl NONE'
+    let l:cmd .= '"|echohl None'
     "DEBUG call input('CMD='.l:cmd)
     exe l:cmd
 endfunction
@@ -200,10 +201,17 @@ function! EchoLine#EchoLine( lineNum, centerCol, prefix, additionalHighlighting 
 "* EFFECTS / POSTCONDITIONS:
 "   :echo's to the command line, avoiding the "Hit ENTER" prompt. 
 "* INPUTS:
-"   a:lineNum	line number in current buffer to be displayed
-"   a:centerCol	column number of the line that will be centered if the line is
+"   a:lineNum	Line number in current buffer to be displayed. 
+"   a:centerCol	Column number of the line that will be centered if the line is
 "		too long to be displayed completely. Use 0 for truncation only
 "		at the right side. 
+"   a:prefix	String that will be echoed before the line. 
+"   a:additionalHighlighting	
+"		List of additional highlightings that should be layered on top
+"		of the line's highlighting. Each list element consists of
+"		[ startCol, endCol, highlightGroup ]. In case there is overlap
+"		in the ranges, the first element that specifies a highlight
+"		group for a column wins. 
 "* RETURN VALUES: 
 "   none
 "*******************************************************************************
@@ -292,7 +300,7 @@ function! ShowLine(...)
 	let argn = argn + 1
     endwhile "}
 
-    let cmd = cmd . '"|echohl NONE'
+    let cmd = cmd . '"|echohl None'
     "DEBUG call input('CMD='.cmd)
     exe cmd
 endfunction
