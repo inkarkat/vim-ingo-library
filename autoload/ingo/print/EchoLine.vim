@@ -33,6 +33,12 @@
 "				BF: Now translating <CR> and <LF> characters
 "				into printable characters instead of letting
 "				:echo break the line. 
+"				BF: Using the correct 'SpecialKey' highlighting
+"				for unprintable characters like Vim does. This
+"				highlighting is not reported by synID(), and
+"				thus must be taken care of separately. As a nice
+"				side effect, the rendering of <Tab> characters
+"				uses this highlighting, too. 
 "	002	04-Aug-2008	Added s:GetCharacter(). 
 "				Finished implementation. 
 "	001	23-Jul-2008	file creation
@@ -167,20 +173,35 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 
 "****D echomsg 'start at virtstartcol' s:virtStartCol
     while s:IsMoreToRead( l:column )
+	let l:char = s:GetCharacter(l:line, l:column)
 	let l:group = s:GetHighlighting(a:lineNum, l:column)
+
+	if l:char =~ '\%(\p\@![\x00-\xFF]\)'
+	    " Emulate the built-in highlighting of translated unprintable
+	    " characters here. The regexp also matches <CR> and <LF>, but no
+	    " non-ASCII multi-byte characters; the 'isprint' option is not
+	    " applicable to them. 
+	    let l:group = 'SpecialKey'
+	endif
+
 	if l:group != l:prev_group
 	    let l:cmd .= (empty(l:cmd) ? '' : '"|')
 	    let l:cmd .= 'echohl ' . (empty(l:group) ? 'None' : l:group) . '|echon "'
+"****D echomsg '****' printf('%4s', '"'. strtrans(l:char) . '"') l:group
 	    let l:prev_group = l:group
 	endif
-	let l:char = s:GetCharacter(l:line, l:column)
-	if l:char == "\t"
-	    let l:width = s:GetTabReplacement(s:GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
-	    let l:cmd .= repeat('.', l:width)
 
+	" <Tab> characters are rendered so that: 
+	" 1. The tab width is the same as in the buffer (even when the echoed
+	" position is shifted due to scrolling or a echo prefix). 
+	" 2. It can be differentiated from a sequence of spaces. 
+	"
 	" The :echo command observes embedded line breaks (in contrast to
 	" :echomsg), which would mess up a single-line message that contains
 	" embedded \n = <CR> = ^M or <LF> = ^@.
+	if l:char == "\t"
+	    let l:width = s:GetTabReplacement(s:GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
+	    let l:cmd .= repeat('.', l:width)
 	elseif l:char == "\<CR>"
 	    let l:cmd .= '^M'
 	elseif l:char == "\<LF>"
