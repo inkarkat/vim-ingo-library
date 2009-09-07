@@ -11,12 +11,14 @@
 " KNOWN PROBLEMS:
 " TODO:
 "
-" Copyright: (C) 2008 by Ingo Karkat
+" Copyright: (C) 2008-2009 by Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	002	18-Jun-2009	Replaced temporary mark z with mark " and using
+"				g` command to avoid clobbering jumplist. 
 "	001	24-Sep-2008	file creation from ingotextobjects.vim
 
 "- functions ------------------------------------------------------------------
@@ -54,8 +56,8 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 	    throw "This selection type has not been implemented."
 	endif
 	let l:textBeforeCharacterCnt = strlen(substitute(a:textBefore, ".", "x", "g"))
-	let l:restoreOriginalPosition = '`z' . l:textBeforeCharacterCnt . 'l'
-	execute 'normal! mzw' . l:backmotion . "i". a:textBefore . "\<Esc>" . l:backendmotion . "a" . a:textAfter . "\<Esc>" . l:restoreOriginalPosition
+	let l:restoreOriginalPosition = 'g`"' . l:textBeforeCharacterCnt . 'l'
+	execute 'normal! m"w' . l:backmotion . "i". a:textBefore . "\<Esc>" . l:backendmotion . "a" . a:textAfter . "\<Esc>" . l:restoreOriginalPosition
     endif
 endfunction
 
