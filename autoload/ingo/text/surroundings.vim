@@ -17,6 +17,13 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	003	08-Sep-2009	BF: Replaced mark " and g` command with
+"				getpos() / setpos() because m" didn't work on
+"				Vim 7.0/7.1, and caused the entire insertion to
+"				be aborted. This change also simplifies the
+"				logic to correct the saved cursor position,
+"				which can now be done with byte offsets instead
+"				of character offsets. 
 "	002	18-Jun-2009	Replaced temporary mark z with mark " and using
 "				g` command to avoid clobbering jumplist. 
 "	001	24-Sep-2008	file creation from ingotextobjects.vim
@@ -55,9 +62,13 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 	else
 	    throw "This selection type has not been implemented."
 	endif
-	let l:textBeforeCharacterCnt = strlen(substitute(a:textBefore, ".", "x", "g"))
-	let l:restoreOriginalPosition = 'g`"' . l:textBeforeCharacterCnt . 'l'
-	execute 'normal! m"w' . l:backmotion . "i". a:textBefore . "\<Esc>" . l:backendmotion . "a" . a:textAfter . "\<Esc>" . l:restoreOriginalPosition
+
+	let l:save_cursor = getpos('.')
+	execute 'normal! w' . l:backmotion . "i". a:textBefore . "\<Esc>" . l:backendmotion . "a" . a:textAfter . "\<Esc>"
+
+	" Adapt saved cursor position to consider inserted text. 
+	let l:save_cursor[2] += strlen(a:textBefore)
+	call setpos('.', l:save_cursor)
     endif
 endfunction
 
