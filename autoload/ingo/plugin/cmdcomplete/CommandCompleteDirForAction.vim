@@ -29,7 +29,7 @@
 "   ~/.vim/autoload). 
 
 " DEPENDENCIES:
-"   - Requires Vim 7.0 or higher. 
+"   - escapings.vim autoload script. 
 
 " CONFIGURATION:
 " INTEGRATION:
@@ -44,6 +44,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	003	27-Oct-2009	BUG: With optional argument, the a:filename
+"				passed to s:CommandWithOptionalArgument() must
+"				not be escaped, only all other filespec
+"				fragments. 
 "	002	26-Oct-2009	Added to arguments: a:commandAttributes e.g. to
 "				make buffer-local commands, a:defaultFilename to
 "				make the filename argument optional. 
@@ -67,9 +71,11 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, argLead )
 endfunction
 
 function! s:CommandWithOptionalArgument( action, defaultFilename, dirspec, filename )
-    let l:filespec = a:dirspec . (empty(a:filename) ? a:defaultFilename : a:filename)
     try
-	execute a:action escapings#fnameescape(l:filespec)
+	" a:filename comes from the custom command, and must be taken as is (the
+	" custom completion will have already escaped the completion). 
+	" All other filespec fragments still need escaping. 
+	execute a:action escapings#fnameescape(a:dirspec) . (empty(a:filename) ? escapings#fnameescape(a:defaultFilename) : a:filename)
     catch /^Vim\%((\a\+)\)\=:E/
 	echohl ErrorMsg
 	" v:exception contains what is normally in v:errmsg, but with extra
