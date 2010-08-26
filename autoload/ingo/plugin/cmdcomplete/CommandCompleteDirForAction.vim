@@ -47,6 +47,8 @@
 "	004	06-Jul-2010	Simplified CommandCompleteDirForAction#setup()
 "				interface via parameter hash that allows to omit
 "				defaults and makes it more easy to extend. 
+"				Implemented a:parameter.postAction, e.g. to
+"				:setfiletype after opening the file. 
 "	003	27-Oct-2009	BUG: With optional argument, the a:filename
 "				passed to s:CommandWithOptionalArgument() must
 "				not be escaped, only all other filespec
@@ -73,12 +75,35 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, argLead )
     endtry
 endfunction
 
-function! s:CommandWithOptionalArgument( action, defaultFilename, dirspec, filename )
+function! s:CommandWithOptionalArgument( action, postAction, defaultFilename, dirspec, filename )
     try
 	" a:filename comes from the custom command, and must be taken as is (the
 	" custom completion will have already escaped the completion). 
 	" All other filespec fragments still need escaping. 
 	execute a:action escapings#fnameescape(a:dirspec) . (empty(a:filename) ? escapings#fnameescape(a:defaultFilename) : a:filename)
+
+	if ! empty(a:postAction)
+	    execute a:postAction
+	endif
+    catch /^Vim\%((\a\+)\)\=:E/
+	echohl ErrorMsg
+	" v:exception contains what is normally in v:errmsg, but with extra
+	" exception source info prepended, which we cut away. 
+	let v:errmsg = substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
+	echomsg v:errmsg
+	echohl None
+    endtry
+endfunction
+function! s:CommandWithPostAction( action, postAction, dirspec, filename )
+    try
+	" a:filename comes from the custom command, and must be taken as is (the
+	" custom completion will have already escaped the completion). 
+	" All other filespec fragments still need escaping. 
+	execute a:action escapings#fnameescape(a:dirspec) . a:filename
+
+	if ! empty(a:postAction)
+	    execute a:postAction
+	endif
     catch /^Vim\%((\a\+)\)\=:E/
 	echohl ErrorMsg
 	" v:exception contains what is normally in v:errmsg, but with extra
@@ -114,6 +139,9 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "   a:parameters.action
 "	    Ex command (e.g. 'edit', 'split') to be invoked with the completed
 "	    filespec. Default is the :drop / :Drop command. 
+"   a:parameters.postAction
+"	    Ex command to be invoked after the file has been opened via
+"	    a:parameters.action. Default empty. 
 "   a:parameters.browsefilter
 "	    File wildcard (e.g. '*.txt') used for filtering the files in
 "	    a:dirspec. Default is empty string to include all (non-hidden) files. 
@@ -131,6 +159,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "*******************************************************************************
     let l:commandAttributes = get(a:parameters, 'commandAttributes', '')
     let l:action = get(a:parameters, 'action', ((exists(':Drop') == 2) ? 'Drop' : 'drop'))
+    let l:postAction = get(a:parameters, 'postAction', '')
     let l:browsefilter = get(a:parameters, 'browsefilter', '')
     let l:wildignore = get(a:parameters, 'wildignore', 0)
     let l:defaultFilename = get(a:parameters, 'defaultFilename', '')
@@ -143,12 +172,22 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     
     let l:isArgumentOptional = ! empty(l:defaultFilename)
     if l:isArgumentOptional
-	execute printf('command! -bar -nargs=? -complete=customlist,CompleteDir%s %s %s call <SID>CommandWithOptionalArgument(%s, %s, %s, <q-args>)',
+	execute printf('command! -bar -nargs=? -complete=customlist,CompleteDir%s %s %s call <SID>CommandWithOptionalArgument(%s, %s, %s, %s, <q-args>)',
 	\   s:count,
 	\   l:commandAttributes,
 	\   a:command,
 	\   string(l:action),
+	\   string(l:postAction),
 	\   string(l:defaultFilename),
+	\   string(a:dirspec),
+	\)
+    elseif ! empty(l:postAction)
+	execute printf('command! -bar -nargs=1 -complete=customlist,CompleteDir%s %s %s call <SID>CommandWithPostAction(%s, %s, %s, <q-args>)',
+	\   s:count,
+	\   l:commandAttributes,
+	\   a:command,
+	\   string(l:action),
+	\   string(l:postAction),
 	\   string(a:dirspec),
 	\)
     else
@@ -159,11 +198,20 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 	\   l:action,
 	\   a:dirspec
 	\)
+	" Unfortunately, we cannot simply append l:postAction to the direct
+	" definition of the command, as some l:action command (like :drop)
+	" cannot be chained via <Bar>. Wrapping the l:action in an :execute
+	" would force escaping of the quoting. 
+	" Additionally, the <Bar> chaining wouldn't short-circuit; i.e. the
+	" l:postAction would always execute, even if l:action failed. 
+	" Thus, we handle l:postAction via a separate s:CommandWithPostAction()
+	" wrapper function. 
     endif
 endfunction
 
-"call CommandCompleteDirForAction#setup( '', 'TestCommand', 'split', 'e:/a/ablage/', '*.txt', 0, '')
-"call CommandCompleteDirForAction#setup( '', 'TestCommand', 'split', 'e:/a/ablage/', '*.txt', 0, 'test.txt')
+"call CommandCompleteDirForAction#setup( 'TestCommand', '~/Ablage/', { 'browsefilter': '*.txt' })
+"call CommandCompleteDirForAction#setup( 'TestCommand', '~/Ablage/', { 'postAction': "echomsg 'opened it!'" })
+"call CommandCompleteDirForAction#setup( 'TestCommand', '~/Ablage/', { 'browsefilter': '*.txt', 'defaultFilename': 'test.txt' })
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
