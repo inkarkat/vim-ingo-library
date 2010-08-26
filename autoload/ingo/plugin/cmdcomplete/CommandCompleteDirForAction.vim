@@ -44,6 +44,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	005	27-Aug-2010	FIX: Filtering out subdirectories from the file
+"				completion candidates; opening them doesn't yet
+"				work, anyway, because only the file name itself
+"				is returned. 
 "	004	06-Jul-2010	Simplified CommandCompleteDirForAction#setup()
 "				interface via parameter hash that allows to omit
 "				defaults and makes it more easy to extend. 
@@ -69,7 +73,13 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, argLead )
 	let &wildignore = a:wildignore
     endif
     try
-	return map(split(glob(l:filespecWildcard), "\n"), 'escapings#fnameescape(fnamemodify(v:val, ":t"))')
+	return map(
+	\   filter(
+	\	split(glob(l:filespecWildcard), "\n"),
+	\	'! isdirectory(v:val)'
+	\   ),
+	\   'escapings#fnameescape(fnamemodify(v:val, ":t"))'
+	\)
     finally
 	let &wildignore = l:save_wildignore
     endtry
