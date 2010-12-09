@@ -45,13 +45,14 @@
 "
 " REVISION	DATE		REMARKS 
 "	005	27-Aug-2010	FIX: Filtering out subdirectories from the file
-"				completion candidates; opening them doesn't yet
-"				work, anyway, because only the file name itself
-"				is returned. 
+"				completion candidates. 
+"				ENH: Added a:parameters.isIncludeSubdirs flag to
+"				allow inclusion of subdirectories. Made this
+"				work even when a browsefilter is set. 
 "	004	06-Jul-2010	Simplified CommandCompleteDirForAction#setup()
 "				interface via parameter hash that allows to omit
 "				defaults and makes it more easy to extend. 
-"				Implemented a:parameter.postAction, e.g. to
+"				Implemented a:parameters.postAction, e.g. to
 "				:setfiletype after opening the file. 
 "	003	27-Oct-2009	BUG: With optional argument, the a:filename
 "				passed to s:CommandWithOptionalArgument() must
@@ -65,7 +66,15 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! s:CompleteFiles( dirspec, browsefilter, wildignore, argLead )
+function! s:RemoveDirspec( filespec, dirspecs )
+    for l:dirspec in a:dirspecs
+	if strpart(a:filespec, 0, strlen(l:dirspec)) ==# l:dirspec
+	    return strpart(a:filespec, strlen(l:dirspec))
+	endif
+    endfor
+    return a:filespec
+endfunction
+function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, argLead )
     let l:browsefilter = (empty(a:browsefilter) ? '*' : a:browsefilter)
     let l:filespecWildcard = a:dirspec . a:argLead . l:browsefilter
     let l:save_wildignore = &wildignore
@@ -73,13 +82,43 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, argLead )
 	let &wildignore = a:wildignore
     endif
     try
-	return map(
-	\   filter(
-	\	split(glob(l:filespecWildcard), "\n"),
-	\	'! isdirectory(v:val)'
-	\   ),
-	\   'escapings#fnameescape(fnamemodify(v:val, ":t"))'
-	\)
+	let l:filespecs = split(glob(l:filespecWildcard), "\n")
+
+	if a:isIncludeSubdirs
+	    " If the a:dirspec itself contains wildcards, there may be multiple
+	    " matches. 
+	    let l:pathSeparator = (exists('+shellslash') && ! &shellslash ? '\' : '/')
+	    let l:resolvedDirspecs = split(glob(a:dirspec), "\n")
+
+	    " If there is a browsefilter, we need to add all directories
+	    " separately, as most of them probably have been filtered away by
+	    " the (file-based) a:browsefilter. 
+	    if ! empty(a:browsefilter)
+		let l:dirspecWildcard = a:dirspec . a:argLead . '*' . l:pathSeparator
+		call extend(l:filespecs, split(glob(l:dirspecWildcard), "\n"))
+		call sort(l:filespecs) " Weave the directories into the files. 
+	    else
+		" glob() doesn't add a trailing path separator on directories
+		" unless the glob pattern has one at the end. Append the path
+		" separator here to be consistent with the alternative block
+		" above, the built-in completion, and because it makes sense to
+		" show the path separator. 
+		call map(l:filespecs, 'isdirectory(v:val) ? v:val . l:pathSeparator : v:val')
+	    endif
+
+	    return map(
+	    \   l:filespecs,
+	    \   'escapings#fnameescape(s:RemoveDirspec(v:val, l:resolvedDirspecs))'
+	    \)
+	else
+	    return map(
+	    \   filter(
+	    \	    l:filespecs,
+	    \	    '! isdirectory(v:val)'
+	    \   ),
+	    \   'escapings#fnameescape(fnamemodify(v:val, ":t"))'
+	    \)
+	endif
     finally
 	let &wildignore = l:save_wildignore
     endtry
@@ -155,12 +194,16 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "   a:parameters.browsefilter
 "	    File wildcard (e.g. '*.txt') used for filtering the files in
 "	    a:dirspec. Default is empty string to include all (non-hidden) files. 
+"	    Does not apply to subdirectories. 
 "   a:parameters.wildignore
 "	    Comma-separated list of file extensions to be ignored. This is
 "	    similar to a:parameters.browsefilter, but with inverted semantics,
 "	    only file extensions, and multiple possible values. Use empty string
 "	    to disable and pass 0 (the default) to keep the current global
 "	    'wildignore' setting. 
+"   a:parameters.isIncludeSubdirs
+"	    Flag whether subdirectories will be included in the completion
+"	    matches. By default, only files in a:dirspec itself will be offered. 
 "   a:parameters.defaultFilename
 "	    If not empty, the command will not require the filename argument,
 "	    and default to this filename if none is specified. 
@@ -172,13 +215,15 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     let l:postAction = get(a:parameters, 'postAction', '')
     let l:browsefilter = get(a:parameters, 'browsefilter', '')
     let l:wildignore = get(a:parameters, 'wildignore', 0)
+    let l:isIncludeSubdirs = get(a:parameters, 'isIncludeSubdirs', 0)
     let l:defaultFilename = get(a:parameters, 'defaultFilename', '')
 
     let s:count += 1
     execute 
-    \ printf("function! CompleteDir%s(ArgLead, CmdLine, CursorPos)\n", s:count) . 
-    \ printf("    return s:CompleteFiles(%s, %s, %s, a:ArgLead)\n", string(a:dirspec), string(l:browsefilter), string(l:wildignore)) .
-    \        "endfunction"
+    \	printf("function! CompleteDir%s(ArgLead, CmdLine, CursorPos)\n", s:count) . 
+    \	printf("    return s:CompleteFiles(%s, %s, %s, %d, a:ArgLead)\n",
+    \	    string(a:dirspec), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
+    \	) .    "endfunction"
     
     let l:isArgumentOptional = ! empty(l:defaultFilename)
     if l:isArgumentOptional
@@ -222,6 +267,8 @@ endfunction
 "call CommandCompleteDirForAction#setup( 'TestCommand', '~/Ablage/', { 'browsefilter': '*.txt' })
 "call CommandCompleteDirForAction#setup( 'TestCommand', '~/Ablage/', { 'postAction': "echomsg 'opened it!'" })
 "call CommandCompleteDirForAction#setup( 'TestCommand', '~/Ablage/', { 'browsefilter': '*.txt', 'defaultFilename': 'test.txt' })
+"call CommandCompleteDirForAction#setup('Vim', '~/Unixhome/.vim/', {'isIncludeSubdirs': 1})
+"call CommandCompleteDirForAction#setup('Vim', '~/Unixhome/.vim/', {'isIncludeSubdirs': 1, 'browsefilter' : '*.vim'})
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
