@@ -171,7 +171,9 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "   argument and executes the a:action Ex command with it. The command will have
 "   a custom completion that completes files from a:dirspec, with
 "   a:parameters.browsefilter applied and a:parameters.wildignore extensions
-"   filtered out. 
+"   filtered out. The custom completion will return the list of file (/
+"   directory / subdir path) names found. Those should be interpreter relative
+"   to and thus do not include a:dirspec. 
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None. 
 "* EFFECTS / POSTCONDITIONS:
@@ -208,7 +210,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "	    If not empty, the command will not require the filename argument,
 "	    and default to this filename if none is specified. 
 "* RETURN VALUES: 
-"	List of file names found (without the dirspec). 
+"   Name of the generated custom completion function. 
 "*******************************************************************************
     let l:commandAttributes = get(a:parameters, 'commandAttributes', '')
     let l:action = get(a:parameters, 'action', ((exists(':Drop') == 2) ? 'Drop' : 'drop'))
@@ -219,16 +221,17 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     let l:defaultFilename = get(a:parameters, 'defaultFilename', '')
 
     let s:count += 1
+    let l:completeFunctionName = 'CompleteDir' . s:count
     execute 
-    \	printf("function! CompleteDir%s(ArgLead, CmdLine, CursorPos)\n", s:count) . 
+    \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:completeFunctionName) . 
     \	printf("    return s:CompleteFiles(%s, %s, %s, %d, a:ArgLead)\n",
     \	    string(a:dirspec), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
     \	) .    "endfunction"
     
     let l:isArgumentOptional = ! empty(l:defaultFilename)
     if l:isArgumentOptional
-	execute printf('command! -bar -nargs=? -complete=customlist,CompleteDir%s %s %s call <SID>CommandWithOptionalArgument(%s, %s, %s, %s, <q-args>)',
-	\   s:count,
+	execute printf('command! -bar -nargs=? -complete=customlist,%s %s %s call <SID>CommandWithOptionalArgument(%s, %s, %s, %s, <q-args>)',
+	\   l:completeFunctionName,
 	\   l:commandAttributes,
 	\   a:command,
 	\   string(l:action),
@@ -237,8 +240,8 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 	\   string(a:dirspec),
 	\)
     elseif ! empty(l:postAction)
-	execute printf('command! -bar -nargs=1 -complete=customlist,CompleteDir%s %s %s call <SID>CommandWithPostAction(%s, %s, %s, <q-args>)',
-	\   s:count,
+	execute printf('command! -bar -nargs=1 -complete=customlist,%s %s %s call <SID>CommandWithPostAction(%s, %s, %s, <q-args>)',
+	\   l:completeFunctionName,
 	\   l:commandAttributes,
 	\   a:command,
 	\   string(l:action),
@@ -246,8 +249,8 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 	\   string(a:dirspec),
 	\)
     else
-	execute printf('command! -bar -nargs=1 -complete=customlist,CompleteDir%s %s %s %s %s<args>',
-	\   s:count,
+	execute printf('command! -bar -nargs=1 -complete=customlist,%s %s %s %s %s<args>',
+	\   l:completeFunctionName,
 	\   l:commandAttributes,
 	\   a:command,
 	\   l:action,
@@ -262,6 +265,8 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 	" Thus, we handle l:postAction via a separate s:CommandWithPostAction()
 	" wrapper function. 
     endif
+
+    return l:completeFunctionName
 endfunction
 
 "call CommandCompleteDirForAction#setup( 'TestCommand', '~/Ablage/', { 'browsefilter': '*.txt' })
