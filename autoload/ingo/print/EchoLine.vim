@@ -10,8 +10,13 @@
 "
 " USAGE:
 " INSTALLATION:
+"   Put the script into your user or system Vim autoload directory (e.g.
+"   ~/.vim/autoload). 
+
 " DEPENDENCIES:
-"   - EchoWithoutScrolling.vim autoload script
+"   - Requires Vim 7.0 or higher. 
+"   - EchoWithoutScrolling.vim autoload script. 
+"   - MultibyteVirtcol.vim autoload script. 
 "
 " CONFIGURATION:
 " INTEGRATION:
@@ -29,6 +34,8 @@
 " Source: Based on ShowLine.vim (vimscript #381) by Gary Holloway
 "
 " REVISION	DATE		REMARKS 
+"	004	02-Jul-2009	Factored out s:GetVirt...Character() functions
+"				into MultibyteVirtcol.vim autoload script. 
 "	003	15-May-2009	Cleanup. 
 "				BF: Now translating <CR> and <LF> characters
 "				into printable characters instead of letting
@@ -42,37 +49,6 @@
 "	002	04-Aug-2008	Added s:GetCharacter(). 
 "				Finished implementation. 
 "	001	23-Jul-2008	file creation
-
-function! s:GetVirtStartColOfCurrentCharacter( lineNum, column )
-    let l:currentVirtCol = s:GetVirtColOfCurrentCharacter(a:lineNum, a:column)
-    let l:offset = 1
-    while virtcol([a:lineNum, a:column - l:offset]) == l:currentVirtCol
-	let l:offset += 1
-    endwhile
-    return virtcol([a:lineNum, a:column - l:offset]) + 1
-endfunction
-function! s:GetVirtColOfCurrentCharacter( lineNum, column )
-    " virtcol() only returns the (end) virtual column of the current character
-    " if the column points to the first byte of a multi-byte character. If we're
-    " pointing to the middle or end of a multi-byte character, the end virtual
-    " column of the _next_ character is returned. 
-    let l:offset = 0
-    while virtcol([a:lineNum, a:column - l:offset]) == virtcol([a:lineNum, a:column + 1])
-	" If the next column's virtual column is the same, we're in the middle
-	" of a multi-byte character, and must backtrack to get this character's
-	" virtual column. 
-	let l:offset += 1
-    endwhile
-    return virtcol([a:lineNum, a:column - l:offset])
-endfunction
-function! s:GetVirtColOfNextCharacter( lineNum, column )
-    let l:currentVirtCol = s:GetVirtColOfCurrentCharacter(a:lineNum, a:column)
-    let l:offset = 1
-    while virtcol([a:lineNum, a:column + l:offset]) == l:currentVirtCol
-	let l:offset += 1
-    endwhile
-    return virtcol([a:lineNum, a:column + l:offset])
-endfunction
 
 function! s:GetCharacter( line, column )
 "*******************************************************************************
@@ -105,9 +81,9 @@ function! s:IsMoreToRead( column )
 
     " The end column has not been reached yet, but a maximum length has been
     " set. We need to determine whether the next character would still fit. 
-    let l:isMore =  (s:GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1 <= s:maxLength)
+    let l:isMore =  (MultibyteVirtcol#GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1 <= s:maxLength)
 
-"****D echomsg 'at column' a:column strpart(getline(s:lineNum), a:column - 1, 1) 'will have length' (s:GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1) (l:isMore ? 'do it' : 'stop')
+"****D echomsg 'at column' a:column strpart(getline(s:lineNum), a:column - 1, 1) 'will have length' (MultibyteVirtcol#GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1) (l:isMore ? 'do it' : 'stop')
 
     return l:isMore
 endfunction
@@ -161,7 +137,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 
     let l:column = (a:startCol == 0 ? 1 : a:startCol)
 
-    let s:virtStartCol = s:GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
+    let s:virtStartCol = MultibyteVirtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
     let s:endCol = (a:endCol == 0 ? strlen(l:line) : a:endCol)
     let s:lineNum = a:lineNum
     let s:maxLength = a:maxLength
@@ -200,7 +176,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 	" :echomsg), which would mess up a single-line message that contains
 	" embedded \n = <CR> = ^M or <LF> = ^@.
 	if l:char == "\t"
-	    let l:width = s:GetTabReplacement(s:GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
+	    let l:width = s:GetTabReplacement(MultibyteVirtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
 	    let l:cmd .= repeat('.', l:width)
 	elseif l:char == "\<CR>"
 	    let l:cmd .= '^M'
@@ -217,7 +193,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 	" The line has been truncated before a <Tab> character, so the maximum
 	" length has not been used up. As there may be a highlighting prolonged
 	" by the <Tab>, we still want to fill up the maximum length. 
-	let l:width = s:virtStartCol + a:maxLength - s:GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
+	let l:width = s:virtStartCol + a:maxLength - MultibyteVirtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
 	if empty(l:cmd)
 	    let l:cmd .= 'echon "'
 	endif
