@@ -11,12 +11,15 @@
 " KNOWN PROBLEMS:
 " TODO:
 "
-" Copyright: (C) 2008-2009 by Ingo Karkat
+" Copyright: (C) 2008-2010 by Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	004	24-Feb-2010	ENH: Supporting multi-word surrounding via
+"				supplied [count]. Evaluating v:count1 for
+"				selectionType 'w' and 'W'. 
 "	003	08-Sep-2009	BF: Replaced mark " and g` command with
 "				getpos() / setpos() because m" didn't work on
 "				Vim 7.0/7.1, and caused the entire insertion to
@@ -64,7 +67,7 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 	endif
 
 	let l:save_cursor = getpos('.')
-	execute 'normal! w' . l:backmotion . "i". a:textBefore . "\<Esc>" . l:backendmotion . "a" . a:textAfter . "\<Esc>"
+	execute 'normal! w' . l:backmotion . "i". a:textBefore . "\<Esc>" . v:count1 . l:backendmotion . "a" . a:textAfter . "\<Esc>"
 
 	" Adapt saved cursor position to consider inserted text. 
 	let l:save_cursor[2] += strlen(a:textBefore)
