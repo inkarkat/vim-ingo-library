@@ -44,6 +44,12 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	006	10-Dec-2010	ENH: Added a:parameters.overrideCompleteFunction
+"				and returning the generated completion function
+"				name in order to allow hooking into the
+"				completion. This is used by the :Vim command to
+"				also offer .vimrc and .gvimrc completion
+"				candidates. 
 "	005	27-Aug-2010	FIX: Filtering out subdirectories from the file
 "				completion candidates. 
 "				ENH: Added a:parameters.isIncludeSubdirs flag to
@@ -209,6 +215,12 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "   a:parameters.defaultFilename
 "	    If not empty, the command will not require the filename argument,
 "	    and default to this filename if none is specified. 
+"   a:parameters.overrideCompleteFunction
+"	    If not empty, will be used as the :command -complete=customlist,...
+"	    completion function name. This hook can be used to manipulate the
+"	    completion list. This overriding completion function probably will
+"	    still invoke the generated custom completion function, which is thus
+"	    returned from this setup function. 
 "* RETURN VALUES: 
 "   Name of the generated custom completion function. 
 "*******************************************************************************
@@ -221,9 +233,10 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     let l:defaultFilename = get(a:parameters, 'defaultFilename', '')
 
     let s:count += 1
-    let l:completeFunctionName = 'CompleteDir' . s:count
+    let l:generatedCompleteFunctionName = 'CompleteDir' . s:count
+    let l:completeFunctionName = get(a:parameters, 'overrideCompleteFunction', l:generatedCompleteFunctionName)
     execute 
-    \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:completeFunctionName) . 
+    \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:generatedCompleteFunctionName) . 
     \	printf("    return s:CompleteFiles(%s, %s, %s, %d, a:ArgLead)\n",
     \	    string(a:dirspec), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
     \	) .    "endfunction"
@@ -266,7 +279,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 	" wrapper function. 
     endif
 
-    return l:completeFunctionName
+    return l:generatedCompleteFunctionName
 endfunction
 
 "call CommandCompleteDirForAction#setup( 'TestCommand', '~/Ablage/', { 'browsefilter': '*.txt' })
