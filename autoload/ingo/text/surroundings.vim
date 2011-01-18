@@ -11,12 +11,15 @@
 " KNOWN PROBLEMS:
 " TODO:
 "
-" Copyright: (C) 2008-2010 by Ingo Karkat
+" Copyright: (C) 2008-2011 by Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	005	14-Jan-2011	FIX: Visual surround clobbered the unnamed
+"				register; now using the unnamed register and
+"				also saving the register mode. 
 "	004	24-Feb-2010	ENH: Supporting multi-word surrounding via
 "				supplied [count]. Evaluating v:count1 for
 "				selectionType 'w' and 'W'. 
@@ -46,15 +49,20 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 	call setreg('z', '', 'av')
 	execute 'normal! s' . a:textBefore . "\<C-R>\<C-O>z" . a:textAfter . "\<Esc>"
     elseif a:selectionType ==# 'v'
-	let l:save_register = @z
-	normal! gv"zs$
+	let l:save_clipboard = &clipboard
+	set clipboard= " Avoid clobbering the selection and clipboard registers. 
+	let l:save_reg = getreg('"')
+	let l:save_regmode = getregtype('"')
+
+	normal! gvs$
 
 	" Set paste type to characterwise; otherwise, linewise selections would
 	" be pasted _below_ the surrounded characters. 
-	call setreg('z', '', 'av')
+	call setreg('"', '', 'av')
 	execute 'normal! s' . a:textBefore . "\<C-R>\<C-O>z" . a:textAfter . "\<Esc>"
 
-	let @z = l:save_register
+	call setreg('"', l:save_reg, l:save_regmode)
+	let &clipboard = l:save_clipboard
     else
 	if a:selectionType ==# 'w'
 	    let l:backmotion = 'b'
