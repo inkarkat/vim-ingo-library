@@ -192,10 +192,10 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "		files will be completed. 
 "
 "   a:parameters.commandAttributes
-"	    Optional :command {attr}, e.g. <buffer>. 
+"	    Optional :command {attr}, e.g. <buffer>, -range. 
 "   a:parameters.action
-"	    Ex command (e.g. 'edit', 'split') to be invoked with the completed
-"	    filespec. Default is the :drop / :Drop command. 
+"	    Ex command (e.g. 'edit', '<line2>read') to be invoked with the
+"	    completed filespec. Default is the :drop / :Drop command. 
 "   a:parameters.postAction
 "	    Ex command to be invoked after the file has been opened via
 "	    a:parameters.action. Default empty. 
