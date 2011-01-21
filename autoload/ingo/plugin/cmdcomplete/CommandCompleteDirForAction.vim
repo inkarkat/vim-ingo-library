@@ -38,12 +38,18 @@
 " KNOWN PROBLEMS:
 " TODO:
 "
-" Copyright: (C) 2009-2010 by Ingo Karkat
+" Copyright: (C) 2009-2011 by Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	007	22-Jan-2011	Collapsed s:CommandWithOptionalArgument(),
+"				s:CommandWithPostAction() and the direct
+"				definition for a non-optional, non-postAction
+"				command into s:Command(), which already handles
+"				all cases anyway, getting rid of the
+"				conditional. 
 "	006	10-Dec-2010	ENH: Added a:parameters.overrideCompleteFunction
 "				and returning the generated completion function
 "				name in order to allow hooking into the
@@ -68,7 +74,6 @@
 "				make buffer-local commands, a:defaultFilename to
 "				make the filename argument optional. 
 "	001	26-Oct-2009	file creation
-
 let s:save_cpo = &cpo
 set cpo&vim
 
@@ -130,40 +135,22 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
     endtry
 endfunction
 
-function! s:CommandWithOptionalArgument( action, postAction, defaultFilename, dirspec, filename )
+function! s:Command( action, postAction, defaultFilename, dirspec, filename )
     try
 	" a:filename comes from the custom command, and must be taken as is (the
 	" custom completion will have already escaped the completion). 
 	" All other filespec fragments still need escaping. 
-	execute a:action escapings#fnameescape(a:dirspec) . (empty(a:filename) ? escapings#fnameescape(a:defaultFilename) : a:filename)
+	let l:filename = (empty(a:filename) ? escapings#fnameescape(a:defaultFilename) : a:filename)
+	execute a:action escapings#fnameescape(a:dirspec) . l:filename
 
 	if ! empty(a:postAction)
 	    execute a:postAction
 	endif
     catch /^Vim\%((\a\+)\)\=:E/
-	echohl ErrorMsg
 	" v:exception contains what is normally in v:errmsg, but with extra
 	" exception source info prepended, which we cut away. 
 	let v:errmsg = substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
-	echomsg v:errmsg
-	echohl None
-    endtry
-endfunction
-function! s:CommandWithPostAction( action, postAction, dirspec, filename )
-    try
-	" a:filename comes from the custom command, and must be taken as is (the
-	" custom completion will have already escaped the completion). 
-	" All other filespec fragments still need escaping. 
-	execute a:action escapings#fnameescape(a:dirspec) . a:filename
-
-	if ! empty(a:postAction)
-	    execute a:postAction
-	endif
-    catch /^Vim\%((\a\+)\)\=:E/
 	echohl ErrorMsg
-	" v:exception contains what is normally in v:errmsg, but with extra
-	" exception source info prepended, which we cut away. 
-	let v:errmsg = substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
 	echomsg v:errmsg
 	echohl None
     endtry
@@ -241,43 +228,15 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \	    string(a:dirspec), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
     \	) .    "endfunction"
     
-    let l:isArgumentOptional = ! empty(l:defaultFilename)
-    if l:isArgumentOptional
-	execute printf('command! -bar -nargs=? -complete=customlist,%s %s %s call <SID>CommandWithOptionalArgument(%s, %s, %s, %s, <q-args>)',
-	\   l:completeFunctionName,
-	\   l:commandAttributes,
-	\   a:command,
-	\   string(l:action),
-	\   string(l:postAction),
-	\   string(l:defaultFilename),
-	\   string(a:dirspec),
-	\)
-    elseif ! empty(l:postAction)
-	execute printf('command! -bar -nargs=1 -complete=customlist,%s %s %s call <SID>CommandWithPostAction(%s, %s, %s, <q-args>)',
-	\   l:completeFunctionName,
-	\   l:commandAttributes,
-	\   a:command,
-	\   string(l:action),
-	\   string(l:postAction),
-	\   string(a:dirspec),
-	\)
-    else
-	execute printf('command! -bar -nargs=1 -complete=customlist,%s %s %s %s %s<args>',
-	\   l:completeFunctionName,
-	\   l:commandAttributes,
-	\   a:command,
-	\   l:action,
-	\   a:dirspec
-	\)
-	" Unfortunately, we cannot simply append l:postAction to the direct
-	" definition of the command, as some l:action command (like :drop)
-	" cannot be chained via <Bar>. Wrapping the l:action in an :execute
-	" would force escaping of the quoting. 
-	" Additionally, the <Bar> chaining wouldn't short-circuit; i.e. the
-	" l:postAction would always execute, even if l:action failed. 
-	" Thus, we handle l:postAction via a separate s:CommandWithPostAction()
-	" wrapper function. 
-    endif
+    execute printf('command! -bar -nargs=? -complete=customlist,%s %s %s call <SID>Command(%s, %s, %s, %s, <q-args>)',
+    \   l:completeFunctionName,
+    \   l:commandAttributes,
+    \   a:command,
+    \   string(l:action),
+    \   string(l:postAction),
+    \   string(l:defaultFilename),
+    \   string(a:dirspec),
+    \)
 
     return l:generatedCompleteFunctionName
 endfunction
