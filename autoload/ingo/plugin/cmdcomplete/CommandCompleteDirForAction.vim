@@ -50,6 +50,12 @@
 "				command into s:Command(), which already handles
 "				all cases anyway, getting rid of the
 "				conditional. 
+"				ENH: Added
+"				a:parameters.FilenameProcessingFunction to allow
+"				processing of the completed or typed filespec.
+"				This is used by the :Vim command to correct the
+"				.vimrc to ../.vimrc when the name is fully
+"				typed, not completed. 
 "	006	10-Dec-2010	ENH: Added a:parameters.overrideCompleteFunction
 "				and returning the generated completion function
 "				name in order to allow hooking into the
@@ -135,12 +141,20 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
     endtry
 endfunction
 
-function! s:Command( action, postAction, defaultFilename, dirspec, filename )
+function! s:Command( action, postAction, defaultFilename, FilenameProcessingFunction, dirspec, filename )
     try
 	" a:filename comes from the custom command, and must be taken as is (the
 	" custom completion will have already escaped the completion). 
 	" All other filespec fragments still need escaping. 
 	let l:filename = (empty(a:filename) ? escapings#fnameescape(a:defaultFilename) : a:filename)
+
+	if ! empty(a:FilenameProcessingFunction)
+	    let l:filename = call(a:FilenameProcessingFunction, [l:filename])
+	endif
+	if empty(l:filename)
+	    return
+	endif
+
 	execute a:action escapings#fnameescape(a:dirspec) . l:filename
 
 	if ! empty(a:postAction)
@@ -208,6 +222,11 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "	    completion list. This overriding completion function probably will
 "	    still invoke the generated custom completion function, which is thus
 "	    returned from this setup function. 
+"   a:parameters.FilenameProcessingFunction
+"	    If not empty, will be passed the completed (or default) filespec,
+"	    and expects a processed filespec in return. (Or an empty string,
+"	    which will abort the command.) 
+"
 "* RETURN VALUES: 
 "   Name of the generated custom completion function. 
 "*******************************************************************************
@@ -218,6 +237,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     let l:wildignore = get(a:parameters, 'wildignore', 0)
     let l:isIncludeSubdirs = get(a:parameters, 'isIncludeSubdirs', 0)
     let l:defaultFilename = get(a:parameters, 'defaultFilename', '')
+    let l:FilenameProcessingFunction = get(a:parameters, 'FilenameProcessingFunction', '')
 
     let s:count += 1
     let l:generatedCompleteFunctionName = 'CompleteDir' . s:count
@@ -228,13 +248,14 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \	    string(a:dirspec), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
     \	) .    "endfunction"
     
-    execute printf('command! -bar -nargs=? -complete=customlist,%s %s %s call <SID>Command(%s, %s, %s, %s, <q-args>)',
+    execute printf('command! -bar -nargs=? -complete=customlist,%s %s %s call <SID>Command(%s, %s, %s, %s, %s, <q-args>)',
     \   l:completeFunctionName,
     \   l:commandAttributes,
     \   a:command,
     \   string(l:action),
     \   string(l:postAction),
     \   string(l:defaultFilename),
+    \	string(l:FilenameProcessingFunction),
     \   string(a:dirspec),
     \)
 
