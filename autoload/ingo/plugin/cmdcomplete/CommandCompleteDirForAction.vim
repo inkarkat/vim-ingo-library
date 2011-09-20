@@ -44,6 +44,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	008	21-Sep-2011	ENH: action and postAction now also support
+"				Funcrefs instead of Ex commands. 
 "	007	22-Jan-2011	Collapsed s:CommandWithOptionalArgument(),
 "				s:CommandWithPostAction() and the direct
 "				definition for a non-optional, non-postAction
@@ -141,7 +143,7 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
     endtry
 endfunction
 
-function! s:Command( action, postAction, defaultFilename, FilenameProcessingFunction, dirspec, filename )
+function! s:Command( Action, PostAction, defaultFilename, FilenameProcessingFunction, dirspec, filename )
     try
 	" a:filename comes from the custom command, and must be taken as is (the
 	" custom completion will have already escaped the completion). 
@@ -155,10 +157,18 @@ function! s:Command( action, postAction, defaultFilename, FilenameProcessingFunc
 	    return
 	endif
 
-	execute a:action escapings#fnameescape(a:dirspec) . l:filename
+	if type(a:Action) == 2
+	    call call(a:Action, [escapings#fnameescape(a:dirspec), l:filename])
+	else
+	    execute a:Action escapings#fnameescape(a:dirspec) . l:filename
+	endif
 
-	if ! empty(a:postAction)
-	    execute a:postAction
+	if ! empty(a:PostAction)
+	    if type(a:PostAction) == 2
+		call call(a:PostAction, [])
+	    else
+		execute a:PostAction
+	    endif
 	endif
     catch /^Vim\%((\a\+)\)\=:E/
 	" v:exception contains what is normally in v:errmsg, but with extra
@@ -175,12 +185,12 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "*******************************************************************************
 "* PURPOSE:
 "   Define a custom a:command that takes an (potentially optional) single file
-"   argument and executes the a:action Ex command with it. The command will have
-"   a custom completion that completes files from a:dirspec, with
-"   a:parameters.browsefilter applied and a:parameters.wildignore extensions
-"   filtered out. The custom completion will return the list of file (/
-"   directory / subdir path) names found. Those should be interpreter relative
-"   to and thus do not include a:dirspec. 
+"   argument and executes the a:parameters.action command or Funcref with it.
+"   The command will have a custom completion that completes files from
+"   a:dirspec, with a:parameters.browsefilter applied and
+"   a:parameters.wildignore extensions filtered out. The custom completion will
+"   return the list of file (/ directory / subdir path) names found. Those
+"   should be interpreter relative to and thus do not include a:dirspec. 
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None. 
 "* EFFECTS / POSTCONDITIONS:
@@ -197,9 +207,14 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "   a:parameters.action
 "	    Ex command (e.g. 'edit', '<line2>read') to be invoked with the
 "	    completed filespec. Default is the :drop / :Drop command. 
+"	    Or Funcref to a function that takes the dirspec and filename (both
+"	    already escaped for use in an Ex command) and performs the action
+"	    itself. 
 "   a:parameters.postAction
 "	    Ex command to be invoked after the file has been opened via
 "	    a:parameters.action. Default empty. 
+"	    Or Funcref to a function that takes no arguments and performs the
+"	    post actions itself. 
 "   a:parameters.browsefilter
 "	    File wildcard (e.g. '*.txt') used for filtering the files in
 "	    a:dirspec. Default is empty string to include all (non-hidden) files. 
@@ -231,8 +246,8 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "   Name of the generated custom completion function. 
 "*******************************************************************************
     let l:commandAttributes = get(a:parameters, 'commandAttributes', '')
-    let l:action = get(a:parameters, 'action', ((exists(':Drop') == 2) ? 'Drop' : 'drop'))
-    let l:postAction = get(a:parameters, 'postAction', '')
+    let l:Action = get(a:parameters, 'action', ((exists(':Drop') == 2) ? 'Drop' : 'drop'))
+    let l:PostAction = get(a:parameters, 'postAction', '')
     let l:browsefilter = get(a:parameters, 'browsefilter', '')
     let l:wildignore = get(a:parameters, 'wildignore', 0)
     let l:isIncludeSubdirs = get(a:parameters, 'isIncludeSubdirs', 0)
@@ -252,8 +267,8 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \   l:completeFunctionName,
     \   l:commandAttributes,
     \   a:command,
-    \   string(l:action),
-    \   string(l:postAction),
+    \   string(l:Action),
+    \   string(l:PostAction),
     \   string(l:defaultFilename),
     \	string(l:FilenameProcessingFunction),
     \   string(a:dirspec),
@@ -262,6 +277,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     return l:generatedCompleteFunctionName
 endfunction
 
+"call CommandCompleteDirForAction#setup( 'TestCommand', '~/tmp/', {})
 "call CommandCompleteDirForAction#setup( 'TestCommand', '~/Ablage/', { 'browsefilter': '*.txt' })
 "call CommandCompleteDirForAction#setup( 'TestCommand', '~/Ablage/', { 'postAction': "echomsg 'opened it!'" })
 "call CommandCompleteDirForAction#setup( 'TestCommand', '~/Ablage/', { 'browsefilter': '*.txt', 'defaultFilename': 'test.txt' })
