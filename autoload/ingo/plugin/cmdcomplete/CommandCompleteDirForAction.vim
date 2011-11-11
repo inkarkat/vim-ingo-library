@@ -46,6 +46,14 @@
 " REVISION	DATE		REMARKS 
 "	008	21-Sep-2011	ENH: action and postAction now also support
 "				Funcrefs instead of Ex commands. 
+"				Generated command now actually demands argument
+"				unless a:parameters.defaultFilename is given. 
+"				a:parameters.defaultFilename can be empty,
+"				resulting in a command with optional argument
+"				and no filename passed to a:parameters.action;
+"				the action (probably a Funcref) is supposed to
+"				handle this. Beforehand, the command would be
+"				aborted if the filename was empty. 
 "	007	22-Jan-2011	Collapsed s:CommandWithOptionalArgument(),
 "				s:CommandWithPostAction() and the direct
 "				definition for a non-optional, non-postAction
@@ -153,9 +161,6 @@ function! s:Command( Action, PostAction, defaultFilename, FilenameProcessingFunc
 	if ! empty(a:FilenameProcessingFunction)
 	    let l:filename = call(a:FilenameProcessingFunction, [l:filename])
 	endif
-	if empty(l:filename)
-	    return
-	endif
 
 	if type(a:Action) == 2
 	    call call(a:Action, [escapings#fnameescape(a:dirspec), l:filename])
@@ -195,8 +200,8 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "   None. 
 "* EFFECTS / POSTCONDITIONS:
 "   Defines custom a:command that takes one filename argument, which will have
-"   filename completion from a:dirspec. If a:parameters.defaultFilename is not
-"   empty, the filename argument is optional. 
+"   filename completion from a:dirspec. Unless a:parameters.defaultFilename is
+"   provided, the filename argument is mandatory. 
 "* INPUTS:
 "   a:command   Name of the custom command to be defined. 
 "   a:dirspec	Directory (including trailing path separator!) from which
@@ -229,7 +234,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "	    Flag whether subdirectories will be included in the completion
 "	    matches. By default, only files in a:dirspec itself will be offered. 
 "   a:parameters.defaultFilename
-"	    If not empty, the command will not require the filename argument,
+"	    If specified, the command will not require the filename argument,
 "	    and default to this filename if none is specified. 
 "   a:parameters.overrideCompleteFunction
 "	    If not empty, will be used as the :command -complete=customlist,...
@@ -263,7 +268,8 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \	    string(a:dirspec), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
     \	) .    "endfunction"
     
-    execute printf('command! -bar -nargs=? -complete=customlist,%s %s %s call <SID>Command(%s, %s, %s, %s, %s, <q-args>)',
+    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s call <SID>Command(%s, %s, %s, %s, %s, <q-args>)',
+    \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'), 
     \   l:completeFunctionName,
     \   l:commandAttributes,
     \   a:command,
