@@ -17,6 +17,15 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	006	19-Jan-2011	BUG: Visual surround broken by previous change,
+"				need to explicitly specify the unnamed register,
+"				or it'll be just aliased to the small delete
+"				register, and then the setreg() will unalias,
+"				and the register contents suddenly are
+"				different! 
+"				FIX: Still clobbering of unnamed register for
+"				selectionType = 'z'; now using the black hole
+"				register. 
 "	005	14-Jan-2011	FIX: Visual surround clobbered the unnamed
 "				register; now using the unnamed register and
 "				also saving the register mode. 
@@ -47,19 +56,19 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 	" Set paste type to characterwise; otherwise, linewise selections would
 	" be pasted _below_ the surrounded characters. 
 	call setreg('z', '', 'av')
-	execute 'normal! s' . a:textBefore . "\<C-R>\<C-O>z" . a:textAfter . "\<Esc>"
+	execute 'normal! "_s' . a:textBefore . "\<C-R>\<C-O>z" . a:textAfter . "\<Esc>"
     elseif a:selectionType ==# 'v'
 	let l:save_clipboard = &clipboard
 	set clipboard= " Avoid clobbering the selection and clipboard registers. 
 	let l:save_reg = getreg('"')
 	let l:save_regmode = getregtype('"')
 
-	normal! gvs$
+	normal! gv""s$
 
 	" Set paste type to characterwise; otherwise, linewise selections would
 	" be pasted _below_ the surrounded characters. 
 	call setreg('"', '', 'av')
-	execute 'normal! s' . a:textBefore . "\<C-R>\<C-O>z" . a:textAfter . "\<Esc>"
+	execute 'normal! "_s' . a:textBefore . "\<C-R>\<C-O>\"" . a:textAfter . "\<Esc>"
 
 	call setreg('"', l:save_reg, l:save_regmode)
 	let &clipboard = l:save_clipboard
