@@ -108,7 +108,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 "*******************************************************************************
 "* PURPOSE:
 "   Display the current buffer's a:lineNum in the command line, using that
-"   line's syntax highlighting. Additional highlighting groups can be applied on
+"   line's syntax highlighting. Additional highlight groups can be applied on
 "   top. 
 "* ASSUMPTIONS / PRECONDITIONS:
 "   l:lineNum refers to existing line in current buffer. 
@@ -210,7 +210,7 @@ function! EchoLine#EchoLine( lineNum, centerCol, prefix, additionalHighlighting 
 "* PURPOSE:
 "   Display (part of) the current buffer's a:lineNum in the command line without
 "   causing the "Hit ENTER" prompt, using that line's syntax highlighting.
-"   Additional highlighting groups can be applied on top. The a:prefix text is
+"   Additional highlight groups can be applied on top. The a:prefix text is
 "   displayed before the line. When the line is too long to be displayed
 "   completely, the a:centerCol column is centered, and parts of the line before
 "   and after that are truncated. 
