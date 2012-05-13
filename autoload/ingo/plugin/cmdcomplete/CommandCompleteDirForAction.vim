@@ -38,12 +38,16 @@
 " KNOWN PROBLEMS:
 " TODO:
 "
-" Copyright: (C) 2009-2011 by Ingo Karkat
+" Copyright: (C) 2009-2012 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	009	27-Jan-2012	ENH: Get <bang> infomation ingo s:Command() and
+"				pass this on to a:Action, and make this
+"				accessible to a:Action Funcrefs via a context
+"				object g:CommandCompleteDirForAction_Context. 
 "	008	21-Sep-2011	ENH: action and postAction now also support
 "				Funcrefs instead of Ex commands. 
 "				Generated command now actually demands argument
@@ -151,8 +155,12 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
     endtry
 endfunction
 
-function! s:Command( Action, PostAction, defaultFilename, FilenameProcessingFunction, dirspec, filename )
+function! s:Command( isBang, Action, PostAction, defaultFilename, FilenameProcessingFunction, dirspec, filename )
     try
+	" Set up a context object so that Funcrefs can have access to the
+	" information whether <bang> was given. 
+	let g:CommandCompleteDirForAction_Context = { 'bang': a:isBang }
+
 	" a:filename comes from the custom command, and must be taken as is (the
 	" custom completion will have already escaped the completion). 
 	" All other filespec fragments still need escaping. 
@@ -165,7 +173,7 @@ function! s:Command( Action, PostAction, defaultFilename, FilenameProcessingFunc
 	if type(a:Action) == 2
 	    call call(a:Action, [escapings#fnameescape(a:dirspec), l:filename])
 	else
-	    execute a:Action escapings#fnameescape(a:dirspec) . l:filename
+	    execute a:Action . (a:isBang ? '!' : '') escapings#fnameescape(a:dirspec) . l:filename
 	endif
 
 	if ! empty(a:PostAction)
@@ -182,6 +190,8 @@ function! s:Command( Action, PostAction, defaultFilename, FilenameProcessingFunc
 	echohl ErrorMsg
 	echomsg v:errmsg
 	echohl None
+    finally
+	unlet! g:CommandCompleteDirForAction_Context
     endtry
 endfunction
 
@@ -208,7 +218,9 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "		files will be completed. 
 "
 "   a:parameters.commandAttributes
-"	    Optional :command {attr}, e.g. <buffer>, -range. 
+"	    Optional :command {attr}, e.g. <buffer>, -bang, -range. 
+"	    Funcrefs can access the <bang> via
+"	    g:CommandCompleteDirForAction_Context.bang. 
 "   a:parameters.action
 "	    Ex command (e.g. 'edit', '<line2>read') to be invoked with the
 "	    completed filespec. Default is the :drop / :Drop command. 
@@ -240,8 +252,8 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "	    If not empty, will be used as the :command -complete=customlist,...
 "	    completion function name. This hook can be used to manipulate the
 "	    completion list. This overriding completion function probably will
-"	    still invoke the generated custom completion function, which is thus
-"	    returned from this setup function. 
+"	    still invoke the generated custom completion function, which is
+"	    therefore returned from this setup function. 
 "   a:parameters.FilenameProcessingFunction
 "	    If not empty, will be passed the completed (or default) filespec,
 "	    and expects a processed filespec in return. (Or an empty string,
@@ -268,7 +280,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \	    string(a:dirspec), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
     \	) .    "endfunction"
     
-    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s call <SID>Command(%s, %s, %s, %s, %s, <q-args>)',
+    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s call <SID>Command(<bang>0, %s, %s, %s, %s, %s, <q-args>)',
     \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'), 
     \   l:completeFunctionName,
     \   l:commandAttributes,
