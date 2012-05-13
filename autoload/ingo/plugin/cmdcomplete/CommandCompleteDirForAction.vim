@@ -1,12 +1,12 @@
 " CommandCompleteDirForAction.vim: Define custom command to complete files from
-" a specified directory. 
+" a specified directory.
 "
 " DESCRIPTION:
 "   In GVIM, one can define a menu item which uses browse() in combination with
 "   an Ex command to open a file browser dialog in a particular directory, lets
-"   the user select a file, and then uses that file for a predefined Ex command. 
+"   the user select a file, and then uses that file for a predefined Ex command.
 "   This script provides a function to define similar custom commands for use
-"   without a GUI file selector, relying instead on custom command completion. 
+"   without a GUI file selector, relying instead on custom command completion.
 "
 " USAGE:
 " EXAMPLE:
@@ -21,15 +21,15 @@
 "	\   '',
 "	\   ''
 "	\)
-"   You can then use the new command with file completion: 
+"   You can then use the new command with file completion:
 "	:BrowseTemp f<Tab> -> :BrowseTemp foo.txt
 "
 " INSTALLATION:
 "   Put the script into your user or system Vim autoload directory (e.g.
-"   ~/.vim/autoload). 
+"   ~/.vim/autoload).
 
 " DEPENDENCIES:
-"   - escapings.vim autoload script. 
+"   - escapings.vim autoload script.
 
 " CONFIGURATION:
 " INTEGRATION:
@@ -39,60 +39,60 @@
 " TODO:
 "
 " Copyright: (C) 2009-2012 Ingo Karkat
-"   The VIM LICENSE applies to this script; see ':help copyright'. 
+"   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
-" REVISION	DATE		REMARKS 
+" REVISION	DATE		REMARKS
 "	009	27-Jan-2012	ENH: Get <bang> infomation ingo s:Command() and
 "				pass this on to a:Action, and make this
 "				accessible to a:Action Funcrefs via a context
-"				object g:CommandCompleteDirForAction_Context. 
+"				object g:CommandCompleteDirForAction_Context.
 "	008	21-Sep-2011	ENH: action and postAction now also support
-"				Funcrefs instead of Ex commands. 
+"				Funcrefs instead of Ex commands.
 "				Generated command now actually demands argument
-"				unless a:parameters.defaultFilename is given. 
+"				unless a:parameters.defaultFilename is given.
 "				a:parameters.defaultFilename can be empty,
 "				resulting in a command with optional argument
 "				and no filename passed to a:parameters.action;
 "				the action (probably a Funcref) is supposed to
 "				handle this. Beforehand, the command would be
-"				aborted if the filename was empty. 
+"				aborted if the filename was empty.
 "	007	22-Jan-2011	Collapsed s:CommandWithOptionalArgument(),
 "				s:CommandWithPostAction() and the direct
 "				definition for a non-optional, non-postAction
 "				command into s:Command(), which already handles
 "				all cases anyway, getting rid of the
-"				conditional. 
+"				conditional.
 "				ENH: Added
 "				a:parameters.FilenameProcessingFunction to allow
 "				processing of the completed or typed filespec.
 "				This is used by the :Vim command to correct the
 "				.vimrc to ../.vimrc when the name is fully
-"				typed, not completed. 
+"				typed, not completed.
 "	006	10-Dec-2010	ENH: Added a:parameters.overrideCompleteFunction
 "				and returning the generated completion function
 "				name in order to allow hooking into the
 "				completion. This is used by the :Vim command to
 "				also offer .vimrc and .gvimrc completion
-"				candidates. 
+"				candidates.
 "	005	27-Aug-2010	FIX: Filtering out subdirectories from the file
-"				completion candidates. 
+"				completion candidates.
 "				ENH: Added a:parameters.isIncludeSubdirs flag to
 "				allow inclusion of subdirectories. Made this
-"				work even when a browsefilter is set. 
+"				work even when a browsefilter is set.
 "	004	06-Jul-2010	Simplified CommandCompleteDirForAction#setup()
 "				interface via parameter hash that allows to omit
-"				defaults and makes it more easy to extend. 
+"				defaults and makes it more easy to extend.
 "				Implemented a:parameters.postAction, e.g. to
-"				:setfiletype after opening the file. 
+"				:setfiletype after opening the file.
 "	003	27-Oct-2009	BUG: With optional argument, the a:filename
 "				passed to s:CommandWithOptionalArgument() must
 "				not be escaped, only all other filespec
-"				fragments. 
+"				fragments.
 "	002	26-Oct-2009	Added to arguments: a:commandAttributes e.g. to
 "				make buffer-local commands, a:defaultFilename to
-"				make the filename argument optional. 
+"				make the filename argument optional.
 "	001	26-Oct-2009	file creation
 let s:save_cpo = &cpo
 set cpo&vim
@@ -117,23 +117,23 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 
 	if a:isIncludeSubdirs
 	    " If the a:dirspec itself contains wildcards, there may be multiple
-	    " matches. 
+	    " matches.
 	    let l:pathSeparator = (exists('+shellslash') && ! &shellslash ? '\' : '/')
 	    let l:resolvedDirspecs = split(glob(a:dirspec), "\n")
 
 	    " If there is a browsefilter, we need to add all directories
 	    " separately, as most of them probably have been filtered away by
-	    " the (file-based) a:browsefilter. 
+	    " the (file-based) a:browsefilter.
 	    if ! empty(a:browsefilter)
 		let l:dirspecWildcard = a:dirspec . a:argLead . '*' . l:pathSeparator
 		call extend(l:filespecs, split(glob(l:dirspecWildcard), "\n"))
-		call sort(l:filespecs) " Weave the directories into the files. 
+		call sort(l:filespecs) " Weave the directories into the files.
 	    else
 		" glob() doesn't add a trailing path separator on directories
 		" unless the glob pattern has one at the end. Append the path
 		" separator here to be consistent with the alternative block
 		" above, the built-in completion, and because it makes sense to
-		" show the path separator. 
+		" show the path separator.
 		call map(l:filespecs, 'isdirectory(v:val) ? v:val . l:pathSeparator : v:val')
 	    endif
 
@@ -158,12 +158,12 @@ endfunction
 function! s:Command( isBang, Action, PostAction, defaultFilename, FilenameProcessingFunction, dirspec, filename )
     try
 	" Set up a context object so that Funcrefs can have access to the
-	" information whether <bang> was given. 
+	" information whether <bang> was given.
 	let g:CommandCompleteDirForAction_Context = { 'bang': a:isBang }
 
 	" a:filename comes from the custom command, and must be taken as is (the
-	" custom completion will have already escaped the completion). 
-	" All other filespec fragments still need escaping. 
+	" custom completion will have already escaped the completion).
+	" All other filespec fragments still need escaping.
 	let l:filename = (empty(a:filename) ? escapings#fnameescape(a:defaultFilename) : a:filename)
 
 	if ! empty(a:FilenameProcessingFunction)
@@ -185,7 +185,7 @@ function! s:Command( isBang, Action, PostAction, defaultFilename, FilenameProces
 	endif
     catch /^Vim\%((\a\+)\)\=:E/
 	" v:exception contains what is normally in v:errmsg, but with extra
-	" exception source info prepended, which we cut away. 
+	" exception source info prepended, which we cut away.
 	let v:errmsg = substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
 	echohl ErrorMsg
 	echomsg v:errmsg
@@ -205,62 +205,62 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "   a:dirspec, with a:parameters.browsefilter applied and
 "   a:parameters.wildignore extensions filtered out. The custom completion will
 "   return the list of file (/ directory / subdir path) names found. Those
-"   should be interpreter relative to and thus do not include a:dirspec. 
+"   should be interpreted relative to (and thus do not include) a:dirspec.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   None. 
+"   None.
 "* EFFECTS / POSTCONDITIONS:
 "   Defines custom a:command that takes one filename argument, which will have
 "   filename completion from a:dirspec. Unless a:parameters.defaultFilename is
-"   provided, the filename argument is mandatory. 
+"   provided, the filename argument is mandatory.
 "* INPUTS:
-"   a:command   Name of the custom command to be defined. 
+"   a:command   Name of the custom command to be defined.
 "   a:dirspec	Directory (including trailing path separator!) from which
-"		files will be completed. 
+"		files will be completed.
 "
 "   a:parameters.commandAttributes
-"	    Optional :command {attr}, e.g. <buffer>, -bang, -range. 
+"	    Optional :command {attr}, e.g. <buffer>, -bang, -range.
 "	    Funcrefs can access the <bang> via
-"	    g:CommandCompleteDirForAction_Context.bang. 
+"	    g:CommandCompleteDirForAction_Context.bang.
 "   a:parameters.action
 "	    Ex command (e.g. 'edit', '<line2>read') to be invoked with the
-"	    completed filespec. Default is the :drop / :Drop command. 
+"	    completed filespec. Default is the :drop / :Drop command.
 "	    Or Funcref to a function that takes the dirspec and filename (both
 "	    already escaped for use in an Ex command) and performs the action
-"	    itself. 
+"	    itself.
 "   a:parameters.postAction
 "	    Ex command to be invoked after the file has been opened via
-"	    a:parameters.action. Default empty. 
+"	    a:parameters.action. Default empty.
 "	    Or Funcref to a function that takes no arguments and performs the
-"	    post actions itself. 
+"	    post actions itself.
 "   a:parameters.browsefilter
 "	    File wildcard (e.g. '*.txt') used for filtering the files in
-"	    a:dirspec. Default is empty string to include all (non-hidden) files. 
-"	    Does not apply to subdirectories. 
+"	    a:dirspec. Default is empty string to include all (non-hidden) files.
+"	    Does not apply to subdirectories.
 "   a:parameters.wildignore
 "	    Comma-separated list of file extensions to be ignored. This is
 "	    similar to a:parameters.browsefilter, but with inverted semantics,
 "	    only file extensions, and multiple possible values. Use empty string
 "	    to disable and pass 0 (the default) to keep the current global
-"	    'wildignore' setting. 
+"	    'wildignore' setting.
 "   a:parameters.isIncludeSubdirs
 "	    Flag whether subdirectories will be included in the completion
-"	    matches. By default, only files in a:dirspec itself will be offered. 
+"	    matches. By default, only files in a:dirspec itself will be offered.
 "   a:parameters.defaultFilename
 "	    If specified, the command will not require the filename argument,
-"	    and default to this filename if none is specified. 
+"	    and default to this filename if none is specified.
 "   a:parameters.overrideCompleteFunction
 "	    If not empty, will be used as the :command -complete=customlist,...
 "	    completion function name. This hook can be used to manipulate the
 "	    completion list. This overriding completion function probably will
 "	    still invoke the generated custom completion function, which is
-"	    therefore returned from this setup function. 
+"	    therefore returned from this setup function.
 "   a:parameters.FilenameProcessingFunction
 "	    If not empty, will be passed the completed (or default) filespec,
 "	    and expects a processed filespec in return. (Or an empty string,
-"	    which will abort the command.) 
+"	    which will abort the command.)
 "
-"* RETURN VALUES: 
-"   Name of the generated custom completion function. 
+"* RETURN VALUES:
+"   Name of the generated custom completion function.
 "*******************************************************************************
     let l:commandAttributes = get(a:parameters, 'commandAttributes', '')
     let l:Action = get(a:parameters, 'action', ((exists(':Drop') == 2) ? 'Drop' : 'drop'))
@@ -274,14 +274,14 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     let s:count += 1
     let l:generatedCompleteFunctionName = 'CompleteDir' . s:count
     let l:completeFunctionName = get(a:parameters, 'overrideCompleteFunction', l:generatedCompleteFunctionName)
-    execute 
-    \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:generatedCompleteFunctionName) . 
+    execute
+    \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:generatedCompleteFunctionName) .
     \	printf("    return s:CompleteFiles(%s, %s, %s, %d, a:ArgLead)\n",
     \	    string(a:dirspec), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
     \	) .    "endfunction"
-    
+
     execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s call <SID>Command(<bang>0, %s, %s, %s, %s, %s, <q-args>)',
-    \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'), 
+    \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'),
     \   l:completeFunctionName,
     \   l:commandAttributes,
     \   a:command,
