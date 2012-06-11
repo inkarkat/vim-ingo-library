@@ -44,7 +44,13 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"	009	27-Jan-2012	ENH: Get <bang> infomation ingo s:Command() and
+"	010	14-May-2012	ENH: Allow special "%" value or Funcref for
+"				a:parameters.defaultFilename.
+"				FIX: Don't append <bang> to a:Action of type
+"				command; this should be contained in a:Action =
+"				"MyCommand<bang>".
+"				Handle custom exceptions thrown from Funcrefs.
+"	009	27-Jan-2012	ENH: Get <bang> information into s:Command() and
 "				pass this on to a:Action, and make this
 "				accessible to a:Action Funcrefs via a context
 "				object g:CommandCompleteDirForAction_Context.
@@ -155,7 +161,8 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
     endtry
 endfunction
 
-function! s:Command( isBang, Action, PostAction, defaultFilename, FilenameProcessingFunction, dirspec, filename )
+function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProcessingFunction, dirspec, filename )
+"****Dechomsg '****' a:isBang string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:dirspec) string(a:filename)
     try
 	" Set up a context object so that Funcrefs can have access to the
 	" information whether <bang> was given.
@@ -164,7 +171,16 @@ function! s:Command( isBang, Action, PostAction, defaultFilename, FilenameProces
 	" a:filename comes from the custom command, and must be taken as is (the
 	" custom completion will have already escaped the completion).
 	" All other filespec fragments still need escaping.
-	let l:filename = (empty(a:filename) ? escapings#fnameescape(a:defaultFilename) : a:filename)
+	let l:filename = (empty(a:filename) ?
+	\   escapings#fnameescape(type(a:DefaultFilename) == 2 ?
+	\       call(a:DefaultFilename, [a:dirspec]) :
+	\       (a:DefaultFilename ==# '%' ?
+	\           expand('%:t') :
+	\           a:DefaultFilename
+	\       )
+	\   ) :
+	\   a:filename
+	\)
 
 	if ! empty(a:FilenameProcessingFunction)
 	    let l:filename = call(a:FilenameProcessingFunction, [l:filename])
@@ -173,7 +189,7 @@ function! s:Command( isBang, Action, PostAction, defaultFilename, FilenameProces
 	if type(a:Action) == 2
 	    call call(a:Action, [escapings#fnameescape(a:dirspec), l:filename])
 	else
-	    execute a:Action . (a:isBang ? '!' : '') escapings#fnameescape(a:dirspec) . l:filename
+	    execute a:Action escapings#fnameescape(a:dirspec) . l:filename
 	endif
 
 	if ! empty(a:PostAction)
@@ -187,6 +203,11 @@ function! s:Command( isBang, Action, PostAction, defaultFilename, FilenameProces
 	" v:exception contains what is normally in v:errmsg, but with extra
 	" exception source info prepended, which we cut away.
 	let v:errmsg = substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
+	echohl ErrorMsg
+	echomsg v:errmsg
+	echohl None
+    catch
+	let v:errmsg = v:exception
 	echohl ErrorMsg
 	echomsg v:errmsg
 	echohl None
@@ -248,6 +269,10 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "   a:parameters.defaultFilename
 "	    If specified, the command will not require the filename argument,
 "	    and default to this filename if none is specified.
+"	    The special value "%" will be replaced with the current buffer's
+"	    filename.
+"	    Or Funcref to a function that takes the dirspec and returns the
+"	    filename.
 "   a:parameters.overrideCompleteFunction
 "	    If not empty, will be used as the :command -complete=customlist,...
 "	    completion function name. This hook can be used to manipulate the
@@ -268,7 +293,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     let l:browsefilter = get(a:parameters, 'browsefilter', '')
     let l:wildignore = get(a:parameters, 'wildignore', 0)
     let l:isIncludeSubdirs = get(a:parameters, 'isIncludeSubdirs', 0)
-    let l:defaultFilename = get(a:parameters, 'defaultFilename', '')
+    let l:DefaultFilename = get(a:parameters, 'defaultFilename', '')
     let l:FilenameProcessingFunction = get(a:parameters, 'FilenameProcessingFunction', '')
 
     let s:count += 1
@@ -287,7 +312,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \   a:command,
     \   string(l:Action),
     \   string(l:PostAction),
-    \   string(l:defaultFilename),
+    \   string(l:DefaultFilename),
     \	string(l:FilenameProcessingFunction),
     \   string(a:dirspec),
     \)
