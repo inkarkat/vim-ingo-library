@@ -11,12 +11,18 @@
 " KNOWN PROBLEMS:
 " TODO:
 "
-" Copyright: (C) 2008-2012 by Ingo Karkat
+" Copyright: (C) 2008-2012 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	008	20-Aug-2012	Do not clobber the default register in
+"				surroundings#RemoveSingleCharDelimiters().
+"				(Using v:register would be inconsistent with
+"				surroundings#RemoveDelimiters() and probably
+"				seldom DWIM.)
+"				Use :normal! everywhere.
 "	007	21-Jan-2012	Move functions from textobjects.vim (renamed to
 "				ingounsurround.vim) here.
 "	006	19-Jan-2011	BUG: Visual surround broken by previous change,
@@ -113,10 +119,10 @@ function! surroundings#ChangeEnclosedText( delimiterChar, isInner )
 	if s:Search( l:literalDelimiterExpr, v:count1, 1 ) > 0
 	    if( a:isInner )
 		call s:CursorRight()
-		normal v
+		normal! v
 		call s:CursorLeft()
 	    else
-		normal v
+		normal! v
 	    endif
 
 	    " Now that we're in Visual mode, extend the selection until the
@@ -128,7 +134,7 @@ function! surroundings#ChangeEnclosedText( delimiterChar, isInner )
 		    call s:CursorRight()
 		endif
 	    else
-		normal v
+		normal! v
 		call setpos('.', l:save_cursor)
 		call s:WarningMsg('Trailing ' . a:delimiterChar . ' not found')
 	    endif
@@ -157,9 +163,9 @@ function! surroundings#RemoveSingleCharDelimiters( delimiterChar )
 	let l:begin_cursor = getpos('.')
 	call setpos('.', l:save_cursor)
 	if s:Search( l:literalDelimiterExpr, v:count1, 0 ) > 0
-	    normal x
+	    normal! "_x
 	    call setpos('.', l:begin_cursor)
-	    normal x
+	    normal! "_x
 	else
 	    call s:WarningMsg('Trailing ' . a:delimiterChar . ' not found')
 	endif
