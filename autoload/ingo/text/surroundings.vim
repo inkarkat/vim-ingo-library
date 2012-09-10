@@ -17,6 +17,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	009	28-Aug-2012	I18N: FIX: s:CursorLeft() and s:CursorRight()
+"				didn't consider multi-byte characters. Use h / l
+"				commands instead of de-/incrementing cursor
+"				column; we've already determined that it's
+"				possible to move there.
 "	008	20-Aug-2012	Do not clobber the default register in
 "				surroundings#RemoveSingleCharDelimiters().
 "				(Using v:register would be inconsistent with
@@ -64,10 +69,10 @@ endfunction
 " Cursor does not move if at top of file.
 function! s:CursorLeft()
     if col('.') > 1
-	call cursor( 0, col('.') - 1 )
+	normal! h
     elseif line('.') > 1
-	call cursor( line('.') - 1, 0 )
-	call cursor( 0, col('$') )
+	call cursor(line('.') - 1, 0)
+	call cursor(0, col('$'))
     endif
 endfunction
 
@@ -75,9 +80,9 @@ endfunction
 " Cursor does not move if at end of file.
 function! s:CursorRight()
     if col('.') + 1 < col('$')
-	call cursor( 0, col('.') + 1 )
+	normal! l
     elseif line('.') < line('$')
-	call cursor( line('.') + 1, 1 )
+	call cursor(line('.') + 1, 1)
     endif
 endfunction
 
