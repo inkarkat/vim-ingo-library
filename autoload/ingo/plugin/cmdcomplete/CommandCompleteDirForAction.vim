@@ -139,7 +139,8 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 		" unless the glob pattern has one at the end. Append the path
 		" separator here to be consistent with the alternative block
 		" above, the built-in completion, and because it makes sense to
-		" show the path separator.
+		" show the path separator, because then autocompletion of the
+		" directory contents can quickly be continued.
 		call map(l:filespecs, 'isdirectory(v:val) ? v:val . l:pathSeparator : v:val')
 	    endif
 
@@ -319,13 +320,6 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 
     return l:generatedCompleteFunctionName
 endfunction
-
-"call CommandCompleteDirForAction#setup( 'TestCommand', '~/tmp/', {})
-"call CommandCompleteDirForAction#setup( 'TestCommand', '~/Ablage/', { 'browsefilter': '*.txt' })
-"call CommandCompleteDirForAction#setup( 'TestCommand', '~/Ablage/', { 'postAction': "echomsg 'opened it!'" })
-"call CommandCompleteDirForAction#setup( 'TestCommand', '~/Ablage/', { 'browsefilter': '*.txt', 'defaultFilename': 'test.txt' })
-"call CommandCompleteDirForAction#setup('Vim', '~/Unixhome/.vim/', {'isIncludeSubdirs': 1})
-"call CommandCompleteDirForAction#setup('Vim', '~/Unixhome/.vim/', {'isIncludeSubdirs': 1, 'browsefilter' : '*.vim'})
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
