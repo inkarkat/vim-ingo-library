@@ -44,6 +44,15 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	011	13-Sep-2012	ENH: Added
+"				a:parameters.FilespecProcessingFunction to allow
+"				processing of both dirspec and filename.
+"				This is now used by the :Vim command to expand
+"				arbitrary <SID> numbers to the corresponding
+"				full path.
+"				FIX: Actually abort the processing when
+"				a:parameters.FilenameProcessingFunction returns
+"				an empty filename (as was documented).
 "	010	14-May-2012	ENH: Allow special "%" value or Funcref for
 "				a:parameters.defaultFilename.
 "				FIX: Don't append <bang> to a:Action of type
@@ -162,8 +171,9 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
     endtry
 endfunction
 
-function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProcessingFunction, dirspec, filename )
-"****Dechomsg '****' a:isBang string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:dirspec) string(a:filename)
+function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspec, filename )
+"****Dechomsg '****' a:isBang string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspec) string(a:filename)
+    let l:dirspec = a:dirspec
     try
 	" Set up a context object so that Funcrefs can have access to the
 	" information whether <bang> was given.
@@ -174,7 +184,7 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 	" All other filespec fragments still need escaping.
 	let l:filename = (empty(a:filename) ?
 	\   escapings#fnameescape(type(a:DefaultFilename) == 2 ?
-	\       call(a:DefaultFilename, [a:dirspec]) :
+	\       call(a:DefaultFilename, [l:dirspec]) :
 	\       (a:DefaultFilename ==# '%' ?
 	\           expand('%:t') :
 	\           a:DefaultFilename
@@ -185,12 +195,23 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 
 	if ! empty(a:FilenameProcessingFunction)
 	    let l:filename = call(a:FilenameProcessingFunction, [l:filename])
+	    if empty(l:filename)
+		return
+	    endif
+	endif
+	if ! empty(a:FilespecProcessingFunction)
+	    let l:processedFilespec = call(a:FilespecProcessingFunction, [l:dirspec, l:filename])
+	    if empty(l:processedFilespec) || empty(join(l:processedFilespec, ''))
+		return
+	    else
+		let [l:dirspec, l:filename] = l:processedFilespec
+	    endif
 	endif
 
 	if type(a:Action) == 2
-	    call call(a:Action, [escapings#fnameescape(a:dirspec), l:filename])
+	    call call(a:Action, [escapings#fnameescape(l:dirspec), l:filename])
 	else
-	    execute a:Action escapings#fnameescape(a:dirspec) . l:filename
+	    execute a:Action escapings#fnameescape(l:dirspec) . l:filename
 	endif
 
 	if ! empty(a:PostAction)
@@ -284,6 +305,11 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "	    If not empty, will be passed the completed (or default) filespec,
 "	    and expects a processed filespec in return. (Or an empty string,
 "	    which will abort the command.)
+"   a:parameters.FilespecProcessingFunction
+"	    If not empty, will be passed both the (not escaped) dirspec and the
+"	    completed (or default) filespec, and expects a List of [dirspec,
+"	    filespec] in return. (Or an empty List, which will abort the
+"	    command.)
 "
 "* RETURN VALUES:
 "   Name of the generated custom completion function.
@@ -296,6 +322,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     let l:isIncludeSubdirs = get(a:parameters, 'isIncludeSubdirs', 0)
     let l:DefaultFilename = get(a:parameters, 'defaultFilename', '')
     let l:FilenameProcessingFunction = get(a:parameters, 'FilenameProcessingFunction', '')
+    let l:FilespecProcessingFunction = get(a:parameters, 'FilespecProcessingFunction', '')
 
     let s:count += 1
     let l:generatedCompleteFunctionName = 'CompleteDir' . s:count
@@ -306,7 +333,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \	    string(a:dirspec), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
     \	) .    "endfunction"
 
-    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s call <SID>Command(<bang>0, %s, %s, %s, %s, %s, <q-args>)',
+    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s call <SID>Command(<bang>0, %s, %s, %s, %s, %s, %s, <q-args>)',
     \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'),
     \   l:completeFunctionName,
     \   l:commandAttributes,
@@ -315,6 +342,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \   string(l:PostAction),
     \   string(l:DefaultFilename),
     \	string(l:FilenameProcessingFunction),
+    \	string(l:FilespecProcessingFunction),
     \   string(a:dirspec),
     \)
 
