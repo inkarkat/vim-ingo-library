@@ -1,22 +1,13 @@
 " surroundings.vim: Generic functions to surround text with something.
 "
-" DESCRIPTION:
-" USAGE:
-" INSTALLATION:
-" DEPENDENCIES:
-" CONFIGURATION:
-" INTEGRATION:
-" LIMITATIONS:
-" ASSUMPTIONS:
-" KNOWN PROBLEMS:
-" TODO:
-"
 " Copyright: (C) 2008-2012 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	010	11-Sep-2012	ENH: Support use of surroundings#SurroundWith()
+"				in custom operator via g@.
 "	009	28-Aug-2012	I18N: FIX: s:CursorLeft() and s:CursorRight()
 "				didn't consider multi-byte characters. Use h / l
 "				commands instead of de-/incrementing cursor
@@ -55,8 +46,6 @@
 "	002	18-Jun-2009	Replaced temporary mark z with mark " and using
 "				g` command to avoid clobbering jumplist.
 "	001	24-Sep-2008	file creation from ingotextobjects.vim
-
-"- functions ------------------------------------------------------------------
 
 function! s:WarningMsg( text )
     echohl WarningMsg
@@ -231,7 +220,16 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 	" be pasted _below_ the surrounded characters.
 	call setreg('z', '', 'av')
 	execute 'normal! "_s' . a:textBefore . "\<C-R>\<C-O>z" . a:textAfter . "\<Esc>"
-    elseif a:selectionType ==# 'v'
+    elseif index(['v', 'char', 'line', 'block'], a:selectionType) != -1
+	if a:selectionType ==# 'char'
+	    silent! execute 'normal! `[v`]'. (&selection ==# 'exclusive' ? 'l' : '') . "\<Esc>"
+	elseif a:selectionType ==# 'line'
+	    silent! execute "normal! '[V']\<Esc>"
+	elseif a:selectionType ==# 'block'
+	    silent! execute "normal! `[\<C-V>`]". (&selection ==# 'exclusive' ? 'l' : '') . "\<Esc>"
+	endif
+
+
 	let l:save_clipboard = &clipboard
 	set clipboard= " Avoid clobbering the selection and clipboard registers.
 	let l:save_reg = getreg('"')
