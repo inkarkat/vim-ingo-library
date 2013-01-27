@@ -30,12 +30,19 @@
 " DEPENDENCIES:
 "   - escapings.vim autoload script
 
-" Copyright: (C) 2009-2012 Ingo Karkat
+" Copyright: (C) 2009-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	013	28-Jan-2013	Handle ++enc= and +cmd file options and
+"				commands. This requires an extension of the
+"				a:parameters.action,
+"				a:parameters.FilenameProcessingFunction and
+"				a:parameters.FilespecProcessingFunction values
+"				to take and return an additional
+"				fileOptionsAndCommands argument.
 "	012	28-Dec-2012	Apply special logic to support lnum 0 with
 "				a:parameters.commandAttributes = "-range=-1"
 "				described at :help ingo-command-lnum.
@@ -169,15 +176,24 @@ endfunction
 function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspec, filename )
 "****Dechomsg '****' a:isBang string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspec) string(a:filename)
     let l:dirspec = a:dirspec
+
+    " Detach any file options or commands for assemling the filespec.
+    let [l:fileOptionsAndCommands, l:filename] = matchlist(a:filename,
+    \   '^\(' .
+    \       '\%(++\%(ff\|fileformat\|enc\|encoding\|bin\|binary\|nobin\|nobinary\|bad\|edit\)\%(=\S*\)\?\s\+\)*' .
+    \	    '\%(+.\{-}\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<! \s*\)\?' .
+    \   '\)\(.*\)$'
+    \)[1:2]
+"****D echomsg '****' string(l:filename) string(l:fileOptionsAndCommands)
     try
 	" Set up a context object so that Funcrefs can have access to the
 	" information whether <bang> was given.
 	let g:CommandCompleteDirForAction_Context = { 'bang': a:isBang }
 
-	" a:filename comes from the custom command, and must be taken as is (the
+	" l:filename comes from the custom command, and must be taken as is (the
 	" custom completion will have already escaped the completion).
 	" All other filespec fragments still need escaping.
-	let l:filename = (empty(a:filename) ?
+	let l:filename = (empty(l:filename) ?
 	\   escapings#fnameescape(type(a:DefaultFilename) == 2 ?
 	\       call(a:DefaultFilename, [l:dirspec]) :
 	\       (a:DefaultFilename ==# '%' ?
@@ -185,28 +201,30 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 	\           a:DefaultFilename
 	\       )
 	\   ) :
-	\   a:filename
+	\   l:filename
 	\)
 
 	if ! empty(a:FilenameProcessingFunction)
-	    let l:filename = call(a:FilenameProcessingFunction, [l:filename])
-	    if empty(l:filename)
+	    let l:processedFilename = call(a:FilenameProcessingFunction, [l:filename, l:fileOptionsAndCommands])
+	    if empty(l:processedFilename) || empty(l:processedFilename[0])
 		return
+	    else
+		let [l:filename, l:fileOptionsAndCommands] = l:processedFilename
 	    endif
 	endif
 	if ! empty(a:FilespecProcessingFunction)
-	    let l:processedFilespec = call(a:FilespecProcessingFunction, [l:dirspec, l:filename])
-	    if empty(l:processedFilespec) || empty(join(l:processedFilespec, ''))
+	    let l:processedFilespec = call(a:FilespecProcessingFunction, [l:dirspec, l:filename, l:fileOptionsAndCommands])
+	    if empty(l:processedFilespec) || empty(join(l:processedFilespec[0:1], ''))
 		return
 	    else
-		let [l:dirspec, l:filename] = l:processedFilespec
+		let [l:dirspec, l:filename, l:fileOptionsAndCommands] = l:processedFilespec
 	    endif
 	endif
 
 	if type(a:Action) == 2
-	    call call(a:Action, [escapings#fnameescape(l:dirspec), l:filename])
+	    call call(a:Action, [escapings#fnameescape(l:dirspec), l:filename, l:fileOptionsAndCommands])
 	else
-	    execute a:Action escapings#fnameescape(l:dirspec) . l:filename
+	    execute a:Action l:fileOptionsAndCommands . escapings#fnameescape(l:dirspec) . l:filename
 	endif
 
 	if ! empty(a:PostAction)
@@ -262,9 +280,10 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "   a:parameters.action
 "	    Ex command (e.g. 'edit', '<line1>read') to be invoked with the
 "	    completed filespec. Default is the :drop / :Drop command.
-"	    Or Funcref to a function that takes the dirspec and filename (both
-"	    already escaped for use in an Ex command) and performs the action
-"	    itself.
+"	    Or Funcref to a function that takes the dirspec, filename (both
+"	    already escaped for use in an Ex command), and potential
+"	    fileOptionsAndCommands (e.g. ++enc=latin1 +set\ ft=c) and performs
+"	    the action itself.
 "   a:parameters.postAction
 "	    Ex command to be invoked after the file has been opened via
 "	    a:parameters.action. Default empty.
@@ -297,14 +316,16 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "	    still invoke the generated custom completion function, which is
 "	    therefore returned from this setup function.
 "   a:parameters.FilenameProcessingFunction
-"	    If not empty, will be passed the completed (or default) filespec,
-"	    and expects a processed filespec in return. (Or an empty string,
+"	    If not empty, will be passed the completed (or default) filespec and
+"	    potential fileOptionsAndCommands, and expects a similar List of
+"	    [filespec, fileOptionsAndCommands] in return. (Or an empty List,
 "	    which will abort the command.)
 "   a:parameters.FilespecProcessingFunction
-"	    If not empty, will be passed both the (not escaped) dirspec and the
-"	    completed (or default) filespec, and expects a List of [dirspec,
-"	    filespec] in return. (Or an empty List, which will abort the
-"	    command.)
+"	    If not empty, will be passed the (not escaped) dirspec, the
+"	    completed (or default) filespec, and the potential
+"	    fileOptionsAndCommands, and expects a similar List of [dirspec,
+"	    filespec, fileOptionsAndCommands] in return. (Or an empty List,
+"	    which will abort the command.)
 "
 "* RETURN VALUES:
 "   Name of the generated custom completion function.
