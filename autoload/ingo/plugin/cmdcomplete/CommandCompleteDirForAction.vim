@@ -8,7 +8,6 @@
 "   This script provides a function to define similar custom commands for use
 "   without a GUI file selector, relying instead on custom command completion.
 "
-" USAGE:
 " EXAMPLE:
 "   Define a command :BrowseTemp that edits a text file from the system TEMP
 "   directory. >
@@ -29,21 +28,17 @@
 "   ~/.vim/autoload).
 
 " DEPENDENCIES:
-"   - escapings.vim autoload script.
+"   - escapings.vim autoload script
 
-" CONFIGURATION:
-" INTEGRATION:
-" LIMITATIONS:
-" ASSUMPTIONS:
-" KNOWN PROBLEMS:
-" TODO:
-"
 " Copyright: (C) 2009-2012 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	012	28-Dec-2012	Apply special logic to support lnum 0 with
+"				a:parameters.commandAttributes = "-range=-1"
+"				described at :help ingo-command-lnum.
 "	011	13-Sep-2012	ENH: Added
 "				a:parameters.FilespecProcessingFunction to allow
 "				processing of both dirspec and filename.
@@ -265,7 +260,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "	    Funcrefs can access the <bang> via
 "	    g:CommandCompleteDirForAction_Context.bang.
 "   a:parameters.action
-"	    Ex command (e.g. 'edit', '<line2>read') to be invoked with the
+"	    Ex command (e.g. 'edit', '<line1>read') to be invoked with the
 "	    completed filespec. Default is the :drop / :Drop command.
 "	    Or Funcref to a function that takes the dirspec and filename (both
 "	    already escaped for use in an Ex command) and performs the action
@@ -338,7 +333,10 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \   l:completeFunctionName,
     \   l:commandAttributes,
     \   a:command,
-    \   string(l:Action),
+    \   (l:commandAttributes =~# '-range=-1' && l:Action =~# '^<line[12]>,\@!' ?
+    \       '(<line2> == 1 ? <line1> : <line2>) . ' . string(l:Action[7:]) :
+    \	    string(l:Action)
+    \   ),
     \   string(l:PostAction),
     \   string(l:DefaultFilename),
     \	string(l:FilenameProcessingFunction),
