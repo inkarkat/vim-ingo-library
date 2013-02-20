@@ -1,0 +1,3 @@
+autoload/ingo/external.vim
+autoload/ingo/msg.vim
+doc/ingo-library.txt
