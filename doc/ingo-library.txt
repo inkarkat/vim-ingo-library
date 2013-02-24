@@ -60,7 +60,10 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.000
+1.001	21-Feb-2013
+Add cmdargs and collections modules for use by PatternsOnText.vim plugin.
+
+1.000	12-Feb-2013
 First published version as separate shared library.
 
 0.001	05-Jan-2009
