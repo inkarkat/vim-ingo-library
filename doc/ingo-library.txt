@@ -60,9 +60,10 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.002
+1.002	08-Mar-2013
 - Minor: Allow to specify filespec of GVIM executable in
   ingo#external#LaunchGvim().
+- Add err module for LineJugglerCommands.vim plugin.
 
 1.001	21-Feb-2013
 Add cmdargs and collections modules for use by PatternsOnText.vim plugin.
