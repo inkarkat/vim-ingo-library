@@ -8,7 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.00.001	22-Jan-2013	file creation
+"   1.000.001	22-Jan-2013	file creation
 
 function! ingo#msg#WarningMsg( text )
     let v:warningmsg = a:text
@@ -30,7 +30,7 @@ function! ingo#msg#MsgFromVimException()
     return substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
 endfunction
 function! ingo#msg#VimExceptionMsg()
-    call ingo#msg#ErrorMsg(ingo#msg#MsgFromException())
+    call ingo#msg#ErrorMsg(ingo#msg#MsgFromVimException())
 endfunction
 function! ingo#msg#CustomExceptionMsg( customPrefixPattern )
     call ingo#msg#ErrorMsg(substitute(v:exception, printf('^\%%(%s\):\s*', a:customPrefixPattern), '', ''))
