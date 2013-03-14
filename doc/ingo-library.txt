@@ -60,6 +60,9 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.003
+Add ingo#msg#ShellError().
+
 1.002	08-Mar-2013
 - Minor: Allow to specify filespec of GVIM executable in
   ingo#external#LaunchGvim().
