@@ -1,11 +1,16 @@
 " surroundings.vim: Generic functions to surround text with something.
 "
-" Copyright: (C) 2008-2012 Ingo Karkat
+" DEPENDENCIES:
+"   - ingocursormove.vim autoload script
+"
+" Copyright: (C) 2008-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	011	07-Jan-2013	Factor out s:CursorLeft() and s:CursorRight() to
+"				autoload/ingocursormove.vim for re-use.
 "	010	11-Sep-2012	ENH: Support use of surroundings#SurroundWith()
 "				in custom operator via g@.
 "	009	28-Aug-2012	I18N: FIX: s:CursorLeft() and s:CursorRight()
@@ -54,27 +59,6 @@ function! s:WarningMsg( text )
     echohl None
 endfunction
 
-" Helper: move cursor one position left; with possible wrap to preceding line.
-" Cursor does not move if at top of file.
-function! s:CursorLeft()
-    if col('.') > 1
-	normal! h
-    elseif line('.') > 1
-	call cursor(line('.') - 1, 0)
-	call cursor(0, col('$'))
-    endif
-endfunction
-
-" Helper: move cursor one position right; with possible wrap to following line.
-" Cursor does not move if at end of file.
-function! s:CursorRight()
-    if col('.') + 1 < col('$')
-	normal! l
-    elseif line('.') < line('$')
-	call cursor(line('.') + 1, 1)
-    endif
-endfunction
-
 " Helper: Make a:string a literal search expression.
 function! s:Literal( string )
     return '\V' . escape(a:string, '\') . '\m'
@@ -109,12 +93,12 @@ function! surroundings#ChangeEnclosedText( delimiterChar, isInner )
     if ! ( (search( '\%#' . l:literalDelimiterExpr . '\n*' . l:literalDelimiterExpr ) > 0) && v:count1 == 1 && a:isInner )
 	" Step right to consider the cursor position and search for leading
 	" delimiter to the left.
-	call s:CursorRight()
-	if s:Search( l:literalDelimiterExpr, v:count1, 1 ) > 0
+	call ingocursormove#Right()
+	if s:Search(l:literalDelimiterExpr, v:count1, 1) > 0
 	    if( a:isInner )
-		call s:CursorRight()
+		call ingocursormove#Right()
 		normal! v
-		call s:CursorLeft()
+		call ingocursormove#Left()
 	    else
 		normal! v
 	    endif
@@ -123,9 +107,9 @@ function! surroundings#ChangeEnclosedText( delimiterChar, isInner )
 	    " trailing delimiter by searching to the right (from the original
 	    " cursor position).
 	    call setpos('.', l:save_cursor)
-	    if s:Search( l:literalDelimiterExpr, v:count1, 0 ) > 0
+	    if s:Search(l:literalDelimiterExpr, v:count1, 0) > 0
 		if( ! a:isInner )
-		    call s:CursorRight()
+		    call ingocursormove#Right()
 		endif
 	    else
 		normal! v
@@ -152,11 +136,11 @@ function! surroundings#RemoveSingleCharDelimiters( delimiterChar )
     let l:literalDelimiterExpr = s:Literal(a:delimiterChar)
 
     " If the cursor rests already ON a delimiter, this one is taken as the first delimiter.
-    call s:CursorRight()
-    if s:Search( l:literalDelimiterExpr, v:count1, 1 ) > 0
+    call ingocursormove#Right()
+    if s:Search(l:literalDelimiterExpr, v:count1, 1) > 0
 	let l:begin_cursor = getpos('.')
 	call setpos('.', l:save_cursor)
-	if s:Search( l:literalDelimiterExpr, v:count1, 0 ) > 0
+	if s:Search(l:literalDelimiterExpr, v:count1, 0) > 0
 	    normal! "_x
 	    call setpos('.', l:begin_cursor)
 	    normal! "_x
@@ -169,11 +153,11 @@ function! surroundings#RemoveSingleCharDelimiters( delimiterChar )
     call setpos('.', l:save_cursor)
 endfunction
 
-" Based on the cursor position, remove the passed 'delimiters' from the
+" Based on the cursor position, remove the passed delimiters from the
 " left and right. Delimiters can be single chars or patterns. Text between
 " delimiters can be across multiple lines or empty and will not be touched.
 " The cursor must rest before the trailing delimiter.
-function! surroundings#RemoveDelimiters( leadingDelimiter, trailingDelimiter )
+function! surroundings#RemoveDelimiters( leadingDelimiterPattern, trailingDelimiterPattern, ... )
     " To cope with different delimiters, we first do a forward search for the
     " trailing delimiter, then go the other direction to the leading one.
     " Memorizing its position, it's back to the trailing one, which is
@@ -181,8 +165,8 @@ function! surroundings#RemoveDelimiters( leadingDelimiter, trailingDelimiter )
     " necessary because the replacement of delimiters changes the former
     " positions.
     let l:save_cursor = getpos('.')
-    let l:literalLeadingDelimiterExpr = s:Literal(a:leadingDelimiter)
-    let l:literalTrailingDelimiterExpr = s:Literal(a:trailingDelimiter)
+    let l:literalLeadingDelimiterExpr  = '\V' . a:leadingDelimiterPattern
+    let l:literalTrailingDelimiterExpr = '\V' . a:trailingDelimiterPattern
 
     if s:Search( l:literalTrailingDelimiterExpr, v:count1, 0 ) > 0
 	call setpos('.', l:save_cursor)
@@ -197,10 +181,10 @@ function! surroundings#RemoveDelimiters( leadingDelimiter, trailingDelimiter )
 		throw "ASSERT: Trailing delimiter shouldn't vanish. "
 	    endif
 	else
-	    call s:WarningMsg('Leading ' . a:leadingDelimiter . ' not found')
+	    call s:WarningMsg('Leading ' . (a:0 ? a:1 : a:leadingDelimiterPattern) . ' not found')
 	endif
     else
-	call s:WarningMsg('Trailing ' . a:trailingDelimiter . ' not found')
+	call s:WarningMsg('Trailing ' . (a:0 ? a:1 : a:trailingDelimiterPattern) . ' not found')
     endif
     call setpos('.', l:save_cursor)
 endfunction
