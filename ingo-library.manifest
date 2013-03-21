@@ -1,5 +1,6 @@
 autoload/ingo/cmdargs.vim
 autoload/ingo/collections.vim
+autoload/ingo/err.vim
 autoload/ingo/external.vim
 autoload/ingo/msg.vim
 doc/ingo-library.txt
