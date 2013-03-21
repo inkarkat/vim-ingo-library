@@ -60,7 +60,7 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.003
+1.003	RELEASEME
 Add ingo#msg#ShellError().
 
 1.002	08-Mar-2013
