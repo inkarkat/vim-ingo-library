@@ -29,6 +29,7 @@
 
 " DEPENDENCIES:
 "   - escapings.vim autoload script
+"   - ingofileargs.vim autoload script
 
 " Copyright: (C) 2009-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -177,13 +178,8 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 "****Dechomsg '****' a:isBang string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspec) string(a:filename)
     let l:dirspec = a:dirspec
 
-    " Detach any file options or commands for assemling the filespec.
-    let [l:fileOptionsAndCommands, l:filename] = matchlist(a:filename,
-    \   '^\(' .
-    \       '\%(++\%(ff\|fileformat\|enc\|encoding\|bin\|binary\|nobin\|nobinary\|bad\|edit\)\%(=\S*\)\?\s\+\)*' .
-    \	    '\%(+.\{-}\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<! \s*\)\?' .
-    \   '\)\(.*\)$'
-    \)[1:2]
+    " Detach any file options or commands for assembling the filespec.
+    let [l:fileOptionsAndCommands, l:filename] = ingofileargs#FilterEscapedFileOptionsAndCommands(a:filename)
 "****D echomsg '****' string(l:filename) string(l:fileOptionsAndCommands)
     try
 	" Set up a context object so that Funcrefs can have access to the
