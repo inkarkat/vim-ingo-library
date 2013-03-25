@@ -61,7 +61,9 @@ IDEAS							  *ingo-library-ideas*
 HISTORY							*ingo-library-history*
 
 1.003	RELEASEME
-Add ingo#msg#ShellError().
+- Add ingo#msg#ShellError().
+- Add ingo#system#Chomped().
+- Add ingo#fstraversal#FindLastContainedInUpDir().
 
 1.002	08-Mar-2013
 - Minor: Allow to specify filespec of GVIM executable in
