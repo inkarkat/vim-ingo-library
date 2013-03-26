@@ -63,7 +63,8 @@ HISTORY							*ingo-library-history*
 1.003	RELEASEME
 - Add ingo#msg#ShellError().
 - Add ingo#system#Chomped().
-- Add ingo#fstraversal#FindLastContainedInUpDir().
+- Add ingo/fs/traversal.vim module.
+- Add search/timelimited.vim module.
 
 1.002	08-Mar-2013
 - Minor: Allow to specify filespec of GVIM executable in
