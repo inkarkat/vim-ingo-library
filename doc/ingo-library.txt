@@ -60,7 +60,7 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.003	RELEASEME
+1.003	27-Mar-2013
 - Add ingo#msg#ShellError().
 - Add ingo#system#Chomped().
 - Add ingo/fs/traversal.vim module.
