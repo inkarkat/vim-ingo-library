@@ -2,6 +2,8 @@
 "
 " DEPENDENCIES:
 "   - surroundings/Lines.vim autoload script
+"   - ingointegration.vim autoload script
+"   - repeatableMapping.vim autoload script (optional)
 "
 " Copyright: (C) 2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -19,6 +21,26 @@ function! surroundings#Lines#Creator#MakeCommand( commandArgs, commandName, befo
     \   a:commandArgs, a:commandName,
     \	string(a:beforeLines), string(a:afterLines), string(a:Transformer)
     \)
+endfunction
+
+function! surroundings#Lines#Creator#MakeMapping( mapArgs, keys, commandName, mapName )
+    let l:doubledKey = matchstr(a:keys, '\(<[[:alpha:]-]\+>\|.\)$')
+    let l:lineMappingKeys = a:keys . l:doubledKey
+
+    " Because of a:commandName defaulting to the last changed text, we have to
+    " insert the "." range when no [count] is given.
+    execute printf('nnoremap %s %s :<C-r><C-r>=v:count ? "" : "."<CR>%s<CR>',
+    \   a:mapArgs, l:lineMappingKeys, a:commandName
+    \)
+    execute printf('xnoremap %s %s :%s<CR>',
+    \   a:mapArgs, a:keys, a:commandName
+    \)
+
+    silent! call repeatableMapping#makeCrossRepeatable(
+    \   'nnoremap ' . a:mapArgs, l:lineMappingKeys, a:mapName . 'Line',
+    \   'xnoremap ' . a:mapArgs, a:keys,            a:mapName . 'Selection'
+    \)
+    call ingointegration#OperatorMappingForRangeCommand(a:mapArgs, a:keys, a:commandName)
 endfunction
 
 let &cpo = s:save_cpo
