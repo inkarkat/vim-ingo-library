@@ -60,6 +60,10 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.004	RELEASEME
+- Add ingo/compat.vim module.
+- Add ingo/lines module.
+
 1.003	27-Mar-2013
 - Add ingo#msg#ShellError().
 - Add ingo#system#Chomped().
