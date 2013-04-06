@@ -1,8 +1,10 @@
 autoload/ingo/cmdargs.vim
 autoload/ingo/collections.vim
+autoload/ingo/compat.vim
 autoload/ingo/err.vim
 autoload/ingo/external.vim
 autoload/ingo/fs/traversal.vim
+autoload/ingo/lines.vim
 autoload/ingo/msg.vim
 autoload/ingo/search/timelimited.vim
 autoload/ingo/system.vim
