@@ -8,11 +8,13 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.002.002	25-Feb-2013	ENH: Allow to specify filespec of GVIM
+"				executable.
 "   1.000.001	28-Jan-2013	file creation from DropQuery.vim
 
-let s:exCommandForExternalGvim = (has('win32') || has('win64') ? 'silent !start gvim' : 'silent ! gvim')
-function! ingo#external#LaunchGvim( commands )
-    execute s:exCommandForExternalGvim join(map(a:commands, '"-c " . escapings#shellescape(v:val, 1)'))
+let s:externalLaunch = (has('win32') || has('win64') ? 'silent !start' : 'silent !')
+function! ingo#external#LaunchGvim( commands, ... )
+    execute s:externalLaunch (a:0 ? a:1 : 'gvim') join(map(a:commands, '"-c " . escapings#shellescape(v:val, 1)'))
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
