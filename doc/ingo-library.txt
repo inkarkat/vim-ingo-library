@@ -63,6 +63,9 @@ HISTORY							*ingo-library-history*
 1.004	RELEASEME
 - Add ingo/compat.vim module.
 - Add ingo/lines module.
+- Add ingo/matches module.
+- Add ingo/mbyte/virtcol module.
+- Add ingo/window/* modules.
 
 1.003	27-Mar-2013
 - Add ingo#msg#ShellError().
