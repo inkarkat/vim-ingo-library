@@ -60,12 +60,18 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.004	RELEASEME
+1.005	RELEASEME
+- Add ingo/plugin/setting.vim module.
+- Add ingo/plugin/cmdcomplete.vim module.
+- Add ingo/search/buffer.vim module.
+
+1.004	10-Apr-2013
 - Add ingo/compat.vim module.
 - Add ingo/lines module.
 - Add ingo/matches module.
 - Add ingo/mbyte/virtcol module.
 - Add ingo/window/* modules.
+- FIX: ingo#external#LaunchGvim() broken with "E117: Unknown function: s:externalLaunch".
 
 1.003	27-Mar-2013
 - Add ingo#msg#ShellError().
