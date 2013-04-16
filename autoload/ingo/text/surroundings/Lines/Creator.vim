@@ -11,18 +11,28 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	002	05-Apr-2013	Remove -bar to allow passing multiple commands.
 "	001	04-Apr-2013	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 
+":{range}Command	Insert ??? around {range}.
+":Command	        Insert ??? around the last changed text.
+":Command {cmd}	        Execute {cmd} (e.g. :read) and insert ???
+"			around the changed text.
 function! surroundings#Lines#Creator#MakeCommand( commandArgs, commandName, beforeLines, afterLines, Transformer )
-    execute printf('command! -bar %s -range=-1 -nargs=* -complete=command %s call setline(<line1>, getline(<line1>)) |' .
+    " Note: No -bar; can take a sequence of Vim commands.
+    execute printf('command! %s -range=-1 -nargs=* -complete=command %s call setline(<line1>, getline(<line1>)) |' .
     \	'call surroundings#Lines#SurroundCommand(%s, %s, %s, <line1>, <line2>, <q-args>)',
     \   a:commandArgs, a:commandName,
     \	string(a:beforeLines), string(a:afterLines), string(a:Transformer)
     \)
 endfunction
 
+" [count]<Leader>??	Insert ??? around [count] lines.
+" [count]<Leader>?{motion}
+"			Insert ??? around lines covered by {motion}.
+" {Visual}<Leader>?	Insert ??? around the selection.
 function! surroundings#Lines#Creator#MakeMapping( mapArgs, keys, commandName, mapName )
     let l:doubledKey = matchstr(a:keys, '\(<[[:alpha:]-]\+>\|.\)$')
     let l:lineMappingKeys = a:keys . l:doubledKey
