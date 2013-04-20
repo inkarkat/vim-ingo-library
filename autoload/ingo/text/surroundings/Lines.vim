@@ -10,6 +10,12 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	002	21-Apr-2013	Change bias of -range=-1 default check to prefer
+"				current line (when on line 1) instead the
+"				last modified range default.
+"				Make the error message on invalid last modified
+"				range more telling than "E16: Invalid range:
+"				3,7call call(a:Transformer, [])"
 "	001	04-Apr-2013	file creation from ftplugin/mail_ingomappings.vim
 
 function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transformer, startLnum, endLnum, command )
@@ -36,7 +42,7 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transform
 "   None.
 "******************************************************************************
     if empty(a:command)
-	if a:endLnum == 1
+	if a:endLnum == 1 && line('.') != 1
 	    " When no [range] is passed, -range=-1 defaults to <line2> == 1.
 	    let [l:startLnum, l:endLnum] = [line("'["), line("']")]
 	else
@@ -59,6 +65,9 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transform
 	    else
 		execute l:startLnum . ',' . l:endLnum . a:Transformer
 	    endif
+	catch /^Vim\%((\a\+)\)\=:E16/ " E16: Invalid range
+	    call ingo#msg#ErrorMsg(printf('Invalid last modified range: %d,%d', l:startLnum, l:endLnum))
+	    return
 	catch /^Vim\%((\a\+)\)\=:E/
 	    call ingo#msg#VimExceptionMsg()
 	    return
