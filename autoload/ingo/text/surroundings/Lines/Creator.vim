@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "   - surroundings/Lines.vim autoload script
-"   - ingointegration.vim autoload script
+"   - ingo/mapmaker.vim autoload script
 "   - repeatableMapping.vim autoload script (optional)
 "
 " Copyright: (C) 2013 Ingo Karkat
@@ -11,6 +11,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	003	17-Apr-2013	Move
+"				ingointegration#OperatorMappingForRangeCommand()
+"				to
+"				ingo#mapmaker#OperatorMappingForRangeCommand().
 "	002	05-Apr-2013	Remove -bar to allow passing multiple commands.
 "	001	04-Apr-2013	file creation
 let s:save_cpo = &cpo
@@ -50,7 +54,7 @@ function! surroundings#Lines#Creator#MakeMapping( mapArgs, keys, commandName, ma
     \   'nnoremap ' . a:mapArgs, l:lineMappingKeys, a:mapName . 'Line',
     \   'xnoremap ' . a:mapArgs, a:keys,            a:mapName . 'Selection'
     \)
-    call ingointegration#OperatorMappingForRangeCommand(a:mapArgs, a:keys, a:commandName)
+    call ingo#mapmaker#OperatorMappingForRangeCommand(a:mapArgs, a:keys, a:commandName)
 endfunction
 
 let &cpo = s:save_cpo
