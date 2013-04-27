@@ -11,6 +11,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	004	21-Apr-2013	Change -range=-1 default check to use <count>
+"				(now passed in separately), which maintains the
+"				actual -1 default, and therefore also delivers
+"				correct results when on line 1.
 "	003	17-Apr-2013	Move
 "				ingointegration#OperatorMappingForRangeCommand()
 "				to
@@ -27,7 +31,7 @@ set cpo&vim
 function! surroundings#Lines#Creator#MakeCommand( commandArgs, commandName, beforeLines, afterLines, Transformer )
     " Note: No -bar; can take a sequence of Vim commands.
     execute printf('command! %s -range=-1 -nargs=* -complete=command %s call setline(<line1>, getline(<line1>)) |' .
-    \	'call surroundings#Lines#SurroundCommand(%s, %s, %s, <line1>, <line2>, <q-args>)',
+    \	'call surroundings#Lines#SurroundCommand(%s, %s, %s, <count>, <line1>, <line2>, <q-args>)',
     \   a:commandArgs, a:commandName,
     \	string(a:beforeLines), string(a:afterLines), string(a:Transformer)
     \)
