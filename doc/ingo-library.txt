@@ -65,6 +65,10 @@ HISTORY							*ingo-library-history*
 - Add ingo/plugin/cmdcomplete.vim module.
 - Add ingo/search/buffer.vim module.
 - Add ingo/number.vim module.
+- Add ingo/cmdrangeconverter.vim module.
+- Add ingo#err#IsSet() for those cases when wrapping the command in :if does
+  not work (e.g. :call'ing a range function).
+- Add ingo#mapmaker.vim module.
 
 1.004	10-Apr-2013
 - Add ingo/compat.vim module.
