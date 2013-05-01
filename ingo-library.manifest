@@ -9,6 +9,7 @@ autoload/ingo/lines.vim
 autoload/ingo/matches.vim
 autoload/ingo/mbyte/virtcol.vim
 autoload/ingo/msg.vim
+autoload/ingo/number.vim
 autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/setting.vim
 autoload/ingo/search/buffer.vim
