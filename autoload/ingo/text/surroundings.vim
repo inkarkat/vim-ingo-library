@@ -170,6 +170,15 @@ function! surroundings#RemoveSingleCharDelimiters( count, delimiterChar )
     call setpos('.', l:save_cursor)
 endfunction
 
+function! s:RemoveExprFromCursorPosition( expr )
+    let l:save_col = col('.')
+	let l:beforeLen = len(getline('.'))
+	    execute 's/\%#' . a:expr . '//e'
+	let l:afterLen = len(getline('.'))
+    call cursor(0, l:save_col)
+
+    return (l:beforeLen - l:afterLen)
+endfunction
 " Based on the cursor position, remove the passed delimiters from the
 " left and right. Delimiters can be single chars or patterns. Text between
 " delimiters can be across multiple lines or empty and will not be touched.
@@ -191,9 +200,26 @@ function! surroundings#RemoveDelimiters( count, leadingDelimiterPattern, trailin
 	    let l:begin_cursor = getpos('.')
 	    call setpos('.', l:save_cursor)
 	    if s:Search( l:literalTrailingDelimiterExpr, a:count, 0 ) > 0
-		execute 's/\%#' . l:literalTrailingDelimiterExpr . '//e'
+		" Remove the trailing delimiter.
+		call s:RemoveExprFromCursorPosition(l:literalTrailingDelimiterExpr)
+
+		" Determine the end position.
+		call ingocursormove#Left()
+		let l:end_pos = getpos('.')
+
+		" Remove the leading delimiter.
 		call setpos('.', l:begin_cursor)
-		execute 's/\%#' . l:literalLeadingDelimiterExpr . '//e'
+		let l:beginByteDiff = s:RemoveExprFromCursorPosition(l:literalLeadingDelimiterExpr)
+
+		" Adjust the end position when the leading delimiter is in the
+		" same line.
+		if l:begin_cursor[1] == l:end_pos[1]
+		    let l:end_pos[2] -= l:beginByteDiff
+		endif
+
+		" Mark the changed area.
+		call setpos("'[", getpos('.'))
+		call setpos("']", l:end_pos)
 	    else
 		throw "ASSERT: Trailing delimiter shouldn't vanish. "
 	    endif
