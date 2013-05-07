@@ -2,6 +2,7 @@
 "
 " DEPENDENCIES:
 "   - ingocursormove.vim autoload script
+"   - ingo/msg.vim autoload script
 "
 " Copyright: (C) 2008-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -9,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	013	08-May-2013	Use ingo-library for warning messages.
 "	012	21-Mar-2013	Avoid changing the jumplist.
 "	011	07-Jan-2013	Factor out s:CursorLeft() and s:CursorRight() to
 "				autoload/ingocursormove.vim for re-use.
@@ -52,13 +54,6 @@
 "	002	18-Jun-2009	Replaced temporary mark z with mark " and using
 "				g` command to avoid clobbering jumplist.
 "	001	24-Sep-2008	file creation from ingotextobjects.vim
-
-function! s:WarningMsg( text )
-    echohl WarningMsg
-    let v:warningmsg = a:text
-    echomsg v:warningmsg
-    echohl None
-endfunction
 
 " Helper: Make a:string a literal search expression.
 function! s:Literal( string )
@@ -115,11 +110,11 @@ function! surroundings#ChangeEnclosedText( delimiterChar, isInner )
 	    else
 		normal! v
 		call setpos('.', l:save_cursor)
-		call s:WarningMsg('Trailing ' . a:delimiterChar . ' not found')
+		call ingo#msg#WarningMsg('Trailing ' . a:delimiterChar . ' not found')
 	    endif
 	else
 	    call setpos('.', l:save_cursor)
-	    call s:WarningMsg('Leading ' . a:delimiterChar . ' not found')
+	    call ingo#msg#WarningMsg('Leading ' . a:delimiterChar . ' not found')
 	endif
     endif
 endfunction
@@ -146,10 +141,10 @@ function! surroundings#RemoveSingleCharDelimiters( delimiterChar )
 	    call setpos('.', l:begin_cursor)
 	    normal! "_x
 	else
-	    call s:WarningMsg('Trailing ' . a:delimiterChar . ' not found')
+	    call ingo#msg#WarningMsg('Trailing ' . a:delimiterChar . ' not found')
 	endif
     else
-	call s:WarningMsg('Leading ' . a:delimiterChar . ' not found')
+	call ingo#msg#WarningMsg('Leading ' . a:delimiterChar . ' not found')
     endif
     call setpos('.', l:save_cursor)
 endfunction
@@ -182,10 +177,10 @@ function! surroundings#RemoveDelimiters( leadingDelimiterPattern, trailingDelimi
 		throw "ASSERT: Trailing delimiter shouldn't vanish. "
 	    endif
 	else
-	    call s:WarningMsg('Leading ' . (a:0 ? a:1 : a:leadingDelimiterPattern) . ' not found')
+	    call ingo#msg#WarningMsg('Leading ' . (a:0 ? a:1 : a:leadingDelimiterPattern) . ' not found')
 	endif
     else
-	call s:WarningMsg('Trailing ' . (a:0 ? a:1 : a:trailingDelimiterPattern) . ' not found')
+	call ingo#msg#WarningMsg('Trailing ' . (a:0 ? a:1 : a:trailingDelimiterPattern) . ' not found')
     endif
     call setpos('.', l:save_cursor)
 endfunction
