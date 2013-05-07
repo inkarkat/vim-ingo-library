@@ -16,6 +16,10 @@
 "				surroundings#ChangeEnclosedText(),
 "				surroundings#RemoveSingleCharDelimiters(),
 "				surroundings#RemoveDelimiters().
+"				ENH: Mark the changed area when the delimiters
+"				were removed. This makes it easier to further
+"				work with it (e.g. to re-surround with a
+"				different delimiter).
 "	012	21-Mar-2013	Avoid changing the jumplist.
 "	011	07-Jan-2013	Factor out s:CursorLeft() and s:CursorRight() to
 "				autoload/ingocursormove.vim for re-use.
@@ -142,9 +146,21 @@ function! surroundings#RemoveSingleCharDelimiters( count, delimiterChar )
 	let l:begin_cursor = getpos('.')
 	call setpos('.', l:save_cursor)
 	if s:Search(l:literalDelimiterExpr, a:count, 0) > 0
+	    " Remove the trailing delimiter.
 	    normal! "_x
+
+	    " Determine the end position; when the leading delimiter is in the
+	    " same line, this needs further adjustment.
+	    call ingocursormove#Left(l:begin_cursor[1] == line('.') ? 2 : 1)
+	    let l:end_pos = getpos('.')
+
+	    " Delete the leading delimiter.
 	    call setpos('.', l:begin_cursor)
 	    normal! "_x
+
+	    " Mark the changed area.
+	    call setpos("'[", getpos('.'))
+	    call setpos("']", l:end_pos)
 	else
 	    call ingo#msg#WarningMsg('Trailing ' . a:delimiterChar . ' not found')
 	endif
