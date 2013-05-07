@@ -16,10 +16,12 @@
 "				surroundings#ChangeEnclosedText(),
 "				surroundings#RemoveSingleCharDelimiters(),
 "				surroundings#RemoveDelimiters().
-"				ENH: Mark the changed area when the delimiters
+"				ENH: Mark the changed area where the delimiters
 "				were removed. This makes it easier to further
 "				work with it (e.g. to re-surround with a
 "				different delimiter).
+"				ENH: Mark the changed area where delimiters
+"				where added (including the delimiters).
 "	012	21-Mar-2013	Avoid changing the jumplist.
 "	011	07-Jan-2013	Factor out s:CursorLeft() and s:CursorRight() to
 "				autoload/ingocursormove.vim for re-use.
@@ -247,6 +249,11 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 	" be pasted _below_ the surrounded characters.
 	call setreg('z', '', 'av')
 	execute 'normal! "_s' . a:textBefore . "\<C-R>\<C-O>z" . a:textAfter . "\<Esc>"
+
+	" Mark the changed area.
+	" The start of the change is already right, but the end is one after the
+	" trailing delimiter. Use the cursor position instead, it is right.
+	call setpos("']", getpos('.'))
     elseif index(['v', 'char', 'line', 'block'], a:selectionType) != -1
 	if a:selectionType ==# 'char'
 	    silent! execute 'normal! g`[vg`]'. (&selection ==# 'exclusive' ? 'l' : '') . "\<Esc>"
@@ -271,6 +278,11 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 
 	call setreg('"', l:save_reg, l:save_regmode)
 	let &clipboard = l:save_clipboard
+
+	" Mark the changed area.
+	" The start of the change is already right, but the end is one after the
+	" trailing delimiter. Use the cursor position instead, it is right.
+	call setpos("']", getpos('.'))
     else
 	if a:selectionType ==# 'w'
 	    let l:backmotion = 'b'
@@ -282,12 +294,21 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 	    throw "This selection type has not been implemented."
 	endif
 
+	let l:count = (v:count ? v:count : '')
 	let l:save_cursor = getpos('.')
-	execute 'normal! w' . l:backmotion . "i". a:textBefore . "\<Esc>" . v:count1 . l:backendmotion . "a" . a:textAfter . "\<Esc>"
+	execute 'normal! w' . l:backmotion . "i". a:textBefore . "\<Esc>"
+	let l:begin_pos = getpos("'[")
+
+	execute 'normal!' l:count . l:backendmotion . "a" . a:textAfter . "\<Esc>"
+	let l:end_pos = getpos(".") " Use the cursor position; '] is one after the change.
 
 	" Adapt saved cursor position to consider inserted text.
 	let l:save_cursor[2] += strlen(a:textBefore)
 	call setpos('.', l:save_cursor)
+
+	" Mark the changed area.
+	call setpos("'[", l:begin_pos)
+	call setpos("']", l:end_pos)
     endif
 endfunction
 
