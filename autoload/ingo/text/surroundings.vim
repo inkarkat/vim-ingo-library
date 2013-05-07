@@ -9,6 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	012	21-Mar-2013	Avoid changing the jumplist.
 "	011	07-Jan-2013	Factor out s:CursorLeft() and s:CursorRight() to
 "				autoload/ingocursormove.vim for re-use.
 "	010	11-Sep-2012	ENH: Support use of surroundings#SurroundWith()
@@ -206,11 +207,11 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 	execute 'normal! "_s' . a:textBefore . "\<C-R>\<C-O>z" . a:textAfter . "\<Esc>"
     elseif index(['v', 'char', 'line', 'block'], a:selectionType) != -1
 	if a:selectionType ==# 'char'
-	    silent! execute 'normal! `[v`]'. (&selection ==# 'exclusive' ? 'l' : '') . "\<Esc>"
+	    silent! execute 'normal! g`[vg`]'. (&selection ==# 'exclusive' ? 'l' : '') . "\<Esc>"
 	elseif a:selectionType ==# 'line'
-	    silent! execute "normal! '[V']\<Esc>"
+	    silent! execute "normal! g'[Vg']\<Esc>"
 	elseif a:selectionType ==# 'block'
-	    silent! execute "normal! `[\<C-V>`]". (&selection ==# 'exclusive' ? 'l' : '') . "\<Esc>"
+	    silent! execute "normal! g`[\<C-V>g`]". (&selection ==# 'exclusive' ? 'l' : '') . "\<Esc>"
 	endif
 
 
