@@ -1,5 +1,6 @@
 autoload/ingo/cmdargs.vim
 autoload/ingo/collections.vim
+autoload/ingo/comments.vim
 autoload/ingo/compat.vim
 autoload/ingo/err.vim
 autoload/ingo/external.vim
@@ -14,6 +15,7 @@ autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/setting.vim
 autoload/ingo/search/buffer.vim
 autoload/ingo/search/timelimited.vim
+autoload/ingo/syntaxitem.vim
 autoload/ingo/system.vim
 autoload/ingo/window/cmdwin.vim
 autoload/ingo/window/dimensions.vim
