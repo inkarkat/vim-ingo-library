@@ -61,6 +61,11 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.006	RELEASEME
+- Add optional isReturnError flag on
+  ingo#window#switches#GotoPreviousWindow().
+- Add ingo#msg#StatusMsg().
+
 1.005	02-May-2013
 - Add ingo/plugin/setting.vim module.
 - Add ingo/plugin/cmdcomplete.vim module.
@@ -75,6 +80,7 @@ HISTORY							*ingo-library-history*
 
 1.004	10-Apr-2013
 - Add ingo/compat.vim module.
+- Add ingo/folds.vim module.
 - Add ingo/lines module.
 - Add ingo/matches module.
 - Add ingo/mbyte/virtcol module.
