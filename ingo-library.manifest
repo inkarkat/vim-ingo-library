@@ -15,6 +15,7 @@ autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/setting.vim
 autoload/ingo/search/buffer.vim
 autoload/ingo/search/timelimited.vim
+autoload/ingo/selection/patternmatch.vim
 autoload/ingo/syntaxitem.vim
 autoload/ingo/system.vim
 autoload/ingo/window/cmdwin.vim
