@@ -65,6 +65,7 @@ HISTORY							*ingo-library-history*
 - Add optional isReturnError flag on
   ingo#window#switches#GotoPreviousWindow().
 - Add ingo#msg#StatusMsg().
+- Add ingo/selection/patternmatch.vim module.
 
 1.005	02-May-2013
 - Add ingo/plugin/setting.vim module.
