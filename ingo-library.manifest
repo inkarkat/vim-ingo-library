@@ -13,8 +13,12 @@ autoload/ingo/msg.vim
 autoload/ingo/number.vim
 autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/setting.vim
+autoload/ingo/regexp.vim
+autoload/ingo/regexp/magic.vim
 autoload/ingo/search/buffer.vim
+autoload/ingo/search/pattern.vim
 autoload/ingo/search/timelimited.vim
+autoload/ingo/selection.vim
 autoload/ingo/selection/patternmatch.vim
 autoload/ingo/syntaxitem.vim
 autoload/ingo/system.vim
