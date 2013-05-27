@@ -8,6 +8,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.006.005	28-May-2013	BUG: ingo#cmdargs#ParseSubstituteArgument()
+"				mistakenly returns a:defaultFlags when full
+"				/pat/repl/ or a literal pat is passed. Only
+"				return a:defaultFlags when the passed
+"				a:arguments is really empty.
 "   1.001.004	21-Feb-2013	Move to ingo-library.
 "	003	29-Jan-2013	Add ingocmdargs#ParseSubstituteArgument() for
 "				use in PatternsOnText/Except.vim and
@@ -104,7 +109,7 @@ function! ingo#cmdargs#ParseSubstituteArgument( arguments, defaultReplacement, .
     let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . (a:0 ? a:2 : '') . '$')
     if ! empty(l:matches)
 	" Full /pat/repl/[flags].
-	return l:matches[1:3] + [(a:0 && ! empty(l:matches[4]) ? l:matches[4] : a:1)]
+	return l:matches[1:3] + (a:0 ? [l:matches[4]] : [])
     endif
 
     let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)$')
@@ -119,7 +124,7 @@ function! ingo#cmdargs#ParseSubstituteArgument( arguments, defaultReplacement, .
 	return l:matches[1:2] + [escape(a:defaultReplacement, l:matches[1])] + (a:0 ? [''] : [])
     elseif ! empty(a:arguments)
 	" Literal pat.
-	return ['', a:arguments, a:defaultReplacement] + (a:0 ? [a:1] : [])
+	return ['', a:arguments, a:defaultReplacement] + (a:0 ? [''] : [])
     else
 	" Nothing.
 	return ['/', '', escape(a:defaultReplacement, '/')] + (a:0 ? [a:1] : [])
