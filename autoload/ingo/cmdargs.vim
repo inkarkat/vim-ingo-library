@@ -8,25 +8,6 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.006.005	28-May-2013	BUG: ingo#cmdargs#ParseSubstituteArgument()
-"				mistakenly returns a:defaultFlags when full
-"				/pat/repl/ or a literal pat is passed. Only
-"				return a:defaultFlags when the passed
-"				a:arguments is really empty.
-"				CHG: Redesign
-"				ingo#cmdargs#ParseSubstituteArgument() interface
-"				to the existing use cases. a:defaultReplacement
-"				should only be used when a:arguments is really
-"				empty, too. Introduce an optional options
-"				Dictionary and preset replacement / flags
-"				defaults of "~" and "&" resp. for when
-"				a:arguments is really empty, which makes sense
-"				for use with :substitute. Allow submatches for
-"				a:flagsExpr via a:options.flagsMatchCount, to
-"				avoid further parsing in the client.
-"				ENH: Also parse lone {flags} (if a:flagsExpr is
-"				given) by default, and allow to turn this off
-"				via a:options.isAllowLoneFlags.
 "   1.001.004	21-Feb-2013	Move to ingo-library.
 "	003	29-Jan-2013	Add ingocmdargs#ParseSubstituteArgument() for
 "				use in PatternsOnText/Except.vim and
@@ -97,7 +78,7 @@ function! ingo#cmdargs#UnescapePatternArgument( parsedArguments )
     return (len(a:parsedArguments) > 2 ? [l:unescapedPattern] + a:parsedArguments[2:] : l:unescapedPattern)
 endfunction
 
-function! ingo#cmdargs#ParseSubstituteArgument( arguments, flagsExpr, ... )
+function! ingo#cmdargs#ParseSubstituteArgument( arguments, defaultReplacement, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Parse the arguments of a custom command that works like :substitute.
@@ -107,71 +88,41 @@ function! ingo#cmdargs#ParseSubstituteArgument( arguments, flagsExpr, ... )
 "	? List of the procedure's effect on each external variable, control, or other element.
 "* INPUTS:
 "   a:arguments The command's raw arguments; usually <q-args>.
-"   a:flagsExpr             Pattern that captures any optional part after the
-"			    replacement (usually some substitution flags).
-"   a:options.flagsMatchCount       Optional number of submatches captured by
-"				    a:flagsExpr. Defaults to 1.
-"   a:options.defaultReplacement    Replacement to use when the replacement part
-"				    is omitted. Empty by default.
-"   a:options.emptyReplacement      Replacement to use when no arguments at all
-"				    are given. Defaults to "~" to use the
-"				    previous replacement in a :substitute.
-"   a:options.emptyFlags            Flags to use when a:flagsExpr is not empty,
-"				    but no arguments at all are given. Defaults
-"				    to "&" to use the previous flags of a
-"				    :substitute. Provide a List if
-"				    a:options.flagsMatchCount is larger than 1.
-"   a:options.isAllowLoneFlags      Allow to omit /pat/repl/, and parse a
-"				    stand-alone a:flagsExpr (assuming one is
-"				    passed). On by default.
+"   a:defaultReplacement    Replacement to use when the replacement part is
+"			    omitted.
+"   a:defaultFlags          Optional: Flags to use when a:flagsExpr is passed,
+"			    but no arguments at all are given.
+"   a:flagsExpr             Optional: Pattern that captures any optional part
+"			    after the replacement (usually some substitution
+"			    flags).
 "* RETURN VALUES:
 "   A list of [separator, pattern, replacement] or [separator, pattern,
-"   replacement, flags] (or more List items when a:options.flagsMatchCount is
-"   greater 1) when the optional arguments are passed.
+"   replacement, flags] when the optional arguments are passed.
 "   The replacement part is always escaped for use inside separator, also when
 "   the default is taken.
 "******************************************************************************
-    let l:options = (a:0 ? a:1 : {})
-    let l:isParseFlags = (! empty(a:flagsExpr))
-    let l:flagsMatchCount = get(l:options, 'flagsMatchCount', 1)
-    let l:defaultFlags = (l:isParseFlags ? repeat([''], l:flagsMatchCount) : [])
-    let l:defaultReplacement = get(l:options, 'defaultReplacement', '')
-    let l:emptyReplacement = get(l:options, 'emptyReplacement', '~')
-    let l:emptyFlags = get(l:options, 'emptyFlags', '&')
-    let l:isAllowLoneFlags = get(l:options, 'isAllowLoneFlags', 1)
-
-    let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . a:flagsExpr . '$')
+    let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . (a:0 ? a:2 : '') . '$')
     if ! empty(l:matches)
 	" Full /pat/repl/[flags].
-	return l:matches[1:3] + (l:isParseFlags ? l:matches[4:(4 + l:flagsMatchCount - 1)] : [])
+	return l:matches[1:3] + [(a:0 && ! empty(l:matches[4]) ? l:matches[4] : a:1)]
     endif
 
     let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)$')
     if ! empty(l:matches)
 	" Partial /pat/[repl].
-	return l:matches[1:2] + [(empty(l:matches[3]) ? escape(l:defaultReplacement, l:matches[1]) : l:matches[3])] + l:defaultFlags
+	return l:matches[1:2] + [(empty(l:matches[3]) ? escape(a:defaultReplacement, l:matches[1]) : l:matches[3])] + (a:0 ? [''] : [])
     endif
 
     let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.\{-}\)$')
     if ! empty(l:matches)
 	" Minimal /[pat].
-	return l:matches[1:2] + [escape(l:defaultReplacement, l:matches[1])] + l:defaultFlags
-    endif
-
-    if l:isParseFlags && l:isAllowLoneFlags
-	let l:matches = matchlist(a:arguments, '^' . a:flagsExpr . '$')
-	if ! empty(l:matches)
-	    " Special case of {flags} without /pat/string/.
-	    return ['/', '', escape(l:emptyReplacement, '/')] + l:matches[1:(l:flagsMatchCount)]
-	endif
-    endif
-
-    if ! empty(a:arguments)
+	return l:matches[1:2] + [escape(a:defaultReplacement, l:matches[1])] + (a:0 ? [''] : [])
+    elseif ! empty(a:arguments)
 	" Literal pat.
-	return ['', a:arguments, l:defaultReplacement] + l:defaultFlags
+	return ['', a:arguments, a:defaultReplacement] + (a:0 ? [a:1] : [])
     else
 	" Nothing.
-	return ['/', '', escape(l:emptyReplacement, '/')] + (l:isParseFlags ? (type(l:emptyFlags) == type([]) ? l:emptyFlags : [l:emptyFlags]) : [])
+	return ['/', '', escape(a:defaultReplacement, '/')] + (a:0 ? [a:1] : [])
     endif
 endfunction
 
