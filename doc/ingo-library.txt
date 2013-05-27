@@ -29,7 +29,7 @@ Other authors have published separate support libraries, too:
 - TOVL (vimscript #1963) by Marc Weber
 - l9 (vimscript #3252) by Takeshi Nishida
 - anwolib (vimscript #3800) by Andy Wokula
-- vim-misc (https://github.com/xolox/vim-misc) by Peter Odding
+- vim-misc (vimscript #4597) by Peter Odding
 
 There have been initiatives to gather and consolidate useful functions into a
 "standard Vim library", but these efforts have mostly fizzled out.
@@ -70,6 +70,7 @@ HISTORY							*ingo-library-history*
 - Add ingo/search/pattern.vim module.
 - Add ingo/regexp.vim module.
 - Add ingo/regexp/magic.vim module.
+- Add ingo/collections/rotate.vim module.
 
 1.005	02-May-2013
 - Add ingo/plugin/setting.vim module.
