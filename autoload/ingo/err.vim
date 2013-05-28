@@ -8,6 +8,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.005.002	17-Apr-2013	Add ingo#err#IsSet() for those cases when
+"				wrapping the command in :if does not work (e.g.
+"				:call'ing a range function).
 "   1.002.001	08-Mar-2013	file creation
 
 "******************************************************************************
@@ -26,6 +29,13 @@
 "   Indicate to the invoking :command via a boolean flag whether the command
 "   succeeded. On failure, :echoerr the stored error message via ingo#err#Get().
 "	command! Foo if ! Foo#Bar() | echoerr ingo#err#Get() | endif
+"   If you cannot wrap the function in :if, you have to ingo#err#Clear() the
+"   message inside your function, and invoke like this:
+"	function! Foo#Bar() range
+"	    call ingo#err#Clear()
+"	    ...
+"	endfunction
+"	nnoremap <Leader>f :call Foo#Bar()<<Bar>if ingo#err#IsSet()<Bar>echoerr ingo#err#Get()<Bar>endif<CR>
 "******************************************************************************
 let s:errmsg = ''
 function! ingo#err#Get()
@@ -33,6 +43,9 @@ function! ingo#err#Get()
 endfunction
 function! ingo#err#Clear()
     let s:errmsg = ''
+endfunction
+function! ingo#err#IsSet()
+    return ! empty(s:errmsg)
 endfunction
 function! ingo#err#Set( errmsg )
     let s:errmsg = a:errmsg
