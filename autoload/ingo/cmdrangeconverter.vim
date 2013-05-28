@@ -68,6 +68,7 @@ function! ingo#cmdrangeconverter#LineToBufferRange( cmd )
 "   a:cmd   Ex command which has a default range=.
 "* RETURN VALUES:
 "   True if successful; False when a Vim error or exception occurred.
+"   Get the error message via ingo#err#Get().
 "******************************************************************************
     call ingo#err#Clear()
     try
