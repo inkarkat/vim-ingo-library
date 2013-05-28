@@ -1,5 +1,6 @@
 autoload/ingo/cmdargs.vim
 autoload/ingo/collections.vim
+autoload/ingo/collections/rotate.vim
 autoload/ingo/comments.vim
 autoload/ingo/compat.vim
 autoload/ingo/err.vim
