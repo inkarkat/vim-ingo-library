@@ -98,6 +98,10 @@ function! ingo#cmdargs#UnescapePatternArgument( parsedArguments )
     return (len(a:parsedArguments) > 2 ? [l:unescapedPattern] + a:parsedArguments[2:] : l:unescapedPattern)
 endfunction
 
+function! s:ApplyEmptyFlags( emptyFlags, parsedFlags)
+    return (empty(filter(copy(a:parsedFlags), '! empty(v:val)')) ? a:emptyFlags : a:parsedFlags)
+endfunction
+
 function! ingo#cmdargs#ParseSubstituteArgument( arguments, flagsExpr, ... )
 "******************************************************************************
 "* PURPOSE:
@@ -170,7 +174,7 @@ function! ingo#cmdargs#ParseSubstituteArgument( arguments, flagsExpr, ... )
 	let l:matches = matchlist(a:arguments, '^' . a:flagsExpr . '$')
 	if ! empty(l:matches)
 	    " Special case of {flags} without /pat/string/.
-	    return ['/', l:emptyPattern, escape(l:emptyReplacement, '/')] + l:matches[1:(l:flagsMatchCount)]
+	    return ['/', l:emptyPattern, escape(l:emptyReplacement, '/')] + s:ApplyEmptyFlags([l:emptyFlags], l:matches[1:(l:flagsMatchCount)])
 	endif
     endif
 
