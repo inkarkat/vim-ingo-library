@@ -188,7 +188,26 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
     endtry
 endfunction
 
-function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspec, filename )
+function! s:Browse( dirspec, browsefilter )
+    if exists('b:browsefilter')
+	let l:save_browsefilter = b:browsefilter
+    endif
+    if empty(a:browsefilter)
+	unlet! b:browsefilter
+    else
+	let b:browsefilter = printf("Selected files (%s)\t%s\n", a:browsefilter, a:browsefilter) . "All Files (*.*)\t*.*\n"
+    endif
+    try
+	return browse(0, 'Select file', a:dirspec, '')
+    finally
+	if exists('l:save_browsefilter')
+	    let b:browsefilter = l:save_browsefilter
+	else
+	    unlet b:browsefilter
+	endif
+    endtry
+endfunction
+function! s:Command( isBang, Action, PostAction, DefaultFilename, browsefilter, FilenameProcessingFunction, FilespecProcessingFunction, dirspec, filename )
     try
 "****Dechomsg '****' a:isBang string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspec) string(a:filename)
 	let l:dirspec = (type(a:dirspec) == 2 ? call(a:dirspec, []) : a:dirspec)
@@ -203,16 +222,19 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 	" l:filename comes from the custom command, and must be taken as is (the
 	" custom completion will have already escaped the completion).
 	" All other filespec fragments still need escaping.
-	let l:filename = (empty(l:filename) ?
-	\   escapings#fnameescape(type(a:DefaultFilename) == 2 ?
-	\       call(a:DefaultFilename, [l:dirspec]) :
-	\       (a:DefaultFilename ==# '%' ?
-	\           expand('%:t') :
-	\           a:DefaultFilename
-	\       )
-	\   ) :
-	\   l:filename
-	\)
+
+	if empty(l:filename)
+	    if type(a:DefaultFilename) == 2
+	       let l:unescapedFilename = call(a:DefaultFilename, [l:dirspec])
+	    elseif a:DefaultFilename ==# '%'
+		let l:unescapedFilename = expand('%:t')
+	    elseif a:DefaultFilename ==# '?'
+		let l:unescapedFilename = s:Browse(a:dirspec, a:browsefilter)
+	    else
+		let l:unescapedFilename = a:DefaultFilename
+	    endif
+	    let l:filename = escapings#fnameescape(l:unescapedFilename)
+	endif
 
 	if ! empty(a:FilenameProcessingFunction)
 	    let l:processedFilename = call(a:FilenameProcessingFunction, [l:filename, l:fileOptionsAndCommands])
@@ -313,6 +335,9 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "	    filename.
 "	    Or Funcref to a function that takes the dirspec and returns the
 "	    filename.
+"	    This can resolve to an empty string; however, then your
+"	    a:parameters.action has to cope with that (e.g. by putting up a
+"	    browse dialog).
 "   a:parameters.overrideCompleteFunction
 "	    If not empty, will be used as the :command -complete=customlist,...
 "	    completion function name. This hook can be used to manipulate the
@@ -353,7 +378,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \	    string(a:dirspec), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
     \	) .    "endfunction"
 
-    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s call <SID>Command(<bang>0, %s, %s, %s, %s, %s, %s, <q-args>)',
+    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s call <SID>Command(<bang>0, %s, %s, %s, %s, %s, %s, %s, <q-args>)',
     \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'),
     \   l:completeFunctionName,
     \   l:commandAttributes,
@@ -364,6 +389,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \   ),
     \   string(l:PostAction),
     \   string(l:DefaultFilename),
+    \   string(l:browsefilter),
     \	string(l:FilenameProcessingFunction),
     \	string(l:FilespecProcessingFunction),
     \   string(a:dirspec),
