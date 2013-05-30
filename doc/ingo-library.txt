@@ -61,7 +61,9 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.006	RELEASEME
+1.006	29-May-2013
+- Add ingo/cmdrangeconverter.vim module.
+- Add ingo#mapmaker.vim module.
 - Add optional isReturnError flag on
   ingo#window#switches#GotoPreviousWindow().
 - Add ingo#msg#StatusMsg().
@@ -71,19 +73,16 @@ HISTORY							*ingo-library-history*
 - Add ingo/regexp.vim module.
 - Add ingo/regexp/magic.vim module.
 - Add ingo/collections/rotate.vim module.
-- BUG: ingo#cmdargs#ParseSubstituteArgument() mistakenly returns
-  a:defaultFlags when full /pat/repl/ or a literal pat is passed. Only return
-  a:defaultFlags when the passed a:arguments is really empty.
+- Redesign ingo#cmdargs#ParseSubstituteArgument() to the existing use cases.
+- Add ingo/buffer.vim module.
 
 1.005	02-May-2013
 - Add ingo/plugin/setting.vim module.
 - Add ingo/plugin/cmdcomplete.vim module.
 - Add ingo/search/buffer.vim module.
 - Add ingo/number.vim module.
-- Add ingo/cmdrangeconverter.vim module.
 - Add ingo#err#IsSet() for those cases when wrapping the command in :if does
   not work (e.g. :call'ing a range function).
-- Add ingo#mapmaker.vim module.
 - Add ingo#syntaxitem.vim module.
 - Add ingo#comments.vim module.
 
