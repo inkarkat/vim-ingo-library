@@ -30,6 +30,7 @@
 " DEPENDENCIES:
 "   - escapings.vim autoload script
 "   - ingofileargs.vim autoload script
+"   - ingo/msg.vim autoload script
 
 " Copyright: (C) 2009-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -37,6 +38,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	014	23-Mar-2013	ENH: Allow determining the a:dirspec during
+"				runtime by taking a Funcref instead of string.
+"				Use error handling functions from ingo/msg.vim.
 "	013	28-Jan-2013	Handle ++enc= and +cmd file options and
 "				commands. This requires an extension of the
 "				a:parameters.action,
@@ -124,8 +128,18 @@ function! s:RemoveDirspec( filespec, dirspecs )
     return a:filespec
 endfunction
 function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, argLead )
+    try
+	let l:dirspec = (type(a:dirspec) == 2 ? call(a:dirspec, []) : a:dirspec)
+    catch /^Vim\%((\a\+)\)\=:E/
+	throw ingo#msg#MsgFromVimException()   " Don't swallow Vimscript errors.
+    catch
+	call ingo#msg#ErrorMsg(v:exception)
+	sleep 1 " Otherwise, the error isn't visible from inside the command-line completion function.
+	return []
+    endtry
+
     let l:browsefilter = (empty(a:browsefilter) ? '*' : a:browsefilter)
-    let l:filespecWildcard = a:dirspec . a:argLead . l:browsefilter
+    let l:filespecWildcard = l:dirspec . a:argLead . l:browsefilter
     let l:save_wildignore = &wildignore
     if type(a:wildignore) == type('')
 	let &wildignore = a:wildignore
@@ -134,16 +148,16 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 	let l:filespecs = split(glob(l:filespecWildcard), "\n")
 
 	if a:isIncludeSubdirs
-	    " If the a:dirspec itself contains wildcards, there may be multiple
+	    " If the l:dirspec itself contains wildcards, there may be multiple
 	    " matches.
 	    let l:pathSeparator = (exists('+shellslash') && ! &shellslash ? '\' : '/')
-	    let l:resolvedDirspecs = split(glob(a:dirspec), "\n")
+	    let l:resolvedDirspecs = split(glob(l:dirspec), "\n")
 
 	    " If there is a browsefilter, we need to add all directories
 	    " separately, as most of them probably have been filtered away by
 	    " the (file-based) a:browsefilter.
 	    if ! empty(a:browsefilter)
-		let l:dirspecWildcard = a:dirspec . a:argLead . '*' . l:pathSeparator
+		let l:dirspecWildcard = l:dirspec . a:argLead . '*' . l:pathSeparator
 		call extend(l:filespecs, split(glob(l:dirspecWildcard), "\n"))
 		call sort(l:filespecs) " Weave the directories into the files.
 	    else
@@ -175,13 +189,13 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 endfunction
 
 function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspec, filename )
-"****Dechomsg '****' a:isBang string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspec) string(a:filename)
-    let l:dirspec = a:dirspec
-
-    " Detach any file options or commands for assembling the filespec.
-    let [l:fileOptionsAndCommands, l:filename] = ingofileargs#FilterEscapedFileOptionsAndCommands(a:filename)
-"****D echomsg '****' string(l:filename) string(l:fileOptionsAndCommands)
     try
+"****Dechomsg '****' a:isBang string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspec) string(a:filename)
+	let l:dirspec = (type(a:dirspec) == 2 ? call(a:dirspec, []) : a:dirspec)
+
+	" Detach any file options or commands for assembling the filespec.
+	let [l:fileOptionsAndCommands, l:filename] = ingofileargs#FilterEscapedFileOptionsAndCommands(a:filename)
+"****D echomsg '****' string(l:filename) string(l:fileOptionsAndCommands)
 	" Set up a context object so that Funcrefs can have access to the
 	" information whether <bang> was given.
 	let g:CommandCompleteDirForAction_Context = { 'bang': a:isBang }
@@ -231,17 +245,9 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 	    endif
 	endif
     catch /^Vim\%((\a\+)\)\=:E/
-	" v:exception contains what is normally in v:errmsg, but with extra
-	" exception source info prepended, which we cut away.
-	let v:errmsg = substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
-	echohl ErrorMsg
-	echomsg v:errmsg
-	echohl None
+	call ingo#msg#VimExceptionMsg()
     catch
-	let v:errmsg = v:exception
-	echohl ErrorMsg
-	echomsg v:errmsg
-	echohl None
+	call ingo#msg#ErrorMsg(v:exception)
     finally
 	unlet! g:CommandCompleteDirForAction_Context
     endtry
@@ -268,6 +274,8 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "   a:command   Name of the custom command to be defined.
 "   a:dirspec	Directory (including trailing path separator!) from which
 "		files will be completed.
+"		Or Funcref to a function that takes no arguments and returns the
+"		dirspec.
 "
 "   a:parameters.commandAttributes
 "	    Optional :command {attr}, e.g. <buffer>, -bang, -range.
