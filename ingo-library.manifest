@@ -17,6 +17,8 @@ autoload/ingo/msg.vim
 autoload/ingo/number.vim
 autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/setting.vim
+autoload/ingo/query/get.vim
+autoload/ingo/query/file.vim
 autoload/ingo/regexp.vim
 autoload/ingo/regexp/magic.vim
 autoload/ingo/search/buffer.vim
