@@ -61,6 +61,10 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.007	RELEASEME
+- Add ingo/query/get.vim module.
+- Add ingo/query/file.vim module.
+
 1.006	29-May-2013
 - Add ingo/cmdrangeconverter.vim module.
 - Add ingo#mapmaker.vim module.
