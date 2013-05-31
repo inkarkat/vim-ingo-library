@@ -8,6 +8,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.006.006	29-May-2013	Again change
+"				ingo#cmdargs#ParseSubstituteArgument() interface
+"				to parse the :substitute [flags] [count] by
+"				default.
 "   1.006.005	28-May-2013	BUG: ingo#cmdargs#ParseSubstituteArgument()
 "				mistakenly returns a:defaultFlags when full
 "				/pat/repl/ or a literal pat is passed. Only
@@ -98,24 +102,38 @@ function! ingo#cmdargs#UnescapePatternArgument( parsedArguments )
     return (len(a:parsedArguments) > 2 ? [l:unescapedPattern] + a:parsedArguments[2:] : l:unescapedPattern)
 endfunction
 
+function! s:EnsureList( val )
+    return (type(a:val) == type([]) ? a:val : [a:val])
+endfunction
 function! s:ApplyEmptyFlags( emptyFlags, parsedFlags)
     return (empty(filter(copy(a:parsedFlags), '! empty(v:val)')) ? a:emptyFlags : a:parsedFlags)
 endfunction
-
-function! ingo#cmdargs#ParseSubstituteArgument( arguments, flagsExpr, ... )
+function! ingo#cmdargs#ParseSubstituteArgument( arguments, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Parse the arguments of a custom command that works like :substitute.
 "* ASSUMPTIONS / PRECONDITIONS:
-"	? List of any external variable, control, or other element whose state affects this procedure.
+"   None.
 "* EFFECTS / POSTCONDITIONS:
-"	? List of the procedure's effect on each external variable, control, or other element.
+"   None.
 "* INPUTS:
 "   a:arguments The command's raw arguments; usually <q-args>.
-"   a:flagsExpr             Pattern that captures any optional part after the
-"			    replacement (usually some substitution flags).
+"   a:options.flagsExpr             Pattern that captures any optional part
+"				    after the replacement (usually some
+"				    substitution flags). By default, captures
+"				    the known :substitute |:s_flags| and
+"				    optional [count]. Pass an empty string to
+"				    disallow any flags.
+"   a:options.additionalFlags       Flags that will be recognized in addition to
+"				    the default |:s_flags|; default none. Modify
+"				    this instead of passing a:options.flagsExpr
+"				    if you want to recognize additional flags.
 "   a:options.flagsMatchCount       Optional number of submatches captured by
-"				    a:flagsExpr. Defaults to 1.
+"				    a:options.flagsExpr. Defaults to 2 with the
+"				    default a:options.flagsExpr, to 1 with a
+"				    non-standard non-empty
+"				    a:options.flagsMatchCount, and 0 if
+"				    a:options.flagsMatchCount is empty.
 "   a:options.defaultReplacement    Replacement to use when the replacement part
 "				    is omitted. Empty by default.
 "   a:options.emptyPattern          Pattern to use when no arguments at all are
@@ -127,32 +145,37 @@ function! ingo#cmdargs#ParseSubstituteArgument( arguments, flagsExpr, ... )
 "   a:options.emptyReplacement      Replacement to use when no arguments at all
 "				    are given. Defaults to "~" to use the
 "				    previous replacement in a :substitute.
-"   a:options.emptyFlags            Flags to use when a:flagsExpr is not empty,
-"				    but no arguments at all are given. Defaults
-"				    to "&" to use the previous flags of a
-"				    :substitute. Provide a List if
+"   a:options.emptyFlags            Flags to use when a:options.flagsExpr is not
+"				    empty, but no arguments at all are given.
+"				    Defaults to "&" to use the previous flags of
+"				    a :substitute. Provide a List if
 "				    a:options.flagsMatchCount is larger than 1.
 "   a:options.isAllowLoneFlags      Allow to omit /pat/repl/, and parse a
-"				    stand-alone a:flagsExpr (assuming one is
-"				    passed). On by default.
+"				    stand-alone a:options.flagsExpr (assuming
+"				    one is passed). On by default.
 "* RETURN VALUES:
-"   A list of [separator, pattern, replacement] or [separator, pattern,
-"   replacement, flags] (or more List items when a:options.flagsMatchCount is
-"   greater 1) when the optional arguments are passed.
+"   A list of [separator, pattern, replacement, flags, count] (default, count
+"   and flags may be omitted or more elements added depending on the
+"   a:options.flagsExpr and a:options.flagsMatchCount).
+"   flags and count are meant to be directly concatenated; count therefore keeps
+"   leading whitespace, but be aware that this is optional with :substitute,
+"   too!
 "   The replacement part is always escaped for use inside separator, also when
 "   the default is taken.
 "******************************************************************************
     let l:options = (a:0 ? a:1 : {})
-    let l:isParseFlags = (! empty(a:flagsExpr))
-    let l:flagsMatchCount = get(l:options, 'flagsMatchCount', 1)
+    let l:additionalFlags = get(l:options, 'additionalFlags', '')
+    let l:flagsExpr = get(l:options, 'flagsExpr', '\(&\?[cegiInp#lr' . l:additionalFlags . ']*\)\(\s*\d*\)')
+    let l:isParseFlags = (! empty(l:flagsExpr))
+    let l:flagsMatchCount = get(l:options, 'flagsMatchCount', (has_key(l:options, 'flagsExpr') ? (l:isParseFlags ? 1 : 0) : 2))
     let l:defaultFlags = (l:isParseFlags ? repeat([''], l:flagsMatchCount) : [])
     let l:defaultReplacement = get(l:options, 'defaultReplacement', '')
     let l:emptyPattern = get(l:options, 'emptyPattern', '')
     let l:emptyReplacement = get(l:options, 'emptyReplacement', '~')
-    let l:emptyFlags = get(l:options, 'emptyFlags', '&')
+    let l:emptyFlags = get(l:options, 'emptyFlags', ['&'] + repeat([''], l:flagsMatchCount - 1))
     let l:isAllowLoneFlags = get(l:options, 'isAllowLoneFlags', 1)
 
-    let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . a:flagsExpr . '$')
+    let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . l:flagsExpr . '$')
     if ! empty(l:matches)
 	" Full /pat/repl/[flags].
 	return l:matches[1:3] + (l:isParseFlags ? l:matches[4:(4 + l:flagsMatchCount - 1)] : [])
@@ -171,19 +194,25 @@ function! ingo#cmdargs#ParseSubstituteArgument( arguments, flagsExpr, ... )
     endif
 
     if l:isParseFlags && l:isAllowLoneFlags
-	let l:matches = matchlist(a:arguments, '^' . a:flagsExpr . '$')
+	let l:matches = matchlist(a:arguments, '^' . l:flagsExpr . '$')
 	if ! empty(l:matches)
 	    " Special case of {flags} without /pat/string/.
-	    return ['/', l:emptyPattern, escape(l:emptyReplacement, '/')] + s:ApplyEmptyFlags([l:emptyFlags], l:matches[1:(l:flagsMatchCount)])
+	    return ['/', l:emptyPattern, escape(l:emptyReplacement, '/')] + s:ApplyEmptyFlags(s:EnsureList(l:emptyFlags), l:matches[1:(l:flagsMatchCount)])
 	endif
     endif
 
     if ! empty(a:arguments)
 	" Literal pat.
-	return ['', a:arguments, l:defaultReplacement] + l:defaultFlags
+	if ! empty(l:defaultReplacement)
+	    " Clients cannot concatentate the results without a separator, so
+	    " use one.
+	    return ['/', escape(a:arguments, '/'), escape(l:defaultReplacement, '/')] + l:defaultFlags
+	else
+	    return ['', a:arguments, l:defaultReplacement] + l:defaultFlags
+	endif
     else
 	" Nothing.
-	return ['/', l:emptyPattern, escape(l:emptyReplacement, '/')] + (l:isParseFlags ? (type(l:emptyFlags) == type([]) ? l:emptyFlags : [l:emptyFlags]) : [])
+	return ['/', l:emptyPattern, escape(l:emptyReplacement, '/')] + (l:isParseFlags ? s:EnsureList(l:emptyFlags) : [])
     endif
 endfunction
 
