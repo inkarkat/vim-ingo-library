@@ -38,6 +38,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	015	31-May-2013	Minor refactoring.
 "	014	23-Mar-2013	ENH: Allow determining the a:dirspec during
 "				runtime by taking a Funcref instead of string.
 "				Use error handling functions from ingo/msg.vim.
@@ -188,26 +189,7 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
     endtry
 endfunction
 
-function! s:Browse( dirspec, browsefilter )
-    if exists('b:browsefilter')
-	let l:save_browsefilter = b:browsefilter
-    endif
-    if empty(a:browsefilter)
-	unlet! b:browsefilter
-    else
-	let b:browsefilter = printf("Selected files (%s)\t%s\n", a:browsefilter, a:browsefilter) . "All Files (*.*)\t*.*\n"
-    endif
-    try
-	return browse(0, 'Select file', a:dirspec, '')
-    finally
-	if exists('l:save_browsefilter')
-	    let b:browsefilter = l:save_browsefilter
-	else
-	    unlet b:browsefilter
-	endif
-    endtry
-endfunction
-function! s:Command( isBang, Action, PostAction, DefaultFilename, browsefilter, FilenameProcessingFunction, FilespecProcessingFunction, dirspec, filename )
+function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspec, filename )
     try
 "****Dechomsg '****' a:isBang string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspec) string(a:filename)
 	let l:dirspec = (type(a:dirspec) == 2 ? call(a:dirspec, []) : a:dirspec)
@@ -228,8 +210,6 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, browsefilter, 
 	       let l:unescapedFilename = call(a:DefaultFilename, [l:dirspec])
 	    elseif a:DefaultFilename ==# '%'
 		let l:unescapedFilename = expand('%:t')
-	    elseif a:DefaultFilename ==# '?'
-		let l:unescapedFilename = s:Browse(a:dirspec, a:browsefilter)
 	    else
 		let l:unescapedFilename = a:DefaultFilename
 	    endif
@@ -378,7 +358,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \	    string(a:dirspec), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
     \	) .    "endfunction"
 
-    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s call <SID>Command(<bang>0, %s, %s, %s, %s, %s, %s, %s, <q-args>)',
+    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s call <SID>Command(<bang>0, %s, %s, %s, %s, %s, %s, <q-args>)',
     \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'),
     \   l:completeFunctionName,
     \   l:commandAttributes,
@@ -389,7 +369,6 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \   ),
     \   string(l:PostAction),
     \   string(l:DefaultFilename),
-    \   string(l:browsefilter),
     \	string(l:FilenameProcessingFunction),
     \	string(l:FilespecProcessingFunction),
     \   string(a:dirspec),
