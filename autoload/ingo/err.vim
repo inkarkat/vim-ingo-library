@@ -21,9 +21,10 @@
 "   purposes).
 "   This set of functions solves the problem that the error is often raised in a
 "   function, but the :echoerr has to be done directly from the :command (to
-"   avoid the printing of the multi-line error source). One could return the
-"   error string from the function and then perform the :echoerr on non-empty
-"   result, but that requires a temporary (global) variable and is cumbersome.
+"   avoid the printing of the multi-line error source). Unfortunately, an error
+"   is still raised when an empty expression is used. One could return the error
+"   string from the function and then perform the :echoerr on non-empty result,
+"   but that requires a temporary (global) variable and is cumbersome.
 "* USAGE:
 "   Inside your function, invoke one of the ingo#err#Set...() functions.
 "   Indicate to the invoking :command via a boolean flag whether the command
@@ -35,7 +36,7 @@
 "	    call ingo#err#Clear()
 "	    ...
 "	endfunction
-"	nnoremap <Leader>f :call Foo#Bar()<<Bar>if ingo#err#IsSet()<Bar>echoerr ingo#err#Get()<Bar>endif<CR>
+"	nnoremap <Leader>f :call Foo#Bar()<Bar>if ingo#err#IsSet()<Bar>echoerr ingo#err#Get()<Bar>endif<CR>
 "******************************************************************************
 let s:errmsg = ''
 function! ingo#err#Get()
