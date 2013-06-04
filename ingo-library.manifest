@@ -1,5 +1,7 @@
 autoload/ingo/buffer.vim
 autoload/ingo/cmdargs.vim
+autoload/ingo/cmdargs/file.vim
+autoload/ingo/cmdargs/glob.vim
 autoload/ingo/cmdrangeconverter.vim
 autoload/ingo/collections.vim
 autoload/ingo/collections/rotate.vim
@@ -8,6 +10,8 @@ autoload/ingo/compat.vim
 autoload/ingo/err.vim
 autoload/ingo/external.vim
 autoload/ingo/folds.vim
+autoload/ingo/fs/path.vim
+autoload/ingo/fs/tempfile.vim
 autoload/ingo/fs/traversal.vim
 autoload/ingo/lines.vim
 autoload/ingo/mapmaker.vim
