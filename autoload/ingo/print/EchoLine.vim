@@ -1,22 +1,22 @@
 " EchoLine.vim: :echo a line from the buffer with the original syntax
-" highlighting. 
+" highlighting.
 "
 " DESCRIPTION:
 "   Display the given line from the current buffer in the command line (i.e. via
 "   :echo), using that line's syntax highlighting (i.e. as it is highlighted in
-"   the buffer itself). 
+"   the buffer itself).
 "   If the line is longer than the available width in the command line, the
-"   output is truncated so that no hit-enter prompt appears. 
+"   output is truncated so that no hit-enter prompt appears.
 "
 " USAGE:
 " INSTALLATION:
 "   Put the script into your user or system Vim autoload directory (e.g.
-"   ~/.vim/autoload). 
+"   ~/.vim/autoload).
 
 " DEPENDENCIES:
-"   - Requires Vim 7.0 or higher. 
-"   - EchoWithoutScrolling.vim autoload script. 
-"   - MultibyteVirtcol.vim autoload script. 
+"   - Requires Vim 7.0 or higher.
+"   - EchoWithoutScrolling.vim autoload script
+"   - ingo/mbyte/virtcol.vim autoload script
 "
 " CONFIGURATION:
 " INTEGRATION:
@@ -25,54 +25,56 @@
 " KNOWN PROBLEMS:
 " TODO:
 "   - <Tab> are currently always rendered as ......; maybe use the settings from
-"     'listchars'. 
+"     'listchars'.
 "
-" Copyright: (C) 2008-2009 by Ingo Karkat
-"   The VIM LICENSE applies to this script; see ':help copyright'. 
+" Copyright: (C) 2008-2013 Ingo Karkat
+"   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 " Source: Based on ShowLine.vim (vimscript #381) by Gary Holloway
 "
-" REVISION	DATE		REMARKS 
+" REVISION	DATE		REMARKS
+"	005	08-Apr-2013	Move MultibyteVirtcol.vim functions into
+"				ingo-library.
 "	004	02-Jul-2009	Factored out s:GetVirt...Character() functions
-"				into MultibyteVirtcol.vim autoload script. 
-"	003	15-May-2009	Cleanup. 
+"				into MultibyteVirtcol.vim autoload script.
+"	003	15-May-2009	Cleanup.
 "				BF: Now translating <CR> and <LF> characters
 "				into printable characters instead of letting
-"				:echo break the line. 
+"				:echo break the line.
 "				BF: Using the correct 'SpecialKey' highlighting
 "				for unprintable characters like Vim does. This
 "				highlighting is not reported by synID(), and
 "				thus must be taken care of separately. As a nice
 "				side effect, the rendering of <Tab> characters
-"				uses this highlighting, too. 
-"	002	04-Aug-2008	Added s:GetCharacter(). 
-"				Finished implementation. 
+"				uses this highlighting, too.
+"	002	04-Aug-2008	Added s:GetCharacter().
+"				Finished implementation.
 "	001	23-Jul-2008	file creation
 
 function! s:GetCharacter( line, column )
 "*******************************************************************************
 "* PURPOSE:
-"   Retrieve a (full, in case of multi-byte) character from a:line, a:column. 
-"   strpart(getline(a:line), a:column, 1) can only deal with single-byte chars. 
+"   Retrieve a (full, in case of multi-byte) character from a:line, a:column.
+"   strpart(getline(a:line), a:column, 1) can only deal with single-byte chars.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   none
 "* EFFECTS / POSTCONDITIONS:
 "   none
 "* INPUTS:
 "
-"* RETURN VALUES: 
-"   Character, or empty string if the position is invalid. 
+"* RETURN VALUES:
+"   Character, or empty string if the position is invalid.
 "*******************************************************************************
     return matchstr( a:line, '\%' . a:column . 'c.' )
 endfunction
 
 function! s:GetTabReplacement( column, tabstop )
     return a:tabstop - (a:column - 1) % a:tabstop
-endfunction 
+endfunction
 
 function! s:IsMoreToRead( column )
-    if a:column > s:endCol 
+    if a:column > s:endCol
 	return 0
     endif
     if s:maxLength <= 0
@@ -80,10 +82,10 @@ function! s:IsMoreToRead( column )
     endif
 
     " The end column has not been reached yet, but a maximum length has been
-    " set. We need to determine whether the next character would still fit. 
-    let l:isMore =  (MultibyteVirtcol#GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1 <= s:maxLength)
+    " set. We need to determine whether the next character would still fit.
+    let l:isMore =  (ingo#mbyte#virtcol#GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1 <= s:maxLength)
 
-"****D echomsg 'at column' a:column strpart(getline(s:lineNum), a:column - 1, 1) 'will have length' (MultibyteVirtcol#GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1) (l:isMore ? 'do it' : 'stop')
+"****D echomsg 'at column' a:column strpart(getline(s:lineNum), a:column - 1, 1) 'will have length' (ingo#mbyte#virtcol#GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1) (l:isMore ? 'do it' : 'stop')
 
     return l:isMore
 endfunction
@@ -109,26 +111,26 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 "* PURPOSE:
 "   Display the current buffer's a:lineNum in the command line, using that
 "   line's syntax highlighting. Additional highlight groups can be applied on
-"   top. 
+"   top.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   l:lineNum refers to existing line in current buffer. 
+"   l:lineNum refers to existing line in current buffer.
 "* EFFECTS / POSTCONDITIONS:
-"   :echo's to the command line. 
+"   :echo's to the command line.
 "* INPUTS:
-"   a:lineNum	Line number in current buffer to be displayed. 
-"   a:startCol	Column number from where to start displaying (0: column 1). 
-"   a:endCol	Last column number to be displayed (0: line's last column). 
+"   a:lineNum	Line number in current buffer to be displayed.
+"   a:startCol	Column number from where to start displaying (0: column 1).
+"   a:endCol	Last column number to be displayed (0: line's last column).
 "   a:maxLength	Maximum number of characters to be displayed; this can be
 "		different from (a:endCol - a:startCol) if the line contains
 "		<Tab> characters, and is useful to avoid the "Hit ENTER" prompt.
 "		(0: unlimited length)
-"   a:additionalHighlighting	
+"   a:additionalHighlighting
 "		List of additional highlightings that should be layered on top
 "		of the line's highlighting. Each list element consists of
 "		[ startCol, endCol, highlightGroup ]. In case there is overlap
 "		in the ranges, the first element that specifies a highlight
-"		group for a column wins. 
-"* RETURN VALUES: 
+"		group for a column wins.
+"* RETURN VALUES:
 "   none
 "*******************************************************************************
     let l:cmd = ''
@@ -137,7 +139,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 
     let l:column = (a:startCol == 0 ? 1 : a:startCol)
 
-    let s:virtStartCol = MultibyteVirtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
+    let s:virtStartCol = ingo#mbyte#virtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
     let s:endCol = (a:endCol == 0 ? strlen(l:line) : a:endCol)
     let s:lineNum = a:lineNum
     let s:maxLength = a:maxLength
@@ -156,7 +158,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 	    " Emulate the built-in highlighting of translated unprintable
 	    " characters here. The regexp also matches <CR> and <LF>, but no
 	    " non-ASCII multi-byte characters; the 'isprint' option is not
-	    " applicable to them. 
+	    " applicable to them.
 	    let l:group = 'SpecialKey'
 	endif
 
@@ -167,16 +169,16 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
 	    let l:prev_group = l:group
 	endif
 
-	" <Tab> characters are rendered so that: 
+	" <Tab> characters are rendered so that:
 	" 1. The tab width is the same as in the buffer (even when the echoed
-	" position is shifted due to scrolling or a echo prefix). 
-	" 2. It can be differentiated from a sequence of spaces. 
+	" position is shifted due to scrolling or a echo prefix).
+	" 2. It can be differentiated from a sequence of spaces.
 	"
 	" The :echo command observes embedded line breaks (in contrast to
 	" :echomsg), which would mess up a single-line message that contains
 	" embedded \n = <CR> = ^M or <LF> = ^@.
 	if l:char == "\t"
-	    let l:width = s:GetTabReplacement(MultibyteVirtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
+	    let l:width = s:GetTabReplacement(ingo#mbyte#virtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
 	    let l:cmd .= repeat('.', l:width)
 	elseif l:char == "\<CR>"
 	    let l:cmd .= '^M'
@@ -192,12 +194,12 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
     if a:maxLength > 0 && s:GetCharacter(l:line, l:column) == "\t"
 	" The line has been truncated before a <Tab> character, so the maximum
 	" length has not been used up. As there may be a highlighting prolonged
-	" by the <Tab>, we still want to fill up the maximum length. 
-	let l:width = s:virtStartCol + a:maxLength - MultibyteVirtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
+	" by the <Tab>, we still want to fill up the maximum length.
+	let l:width = s:virtStartCol + a:maxLength - ingo#mbyte#virtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
 	if empty(l:cmd)
 	    let l:cmd .= 'echon "'
 	endif
-	let l:cmd .= repeat('.', l:width) 
+	let l:cmd .= repeat('.', l:width)
     endif
 
     let l:cmd .= '"|echohl None'
@@ -213,24 +215,24 @@ function! EchoLine#EchoLine( lineNum, centerCol, prefix, additionalHighlighting 
 "   Additional highlight groups can be applied on top. The a:prefix text is
 "   displayed before the line. When the line is too long to be displayed
 "   completely, the a:centerCol column is centered, and parts of the line before
-"   and after that are truncated. 
+"   and after that are truncated.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   l:lineNum refers to existing line in current buffer. 
+"   l:lineNum refers to existing line in current buffer.
 "* EFFECTS / POSTCONDITIONS:
-"   :echo's to the command line, avoiding the "Hit ENTER" prompt. 
+"   :echo's to the command line, avoiding the "Hit ENTER" prompt.
 "* INPUTS:
-"   a:lineNum	Line number in current buffer to be displayed. 
+"   a:lineNum	Line number in current buffer to be displayed.
 "   a:centerCol	Column number of the line that will be centered if the line is
 "		too long to be displayed completely. Use 0 for truncation only
-"		at the right side. 
-"   a:prefix	String that will be echoed before the line. 
-"   a:additionalHighlighting	
+"		at the right side.
+"   a:prefix	String that will be echoed before the line.
+"   a:additionalHighlighting
 "		List of additional highlightings that should be layered on top
 "		of the line's highlighting. Each list element consists of
 "		[ startCol, endCol, highlightGroup ]. In case there is overlap
 "		in the ranges, the first element that specifies a highlight
-"		group for a column wins. 
-"* RETURN VALUES: 
+"		group for a column wins.
+"* RETURN VALUES:
 "   none
 "*******************************************************************************
 
@@ -239,7 +241,7 @@ function! EchoLine#EchoLine( lineNum, centerCol, prefix, additionalHighlighting 
 
     " The a:centerCol is specified in buffer columns, but the l:maxLength is in
     " screen space. To (more or less) bridge this mismatch, a constant factor of
-    " 0 < (# of chars / bytes) <= 100 is assumed. 
+    " 0 < (# of chars / bytes) <= 100 is assumed.
     let l:numOfChars = strlen(substitute(EchoWithoutScrolling#RenderTabs(l:line, &tabstop, 1), '.', 'x', 'g'))
     let l:lengthToColFactor = 100 * l:numOfChars / strlen(l:line)
 "****D echomsg '****' l:lengthToColFactor
