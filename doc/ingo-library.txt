@@ -64,6 +64,12 @@ HISTORY							*ingo-library-history*
 1.007	RELEASEME
 - Add ingo/query/get.vim module.
 - Add ingo/query/file.vim module.
+- Add ingo/fs/path.vim module.
+- Add ingo/fs/tempfile.vim module.
+- Add ingo/cmdargs/file.vim module.
+- Add ingo/cmdargs/glob.vim module.
+- CHG: Move most functions from ingo/cmdargs.vim to new modules
+  ingo/cmdargs/pattern.vim and ingo/cmdargs/substitute.vim.
 
 1.006	29-May-2013
 - Add ingo/cmdrangeconverter.vim module.
