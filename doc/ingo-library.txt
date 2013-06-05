@@ -70,6 +70,7 @@ HISTORY							*ingo-library-history*
 - Add ingo/cmdargs/glob.vim module.
 - CHG: Move most functions from ingo/cmdargs.vim to new modules
   ingo/cmdargs/pattern.vim and ingo/cmdargs/substitute.vim.
+- Add ingo/compat/complete.vim module.
 
 1.006	29-May-2013
 - Add ingo/cmdrangeconverter.vim module.
