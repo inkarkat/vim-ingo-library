@@ -49,21 +49,15 @@ function! ingo#tabstops#Render( text, ... )
     let l:tabstop = (a:0 ? a:1 : &l:tabstop)
     let l:startColumn = (a:0 > 1 ? a:2 : 1)
     let l:pos = 0
-    let l:width = l:startColumn - 1
     let l:text = a:text
     while l:pos < strlen(l:text)
-	let l:newPos = stridx(l:text, "\t", l:pos)
-	if l:newPos == -1
+	" FIXME: The assumption index == char width doesn't work for unprintable
+	" ASCII and any non-ASCII characters.
+	let l:pos = stridx( l:text, "\t", l:pos )
+	if l:pos == -1
 	    break
 	endif
-	let l:newPart = strpart(l:text, l:pos, l:newPos - l:pos)
-	let l:newWidth = ingo#compat#strdisplaywidth(l:newPart)
-	let l:tabWidth = ingo#tabstops#DisplayWidth(1 + l:width + l:newWidth, l:tabstop)
-	let l:text = strpart(l:text, 0, l:newPos) . repeat(' ', l:tabWidth) . strpart(l:text, l:newPos + 1)
-"****D echomsg '****' l:pos l:width string(strtrans(l:newPart)) l:newWidth l:tabWidth
-"****D echomsg '####' string(strtrans(l:text))
-	let l:pos = l:newPos + l:tabWidth
-	let l:width += l:newWidth + l:tabWidth
+	let l:text = strpart(l:text, 0, l:pos) . repeat(' ', ingo#tabstops#DisplayWidth(l:pos + l:startColumn, l:tabstop)) . strpart(l:text, l:pos + 1)
     endwhile
 
     return l:text
