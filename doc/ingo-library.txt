@@ -61,7 +61,11 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.007	RELEASEME
+1.008	RELEASEME
+- Fix missing argument error for ingo#query#file#BrowseDirForOpenFile() and
+  ingo#query#file#BrowseDirForAction().
+
+1.007	06-Jun-2013
 - Add ingo/query/get.vim module.
 - Add ingo/query/file.vim module.
 - Add ingo/fs/path.vim module.
