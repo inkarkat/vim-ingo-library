@@ -2,6 +2,8 @@ autoload/ingo/buffer.vim
 autoload/ingo/cmdargs.vim
 autoload/ingo/cmdargs/file.vim
 autoload/ingo/cmdargs/glob.vim
+autoload/ingo/cmdargs/pattern.vim
+autoload/ingo/cmdargs/substitute.vim
 autoload/ingo/cmdrangeconverter.vim
 autoload/ingo/collections.vim
 autoload/ingo/collections/rotate.vim
