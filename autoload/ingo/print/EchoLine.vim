@@ -15,7 +15,8 @@
 
 " DEPENDENCIES:
 "   - Requires Vim 7.0 or higher.
-"   - EchoWithoutScrolling.vim autoload script
+"   - ingo/avoidprompt.vim autoload script
+"   - ingo/compat.vim autoload script
 "   - ingo/mbyte/virtcol.vim autoload script
 "
 " CONFIGURATION:
@@ -34,6 +35,9 @@
 " Source: Based on ShowLine.vim (vimscript #381) by Gary Holloway
 "
 " REVISION	DATE		REMARKS
+"	007	07-Jun-2013	Move EchoWithoutScrolling#DetermineVirtColNum()
+"				into ingo-library compat module.
+"   			    	Move EchoWithoutScrolling.vim into ingo-library.
 "	006	05-Jun-2013	Additional arguments to
 "				EchoWithoutScrolling#RenderTabs() are now
 "				optional.
@@ -239,7 +243,7 @@ function! EchoLine#EchoLine( lineNum, centerCol, prefix, additionalHighlighting 
 "   none
 "*******************************************************************************
 
-    let l:maxLength = EchoWithoutScrolling#MaxLength() - EchoWithoutScrolling#DetermineVirtColNum(a:prefix)
+    let l:maxLength = ingo#avoidprompt#MaxLength() - ingo#compat#strdisplaywidth(a:prefix)
     let l:line = getline(line('.'))
 
     " The a:centerCol is specified in buffer columns, but the l:maxLength is in
