@@ -34,6 +34,9 @@
 " Source: Based on ShowLine.vim (vimscript #381) by Gary Holloway
 "
 " REVISION	DATE		REMARKS
+"	006	05-Jun-2013	Additional arguments to
+"				EchoWithoutScrolling#RenderTabs() are now
+"				optional.
 "	005	08-Apr-2013	Move MultibyteVirtcol.vim functions into
 "				ingo-library.
 "	004	02-Jul-2009	Factored out s:GetVirt...Character() functions
@@ -242,7 +245,7 @@ function! EchoLine#EchoLine( lineNum, centerCol, prefix, additionalHighlighting 
     " The a:centerCol is specified in buffer columns, but the l:maxLength is in
     " screen space. To (more or less) bridge this mismatch, a constant factor of
     " 0 < (# of chars / bytes) <= 100 is assumed.
-    let l:numOfChars = strlen(substitute(EchoWithoutScrolling#RenderTabs(l:line, &tabstop, 1), '.', 'x', 'g'))
+    let l:numOfChars = strlen(substitute(EchoWithoutScrolling#RenderTabs(l:line), '.', 'x', 'g'))
     let l:lengthToColFactor = 100 * l:numOfChars / strlen(l:line)
 "****D echomsg '****' l:lengthToColFactor
 
