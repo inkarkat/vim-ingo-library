@@ -29,7 +29,7 @@
 
 " DEPENDENCIES:
 "   - escapings.vim autoload script
-"   - ingofileargs.vim autoload script
+"   - ingo/cmdargs/file.vim autoload script
 "   - ingo/msg.vim autoload script
 
 " Copyright: (C) 2009-2013 Ingo Karkat
@@ -38,6 +38,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	016	01-Jun-2013	Move ingofileargs.vim into ingo-library.
 "	015	31-May-2013	Minor refactoring.
 "	014	23-Mar-2013	ENH: Allow determining the a:dirspec during
 "				runtime by taking a Funcref instead of string.
@@ -195,7 +196,7 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 	let l:dirspec = (type(a:dirspec) == 2 ? call(a:dirspec, []) : a:dirspec)
 
 	" Detach any file options or commands for assembling the filespec.
-	let [l:fileOptionsAndCommands, l:filename] = ingofileargs#FilterEscapedFileOptionsAndCommands(a:filename)
+	let [l:fileOptionsAndCommands, l:filename] = ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands(a:filename)
 "****D echomsg '****' string(l:filename) string(l:fileOptionsAndCommands)
 	" Set up a context object so that Funcrefs can have access to the
 	" information whether <bang> was given.
@@ -207,7 +208,7 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 
 	if empty(l:filename)
 	    if type(a:DefaultFilename) == 2
-	       let l:unescapedFilename = call(a:DefaultFilename, [l:dirspec])
+		let l:unescapedFilename = call(a:DefaultFilename, [l:dirspec])
 	    elseif a:DefaultFilename ==# '%'
 		let l:unescapedFilename = expand('%:t')
 	    else
