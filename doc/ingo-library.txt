@@ -64,6 +64,10 @@ HISTORY							*ingo-library-history*
 1.008	RELEASEME
 - Fix missing argument error for ingo#query#file#BrowseDirForOpenFile() and
   ingo#query#file#BrowseDirForAction().
+- Implement ingo#compat#strdisplaywidth() emulation inside the library;
+  EchoWithoutScrolling.vim isn't used for that any more.
+- Add ingo/avoidprompt.vim, ingo/strdisplaywidth.vim, and ingo/tabstops
+  modules, containing the former EchoWithoutScrolling.vim functions.
 
 1.007	06-Jun-2013
 - Add ingo/query/get.vim module.
