@@ -68,6 +68,8 @@ HISTORY							*ingo-library-history*
   EchoWithoutScrolling.vim isn't used for that any more.
 - Add ingo/avoidprompt.vim, ingo/strdisplaywidth.vim, and ingo/tabstops
   modules, containing the former EchoWithoutScrolling.vim functions.
+- Add ingo/buffer/temp.vim and ingo/buffer/visible.vim modules.
+- Add ingo/regexp/previoussubstitution.vim module.
 
 1.007	06-Jun-2013
 - Add ingo/query/get.vim module.
