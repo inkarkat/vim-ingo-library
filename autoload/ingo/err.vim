@@ -37,6 +37,11 @@
 "	    ...
 "	endfunction
 "	nnoremap <Leader>f :call Foo#Bar()<Bar>if ingo#err#IsSet()<Bar>echoerr ingo#err#Get()<Bar>endif<CR>
+"   Don't invoke anything after the :echoerr ... | endif | XXX! Though this is
+"   normally executed, when run inside try...catch, it isn't! Better place the
+"   command(s) between your function and the :echoerr, and also query
+"   ingo#err#IsSet() to avoid having to use a temporary variable to get the
+"   returned error flag across the command(s).
 "******************************************************************************
 let s:errmsg = ''
 function! ingo#err#Get()
