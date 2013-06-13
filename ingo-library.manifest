@@ -1,5 +1,7 @@
 autoload/ingo/avoidprompt.vim
 autoload/ingo/buffer.vim
+autoload/ingo/buffer/temp.vim
+autoload/ingo/buffer/visible.vim
 autoload/ingo/cmdargs.vim
 autoload/ingo/cmdargs/file.vim
 autoload/ingo/cmdargs/glob.vim
@@ -29,6 +31,7 @@ autoload/ingo/query/get.vim
 autoload/ingo/query/file.vim
 autoload/ingo/regexp.vim
 autoload/ingo/regexp/magic.vim
+autoload/ingo/regexp/previoussubstitution.vim
 autoload/ingo/search/buffer.vim
 autoload/ingo/search/pattern.vim
 autoload/ingo/search/timelimited.vim
