@@ -8,8 +8,14 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.006.003	06-May-2013	Add ingo#msg#StatusMsg().
 "   1.003.002	13-Mar-2013	Add ingo#msg#ShellError().
 "   1.000.001	22-Jan-2013	file creation
+
+function! ingo#msg#StatusMsg( text )
+    let v:statusmsg = a:text
+    echomsg v:statusmsg
+endfunction
 
 function! ingo#msg#WarningMsg( text )
     let v:warningmsg = a:text
