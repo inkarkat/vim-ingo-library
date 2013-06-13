@@ -61,7 +61,7 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.008	RELEASEME
+1.008	13-Jun-2013
 - Fix missing argument error for ingo#query#file#BrowseDirForOpenFile() and
   ingo#query#file#BrowseDirForAction().
 - Implement ingo#compat#strdisplaywidth() emulation inside the library;
