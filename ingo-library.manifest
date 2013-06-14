@@ -38,6 +38,7 @@ autoload/ingo/search/timelimited.vim
 autoload/ingo/selection.vim
 autoload/ingo/selection/patternmatch.vim
 autoload/ingo/strdisplaywidth.vim
+autoload/ingo/subst.vim
 autoload/ingo/syntaxitem.vim
 autoload/ingo/system.vim
 autoload/ingo/tabstops.vim
