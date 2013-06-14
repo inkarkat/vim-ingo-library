@@ -61,6 +61,10 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.009	RELEASEME
+- Minor: Make substitute() robust against 'ignorecase' in various functions.
+- Add ingo/subst.vim module.
+
 1.008	13-Jun-2013
 - Fix missing argument error for ingo#query#file#BrowseDirForOpenFile() and
   ingo#query#file#BrowseDirForAction().
