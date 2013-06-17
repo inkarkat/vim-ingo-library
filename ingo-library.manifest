@@ -14,6 +14,7 @@ autoload/ingo/comments.vim
 autoload/ingo/compat.vim
 autoload/ingo/compat/complete.vim
 autoload/ingo/err.vim
+autoload/ingo/escape.vim
 autoload/ingo/external.vim
 autoload/ingo/folds.vim
 autoload/ingo/fs/path.vim
