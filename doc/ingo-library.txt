@@ -65,6 +65,8 @@ HISTORY							*ingo-library-history*
 - Minor: Make substitute() robust against 'ignorecase' in various functions.
 - Add ingo/subst.vim module.
 - Add ingo/escape.vim module.
+- Add ingo/regexp/comments.vim module.
+- Add ingo/cmdline/showmode.vim module.
 
 1.008	13-Jun-2013
 - Fix missing argument error for ingo#query#file#BrowseDirForOpenFile() and
