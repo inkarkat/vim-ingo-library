@@ -7,6 +7,7 @@ autoload/ingo/cmdargs/file.vim
 autoload/ingo/cmdargs/glob.vim
 autoload/ingo/cmdargs/pattern.vim
 autoload/ingo/cmdargs/substitute.vim
+autoload/ingo/cmdline/showmode.vim
 autoload/ingo/cmdrangeconverter.vim
 autoload/ingo/collections.vim
 autoload/ingo/collections/rotate.vim
@@ -31,6 +32,7 @@ autoload/ingo/plugin/setting.vim
 autoload/ingo/query/get.vim
 autoload/ingo/query/file.vim
 autoload/ingo/regexp.vim
+autoload/ingo/regexp/comments.vim
 autoload/ingo/regexp/magic.vim
 autoload/ingo/regexp/previoussubstitution.vim
 autoload/ingo/search/buffer.vim
