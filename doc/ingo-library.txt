@@ -68,6 +68,7 @@ HISTORY							*ingo-library-history*
 - Add ingo/regexp/comments.vim module.
 - Add ingo/cmdline/showmode.vim module.
 - Add ingo/str.vim module.
+- Add ingo/strdisplaywidth/pad.vim module.
 
 1.008	13-Jun-2013
 - Fix missing argument error for ingo#query#file#BrowseDirForOpenFile() and
