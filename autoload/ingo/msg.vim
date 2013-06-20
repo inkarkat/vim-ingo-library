@@ -8,6 +8,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.009.004	14-Jun-2013	Minor: Make substitute() robust against
+"				'ignorecase'.
 "   1.006.003	06-May-2013	Add ingo#msg#StatusMsg().
 "   1.003.002	13-Mar-2013	Add ingo#msg#ShellError().
 "   1.000.001	22-Jan-2013	file creation
@@ -34,13 +36,13 @@ endfunction
 function! ingo#msg#MsgFromVimException()
     " v:exception contains what is normally in v:errmsg, but with extra
     " exception source info prepended, which we cut away.
-    return substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
+    return substitute(v:exception, '^\CVim\%((\a\+)\)\=:', '', '')
 endfunction
 function! ingo#msg#VimExceptionMsg()
     call ingo#msg#ErrorMsg(ingo#msg#MsgFromVimException())
 endfunction
 function! ingo#msg#CustomExceptionMsg( customPrefixPattern )
-    call ingo#msg#ErrorMsg(substitute(v:exception, printf('^\%%(%s\):\s*', a:customPrefixPattern), '', ''))
+    call ingo#msg#ErrorMsg(substitute(v:exception, printf('^\C\%%(%s\):\s*', a:customPrefixPattern), '', ''))
 endfunction
 
 function! ingo#msg#ShellError( whatFailure, shellOutput )
