@@ -42,6 +42,7 @@ autoload/ingo/selection.vim
 autoload/ingo/selection/patternmatch.vim
 autoload/ingo/str.vim
 autoload/ingo/strdisplaywidth.vim
+autoload/ingo/strdisplaywidth/pad.vim
 autoload/ingo/subst.vim
 autoload/ingo/syntaxitem.vim
 autoload/ingo/system.vim
