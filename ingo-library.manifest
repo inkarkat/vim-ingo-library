@@ -14,6 +14,7 @@ autoload/ingo/collections/rotate.vim
 autoload/ingo/comments.vim
 autoload/ingo/compat.vim
 autoload/ingo/compat/complete.vim
+autoload/ingo/dict.vim
 autoload/ingo/err.vim
 autoload/ingo/escape.vim
 autoload/ingo/external.vim
