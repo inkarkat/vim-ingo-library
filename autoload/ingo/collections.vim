@@ -1,13 +1,15 @@
-" ingocollections.vim: Custom utility functions for collections.
+" ingo/collections.vim: Functions to operate on collections.
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2012 Ingo Karkat
+" Copyright: (C) 2011-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.001.008	21-Feb-2013	Move to ingo-library. Change case of *#unique*
+"				functions.
 "	007	09-Nov-2012	Add ingocollections#MakeUnique().
 "	006	16-Aug-2012	Add ingocollections#uniqueSorted() and
 "				ingocollections#uniqueStable() variants of
@@ -20,14 +22,14 @@
 "	002	11-Jun-2011	Add ingocollections#SplitKeepSeparators().
 "	001	08-Oct-2010	file creation
 
-function! ingocollections#ToDict( list )
+function! ingo#collections#ToDict( list )
     let l:itemDict = {}
     for l:item in a:list
 	let l:itemDict[l:item] = 1
     endfor
     return l:itemDict
 endfunction
-function! ingocollections#unique( list )
+function! ingo#collections#Unique( list )
 "******************************************************************************
 "* PURPOSE:
 "   Return a list where each element from a:list is contained only once.
@@ -41,12 +43,12 @@ function! ingocollections#unique( list )
 "* RETURN VALUES:
 "   Return the string representation of the unique elements of a:list. The order
 "   of returned elements is undetermined. To maintain the original order, use
-"   ingocollections#uniqueStable(). To keep the original elements, use
-"   ingocollections#uniqueSorted(). But this is the fastest function.
+"   ingo#collections#UniqueStable(). To keep the original elements, use
+"   ingo#collections#UniqueSorted(). But this is the fastest function.
 "******************************************************************************
-    return keys(ingocollections#ToDict(a:list))
+    return keys(ingo#collections#ToDict(a:list))
 endfunction
-function! ingocollections#uniqueSorted( list )
+function! ingo#collections#UniqueSorted( list )
 "******************************************************************************
 "* PURPOSE:
 "   Filter the sorted a:list so that each element is contained only once.
@@ -74,7 +76,7 @@ function! ingocollections#uniqueSorted( list )
     endfor
     return l:result
 endfunction
-function! ingocollections#uniqueStable( list )
+function! ingo#collections#UniqueStable( list )
 "******************************************************************************
 "* PURPOSE:
 "   Filter a:list so that each element is contained only once (in its first
@@ -106,7 +108,7 @@ function! s:add( list, expr, keepempty )
     endif
     return add(a:list, a:expr)
 endfunction
-function! ingocollections#SplitKeepSeparators( expr, pattern, ... )
+function! ingo#collections#SplitKeepSeparators( expr, pattern, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Like the built-in |split()|, but keep the separators matched by a:pattern as
@@ -163,7 +165,7 @@ function! ingocollections#SplitKeepSeparators( expr, pattern, ... )
     return l:items
 endfunction
 
-function! ingocollections#isort( i1, i2 )
+function! ingo#collections#isort( i1, i2 )
 "******************************************************************************
 "* PURPOSE:
 "   Case-insensitive sort function for strings; lowercase comes before
@@ -188,7 +190,7 @@ function! ingocollections#isort( i1, i2 )
     endif
 endfunction
 
-function! ingocollections#numsort( i1, i2, ... )
+function! ingo#collections#numsort( i1, i2, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Numerical (through str2nr()) sort function for numbers; text after the
@@ -208,7 +210,7 @@ function! ingocollections#numsort( i1, i2, ... )
     return l:i1 == l:i2 ? 0 : l:i1 > l:i2 ? 1 : -1
 endfunction
 
-function! ingocollections#MakeUnique( memory, expr )
+function! ingo#collections#MakeUnique( memory, expr )
 "******************************************************************************
 "* PURPOSE:
 "   Based on the a:memory lookup, create a unique String from a:expr by
