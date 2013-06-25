@@ -72,6 +72,9 @@ HISTORY							*ingo-library-history*
 - Add ingo/dict.vim module.
 - Add ingo#msg#HighlightMsg(), and allow to pass an optional highlight group
   to ingo#msg#StatusMsg().
+- Add ingo#collections#Flatten() and ingo#collections#Flatten1().
+- Move ingo#collections#MakeUnique() to ingo/collections/unique.vim.
+- Add ingo#collections#unique#ExtendWithNew().
 
 1.008	13-Jun-2013
 - Fix missing argument error for ingo#query#file#BrowseDirForOpenFile() and
