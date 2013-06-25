@@ -38,6 +38,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	017	10-Jun-2013	Better handling for errors from :echoerr.
 "	016	01-Jun-2013	Move ingofileargs.vim into ingo-library.
 "	015	31-May-2013	Minor refactoring.
 "	014	23-Mar-2013	ENH: Allow determining the a:dirspec during
@@ -134,6 +135,8 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 	let l:dirspec = (type(a:dirspec) == 2 ? call(a:dirspec, []) : a:dirspec)
     catch /^Vim\%((\a\+)\)\=:E/
 	throw ingo#msg#MsgFromVimException()   " Don't swallow Vimscript errors.
+    catch /^Vim\%((\a\+)\)\=:/
+	call ingo#msg#VimExceptionMsg()        " Errors from :echoerr.
     catch
 	call ingo#msg#ErrorMsg(v:exception)
 	sleep 1 " Otherwise, the error isn't visible from inside the command-line completion function.
