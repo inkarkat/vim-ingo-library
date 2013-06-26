@@ -9,6 +9,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.009.007	26-Jun-2013	Add ingo#tabstops#RenderMultiLine(), as
+"				ingo#tabstops#Render() does not properly render
+"				multi-line text.
 "   1.008.006	07-Jun-2013	Fix the rendering for text containing
 "				unprintable ASCII and double-width (east Asian)
 "				characters. The assumption index == char width
@@ -23,6 +26,8 @@
 "				have text that potentially contains line breaks.
 "	002	16-Aug-2008	Split off TruncateTo() from Truncate().
 "	001	22-Jul-2008	file creation
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! ingo#tabstops#DisplayWidth( column, tabstop )
     return a:tabstop - (a:column - 1) % a:tabstop
@@ -38,7 +43,9 @@ function! ingo#tabstops#Render( text, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   none
 "* INPUTS:
-"   a:text	    Text to be rendered.
+"   a:text	    Text to be rendered. If the text contains newline
+"		    characters, the rendering will be wrong in subsequent lines.
+"		    Use ingo#tabstops#RenderMultiLine() then.
 "   a:tabstop	    tabstop value (The built-in :echo command always uses a
 "		    fixed value of 8; it isn't affected by the 'tabstop'
 "		    setting.) Defaults to the buffer's 'tabstop' value.
@@ -72,5 +79,37 @@ function! ingo#tabstops#Render( text, ... )
 
     return l:text
 endfunction
+function! ingo#tabstops#RenderMultiLine( text, ... )
+"*******************************************************************************
+"* PURPOSE:
+"   Replaces <Tab> characters (in potentially multiple lines in) a:text with the
+"   correct amount of <Space>, depending on the a:tabstop value. a:startColumn
+"   specifies at which start column (each line of) a:text will be printed.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   none
+"* EFFECTS / POSTCONDITIONS:
+"   none
+"* INPUTS:
+"   a:text	    Text to be rendered. Each line (i.e. substring delimited by
+"		    newline characters) will be rendered separately and
+"		    therefore correctly.
+"   a:tabstop	    tabstop value (The built-in :echo command always uses a
+"		    fixed value of 8; it isn't affected by the 'tabstop'
+"		    setting.) Defaults to the buffer's 'tabstop' value.
+"   a:startColumn   Column at which the text is to be rendered (default 1).
+"* RETURN VALUES:
+"   a:text with replaced <Tab> characters.
+"*******************************************************************************
+    return
+    \   join(
+    \       map(
+    \           split(a:text, '\n', 1),
+    \           'ingo#tabstops#Render(v:val' . (a:0 ? ', ' . string(a:1) : '') . ')'
+    \       ),
+    \       "\n"
+    \   )
+endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
