@@ -8,6 +8,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.008.004	06-Jun-2013	Fix missing argument error for
+"				ingo#query#file#BrowseDirForOpenFile() and
+"				ingo#query#file#BrowseDirForAction().
 "   1.007.003	31-May-2013	Move into ingo-library.
 "	002	30-Nov-2012	ENH: Allow Funcref action for
 "				ingouserinteraction#BrowseDirForAction().
@@ -33,7 +36,7 @@ function! ingo#query#file#Browse( save, title, initdir, default, browsefilter )
     endtry
 endfunction
 function! ingo#query#file#BrowseDirForAction( action, title, dirspec, browsefilter )
-    let l:filespec = ingo#query#file#Browse(0, a:title, expand(a:dirspec), '')
+    let l:filespec = ingo#query#file#Browse(0, a:title, expand(a:dirspec), '', a:browsefilter)
     if ! empty(l:filespec)
 	if type(a:action) == type(function('tr'))
 	    call call(a:action, [l:filespec])
@@ -45,7 +48,7 @@ function! ingo#query#file#BrowseDirForAction( action, title, dirspec, browsefilt
     endif
 endfunction
 function! ingo#query#file#BrowseDirForOpenFile( title, dirspec, browsefilter )
-    call ingo#query#file#BrowseDirForAction(((exists(':Drop') == 2) ? 'Drop' : 'drop'), a:title, a:dirspec)
+    call ingo#query#file#BrowseDirForAction(((exists(':Drop') == 2) ? 'Drop' : 'drop'), a:title, a:dirspec, a:browsefilter)
 endfunction
 
 
