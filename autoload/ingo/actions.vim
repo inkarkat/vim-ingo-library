@@ -1,4 +1,4 @@
-" ingo/actions.vim: Functions for flexible action execution.
+" ingoactions.vim: Custom flexible command handling.
 "
 " DEPENDENCIES:
 "
@@ -8,12 +8,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.010.003	03-Jul-2013	Move into ingo-library.
 "	002	17-Jan-2013	Add ingoactions#EvaluateOrFunc(), used by
 "				autoload/ErrorFix.vim.
 "	001	23-Oct-2012	file creation
 
-function! ingo#actions#NormalOrFunc( Action )
+function! ingoactions#NormalOrFunc( Action )
     if type(a:Action) == type(function('tr'))
 	return call(a:Action, [])
     else
@@ -21,7 +20,7 @@ function! ingo#actions#NormalOrFunc( Action )
 	return ''
     endif
 endfunction
-function! ingo#actions#ExecuteOrFunc( Action )
+function! ingoactions#ExecuteOrFunc( Action )
     if type(a:Action) == type(function('tr'))
 	return call(a:Action, [])
     else
@@ -29,7 +28,7 @@ function! ingo#actions#ExecuteOrFunc( Action )
 	return ''
     endif
 endfunction
-function! ingo#actions#EvaluateOrFunc( Action )
+function! ingoactions#EvaluateOrFunc( Action )
     if type(a:Action) == type(function('tr'))
 	return call(a:Action, [])
     else
