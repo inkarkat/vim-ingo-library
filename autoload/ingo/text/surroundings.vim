@@ -22,6 +22,10 @@
 "				different delimiter).
 "				ENH: Mark the changed area where delimiters
 "				where added (including the delimiters).
+"				ENH: For v_<Leader>i, show the original text
+"				surrounded by $, not just a simple $
+"				replacement, while querying for the surrounding
+"				character.
 "	012	21-Mar-2013	Avoid changing the jumplist.
 "	011	07-Jan-2013	Factor out s:CursorLeft() and s:CursorRight() to
 "				autoload/ingocursormove.vim for re-use.
@@ -248,7 +252,7 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 	" Set paste type to characterwise; otherwise, linewise selections would
 	" be pasted _below_ the surrounded characters.
 	call setreg('z', '', 'av')
-	execute 'normal! "_s' . a:textBefore . "\<C-R>\<C-O>z" . a:textAfter . "\<Esc>"
+	execute 'normal! g`[' . visualmode() . 'g`]"_c' . a:textBefore . "\<C-R>\<C-O>z" . a:textAfter . "\<Esc>"
 
 	" Mark the changed area.
 	" The start of the change is already right, but the end is one after the
