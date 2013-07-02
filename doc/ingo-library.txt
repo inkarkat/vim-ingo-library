@@ -79,6 +79,8 @@ HISTORY							*ingo-library-history*
 - Add ingo#tabstops#RenderMultiLine(), as ingo#tabstops#Render() does not
   properly render multi-line text.
 - Add ingo/str/split.vim module.
+- FIX: Avoid E108: No such variable: "b:browsefilter" in
+  ingo#query#file#Browse().
 
 1.008	13-Jun-2013
 - Fix missing argument error for ingo#query#file#BrowseDirForOpenFile() and
