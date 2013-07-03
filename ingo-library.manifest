@@ -1,3 +1,4 @@
+autoload/ingo/actions.vim
 autoload/ingo/avoidprompt.vim
 autoload/ingo/buffer.vim
 autoload/ingo/buffer/temp.vim
@@ -15,6 +16,7 @@ autoload/ingo/collections/unique.vim
 autoload/ingo/comments.vim
 autoload/ingo/compat.vim
 autoload/ingo/compat/complete.vim
+autoload/ingo/cursor/move.vim
 autoload/ingo/dict.vim
 autoload/ingo/err.vim
 autoload/ingo/escape.vim
