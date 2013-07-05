@@ -11,6 +11,12 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	005	28-Apr-2013	BUG: Found the root cause of wrong range
+"				application of <Leader>qq mapping: Because an
+"				a:commandName that is defined through
+"				surroundings#Lines#Creator#MakeCommand() does
+"				not support command sequencing with <Bar>, we
+"				must enclose the entire command with :execute.
 "	004	21-Apr-2013	Change -range=-1 default check to use <count>
 "				(now passed in separately), which maintains the
 "				actual -1 default, and therefore also delivers
@@ -47,8 +53,16 @@ function! surroundings#Lines#Creator#MakeMapping( mapArgs, keys, commandName, ma
 
     " Because of a:commandName defaulting to the last changed text, we have to
     " insert the "." range when no [count] is given.
-    execute printf('nnoremap %s %s :<C-r><C-r>=v:count ? "" : "."<CR>%s<CR>',
-    \   a:mapArgs, l:lineMappingKeys, a:commandName
+    " Because an a:commandName that is defined through
+    " surroundings#Lines#Creator#MakeCommand() does not support command
+    " sequencing with <Bar>, we must enclose the entire command with :execute
+    " (but keep the range directly before the command, so that it is invoked
+    " only once) to make the transformation through repeatableMapping work.
+    " (Otherwise, the appended <Bar>silent! call repeat#set() would be
+    " interpreted as a command argument to a:commandName, and the wrong range
+    " would be used).
+    execute printf('nnoremap %s %s :<Home>execute ''<End><C-r><C-r>=v:count ? "" : "."<CR>%s''<CR>',
+    \   a:mapArgs, l:lineMappingKeys, substitute(a:commandName, "'", "''", 'g')
     \)
     execute printf('xnoremap %s %s :%s<CR>',
     \   a:mapArgs, a:keys, a:commandName
