@@ -43,6 +43,7 @@ autoload/ingo/search/buffer.vim
 autoload/ingo/search/pattern.vim
 autoload/ingo/search/timelimited.vim
 autoload/ingo/selection.vim
+autoload/ingo/selection/position.vim
 autoload/ingo/selection/patternmatch.vim
 autoload/ingo/str.vim
 autoload/ingo/str/split.vim
