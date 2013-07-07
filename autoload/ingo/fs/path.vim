@@ -8,6 +8,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.009.002	26-Jun-2013	Add ingo#fs#path#Equals().
+"				Minor: Remove duplication.
 "   1.007.001	01-Jun-2013	file creation from ingofile.vim
 
 function! ingo#fs#path#Separator()
@@ -67,8 +69,7 @@ function! ingo#fs#path#Combine( first, ... )
     else
 	" The dirspec doesn't contain a path separator, fall back to the
 	" system's default.
-	let l:defaultPathSeparator = (exists('+shellslash') && ! &shellslash ? '\' : '/')
-	let l:pathSeparator = l:defaultPathSeparator
+	let l:pathSeparator = ingo#fs#path#Separator()
     endif
 
     let l:filespec = l:dirspec
@@ -98,5 +99,15 @@ function! ingo#fs#path#GetRootDir( filespec )
 
     return l:dir
 endfunction
+
+if has('dos16') || has('dos32') || has('win95') || has('win32') || has('win64')
+    function! ingo#fs#path#Equals( p1, p2 )
+	return a:p1 ==? a:p2 || ingo#fs#path#Normalize(fnamemodify(a:p1, ':p')) ==? ingo#fs#path#Normalize(fnamemodify(a:p2, ':p'))
+    endfunction
+else
+    function! ingo#fs#path#Equals( p1, p2 )
+	return a:p1 ==# a:p2 || ingo#fs#path#Normalize(fnamemodify(resolve(a:p1), ':p')) ==# ingo#fs#path#Normalize(fnamemodify(resolve(a:p2), ':p'))
+    endfunction
+endif
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
