@@ -8,7 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"	001	08-Apr-2013	file creation from autoload/ingowindow.vim
+"   1.004.001	08-Apr-2013	file creation from autoload/ingowindow.vim
 
 " The command-line window is implemented as a window, so normal mode mappings
 " apply here as well. However, certain actions cannot be performed in this
