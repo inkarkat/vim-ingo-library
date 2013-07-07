@@ -1,0 +1,33 @@
+" ingo/buffer.vim: Functions for buffer information.
+"
+" DEPENDENCIES:
+"
+" Copyright: (C) 2013 Ingo Karkat
+"   The VIM LICENSE applies to this script; see ':help copyright'.
+"
+" Maintainer:	Ingo Karkat <ingo@karkat.de>
+"
+" REVISION	DATE		REMARKS
+"   1.006.001	29-May-2013	file creation
+let s:save_cpo = &cpo
+set cpo&vim
+
+function! ingo#buffer#IsBlank( bufnr )
+    return (empty(bufname(a:bufnr)) &&
+    \ getbufvar(a:bufnr, '&modified') == 0 &&
+    \ empty(getbufvar(a:bufnr, '&buftype'))
+    \)
+endfunction
+
+function! ingo#buffer#ExistOtherBuffers( targetBufNr )
+    return ! empty(filter(range(1, bufnr('$')), 'buflisted(v:val) && v:val != a:targetBufNr'))
+endfunction
+
+function! ingo#buffer#IsEmptyVim()
+    let l:currentBufNr = bufnr('')
+    return ingo#buffer#IsBlank(l:currentBufNr) && ! ingo#buffer#ExistOtherBuffers(l:currentBufNr)
+endfunction
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
+" vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
