@@ -4,6 +4,7 @@
 							    *ingo-library.vim*
 description			|ingo-library-description|
 installation			|ingo-library-installation|
+usage				|ingo-library-usage|
 limitations			|ingo-library-limitations|
 known problems			|ingo-library-known-problems|
 todo				|ingo-library-todo|
@@ -33,6 +34,23 @@ Other authors have published separate support libraries, too:
 
 There have been initiatives to gather and consolidate useful functions into a
 "standard Vim library", but these efforts have mostly fizzled out.
+
+==============================================================================
+USAGE							  *ingo-library-usage*
+
+This library is mainly intended to be used by my own plugins. However, I try
+to maintain backwards compatibility as much as possible. Feel free to use the
+library for your own plugins and customizations, too. I'd also like to hear
+from you if you have additions or comments.
+
+EXCEPTION HANDLING							     *
+
+For exceptional conditions (e.g. cannot locate window that should be there)
+and programming errors (e.g. passing a wrong variable type to a library
+function), error strings are |:throw|n. These are prefixed with (something
+resembling) the short function name, so that it's possible to |:catch| these
+and e.g. convert them into a proper error (e.g. via
+|ingo#err#SetCustomException()|).
 
 ==============================================================================
 INSTALLATION					   *ingo-library-installation*
@@ -67,6 +85,13 @@ HISTORY							*ingo-library-history*
 - Add ingo#collections#unique#AddNew() and
   ingo#collections#unique#InsertNew().
 - Add ingo/selection/position.vim module.
+- Add ingo/plugin/marks.vim module.
+- Add ingo/date.vim module.
+- Add ingo#buffer#IsEmpty().
+- Add ingo/buffer/scratch.vim module.
+- Add ingo/cmdargs/command.vim module.
+- Add ingo/cmdargs/commandcommands.vim module.
+- Add ingo/cmdargs/range.vim module.
 
 1.009	03-Jul-2013
 - Minor: Make substitute() robust against 'ignorecase' in various functions.
