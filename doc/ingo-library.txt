@@ -79,7 +79,10 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.010	RELEASEME
+1.011	RELEASEME
+- Add ingo/register.vim module.
+
+1.010	09-Jul-2013
 - Add ingo/actions.vim module.
 - Add ingo/cursor/move.vim module.
 - Add ingo#collections#unique#AddNew() and
