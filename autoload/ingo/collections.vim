@@ -1,6 +1,7 @@
 " ingo/collections.vim: Functions to operate on collections.
 "
 " DEPENDENCIES:
+"   - ingo/dict.vim autoload script
 "
 " Copyright: (C) 2011-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -8,6 +9,12 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.009.009	25-Jun-2013	Add ingo#collections#Flatten() and
+"				ingo#collections#Flatten1().
+"				Delegate ingo#collections#ToDict()
+"				implementation to ingo#dict#FromKeys().
+"				Move ingo#collections#MakeUnique() to
+"				ingo/collections/unique.vim.
 "   1.001.008	21-Feb-2013	Move to ingo-library. Change case of *#unique*
 "				functions.
 "	007	09-Nov-2012	Add ingocollections#MakeUnique().
@@ -23,11 +30,7 @@
 "	001	08-Oct-2010	file creation
 
 function! ingo#collections#ToDict( list )
-    let l:itemDict = {}
-    for l:item in a:list
-	let l:itemDict[l:item] = 1
-    endfor
-    return l:itemDict
+    return ingo#dict#FromKeys(a:list, 1)
 endfunction
 function! ingo#collections#Unique( list )
 "******************************************************************************
@@ -210,31 +213,28 @@ function! ingo#collections#numsort( i1, i2, ... )
     return l:i1 == l:i2 ? 0 : l:i1 > l:i2 ? 1 : -1
 endfunction
 
-function! ingo#collections#MakeUnique( memory, expr )
-"******************************************************************************
-"* PURPOSE:
-"   Based on the a:memory lookup, create a unique String from a:expr by
-"   appending a running counter to it.
-"* ASSUMPTIONS / PRECONDITIONS:
-"   None.
-"* EFFECTS / POSTCONDITIONS:
-"   Adds the unique returned result to a:memory.
-"* INPUTS:
-"   a:memory    Dictionary holding the existing values as keys.
-"   a:expr      String that is made unique with regards to a:memory and
-"		returned.
-"* RETURN VALUES:
-"   a:expr (when it's not yet contained in the a:memory), or a unique version of
-"   it.
-"******************************************************************************
-    let l:result = a:expr
-    let l:counter = 0
-    while has_key(a:memory, l:result)
-	let l:counter += 1
-	let l:result = printf('%s%s(%d)', a:expr, (empty(a:expr) ? '' : ' '), l:counter)
-    endwhile
-
-    let a:memory[l:result] = 1
+function! ingo#collections#Flatten1( list )
+    let l:result = []
+    for l:item in a:list
+	if type(l:item) == type([])
+	    call extend(l:result, l:item)
+	else
+	    call add(l:result, l:item)
+	endif
+	unlet l:item
+    endfor
+    return l:result
+endfunction
+function! ingo#collections#Flatten( list )
+    let l:result = []
+    for l:item in a:list
+	if type(l:item) == type([])
+	    call extend(l:result, ingo#collections#Flatten(l:item))
+	else
+	    call add(l:result, l:item)
+	endif
+	unlet l:item
+    endfor
     return l:result
 endfunction
 
