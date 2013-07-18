@@ -1,12 +1,16 @@
 autoload/ingo/actions.vim
 autoload/ingo/avoidprompt.vim
 autoload/ingo/buffer.vim
+autoload/ingo/buffer/scratch.vim
 autoload/ingo/buffer/temp.vim
 autoload/ingo/buffer/visible.vim
 autoload/ingo/cmdargs.vim
+autoload/ingo/cmdargs/command.vim
+autoload/ingo/cmdargs/commandcommands.vim
 autoload/ingo/cmdargs/file.vim
 autoload/ingo/cmdargs/glob.vim
 autoload/ingo/cmdargs/pattern.vim
+autoload/ingo/cmdargs/range.vim
 autoload/ingo/cmdargs/substitute.vim
 autoload/ingo/cmdline/showmode.vim
 autoload/ingo/cmdrangeconverter.vim
@@ -17,6 +21,7 @@ autoload/ingo/comments.vim
 autoload/ingo/compat.vim
 autoload/ingo/compat/complete.vim
 autoload/ingo/cursor/move.vim
+autoload/ingo/date.vim
 autoload/ingo/dict.vim
 autoload/ingo/err.vim
 autoload/ingo/escape.vim
@@ -32,6 +37,7 @@ autoload/ingo/mbyte/virtcol.vim
 autoload/ingo/msg.vim
 autoload/ingo/number.vim
 autoload/ingo/plugin/cmdcomplete.vim
+autoload/ingo/plugin/marks.vim
 autoload/ingo/plugin/setting.vim
 autoload/ingo/query/get.vim
 autoload/ingo/query/file.vim
@@ -39,6 +45,7 @@ autoload/ingo/regexp.vim
 autoload/ingo/regexp/comments.vim
 autoload/ingo/regexp/magic.vim
 autoload/ingo/regexp/previoussubstitution.vim
+autoload/ingo/register.vim
 autoload/ingo/search/buffer.vim
 autoload/ingo/search/pattern.vim
 autoload/ingo/search/timelimited.vim
