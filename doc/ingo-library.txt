@@ -85,6 +85,7 @@ HISTORY							*ingo-library-history*
   a:emptyValue argument. This also distinguishes it from ingo#dict#FromKeys().
 - ENH: Handle empty list items in ingo#collections#Unique() and
   ingo#collections#UniqueStable().
+- Add ingo/gui/position.vim module.
 
 1.010	09-Jul-2013
 - Add ingo/actions.vim module.
