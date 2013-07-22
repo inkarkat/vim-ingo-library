@@ -8,6 +8,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.010.002	08-Jul-2013	Add prefix to exception thrown from
+"				ingo#window#cmdwin#UndefineMappingForCmdwin().
 "   1.004.001	08-Apr-2013	file creation from autoload/ingowindow.vim
 
 " The command-line window is implemented as a window, so normal mode mappings
@@ -39,7 +41,7 @@ function! ingo#window#cmdwin#UndefineMappingForCmdwin( mappings, ... )
     elseif type(a:mappings) == type('')
 	let l:mappings = [ a:mappings ]
     else
-	throw 'passed invalid type ' . type(a:mappings)
+	throw 'UndefineMappingForCmdwin: Passed invalid type ' . type(a:mappings)
     endif
     for l:mapping in l:mappings
 	let s:CmdwinMappings[ l:mapping ] = l:alternative
