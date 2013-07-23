@@ -8,6 +8,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.009.008	14-Jun-2013	Minor: Make matchlist() robust against
+"				'ignorecase'.
 "   1.007.007	01-Jun-2013	Move functions from ingo/cmdargs.vim to
 "				ingo/cmdargs/pattern.vim and
 "				ingo/cmdargs/substitute.vim.
@@ -122,26 +124,26 @@ function! ingo#cmdargs#substitute#Parse( arguments, ... )
     let l:emptyFlags = get(l:options, 'emptyFlags', ['&'] + repeat([''], l:flagsMatchCount - 1))
     let l:isAllowLoneFlags = get(l:options, 'isAllowLoneFlags', 1)
 
-    let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . l:flagsExpr . '$')
+    let l:matches = matchlist(a:arguments, '\C^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . l:flagsExpr . '$')
     if ! empty(l:matches)
 	" Full /pat/repl/[flags].
 	return l:matches[1:3] + (l:isParseFlags ? l:matches[4:(4 + l:flagsMatchCount - 1)] : [])
     endif
 
-    let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)$')
+    let l:matches = matchlist(a:arguments, '\C^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)$')
     if ! empty(l:matches)
 	" Partial /pat/[repl].
 	return l:matches[1:2] + [(empty(l:matches[3]) ? escape(l:defaultReplacement, l:matches[1]) : l:matches[3])] + l:defaultFlags
     endif
 
-    let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.\{-}\)$')
+    let l:matches = matchlist(a:arguments, '\C^\(\i\@!\S\)\(.\{-}\)$')
     if ! empty(l:matches)
 	" Minimal /[pat].
 	return l:matches[1:2] + [escape(l:defaultReplacement, l:matches[1])] + l:defaultFlags
     endif
 
     if l:isParseFlags && l:isAllowLoneFlags
-	let l:matches = matchlist(a:arguments, '^' . l:flagsExpr . '$')
+	let l:matches = matchlist(a:arguments, '\C^' . l:flagsExpr . '$')
 	if ! empty(l:matches)
 	    " Special case of {flags} without /pat/string/.
 	    return ['/', l:emptyPattern, escape(l:emptyReplacement, '/')] + s:ApplyEmptyFlags(s:EnsureList(l:emptyFlags), l:matches[1:(l:flagsMatchCount)])
