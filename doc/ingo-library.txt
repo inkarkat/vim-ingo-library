@@ -86,6 +86,12 @@ HISTORY							*ingo-library-history*
 - ENH: Handle empty list items in ingo#collections#Unique() and
   ingo#collections#UniqueStable().
 - Add ingo/gui/position.vim module.
+- Add ingo/filetype.vim module.
+- Add ingo/ftplugin/onbufwinenter.vim module.
+- Add ingo/selection/frompattern.vim module.
+- Add ingo/text.vim module.
+- Add ingo/ftplugin/windowsettings.vim module.
+- Add ingo/text/replace.vim module.
 
 1.010	09-Jul-2013
 - Add ingo/actions.vim module.
