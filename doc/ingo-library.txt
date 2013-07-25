@@ -92,6 +92,8 @@ HISTORY							*ingo-library-history*
 - Add ingo/text.vim module.
 - Add ingo/ftplugin/windowsettings.vim module.
 - Add ingo/text/replace.vim module.
+- FIX: Use the rules for the /pattern/ separator as stated in :help E146 for
+  ingo#cmdargs#pattern#Parse() and ingo#cmdargs#substitute#Parse().
 
 1.010	09-Jul-2013
 - Add ingo/actions.vim module.
