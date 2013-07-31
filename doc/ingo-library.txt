@@ -94,6 +94,9 @@ HISTORY							*ingo-library-history*
 - Add ingo/text/replace.vim module.
 - FIX: Use the rules for the /pattern/ separator as stated in :help E146 for
   ingo#cmdargs#pattern#Parse() and ingo#cmdargs#substitute#Parse().
+- FIX: Off-by-one in ingo#strdisplaywidth#HasMoreThan() and
+  ingo#strdisplaywidth#strleft().
+- Add ingo#str#Reverse().
 
 1.010	09-Jul-2013
 - Add ingo/actions.vim module.
