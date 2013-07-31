@@ -8,6 +8,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.010.003	08-Jul-2013	Add prefix to exception thrown from
+"				ingo#fs#path#GetRootDir().
 "   1.009.002	26-Jun-2013	Add ingo#fs#path#Equals().
 "				Minor: Remove duplication.
 "   1.007.001	01-Jun-2013	file creation from ingofile.vim
@@ -94,7 +96,7 @@ function! ingo#fs#path#GetRootDir( filespec )
     endwhile
 
     if empty(l:dir)
-	throw 'Could not determine root dir!'
+	throw 'GetRootDir: Could not determine root dir!'
     endif
 
     return l:dir
