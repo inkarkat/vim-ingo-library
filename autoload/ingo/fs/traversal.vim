@@ -1,6 +1,8 @@
 " ingo/fs/traversal.vim: Functions for traversal of the file system.
 "
 " DEPENDENCIES:
+"   - ingo/actions.vim autoload script
+"   - ingo/fs/path.vim autoload script
 "
 " Copyright: (C) 2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -8,15 +10,79 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.011.003	01-Aug-2013	Make a:path argument optional and default to the
+"				current buffer's directory (as all existing
+"				clients use that).
 "   1.003.002	26-Mar-2013	Rename to
 "				ingo#fs#traversal#FindLastContainedInUpDir()
 "	001	22-Mar-2013	file creation
 
-function! ingo#fs#traversal#FindLastContainedInUpDir( name, path )
-    let l:dir = a:path
+function! ingo#fs#traversal#FindDirUpwards( Predicate, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Find directory where a:Predicate matches in a:path, searching upwards. Like
+"   |finddir()|, but supports not just fixed directory names, but only upwards
+"   search.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:Predicate     Either a Funcref that gets invoked with a dirspec and its
+"		    previous (sub-)dirspec, or an expression where "v:val" is
+"		    replaced with a List of those two arguments.
+"   a:dirspec   Optional starting directory. Should be absolute or at least in a
+"		format that allows upward traversal via :h. If omitted, the
+"		search starts from the current buffer's directory.
+"* RETURN VALUES:
+"   First dirspec where a:Predicate returns true.
+"   Empty string when that never happens until the root directory is reached.
+"******************************************************************************
+    if (has('win32') || has('win64'))
+	let l:ps = escape(ingo#fs#path#Separator(), '\')
+	let l:uncPathPattern = printf('^%s%s[^%s]\+%s[^%s]\+$', l:ps, l:ps, l:ps, l:ps, l:ps)
+    endif
+
+    let l:dir = (a:0 ? a:1 : expand('%:p:h'))
     let l:prevDir = ''
     while l:dir !=# l:prevDir
-	if empty(globpath(l:dir, a:name, 1))
+	if ingo#actions#EvaluateWithValOrFunc(a:Predicate, l:dir, l:prevDir)
+	    return l:dir
+	endif
+
+	" Stop iterating after reaching the file system root.
+	if exists('l:uncPathPattern') && l:dir =~# l:uncPathPattern
+	    break
+	endif
+	let l:prevDir = l:dir
+	let l:dir = fnamemodify(l:dir, ':h')
+    endwhile
+
+    return ''
+endfunction
+
+function! ingo#fs#traversal#FindLastContainedInUpDir( expr, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Traversing upwards from the current buffer's directory, find the last
+"   directory that yields a match for the a:expr glob.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:expr  File glob that must match in each upwards directory.
+"   a:dirspec   Optional starting directory. Should be absolute or at least in a
+"		format that allows upward traversal via :h. If omitted, the
+"		search starts from the current buffer's directory.
+"* RETURN VALUES:
+"   Dirspec of the highest directory that still matches a:expr.
+"   Empty string if a:expr doesn't even match in the starting directory.
+"******************************************************************************
+    let l:dir = (a:0 ? a:1 : expand('%:p:h'))
+    let l:prevDir = ''
+    while l:dir !=# l:prevDir
+	if empty(globpath(l:dir, a:expr, 1))
 	    return l:prevDir
 	endif
 	let l:prevDir = l:dir
