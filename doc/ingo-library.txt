@@ -97,6 +97,11 @@ HISTORY							*ingo-library-history*
 - FIX: Off-by-one in ingo#strdisplaywidth#HasMoreThan() and
   ingo#strdisplaywidth#strleft().
 - Add ingo#str#Reverse().
+- ingo#fs#traversal#FindLastContainedInUpDir now defaults to the current
+  buffer's directory; omit the argument.
+- Add ingo#actions#EvaluateWithValOrFunc().
+- Extract ingo#fs#path#IsUncPathRoot().
+- Add ingo#fs#traversal#FindDirUpwards().
 
 1.010	09-Jul-2013
 - Add ingo/actions.vim module.
