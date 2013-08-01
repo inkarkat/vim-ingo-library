@@ -26,10 +26,13 @@ autoload/ingo/dict.vim
 autoload/ingo/err.vim
 autoload/ingo/escape.vim
 autoload/ingo/external.vim
+autoload/ingo/filetype.vim
 autoload/ingo/folds.vim
 autoload/ingo/fs/path.vim
 autoload/ingo/fs/tempfile.vim
 autoload/ingo/fs/traversal.vim
+autoload/ingo/ftplugin/onbufwinenter.vim
+autoload/ingo/ftplugin/windowsettings.vim
 autoload/ingo/gui/position.vim
 autoload/ingo/lines.vim
 autoload/ingo/mapmaker.vim
@@ -51,6 +54,7 @@ autoload/ingo/search/buffer.vim
 autoload/ingo/search/pattern.vim
 autoload/ingo/search/timelimited.vim
 autoload/ingo/selection.vim
+autoload/ingo/selection/frompattern.vim
 autoload/ingo/selection/position.vim
 autoload/ingo/selection/patternmatch.vim
 autoload/ingo/str.vim
@@ -61,6 +65,8 @@ autoload/ingo/subst.vim
 autoload/ingo/syntaxitem.vim
 autoload/ingo/system.vim
 autoload/ingo/tabstops.vim
+autoload/ingo/text.vim
+autoload/ingo/text/replace.vim
 autoload/ingo/window/cmdwin.vim
 autoload/ingo/window/dimensions.vim
 autoload/ingo/window/preview.vim
