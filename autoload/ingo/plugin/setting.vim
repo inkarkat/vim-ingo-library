@@ -8,6 +8,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.010.004	08-Jul-2013	Add prefix to exception thrown from
+"				ingo#plugin#setting#GetFromScope().
 "   1.005.003	10-Apr-2013	Move into ingo-library.
 "	002	06-Jul-2010	ENH: Now supporting passing of default value
 "				instead of throwing exception, like the built-in
@@ -24,7 +26,7 @@ function! ingo#plugin#setting#GetFromScope( variableName, scopeList, ... )
     if a:0
 	return a:1
     else
-	throw "No variable named '" . a:variableName . "' defined. "
+	throw "GetFromScope: No variable named '" . a:variableName . "' defined. "
     endif
 endfunction
 
