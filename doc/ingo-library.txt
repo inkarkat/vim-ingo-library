@@ -79,7 +79,8 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.011	RELEASEME
+1.011	02-Aug-2013
+- Add ingo/range.vim module.
 - Add ingo/register.vim module.
 - Make ingo#collections#ToDict() handle empty list items via an optional
   a:emptyValue argument. This also distinguishes it from ingo#dict#FromKeys().
