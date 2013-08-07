@@ -8,6 +8,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.009.005	28-Jun-2013	FIX: Avoid E108: No such variable:
+"				"b:browsefilter".
 "   1.008.004	06-Jun-2013	Fix missing argument error for
 "				ingo#query#file#BrowseDirForOpenFile() and
 "				ingo#query#file#BrowseDirForAction().
@@ -31,7 +33,7 @@ function! ingo#query#file#Browse( save, title, initdir, default, browsefilter )
 	if exists('l:save_browsefilter')
 	    let b:browsefilter = l:save_browsefilter
 	else
-	    unlet b:browsefilter
+	    unlet! b:browsefilter
 	endif
     endtry
 endfunction
