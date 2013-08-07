@@ -9,6 +9,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.009.004	14-Jun-2013	Minor: Make matchstr() robust against
+"				'ignorecase'.
 "   1.008.003	12-Jun-2013	Change implementation from doing a :substitute
 "				in a temp buffer (which has the nasty side
 "				effect of clobbering the remembered flags) to
@@ -39,7 +41,7 @@ function! ingo#regexp#previoussubstitution#Get()
     try
 	execute 'wviminfo!' escapings#fnameescape(l:tempfile)
 	let l:viminfo = join(readfile(l:tempfile), "\n")
-	let l:previousSubstitution = matchstr(l:viminfo, '\n# Last Substitute String:\n\$\zs\_.\{-}\ze\n\n# .* (newest to oldest):\n')
+	let l:previousSubstitution = matchstr(l:viminfo, '\C\n# Last Substitute String:\n\$\zs\_.\{-}\ze\n\n# .* (newest to oldest):\n')
     catch /^Vim\%((\a\+)\)\=:E/
 	" Fallback.
 	let l:previousSubstitution = ingo#buffer#temp#Execute('substitute/^/' . (&magic ? '~' : '\~') . '/')
