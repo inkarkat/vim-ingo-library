@@ -1,7 +1,7 @@
 " ingo/compat.vim: Functions for backwards compatibility with old Vim versions.
 "
 " DEPENDENCIES:
-"   - EchoWithoutScrolling.vim autoload script (optional, for Vim 7.0 - 7.2)
+"   - ingo/strdisplaywidth.vim autoload script
 "
 " Copyright: (C) 2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -9,6 +9,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.008.002	07-Jun-2013	Move EchoWithoutScrolling#DetermineVirtColNum()
+"				implementaion in here.
 "   1.004.001	04-Apr-2013	file creation
 
 if exists('*strdisplaywidth')
@@ -16,22 +18,16 @@ if exists('*strdisplaywidth')
 	return call('strdisplaywidth', [a:expr] + a:000)
     endfunction
 else
-    if ! exists('*EchoWithoutScrolling#DetermineVirtColNum')
-	runtime! autoload/EchoWithoutScrolling.vim
-    endif
-    if exists('*EchoWithoutScrolling#DetermineVirtColNum')
-	function! ingo#compat#strdisplaywidth( expr, ... )
-	    if a:0
-		return EchoWithoutScrolling#DetermineVirtColNum(repeat(' ', a:1) . a:expr) - a:1
-	    else
-		return EchoWithoutScrolling#DetermineVirtColNum(a:expr)
+    function! ingo#compat#strdisplaywidth( expr, ... )
+	let l:expr = (a:0 ? repeat(' ', a:1) . a:expr : a:expr)
+	let i = 1
+	while 1
+	    if ! ingo#strdisplaywidth#HasMoreThan(l:expr, i)
+		return i - 1 - (a:0 ? a:1 : 0)
 	    endif
-	endfunction
-    else
-	function! ingo#compat#strdisplaywidth( expr, ... )
-	    return strlen(strtrans(substitute(a:expr, '\t', repeat(' ', &tabstop), 'g')))
-	endfunction
-    endif
+	    let i += 1
+	endwhile
+    endfunction
 endif
 
 if exists('*strchars')
