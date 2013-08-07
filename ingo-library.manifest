@@ -43,8 +43,9 @@ autoload/ingo/number.vim
 autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/marks.vim
 autoload/ingo/plugin/setting.vim
-autoload/ingo/query/get.vim
 autoload/ingo/query/file.vim
+autoload/ingo/query/get.vim
+autoload/ingo/range.vim
 autoload/ingo/regexp.vim
 autoload/ingo/regexp/comments.vim
 autoload/ingo/regexp/magic.vim
