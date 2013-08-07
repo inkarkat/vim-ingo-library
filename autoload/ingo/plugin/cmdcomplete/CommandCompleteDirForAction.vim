@@ -30,6 +30,7 @@
 " DEPENDENCIES:
 "   - escapings.vim autoload script
 "   - ingo/cmdargs/file.vim autoload script
+"   - ingo/fs/path.vim autoload script
 "   - ingo/msg.vim autoload script
 
 " Copyright: (C) 2009-2013 Ingo Karkat
@@ -38,6 +39,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	018	26-Jun-2013	Use ingo/fs/path.vim.
 "	017	10-Jun-2013	Better handling for errors from :echoerr.
 "	016	01-Jun-2013	Move ingofileargs.vim into ingo-library.
 "	015	31-May-2013	Minor refactoring.
@@ -155,14 +157,13 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 	if a:isIncludeSubdirs
 	    " If the l:dirspec itself contains wildcards, there may be multiple
 	    " matches.
-	    let l:pathSeparator = (exists('+shellslash') && ! &shellslash ? '\' : '/')
 	    let l:resolvedDirspecs = split(glob(l:dirspec), "\n")
 
 	    " If there is a browsefilter, we need to add all directories
 	    " separately, as most of them probably have been filtered away by
 	    " the (file-based) a:browsefilter.
 	    if ! empty(a:browsefilter)
-		let l:dirspecWildcard = l:dirspec . a:argLead . '*' . l:pathSeparator
+		let l:dirspecWildcard = l:dirspec . a:argLead . '*' . ingo#fs#path#Separator()
 		call extend(l:filespecs, split(glob(l:dirspecWildcard), "\n"))
 		call sort(l:filespecs) " Weave the directories into the files.
 	    else
@@ -172,7 +173,7 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 		" above, the built-in completion, and because it makes sense to
 		" show the path separator, because then autocompletion of the
 		" directory contents can quickly be continued.
-		call map(l:filespecs, 'isdirectory(v:val) ? v:val . l:pathSeparator : v:val')
+		call map(l:filespecs, 'isdirectory(v:val) ? v:val . ingo#fs#path#Separator() : v:val')
 	    endif
 
 	    return map(
