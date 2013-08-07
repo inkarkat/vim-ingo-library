@@ -79,6 +79,10 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.012	RELEASEME
+- CHG: Change return value format of ingo#selection#frompattern#GetPositions()
+  to better match the arguments of functions like ingo#text#Get().
+
 1.011	02-Aug-2013
 - Add ingo/range.vim module.
 - Add ingo/register.vim module.
