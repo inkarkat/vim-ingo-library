@@ -9,6 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.012.004	09-Aug-2013	Add ingo#compat#maparg().
 "   1.012.003	08-Aug-2013	Add ingo#compat#fnameescape() and
 "				ingo#compat#shellescape() from escapings.vim.
 "   1.008.002	07-Jun-2013	Move EchoWithoutScrolling#DetermineVirtColNum()
@@ -111,5 +112,24 @@ function! ingo#compat#shellescape( filespec, ... )
 	endif
     endif
 endfunction
+
+if v:version == 703 && has('patch32') || v:version > 703
+    function! ingo#compat#maparg( name, ... )
+	let l:args = [a:name, '', 0, 1]
+	if a:0 > 0
+	    let l:args[1] = a:1
+	endif
+	if a:0 > 1
+	    let l:args[2] = a:2
+	endif
+	return call('maparg', l:args).rhs
+    endfunction
+else
+    function! ingo#compat#maparg( name, ... )
+	let l:rhs = call('maparg', [a:name] + a:000)
+	let l:rhs = substitute(l:rhs, '|', '<Bar>', 'g')    " '|' must be escaped, or the map command will end prematurely.
+	return l:rhs
+    endfunction
+endif
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
