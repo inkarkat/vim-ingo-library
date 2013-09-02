@@ -82,6 +82,14 @@ HISTORY							*ingo-library-history*
 1.012	RELEASEME
 - CHG: Change return value format of ingo#selection#frompattern#GetPositions()
   to better match the arguments of functions like ingo#text#Get().
+- Add ingo/os.vim module.
+- Add ingo#compat#fnameescape() and ingo#compat#shellescape() from
+  escapings.vim.
+- Add remaining former escapings.vim functions as ingo/escape/shellcommand.vim
+  and ingo/escape/file.vim modules.
+- Add ingo/motion/boundary.vim module.
+- Add ingo#compat#maparg().
+- Add ingo/escape/command.vim module.
 
 1.011	02-Aug-2013
 - Add ingo/range.vim module.
