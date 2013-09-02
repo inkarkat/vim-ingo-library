@@ -25,6 +25,9 @@ autoload/ingo/date.vim
 autoload/ingo/dict.vim
 autoload/ingo/err.vim
 autoload/ingo/escape.vim
+autoload/ingo/escape/command.vim
+autoload/ingo/escape/file.vim
+autoload/ingo/escape/shellcommand.vim
 autoload/ingo/external.vim
 autoload/ingo/filetype.vim
 autoload/ingo/folds.vim
@@ -38,8 +41,10 @@ autoload/ingo/lines.vim
 autoload/ingo/mapmaker.vim
 autoload/ingo/matches.vim
 autoload/ingo/mbyte/virtcol.vim
+autoload/ingo/motion/boundary.vim
 autoload/ingo/msg.vim
 autoload/ingo/number.vim
+autoload/ingo/os.vim
 autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/marks.vim
 autoload/ingo/plugin/setting.vim
