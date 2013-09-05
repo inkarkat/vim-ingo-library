@@ -1,13 +1,14 @@
-" ingocomments.vim: Custom functions around comment handling.
+" ingo/comments.vim: Functions around comment handling.
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2012 Ingo Karkat
+" Copyright: (C) 2011-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.005.004	02-May-2013	Move to ingo-library.
 "	003	24-May-2012	Add ingocomments#RemoveCommentPrefix().
 "	002	09-Nov-2011	Add ingocomments#CheckComment() and
 "				ingocomments#RenderComment(), used by
@@ -23,7 +24,7 @@ function! s:IsPrefixMatch( string, prefix )
     return strpart(a:string, 0, len(a:prefix)) ==# a:prefix
 endfunction
 
-function! ingocomments#CheckComment( text, isIgnoreIndent )
+function! ingo#comments#CheckComment( text, isIgnoreIndent )
 "******************************************************************************
 "* PURPOSE:
 "   Check whether a:text is a comment according to 'comments' definitions.
@@ -94,7 +95,7 @@ function! ingocomments#CheckComment( text, isIgnoreIndent )
     return []
 endfunction
 
-function! ingocomments#RenderComment( text, checkComment )
+function! ingo#comments#RenderComment( text, checkComment )
 "******************************************************************************
 "* PURPOSE:
 "   Render a:text as a comment.
@@ -104,7 +105,7 @@ function! ingocomments#RenderComment( text, checkComment )
 "   None.
 "* INPUTS:
 "   a:text  The text to be rendered.
-"   a:checkComment  Comment information returned by ingocomments#CheckComment().
+"   a:checkComment  Comment information returned by ingo#comments#CheckComment().
 "* RETURN VALUES:
 "   Returns a:text unchanged if a:checkComment is empty.
 "   Otherwise, returns a:text rendered as a comment (as good as it can).
@@ -132,7 +133,7 @@ function! ingocomments#RenderComment( text, checkComment )
     endif
 endfunction
 
-function! ingocomments#RemoveCommentPrefix( text, checkComment )
+function! ingo#comments#RemoveCommentPrefix( text, checkComment )
 "******************************************************************************
 "* PURPOSE:
 "   Remove the detected a:checkComment from a:text.
@@ -142,7 +143,7 @@ function! ingocomments#RemoveCommentPrefix( text, checkComment )
 "   None.
 "* INPUTS:
 "   a:text  The text to be rendered comment-less.
-"   a:checkComment  Comment information returned by ingocomments#CheckComment().
+"   a:checkComment  Comment information returned by ingo#comments#CheckComment().
 "* RETURN VALUES:
 "   Returns a:text unchanged if a:checkComment is empty.
 "   Otherwise, returns a:text rendered without the comment prefix.
@@ -156,7 +157,7 @@ function! ingocomments#RemoveCommentPrefix( text, checkComment )
     return substitute(a:text, '\s*\V\C' . escape(l:commentprefix, '\') . (l:isBlankRequired ? '\s\+' : '\s\*'), '', 'g')
 endfunction
 
-function! ingocomments#GetCommentPrefixType( prefix )
+function! ingo#comments#GetCommentPrefixType( prefix )
 "******************************************************************************
 "* PURPOSE:
 "   Check whether a:prefix is a comment leader as defined in 'comments'.
@@ -198,7 +199,7 @@ function! ingocomments#GetCommentPrefixType( prefix )
     return []
 endfunction
 
-function! ingocomments#GetThreePieceIndent( prefix )
+function! ingo#comments#GetThreePieceIndent( prefix )
 "******************************************************************************
 "* PURPOSE:
 "   Check whether a:prefix is a comment leader of a three-piece comment as
