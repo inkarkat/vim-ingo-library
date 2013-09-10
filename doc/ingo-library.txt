@@ -84,6 +84,14 @@ HISTORY							*ingo-library-history*
   'cpo' contains "y".
 - Name the temp buffer for ingo#buffer#temp#Execute() and re-use previous
   instances to avoid increasing the buffer numbers and output of :ls!.
+- CHG: Make a:isIgnoreIndent flag to ingo#comments#CheckComment() optional and
+  add a:isStripNonEssentialWhiteSpaceFromCommentString, which is also on by
+  default for DWIM.
+- CHG: Don't strip whitespace in ingo#comments#RemoveCommentPrefix(); with the
+  changed ingo#comments#CheckComment() default behavior, this isn't necessary,
+  and is unexpected.
+- ingo#comments#RenderComment: When the text starts with indent identical to
+  what 'commentstring' would render, avoid having duplicate indent.
 
 1.012	05-Sep-2013
 - CHG: Change return value format of ingo#selection#frompattern#GetPositions()
