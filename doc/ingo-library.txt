@@ -92,6 +92,8 @@ HISTORY							*ingo-library-history*
   and is unexpected.
 - ingo#comments#RenderComment: When the text starts with indent identical to
   what 'commentstring' would render, avoid having duplicate indent.
+- Minor: Return last search pattern instead of empty string on
+  ingo#search#pattern#GetLastForwardSearch(0).
 
 1.012	05-Sep-2013
 - CHG: Change return value format of ingo#selection#frompattern#GetPositions()
