@@ -8,6 +8,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.011.010	24-Jul-2013	Minor: Remove invalid "e" flag from
+"				substitute().
 "   1.006.009	24-May-2013	Move into ingo-library.
 "				Restructure ingo#regexp#FromLiteralText() a bit.
 "	008	21-Feb-2013	Move ingocollections.vim to ingo-library.
@@ -64,7 +66,7 @@ function! ingo#regexp#EscapeLiteralText( text, additionalEscapeCharacters )
 "* RETURN VALUES:
 "   Regular expression for matching a:text.
 "*******************************************************************************
-    return substitute( escape(a:text, '\' . ingo#regexp#GetSpecialCharacters() . a:additionalEscapeCharacters), "\n", '\\n', 'ge' )
+    return substitute(escape(a:text, '\' . ingo#regexp#GetSpecialCharacters() . a:additionalEscapeCharacters), "\n", '\\n', 'g')
 endfunction
 
 function! s:MakeWholeWordSearch( text, pattern )
