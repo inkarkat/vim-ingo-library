@@ -95,7 +95,7 @@ function! ingo#cmdargs#glob#Resolve( fileglobs )
 "   a:fileglobs Raw list of file patterns.
 "* RETURN VALUES:
 "   [l:filespecs, l:statistics]	First element is a list of the resolved
-"   filespecs (in normal, not ex syntax), second element is a dictionary
+"   filespecs (in normal, not Ex syntax), second element is a dictionary
 "   containing the file statistics.
 "*******************************************************************************
     let l:statistics = { 'files': 0, 'removed': 0, 'nonexisting': 0 }
