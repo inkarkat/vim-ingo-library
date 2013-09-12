@@ -13,6 +13,7 @@
 "   1.011.003	01-Aug-2013	Make a:path argument optional and default to the
 "				current buffer's directory (as all existing
 "				clients use that).
+"				Add ingo#fs#traversal#FindDirUpwards().
 "   1.003.002	26-Mar-2013	Rename to
 "				ingo#fs#traversal#FindLastContainedInUpDir()
 "	001	22-Mar-2013	file creation
@@ -28,9 +29,8 @@ function! ingo#fs#traversal#FindDirUpwards( Predicate, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:Predicate     Either a Funcref that gets invoked with a dirspec and its
-"		    previous (sub-)dirspec, or an expression where "v:val" is
-"		    replaced with a List of those two arguments.
+"   a:Predicate     Either a Funcref that gets invoked with a dirspec, or an
+"		    expression where "v:val" is replaced with a dirspec.
 "   a:dirspec   Optional starting directory. Should be absolute or at least in a
 "		format that allows upward traversal via :h. If omitted, the
 "		search starts from the current buffer's directory.
@@ -38,20 +38,15 @@ function! ingo#fs#traversal#FindDirUpwards( Predicate, ... )
 "   First dirspec where a:Predicate returns true.
 "   Empty string when that never happens until the root directory is reached.
 "******************************************************************************
-    if (has('win32') || has('win64'))
-	let l:ps = escape(ingo#fs#path#Separator(), '\')
-	let l:uncPathPattern = printf('^%s%s[^%s]\+%s[^%s]\+$', l:ps, l:ps, l:ps, l:ps, l:ps)
-    endif
-
     let l:dir = (a:0 ? a:1 : expand('%:p:h'))
     let l:prevDir = ''
     while l:dir !=# l:prevDir
-	if ingo#actions#EvaluateWithValOrFunc(a:Predicate, l:dir, l:prevDir)
+	if ingo#actions#EvaluateWithValOrFunc(a:Predicate, l:dir)
 	    return l:dir
 	endif
 
 	" Stop iterating after reaching the file system root.
-	if exists('l:uncPathPattern') && l:dir =~# l:uncPathPattern
+	if (has('win32') || has('win64')) && ingo#fs#path#IsUncPathRoot(l:dir)
 	    break
 	endif
 	let l:prevDir = l:dir
@@ -87,7 +82,7 @@ function! ingo#fs#traversal#FindLastContainedInUpDir( expr, ... )
 	endif
 	let l:prevDir = l:dir
 	let l:dir = fnamemodify(l:dir, ':h')
-	if (has('win32') || has('win64')) && l:dir =~ '^\\\\[^\\]\+$'
+	if (has('win32') || has('win64')) && ingo#fs#path#IsUncPathRoot(l:dir)
 	    break
 	endif
     endwhile
