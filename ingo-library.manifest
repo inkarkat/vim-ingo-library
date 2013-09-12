@@ -72,6 +72,7 @@ autoload/ingo/syntaxitem.vim
 autoload/ingo/system.vim
 autoload/ingo/tabstops.vim
 autoload/ingo/text.vim
+autoload/ingo/text/frompattern.vim
 autoload/ingo/text/replace.vim
 autoload/ingo/window/cmdwin.vim
 autoload/ingo/window/dimensions.vim
