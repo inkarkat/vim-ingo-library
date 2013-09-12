@@ -8,6 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.011.004	01-Aug-2013	Extract ingo#fs#path#IsUncPathRoot().
 "   1.010.003	08-Jul-2013	Add prefix to exception thrown from
 "				ingo#fs#path#GetRootDir().
 "   1.009.002	26-Jun-2013	Add ingo#fs#path#Equals().
@@ -83,15 +84,18 @@ function! ingo#fs#path#Combine( first, ... )
     return l:filespec
 endfunction
 
+function! ingo#fs#path#IsUncPathRoot( filespec )
+    let l:ps = escape(ingo#fs#path#Separator(), '\')
+    let l:uncPathPattern = printf('^%s%s[^%s]\+%s[^%s]\+$', l:ps, l:ps, l:ps, l:ps, l:ps)
+    return (a:filespec =~# l:uncPathPattern)
+endfunction
 function! ingo#fs#path#GetRootDir( filespec )
     if ! (has('win32') || has('win64'))
 	return '/'
     endif
 
     let l:dir = a:filespec
-    let l:ps = escape(ingo#fs#path#Separator(), '\')
-    let l:uncPathPattern = printf('^%s%s[^%s]\+%s[^%s]\+$', l:ps, l:ps, l:ps, l:ps, l:ps)
-    while fnamemodify(l:dir, ':h') !=# l:dir && l:dir !~# l:uncPathPattern
+    while fnamemodify(l:dir, ':h') !=# l:dir && ! ingo#fs#path#IsUncPathRoot(l:dir)
 	let l:dir = fnamemodify(l:dir, ':h')
     endwhile
 
