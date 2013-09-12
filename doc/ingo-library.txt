@@ -94,6 +94,8 @@ HISTORY							*ingo-library-history*
   what 'commentstring' would render, avoid having duplicate indent.
 - Minor: Return last search pattern instead of empty string on
   ingo#search#pattern#GetLastForwardSearch(0).
+- Avoid using \ze in ingo#regexp#comments#CommentToExpression(). It may be
+  used in a larger expression that still wants to match after the prefix.
 
 1.012	05-Sep-2013
 - CHG: Change return value format of ingo#selection#frompattern#GetPositions()
