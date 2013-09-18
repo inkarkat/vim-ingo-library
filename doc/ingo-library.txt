@@ -79,7 +79,11 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.013	RELEASEME
+1.014	RELEASEME
+- Add ingo/date/format.vim module.
+- Add ingo#os#PathSeparator().
+
+1.013	13-Sep-2013
 - Also avoid clobbering the last change ('.') in ingo#selection#Get() when
   'cpo' contains "y".
 - Name the temp buffer for ingo#buffer#temp#Execute() and re-use previous
@@ -96,6 +100,11 @@ HISTORY							*ingo-library-history*
   ingo#search#pattern#GetLastForwardSearch(0).
 - Avoid using \ze in ingo#regexp#comments#CommentToExpression(). It may be
   used in a larger expression that still wants to match after the prefix.
+- FIX: Correct case of ingo#os#IsWin*() function names.
+- ingo#regexp#FromWildcard(): Limit * glob matching to individual path
+  components and add ** for cross-directory matching.
+- Consistently use operating system detection functions from ingo/os.vim
+  within the ingo-library.
 
 1.012	05-Sep-2013
 - CHG: Change return value format of ingo#selection#frompattern#GetPositions()
