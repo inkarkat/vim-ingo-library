@@ -1,6 +1,7 @@
 " ingo/fs/path.vim: Functions for manipulating a file system path.
 "
 " DEPENDENCIES:
+"   - ingo/os.vim autoload script
 "
 " Copyright: (C) 2012-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -8,6 +9,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.013.005	13-Sep-2013	Use operating system detection functions from
+"				ingo/os.vim.
 "   1.011.004	01-Aug-2013	Extract ingo#fs#path#IsUncPathRoot().
 "   1.010.003	08-Jul-2013	Add prefix to exception thrown from
 "				ingo#fs#path#GetRootDir().
@@ -90,7 +93,7 @@ function! ingo#fs#path#IsUncPathRoot( filespec )
     return (a:filespec =~# l:uncPathPattern)
 endfunction
 function! ingo#fs#path#GetRootDir( filespec )
-    if ! (has('win32') || has('win64'))
+    if ! ingo#os#IsWinOrDos()
 	return '/'
     endif
 
@@ -106,7 +109,7 @@ function! ingo#fs#path#GetRootDir( filespec )
     return l:dir
 endfunction
 
-if has('dos16') || has('dos32') || has('win95') || has('win32') || has('win64')
+if ingo#os#IsWinOrDos()
     function! ingo#fs#path#Equals( p1, p2 )
 	return a:p1 ==? a:p2 || ingo#fs#path#Normalize(fnamemodify(a:p1, ':p')) ==? ingo#fs#path#Normalize(fnamemodify(a:p2, ':p'))
     endfunction
