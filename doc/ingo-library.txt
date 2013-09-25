@@ -82,6 +82,7 @@ HISTORY							*ingo-library-history*
 1.014	RELEASEME
 - Add ingo/date/format.vim module.
 - Add ingo#os#PathSeparator().
+- Add ingo/foldtext.vim module.
 
 1.013	13-Sep-2013
 - Also avoid clobbering the last change ('.') in ingo#selection#Get() when
