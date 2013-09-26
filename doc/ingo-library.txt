@@ -83,6 +83,9 @@ HISTORY							*ingo-library-history*
 - Add ingo/date/format.vim module.
 - Add ingo#os#PathSeparator().
 - Add ingo/foldtext.vim module.
+- Add ingo#os#IsCygwin().
+- ingo#fs#path#Normalize(): Also convert between the different D:\ and
+  /cygdrive/d/ notations on Windows and Cygwin.
 
 1.013	13-Sep-2013
 - Also avoid clobbering the last change ('.') in ingo#selection#Get() when
