@@ -8,9 +8,14 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.010.002	08-Jul-2013	Add ingo#buffer#IsEmpty().
 "   1.006.001	29-May-2013	file creation
 let s:save_cpo = &cpo
 set cpo&vim
+
+function! ingo#buffer#IsEmpty()
+    return line('$') == 1 && empty(getline(1))
+endfunction
 
 function! ingo#buffer#IsBlank( bufnr )
     return (empty(bufname(a:bufnr)) &&
