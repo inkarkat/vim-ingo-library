@@ -86,6 +86,8 @@ HISTORY							*ingo-library-history*
 - Add ingo#os#IsCygwin().
 - ingo#fs#path#Normalize(): Also convert between the different D:\ and
   /cygdrive/d/ notations on Windows and Cygwin.
+- Add ingo#text#frompattern#GetHere().
+- Add ingo/date/epoch.vim module.
 
 1.013	13-Sep-2013
 - Also avoid clobbering the last change ('.') in ingo#selection#Get() when
