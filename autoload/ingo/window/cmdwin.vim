@@ -8,6 +8,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.011.003	23-Jul-2013	Change naming of augroup to match ingo-library
+"				convention.
 "   1.010.002	08-Jul-2013	Add prefix to exception thrown from
 "				ingo#window#cmdwin#UndefineMappingForCmdwin().
 "   1.004.001	08-Apr-2013	file creation from autoload/ingowindow.vim
@@ -55,9 +57,8 @@ function! s:UndefineMappings()
     endfor
 endfunction
 if has('autocmd')
-    augroup ingowindowcmdwin
-	autocmd!
-	autocmd CmdwinEnter * call <SID>UndefineMappings()
+    augroup IngoLibraryCmdWin
+	autocmd! CmdwinEnter * call <SID>UndefineMappings()
     augroup END
 endif
 
