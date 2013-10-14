@@ -8,6 +8,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.011.009	24-Jul-2013	FIX: Use the rules for the /pattern/ separator
+"				as stated in :help E146.
 "   1.009.008	14-Jun-2013	Minor: Make matchlist() robust against
 "				'ignorecase'.
 "   1.007.007	01-Jun-2013	Move functions from ingo/cmdargs.vim to
@@ -124,19 +126,19 @@ function! ingo#cmdargs#substitute#Parse( arguments, ... )
     let l:emptyFlags = get(l:options, 'emptyFlags', ['&'] + repeat([''], l:flagsMatchCount - 1))
     let l:isAllowLoneFlags = get(l:options, 'isAllowLoneFlags', 1)
 
-    let l:matches = matchlist(a:arguments, '\C^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . l:flagsExpr . '$')
+    let l:matches = matchlist(a:arguments, '\C^\([[:alnum:]\\"|]\@![\x00-\xFF]\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . l:flagsExpr . '$')
     if ! empty(l:matches)
 	" Full /pat/repl/[flags].
 	return l:matches[1:3] + (l:isParseFlags ? l:matches[4:(4 + l:flagsMatchCount - 1)] : [])
     endif
 
-    let l:matches = matchlist(a:arguments, '\C^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)$')
+    let l:matches = matchlist(a:arguments, '\C^\([[:alnum:]\\"|]\@![\x00-\xFF]\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.\{-}\)$')
     if ! empty(l:matches)
 	" Partial /pat/[repl].
 	return l:matches[1:2] + [(empty(l:matches[3]) ? escape(l:defaultReplacement, l:matches[1]) : l:matches[3])] + l:defaultFlags
     endif
 
-    let l:matches = matchlist(a:arguments, '\C^\(\i\@!\S\)\(.\{-}\)$')
+    let l:matches = matchlist(a:arguments, '\C^\([[:alnum:]\\"|]\@![\x00-\xFF]\)\(.\{-}\)$')
     if ! empty(l:matches)
 	" Minimal /[pat].
 	return l:matches[1:2] + [escape(l:defaultReplacement, l:matches[1])] + l:defaultFlags
