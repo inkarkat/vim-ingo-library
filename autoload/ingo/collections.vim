@@ -9,6 +9,13 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.011.010	12-Jul-2013	Make ingo#collections#ToDict() handle empty list
+"				items via an optional a:emptyValue argument.
+"				This also distinguishes it from
+"				ingo#dict#FromKeys().
+"				ENH: Handle empty list items in
+"				ingo#collections#Unique() and
+"				ingo#collections#UniqueStable().
 "   1.009.009	25-Jun-2013	Add ingo#collections#Flatten() and
 "				ingo#collections#Flatten1().
 "				Delegate ingo#collections#ToDict()
@@ -29,10 +36,41 @@
 "	002	11-Jun-2011	Add ingocollections#SplitKeepSeparators().
 "	001	08-Oct-2010	file creation
 
-function! ingo#collections#ToDict( list )
-    return ingo#dict#FromKeys(a:list, 1)
+function! ingo#collections#ToDict( list, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Convert a:list to a Dictionary, with each list element becoming a key (and
+"   the unimportant value is 1).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:list  List of keys.
+"   a:emptyValue    Optional value for items in a:list that yield an empty
+"		    string, which cannot be uses as a Dictionary key.
+"		    If omitted, empty values are not included in the Dictionary.
+"* RETURN VALUES:
+"   A new Dictionary with keys taken from a:list.
+"* SEE ALSO:
+"   ingo#dict#FromKeys() allows to specify a default value (here hard-coded to
+"   1), but doesn't handle empty keys.
+"******************************************************************************
+    let l:dict = {}
+    for l:item in a:list
+	let l:key = '' . l:item
+	if l:key ==# ''
+	    if a:0
+		let l:dict[a:1] = 1
+	    endif
+	else
+	    let l:dict[l:key] = 1
+	endif
+    endfor
+    return l:dict
 endfunction
-function! ingo#collections#Unique( list )
+
+function! ingo#collections#Unique( list, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Return a list where each element from a:list is contained only once.
@@ -43,13 +81,16 @@ function! ingo#collections#Unique( list )
 "   None.
 "* INPUTS:
 "   a:list  List of elements; does not need to be sorted.
+"   a:emptyValue    Optional value for items in a:list that yield an empty
+"		    string. Default is <Nul>.
 "* RETURN VALUES:
 "   Return the string representation of the unique elements of a:list. The order
 "   of returned elements is undetermined. To maintain the original order, use
 "   ingo#collections#UniqueStable(). To keep the original elements, use
 "   ingo#collections#UniqueSorted(). But this is the fastest function.
 "******************************************************************************
-    return keys(ingo#collections#ToDict(a:list))
+    let l:emptyValue = (a:0 ? a:1 : "\<Nul>")
+    return map(keys(ingo#collections#ToDict(a:list, l:emptyValue)), 'v:val == l:emptyValue ? "" : v:val')
 endfunction
 function! ingo#collections#UniqueSorted( list )
 "******************************************************************************
@@ -79,7 +120,7 @@ function! ingo#collections#UniqueSorted( list )
     endfor
     return l:result
 endfunction
-function! ingo#collections#UniqueStable( list )
+function! ingo#collections#UniqueStable( list, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Filter a:list so that each element is contained only once (in its first
@@ -91,14 +132,18 @@ function! ingo#collections#UniqueStable( list )
 "   None.
 "* INPUTS:
 "   a:list  List of elements; does not need to be sorted.
+"   a:emptyValue    Optional value for items in a:list that yield an empty
+"		    string. Default is <Nul>.
 "* RETURN VALUES:
 "   The order of returned elements is kept.
 "******************************************************************************
+    let l:emptyValue = (a:0 ? a:1 : "\<Nul>")
     let l:itemDict = {}
     let l:result = []
     for l:item in a:list
-	if ! has_key(l:itemDict, l:item)
-	    let l:itemDict[l:item] = 1
+	let l:key = ('' . l:item ==# '' ? l:emptyValue : l:item)
+	if ! has_key(l:itemDict, l:key)
+	    let l:itemDict[l:key] = 1
 	    call add(l:result, l:item)
 	endif
     endfor
