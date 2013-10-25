@@ -41,6 +41,7 @@ autoload/ingo/ftplugin/onbufwinenter.vim
 autoload/ingo/ftplugin/windowsettings.vim
 autoload/ingo/gui/position.vim
 autoload/ingo/lines.vim
+autoload/ingo/list.vim
 autoload/ingo/mapmaker.vim
 autoload/ingo/matches.vim
 autoload/ingo/mbyte/virtcol.vim
@@ -51,6 +52,7 @@ autoload/ingo/os.vim
 autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/marks.vim
 autoload/ingo/plugin/setting.vim
+autoload/ingo/query/confirm.vim
 autoload/ingo/query/file.vim
 autoload/ingo/query/get.vim
 autoload/ingo/range.vim
