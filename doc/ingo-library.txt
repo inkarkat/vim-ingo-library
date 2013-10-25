@@ -91,6 +91,7 @@ HISTORY							*ingo-library-history*
 - Add ingo#buffer#IsPersisted().
 - Add ingo/list.vim module.
 - Add ingo/query/confirm.vim module.
+- Add ingo#text#GetChar().
 
 1.013	13-Sep-2013
 - Also avoid clobbering the last change ('.') in ingo#selection#Get() when
