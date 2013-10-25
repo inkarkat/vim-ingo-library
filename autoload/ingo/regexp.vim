@@ -8,6 +8,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.013.011	13-Sep-2013	ingo#regexp#FromWildcard(): Limit * glob
+"				matching to individual path components and add
+"				** for cross-directory matching.
 "   1.011.010	24-Jul-2013	Minor: Remove invalid "e" flag from
 "				substitute().
 "   1.006.009	24-May-2013	Move into ingo-library.
@@ -130,8 +133,13 @@ function! ingo#regexp#FromWildcard( wildcardExpr, additionalEscapeCharacters )
 "* RETURN VALUES:
 "   Regular expression for matching a:wildcardExpr.
 "*******************************************************************************
-    " From the ? and * and [xyz] wildcards; we emulate the first two here:
-    return '\V' . substitute(substitute(escape(a:wildcardExpr, '\' . a:additionalEscapeCharacters), '?', '\\.', 'g'), '*', '\\.\\*', 'g')
+    let l:expr = '\V' . escape(a:wildcardExpr, '\' . a:additionalEscapeCharacters)
+
+    " From the wildcards; emulate ?, * and **, but not [xyz].
+    let l:expr = substitute(l:expr, '?', '\\.', 'g')
+    let l:expr = substitute(l:expr, '\*\*', '\\.\\*', 'g')
+    let l:expr = substitute(l:expr, '\*', '\\[^/\\\\]\\*', 'g')
+    return l:expr
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
