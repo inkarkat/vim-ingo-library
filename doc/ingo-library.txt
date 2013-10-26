@@ -92,6 +92,10 @@ HISTORY							*ingo-library-history*
 - Add ingo/list.vim module.
 - Add ingo/query/confirm.vim module.
 - Add ingo#text#GetChar().
+- Add ingo/regexp/fromwildcard.vim module (contributed by the EditSimilar.vim
+  plugin). In constrast to the simpler ingo#regexp#FromWildcard(), this
+  handles the full range of wildcards and considers the path separators on
+  different platforms.
 
 1.013	13-Sep-2013
 - Also avoid clobbering the last change ('.') in ingo#selection#Get() when
