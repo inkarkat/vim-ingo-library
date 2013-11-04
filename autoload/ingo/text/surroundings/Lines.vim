@@ -10,15 +10,16 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"	002	21-Apr-2013	Change bias of -range=-1 default check to prefer
-"				current line (when on line 1) instead the
-"				last modified range default.
+"	002	21-Apr-2013	Change -range=-1 default check to use <count>
+"				(now passed in separately), which maintains the
+"				actual -1 default, and therefore also delivers
+"				correct results when on line 1.
 "				Make the error message on invalid last modified
 "				range more telling than "E16: Invalid range:
 "				3,7call call(a:Transformer, [])"
 "	001	04-Apr-2013	file creation from ftplugin/mail_ingomappings.vim
 
-function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transformer, startLnum, endLnum, command )
+function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transformer, count, startLnum, endLnum, command )
 "******************************************************************************
 "* PURPOSE:
 "   Surround the lines between a:startLnum and a:endLnum with added
@@ -32,18 +33,20 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transform
 "   a:afterLines    List of text lines to be appended after a:endLnum.
 "   a:Transformer   When not empty, is invoked as a Funcref / Ex command with
 "		    the a:startLnum,a:endLnum range. Should transform the range.
+"   a:count         Range as <count> to check for default. When no range is
+"		    passed in a command defined with -range=-1, the last
+"		    modified range '[,'] is used instead of the following two
+"		    arguments.
 "   a:startLnum     Begin of the range to be surrounded.
-"   a:endLnum       End of the range to be surrounded. When no range is passed
-"		    in a command defined with -range=-1, the last modified range
-"		    '[,'] is used instead.
+"   a:endLnum       End of the range to be surrounded.
 "   a:command       When not empty, is executed as an Ex command, and the
 "		    modified range is used instead of a:startLnum,a:endLnum.
 "* RETURN VALUES:
 "   None.
 "******************************************************************************
     if empty(a:command)
-	if a:endLnum == 1 && line('.') != 1
-	    " When no [range] is passed, -range=-1 defaults to <line2> == 1.
+	if a:count == -1
+	    " When no [range] is passed, -range=-1 defaults to <count> == -1.
 	    let [l:startLnum, l:endLnum] = [line("'["), line("']")]
 	else
 	    let [l:startLnum, l:endLnum] = [a:startLnum, a:endLnum]
