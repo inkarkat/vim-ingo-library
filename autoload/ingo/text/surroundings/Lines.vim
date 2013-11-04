@@ -10,6 +10,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	003	05-Nov-2013	ENH: Support dynamic a:beforeLines and
+"				a:afterLines.
 "	002	21-Apr-2013	Change -range=-1 default check to use <count>
 "				(now passed in separately), which maintains the
 "				actual -1 default, and therefore also delivers
@@ -29,8 +31,10 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transform
 "* EFFECTS / POSTCONDITIONS:
 "   Changes the lines.
 "* INPUTS:
-"   a:beforeLines   List of text lines to be prepended before a:startLnum.
-"   a:afterLines    List of text lines to be appended after a:endLnum.
+"   a:beforeLines   List of text lines to be prepended before a:startLnum, or a
+"		    Funcref returning such.
+"   a:afterLines    List of text lines to be appended after a:endLnum, or a
+"		    Funcref returning such.
 "   a:Transformer   When not empty, is invoked as a Funcref / Ex command with
 "		    the a:startLnum,a:endLnum range. Should transform the range.
 "   a:count         Range as <count> to check for default. When no range is
@@ -81,16 +85,18 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transform
     endif
 
     if ! empty(a:afterLines)
-	silent call ingo#lines#PutWrapper(l:endLnum, 'put', a:afterLines)
+	let l:afterLines = ingo#actions#ValueOrFunc(a:afterLines)
+	silent call ingo#lines#PutWrapper(l:endLnum, 'put', l:afterLines)
     endif
     if ! empty(a:beforeLines)
-	silent call ingo#lines#PutWrapper(l:startLnum, 'put!', a:beforeLines)
+	let l:beforeLines = ingo#actions#ValueOrFunc(a:beforeLines)
+	silent call ingo#lines#PutWrapper(l:startLnum, 'put!', l:beforeLines)
     endif
 
     " The entire block is the last changed text, not just the start marker that
     " was added last.
     call setpos("'[", [0, l:startLnum, 1, 0])
-    call setpos("']", [0, l:endLnum + len(a:beforeLines) + len(a:afterLines), 1, 0])
+    call setpos("']", [0, l:endLnum + len(l:beforeLines) + len(l:afterLines), 1, 0])
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
