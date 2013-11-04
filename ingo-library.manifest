@@ -58,6 +58,7 @@ autoload/ingo/query/get.vim
 autoload/ingo/range.vim
 autoload/ingo/regexp.vim
 autoload/ingo/regexp/comments.vim
+autoload/ingo/regexp/fromwildcard.vim
 autoload/ingo/regexp/magic.vim
 autoload/ingo/regexp/previoussubstitution.vim
 autoload/ingo/register.vim
