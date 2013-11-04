@@ -8,6 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.011.005	01-Aug-2013	Add ingo#actions#EvaluateWithValOrFunc().
 "   1.010.004	04-Jul-2013	Add ingo#actions#EvaluateWithVal().
 "   1.010.003	03-Jul-2013	Move into ingo-library.
 "				Allow to specify Funcref arguments.
@@ -32,13 +33,26 @@ function! ingo#actions#ExecuteOrFunc( Action, ... )
     endif
 endfunction
 function! ingo#actions#EvaluateOrFunc( Action, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Evaluate a:Action; a Funcref is passed all arguments, else it is eval()ed.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:Action    Either a Funcref or an expression to be eval()ed.
+"   a:arguments Value(s) to be passed to the a:Action Funcref (but not the
+"		expression; use ingo#actions#EvaluateWithValOrFunc() for that).
+"* RETURN VALUES:
+"   Result of evaluating a:Action.
+"******************************************************************************
     if type(a:Action) == type(function('tr'))
 	return call(a:Action, (a:0 ? a:1 : []))
     else
 	return eval(a:Action)
     endif
 endfunction
-
 function! ingo#actions#EvaluateWithVal( expression, val )
 "******************************************************************************
 "* PURPOSE:
@@ -56,6 +70,30 @@ function! ingo#actions#EvaluateWithVal( expression, val )
 "   Result of evaluating a:expression.
 "******************************************************************************
     return get(map([a:val], a:expression), 0, '')
+endfunction
+function! ingo#actions#EvaluateWithValOrFunc( Action, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Evaluate a:Action; a Funcref is passed all arguments, else each occurrence
+"   of "v:val" is replaced with the single argument / a List of the passed
+"   arguments.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:Action    Either a Funcref or an expression to be eval()ed.
+"   a:arguments Value(s) to be passed to the a:Action Funcref or used for
+"		occurrences of "v:val" inside the a:Action expression.
+"* RETURN VALUES:
+"   Result of evaluating a:Action.
+"******************************************************************************
+    if type(a:Action) == type(function('tr'))
+	return call(a:Action, (a:0 ? a:000 : []))
+    else
+	let l:val = (a:0 == 1 ? a:1 : a:000)
+	return get(map([l:val], a:Action), 0, '')
+    endif
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
