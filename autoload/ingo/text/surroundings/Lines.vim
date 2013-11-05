@@ -1,6 +1,7 @@
 " surroundings/Lines.vim: Generic functions to surround whole lines with something.
 "
 " DEPENDENCIES:
+"   - ingo/funcref.vim autoload script
 "   - ingo/lines.vim autoload script
 "   - ingo/msg.vim autoload script
 "
@@ -12,6 +13,9 @@
 " REVISION	DATE		REMARKS
 "	003	05-Nov-2013	ENH: Support dynamic a:beforeLines and
 "				a:afterLines.
+"				Do not invoke the a:Transformer once per line if
+"				the underlying function has been defined with
+"				the "range" attribute.
 "	002	21-Apr-2013	Change -range=-1 default check to use <count>
 "				(now passed in separately), which maintains the
 "				actual -1 default, and therefore also delivers
@@ -68,7 +72,12 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transform
     if ! empty(a:Transformer)
 	try
 	    if type(a:Transformer) == type(function('tr'))
-		execute l:startLnum . ',' . l:endLnum . 'call call(a:Transformer, [])'
+		" Note: When going through call(), the Funcref is invoked once
+		" for each line, even when the referenced function is defined
+		" with the "range" attribute! Therefore, the transformer needs
+		" to be invoked directly. (Fortunately, we have to arguments to
+		" pass.)
+		execute l:startLnum . ',' . l:endLnum . 'call ' . ingo#funcref#ToString(a:Transformer) . '()'
 	    else
 		execute l:startLnum . ',' . l:endLnum . a:Transformer
 	    endif
