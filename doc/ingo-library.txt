@@ -97,6 +97,8 @@ HISTORY							*ingo-library-history*
   handles the full range of wildcards and considers the path separators on
   different platforms.
 - Add ingo#register#KeepRegisterExecuteOrFunc().
+- Add ingo#actions#ValueOrFunc().
+- Add ingo/funcref.vim module.
 
 1.013	13-Sep-2013
 - Also avoid clobbering the last change ('.') in ingo#selection#Get() when
