@@ -1,13 +1,14 @@
-" ingodate.vim: Custom date and time functions. 
+" ingo/date.vim: Functions for date and time.
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011 Ingo Karkat
-"   The VIM LICENSE applies to this script; see ':help copyright'. 
+" Copyright: (C) 2011-2013 Ingo Karkat
+"   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
-" REVISION	DATE		REMARKS 
+" REVISION	DATE		REMARKS
+"   1.010.002	08-Jul-2013	Move into ingo-library.
 "	001	07-Oct-2011	file creation
 
 function! s:Align( isShortFormat, isRightAligned, text )
@@ -26,24 +27,24 @@ function! s:Relative( isShortFormat, isRightAligned, isInFuture, time, timeunit 
 
     return s:Align(a:isShortFormat, a:isRightAligned, a:isInFuture ? 'in ' . l:timestring : l:timestring . ' ago')
 endfunction
-function! ingodate#HumanReltime( timeElapsed, ... )
+function! ingo#date#HumanReltime( timeElapsed, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Format a relative timespan in a format that is concise, not too precise, and
-"   suitable for human understanding. 
+"   suitable for human understanding.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   None. 
+"   None.
 "* EFFECTS / POSTCONDITIONS:
-"   None. 
+"   None.
 "* INPUTS:
-"   a:timeElapsed   Time span in seconds; positive values mean time in the past. 
+"   a:timeElapsed   Time span in seconds; positive values mean time in the past.
 "   a:options.shortformat   Flag whether a concise representation should be used
-"			    (2 minutes -> 2m). 
+"			    (2 minutes -> 2m).
 "   a:options.rightaligned  Flag whether the time text should be right-aligned,
-"			    so that all results have the same width. 
-"* RETURN VALUES: 
+"			    so that all results have the same width.
+"* RETURN VALUES:
 "   Text of the rendered time span, e.g. "just now", "2 minutes ago", "in 5
-"   hours". 
+"   hours".
 "******************************************************************************
     let l:options = (a:0 ? a:1 : {})
     let l:isShortFormat = get(l:options, 'shortformat', 0)
