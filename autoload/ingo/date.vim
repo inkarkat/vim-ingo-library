@@ -49,7 +49,11 @@ function! ingo#date#HumanReltime( timeElapsed, ... )
     let l:options = (a:0 ? a:1 : {})
     let l:isShortFormat = get(l:options, 'shortformat', 0)
     let l:isRightAligned = get(l:options, 'rightaligned', 0)
-    let [l:now, l:seconds, l:minutes, l:hours, l:days] = (l:isShortFormat ? ['now', 's', 'm', 'h', 'd'] : ['just now', 'second', 'minute', 'hour', 'day'])
+    let [l:now, l:seconds, l:minutes, l:hours, l:days, l:months] = (
+    \   l:isShortFormat ?
+    \       ['now', 's', 'm', 'h', 'd', 'mo.'] :
+    \       ['just now', 'second', 'minute', 'hour', 'day', 'month']
+    \)
 
     let l:isInFuture = 0
     let l:timeElapsed = a:timeElapsed
@@ -62,6 +66,7 @@ function! ingo#date#HumanReltime( timeElapsed, ... )
     let l:minutesElapsed = (l:timeElapsed / 60) % 60
     let l:hoursElapsed = (l:timeElapsed / 3600) % 24
     let l:daysElapsed = (l:timeElapsed / (3600 * 24))
+    let l:monthsElapsed = (l:timeElapsed / (3600 * 24 * 30))
 
     if l:timeElapsed < 5
 	return s:Align(l:isShortFormat, l:isRightAligned, l:now)
@@ -73,8 +78,10 @@ function! ingo#date#HumanReltime( timeElapsed, ... )
 	return s:Relative(l:isShortFormat, l:isRightAligned, l:isInFuture, (l:timeElapsed / 60), l:minutes)
     elseif l:timeElapsed < 86400
 	return s:Relative(l:isShortFormat, l:isRightAligned, l:isInFuture, (l:timeElapsed / 3600), l:hours)
-    else
+    elseif l:timeElapsed < 86400 * (30 + 31)
 	return s:Relative(l:isShortFormat, l:isRightAligned, l:isInFuture, (l:timeElapsed / 86400), l:days)
+    else
+	return s:Relative(l:isShortFormat, l:isRightAligned, l:isInFuture, (l:timeElapsed / 86400 / 30), l:months)
     endif
 endfunction
 
