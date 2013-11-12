@@ -99,6 +99,7 @@ HISTORY							*ingo-library-history*
 - Add ingo#register#KeepRegisterExecuteOrFunc().
 - Add ingo#actions#ValueOrFunc().
 - Add ingo/funcref.vim module.
+- Add month and year granularity to ingo#date#HumanReltime().
 
 1.013	13-Sep-2013
 - Also avoid clobbering the last change ('.') in ingo#selection#Get() when
