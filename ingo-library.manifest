@@ -39,6 +39,7 @@ autoload/ingo/fs/tempfile.vim
 autoload/ingo/fs/traversal.vim
 autoload/ingo/ftplugin/onbufwinenter.vim
 autoload/ingo/ftplugin/windowsettings.vim
+autoload/ingo/funcref.vim
 autoload/ingo/gui/position.vim
 autoload/ingo/lines.vim
 autoload/ingo/list.vim
