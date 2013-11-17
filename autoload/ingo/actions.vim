@@ -8,6 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.014.006	05-Nov-2013	Add ingo#actions#ValueOrFunc().
 "   1.011.005	01-Aug-2013	Add ingo#actions#EvaluateWithValOrFunc().
 "   1.010.004	04-Jul-2013	Add ingo#actions#EvaluateWithVal().
 "   1.010.003	03-Jul-2013	Move into ingo-library.
@@ -16,6 +17,13 @@
 "				autoload/ErrorFix.vim.
 "	001	23-Oct-2012	file creation
 
+function! ingo#actions#ValueOrFunc( Action, ... )
+    if type(a:Action) == type(function('tr'))
+	return call(a:Action, (a:0 ? a:1 : []))
+    else
+	return a:Action
+    endif
+endfunction
 function! ingo#actions#NormalOrFunc( Action, ... )
     if type(a:Action) == type(function('tr'))
 	return call(a:Action, (a:0 ? a:1 : []))
