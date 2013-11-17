@@ -79,7 +79,7 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.014	RELEASEME
+1.014	14-Nov-2013
 - Add ingo/date/format.vim module.
 - Add ingo#os#PathSeparator().
 - Add ingo/foldtext.vim module.
