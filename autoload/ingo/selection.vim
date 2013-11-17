@@ -25,6 +25,9 @@ function! ingo#selection#Get()
 "   None.
 "* RETURN VALUES:
 "   Text of visual selection.
+"* SEE ALSO:
+"   To execute an action while keeping the default register contents, use
+"   ingo#register#KeepRegisterExecuteOrFunc().
 "******************************************************************************
     let l:save_clipboard = &clipboard
     set clipboard= " Avoid clobbering the selection and clipboard registers.
