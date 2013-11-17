@@ -1,7 +1,7 @@
 " surroundings.vim: Generic functions to surround text with something.
 "
 " DEPENDENCIES:
-"   - ingocursormove.vim autoload script
+"   - ingo/cursor/move.vim autoload script
 "   - ingo/msg.vim autoload script
 "
 " Copyright: (C) 2008-2013 Ingo Karkat
@@ -10,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	014	03-Jul-2013	Move ingocursormove.vim into ingo-library.
 "	013	08-May-2013	Use ingo-library for warning messages.
 "				FIX: Used :normal clobbers used [count];
 "				instead, pass it into
@@ -104,12 +105,12 @@ function! surroundings#ChangeEnclosedText( count, delimiterChar, isInner )
     if ! ( (search( '\%#' . l:literalDelimiterExpr . '\n*' . l:literalDelimiterExpr ) > 0) && a:count == 1 && a:isInner )
 	" Step right to consider the cursor position and search for leading
 	" delimiter to the left.
-	call ingocursormove#Right()
+	call ingo#cursor#move#Right()
 	if s:Search(l:literalDelimiterExpr, 1, 1) > 0
 	    if( a:isInner )
-		call ingocursormove#Right()
+		call ingo#cursor#move#Right()
 		normal! v
-		call ingocursormove#Left()
+		call ingo#cursor#move#Left()
 	    else
 		normal! v
 	    endif
@@ -120,7 +121,7 @@ function! surroundings#ChangeEnclosedText( count, delimiterChar, isInner )
 	    call setpos('.', l:save_cursor)
 	    if s:Search(l:literalDelimiterExpr, a:count, 0) > 0
 		if( ! a:isInner )
-		    call ingocursormove#Right()
+		    call ingo#cursor#move#Right()
 		endif
 	    else
 		normal! v
@@ -147,7 +148,7 @@ function! surroundings#RemoveSingleCharDelimiters( count, delimiterChar )
     let l:literalDelimiterExpr = s:Literal(a:delimiterChar)
 
     " If the cursor rests already ON a delimiter, this one is taken as the first delimiter.
-    call ingocursormove#Right()
+    call ingo#cursor#move#Right()
     if s:Search(l:literalDelimiterExpr, 1, 1) > 0
 	let l:begin_cursor = getpos('.')
 	call setpos('.', l:save_cursor)
@@ -157,7 +158,7 @@ function! surroundings#RemoveSingleCharDelimiters( count, delimiterChar )
 
 	    " Determine the end position; when the leading delimiter is in the
 	    " same line, this needs further adjustment.
-	    call ingocursormove#Left(l:begin_cursor[1] == line('.') ? 2 : 1)
+	    call ingo#cursor#move#Left(l:begin_cursor[1] == line('.') ? 2 : 1)
 	    let l:end_pos = getpos('.')
 
 	    " Delete the leading delimiter.
@@ -210,7 +211,7 @@ function! surroundings#RemoveDelimiters( count, leadingDelimiterPattern, trailin
 		call s:RemoveExprFromCursorPosition(l:literalTrailingDelimiterExpr)
 
 		" Determine the end position.
-		call ingocursormove#Left()
+		call ingo#cursor#move#Left()
 		let l:end_pos = getpos('.')
 
 		" Remove the leading delimiter.
