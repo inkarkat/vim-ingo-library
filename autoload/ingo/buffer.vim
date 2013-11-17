@@ -28,7 +28,7 @@ endfunction
 
 function! ingo#buffer#IsPersisted( ... )
     let l:bufType = (a:0 ? getbufvar(a:1, '&buftype') : &l:buftype)
-    return ! (l:buftype ==# 'nofile' || l:buftype ==# 'nowrite')
+    return (empty(l:bufType) || l:bufType ==# 'acwrite')
 endfunction
 
 function! ingo#buffer#ExistOtherBuffers( targetBufNr )
