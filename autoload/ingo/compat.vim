@@ -9,6 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.015.006	20-Nov-2013	Add ingo#compat#setpos().
 "   1.012.005	02-Sep-2013	FIX: Contrary to the old maparg(), <SID> doesn't
 "				get automatically translated into <SNR>NNN_
 "				when using the new ,{dict} overload. Perform
@@ -138,6 +139,49 @@ else
 	let l:rhs = call('maparg', [a:name] + a:000)
 	let l:rhs = substitute(l:rhs, '|', '<Bar>', 'g')    " '|' must be escaped, or the map command will end prematurely.
 	return l:rhs
+    endfunction
+endif
+
+if v:version == 703 && has('patch590') || v:version > 703
+    function! ingo#compat#setpos( expr, list )
+	return setpos(a:expr, a:list)
+    endfunction
+else
+    function! s:IsOnOrAfter( pos1, pos2 )
+	return (a:pos2[1] > a:pos1[1] || a:pos2[1] == a:pos1[1] && a:pos2[2] >= a:pos1[2])
+    endfunction
+    function! ingo#compat#setpos( expr, list )
+	" Vim versions before 7.3.590 cannot set the selection directly.
+	let l:save_cursor = getpos('.')
+	if a:expr ==# "'<"
+	    let l:status = setpos('.', a:list)
+	    if l:status != 0 | return l:status | endif
+	    if s:IsOnOrAfter(a:list, getpos("'>"))
+		execute "normal! vg`>\<Esc>"
+	    else
+		" We cannot maintain the position of the end of the selection,
+		" as it is _before_ the new start, and would therefore make Vim
+		" swap the two mark positions.
+		execute "normal! v\<Esc>"
+	    endif
+	    call setpos('.', l:save_cursor)
+	    return 0
+	elseif a:expr ==# "'>"
+	    let l:status = setpos('.', a:list)
+	    if l:status != 0 | return l:status | endif
+	    if s:IsOnOrAfter(getpos("'<"), a:list)
+		execute "normal! vg`<o\<Esc>"
+	    else
+		" We cannot maintain the position of the start of the selection,
+		" as it is _after_ the new end, and would therefore make Vim
+		" swap the two mark positions.
+		execute "normal! v\<Esc>"
+	    endif
+	    call setpos('.', l:save_cursor)
+	    return 0
+	else
+	    return setpos(a:expr, a:list)
+	endif
     endfunction
 endif
 
