@@ -9,6 +9,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.012.005	02-Sep-2013	FIX: Contrary to the old maparg(), <SID> doesn't
+"				get automatically translated into <SNR>NNN_
+"				when using the new ,{dict} overload. Perform
+"				this substitution ourselves to maintain
+"				compatibility.
 "   1.012.004	09-Aug-2013	Add ingo#compat#maparg().
 "   1.012.003	08-Aug-2013	Add ingo#compat#fnameescape() and
 "				ingo#compat#shellescape() from escapings.vim.
@@ -122,7 +127,11 @@ if v:version == 703 && has('patch32') || v:version > 703
 	if a:0 > 1
 	    let l:args[2] = a:2
 	endif
-	return call('maparg', l:args).rhs
+	let l:mapInfo = call('maparg', l:args)
+
+	" Contrary to the old maparg(), <SID> doesn't get automatically
+	" translated into <SNR>NNN_ here.
+	return substitute(l:mapInfo.rhs, '\c<SID>', '<SNR>' . l:mapInfo.sid . '_', 'g')
     endfunction
 else
     function! ingo#compat#maparg( name, ... )
