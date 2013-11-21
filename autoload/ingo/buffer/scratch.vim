@@ -1,6 +1,8 @@
 " ingo/buffer/scratch.vim: Functions for creating scratch buffers.
 "
 " DEPENDENCIES:
+"   - ingo/compat.vim autoload script
+"   - ingo/escape/file.vim autoload script
 "   - ingo/fs/path.vim autoload script
 "
 " Copyright: (C) 2009-2013 Ingo Karkat
@@ -9,6 +11,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.012.021	08-Aug-2013	Move escapings.vim into ingo-library.
 "   1.010.020	08-Jul-2013	Move into ingo-library.
 "	019	11-Jun-2013	Move ingobuffer#ExecuteIn...() and
 "				ingobuffer#CallIn...() to ingo/buffer/temp.vim
@@ -122,10 +125,10 @@ function! s:Bufnr( dirspec, filename, isFile )
 	" this name in the Vim session.
 	" Do a partial search for the buffer name matching any file name in any
 	" directory.
-	return bufnr('/'. escapings#bufnameescape(a:filename, 0) . '$')
+	return bufnr('/'. ingo#escape#file#bufnameescape(a:filename, 0) . '$')
     else
 	return bufnr(
-	\   escapings#bufnameescape(
+	\   ingo#escape#file#bufnameescape(
 	\	fnamemodify(
 	\	    ingo#fs#path#Combine(a:dirspec, a:filename),
 	\	    '%:p'
@@ -168,7 +171,7 @@ function! s:ChangeDir( dirspec )
     if empty( a:dirspec )
 	return
     endif
-    execute 'lcd ' . escapings#fnameescape(a:dirspec)
+    execute 'lchdir' ingo#compat#fnameescape(a:dirspec)
 endfunction
 function! s:BufType( scratchIsFile )
     return (a:scratchIsFile ? 'nowrite' : 'nofile')
@@ -231,7 +234,7 @@ function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIs
 	    " Note: The directory must already be changed here so that the :file
 	    " command can set the correct buffer filespec.
 	    call s:ChangeDir(a:scratchDirspec)
-	    execute 'silent keepalt file ' . escapings#fnameescape(a:scratchFilename)
+	    execute 'silent keepalt file' ingo#compat#fnameescape(a:scratchFilename)
 	    let l:status = 4
 	elseif getbufvar(l:scratchBufnr, '&buftype') ==# s:BufType(a:scratchIsFile)
 	    execute a:windowOpenCommand
