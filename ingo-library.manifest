@@ -34,6 +34,7 @@ autoload/ingo/external.vim
 autoload/ingo/filetype.vim
 autoload/ingo/folds.vim
 autoload/ingo/foldtext.vim
+autoload/ingo/format.vim
 autoload/ingo/fs/path.vim
 autoload/ingo/fs/tempfile.vim
 autoload/ingo/fs/traversal.vim
