@@ -91,6 +91,7 @@ HISTORY							*ingo-library-history*
   ingo#actions#EvaluateOrFunc() instead of only the first (interpreted as a
   List of arguments) when passed a Funcref as a:Action.
 - Add ingo#compat#setpos().
+- Add ingo/print.vim module.
 
 1.014	14-Nov-2013
 - Add ingo/date/format.vim module.
