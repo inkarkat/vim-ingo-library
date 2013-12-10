@@ -79,6 +79,9 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.016	RELEASEME
+- Add ingo#window#quickfix#GetList() and ingo#window#quickfix#SetList().
+
 1.015	28-Nov-2013
 - Add ingo/format.vim module.
 - FIX: Actually return the result of a Funcref passed to
