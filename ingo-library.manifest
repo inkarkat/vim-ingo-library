@@ -54,6 +54,7 @@ autoload/ingo/os.vim
 autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/marks.vim
 autoload/ingo/plugin/setting.vim
+autoload/ingo/print.vim
 autoload/ingo/query/confirm.vim
 autoload/ingo/query/file.vim
 autoload/ingo/query/get.vim
