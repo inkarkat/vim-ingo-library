@@ -81,6 +81,7 @@ HISTORY							*ingo-library-history*
 
 1.016	RELEASEME
 - Add ingo#window#quickfix#GetList() and ingo#window#quickfix#SetList().
+- Add ingo/cursor.vim module.
 
 1.015	28-Nov-2013
 - Add ingo/format.vim module.
