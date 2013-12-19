@@ -8,7 +8,34 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.014.002	27-Sep-2013	Add ingo#text#frompattern#GetHere().
 "   1.012.001	03-Sep-2013	file creation
+
+function! ingo#text#frompattern#GetHere( pattern, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Extract the match of a:pattern starting from the current cursor position.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:pattern       Regular expression to search. 'ignorecase', 'smartcase' and
+"		    'magic' applies. When empty, the last search pattern |"/| is
+"		    used.
+"   a:lastLine      End line number to search for the start of the pattern.
+"		    Optional; defaults to the current line.
+"* RETURN VALUES:
+"   Matched text, or empty string.
+"******************************************************************************
+    let l:startPos = getpos('.')[1:2]
+    let l:endPos = searchpos(a:pattern, 'ceW', (a:0 ? a:1 : line('.')))
+    if l:endPos == [0, 0]
+	return ''
+    endif
+    return ingo#text#Get(l:startPos, l:endPos)
+endfunction
+
 
 function! s:UniqueAdd( list, expr )
     if index(a:list, a:expr) == -1
