@@ -1,13 +1,14 @@
-" ingoftplugin.vim: Custom utility functions for ftplugins.
+" ingo/ftplugin/windowsettings.vim: Function to undo window settings for a buffer.
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011 Ingo Karkat
+" Copyright: (C) 2011-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.011.004	23-Jul-2013	Move into ingo-library.
 "	003	23-Nov-2012	ENH: Correctly unset the window-local settings
 "				when doing a :split otherfile, and when the
 "				buffer is still visible in another window, so
@@ -17,7 +18,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! ingoftplugin#UndoWindowSettings( windowSettings )
+function! ingo#ftplugin#windowsettings#Undo( windowSettings )
 "******************************************************************************
 "* PURPOSE:
 "   Filetype settings that have buffer-scope are undone via the b:undo_ftplugin
