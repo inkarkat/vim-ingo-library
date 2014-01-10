@@ -20,6 +20,7 @@ autoload/ingo/collections/unique.vim
 autoload/ingo/comments.vim
 autoload/ingo/compat.vim
 autoload/ingo/compat/complete.vim
+autoload/ingo/cursor.vim
 autoload/ingo/cursor/move.vim
 autoload/ingo/date.vim
 autoload/ingo/date/epoch.vim
