@@ -49,6 +49,7 @@ autoload/ingo/mapmaker.vim
 autoload/ingo/matches.vim
 autoload/ingo/mbyte/virtcol.vim
 autoload/ingo/motion/boundary.vim
+autoload/ingo/motion/helper.vim
 autoload/ingo/msg.vim
 autoload/ingo/number.vim
 autoload/ingo/os.vim
