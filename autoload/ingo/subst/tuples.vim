@@ -13,6 +13,16 @@
 "				autoload/EditSimilar/Substitute.vim
 
 let s:tuplePattern = '\(^.\+\)=\(.*$\)'
+function! s:TupleToPair( tuple )
+    if a:tuple !~# s:tuplePattern
+	throw 'Substitute: Not a substitution: ' . a:tuple
+    endif
+    let [l:from, l:to] = matchlist(a:tuple, s:tuplePattern)[1:2]
+    return [ingo#regexp#fromwildcard#Convert(l:from), l:to]
+endfunction
+function! ingo#subst#tuples#GetPairs( tuples )
+    return map(a:tuples, 's:TupleToPair(v:val)')
+endfunction
 function! ingo#subst#tuples#Substitute( text, tuples )
 "******************************************************************************
 "* PURPOSE:
@@ -34,13 +44,9 @@ function! ingo#subst#tuples#Substitute( text, tuples )
     let l:failedTuples = []
 
     for l:tuple in a:tuples
-	if l:tuple !~# s:tuplePattern
-	    throw 'Substitute: Not a substitution: ' . l:tuple
-	endif
-	let [l:match, l:from, l:to; l:rest] = matchlist(l:tuple, s:tuplePattern)
-	if empty(l:match) || empty(l:from) | throw 'ASSERT: Pattern can be applied. ' | endif
+	let [l:from, l:to] = s:TupleToPair(l:tuple)
 	let l:beforeReplacement = l:replacement
-	let l:replacement = substitute(l:replacement, ingo#regexp#fromwildcard#Convert(l:from), escape(l:to, '\&~'), 'g')
+	let l:replacement = substitute(l:replacement, l:from, escape(l:to, '\&~'), 'g')
 	if l:replacement ==# l:beforeReplacement
 	    call add(l:failedTuples, l:tuple)
 	endif
