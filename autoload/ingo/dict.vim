@@ -8,6 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.016.002	23-Dec-2013	Add ingo#dict#Mirror().
 "   1.009.001	21-Jun-2013	file creation
 
 function! ingo#dict#FromItems( items )
@@ -53,6 +54,25 @@ function! ingo#dict#FromKeys( keys, defaultValue )
 	let l:dict[l:key] = a:defaultValue
     endfor
     return l:dict
+endfunction
+
+function! ingo#dict#Mirror( dict )
+"******************************************************************************
+"* PURPOSE:
+"   Also define all values in a:dict as keys (with their keys as values).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:dict  Dictionary.
+"* RETURN VALUES:
+"   Returns the original a:dict with added reversed entries.
+"******************************************************************************
+    for [l:key, l:value] in items(a:dict)
+        let a:dict[l:value] = l:key
+    endfor
+    return a:dict
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
