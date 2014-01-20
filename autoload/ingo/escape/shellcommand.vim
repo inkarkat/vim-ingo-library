@@ -1,4 +1,4 @@
-" ingo/escape/command.vim: Additional escapings of commands.
+" ingo/escape/shellcommand.vim: Additional escapings of shell commands.
 "
 " DEPENDENCIES:
 "   - ingo/os.vim autoload script
@@ -9,9 +9,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"	001	08-Aug-2013	file creation
+"   1.012.002	09-Aug-2013	Rename file.
+"	001	08-Aug-2013	file creation from escapings.vim.
 
-function! ingo#escape#command#exescape( command )
+function! ingo#escape#shellcommand#exescape( command )
 "*******************************************************************************
 "* PURPOSE:
 "   Escape a shell command (potentially consisting of multiple commands and
@@ -35,16 +36,16 @@ function! ingo#escape#command#exescape( command )
     endif
 endfunction
 
-function! ingo#escape#command#shellcmdescape( command )
+function! ingo#escape#shellcommand#shellcmdescape( command )
 "******************************************************************************
 "* PURPOSE:
-"   Wrap the entire a:command in double quotes on Windows.
+"   Wrap the entire shell command a:command in double quotes on Windows.
 "   This is necessary when passing a command to cmd.exe which has arguments that
 "   are enclosed in double quotes, e.g.
 "	""%SystemRoot%\system32\dir.exe" /B "%ProgramFiles%"".
 "
 "* EXAMPLE:
-"   execute '!' ingo#escape#command#shellcmdescape(escapings#shellescape($ProgramFiles .
+"   execute '!' ingo#escape#shellcommand#shellcmdescape(escapings#shellescape($ProgramFiles .
 "   '/foobar/foo.exe', 1) . ' ' . escapings#shellescape(args, 1))
 "
 "* ASSUMPTIONS / PRECONDITIONS:
