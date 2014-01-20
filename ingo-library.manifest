@@ -50,6 +50,7 @@ autoload/ingo/matches.vim
 autoload/ingo/mbyte/virtcol.vim
 autoload/ingo/motion/boundary.vim
 autoload/ingo/motion/helper.vim
+autoload/ingo/motion/omap.vim
 autoload/ingo/msg.vim
 autoload/ingo/number.vim
 autoload/ingo/os.vim
@@ -79,6 +80,7 @@ autoload/ingo/str/split.vim
 autoload/ingo/strdisplaywidth.vim
 autoload/ingo/strdisplaywidth/pad.vim
 autoload/ingo/subst.vim
+autoload/ingo/subst/pairs.vim
 autoload/ingo/syntaxitem.vim
 autoload/ingo/system.vim
 autoload/ingo/tabstops.vim
