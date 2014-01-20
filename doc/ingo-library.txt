@@ -84,11 +84,13 @@ HISTORY							*ingo-library-history*
 - Add ingo/cursor.vim module.
 - Add ingo#text#Insert() and ingo#text#Remove().
 - Add ingo#str#StartsWith() and ingo#str#EndsWith().
-- Add ingo#dict#Mirror().
+- Add ingo#dict#Mirror() and ingo#dict#AddMirrored().
 - BUG: Wrap :autocmd! undo_ftplugin_N in :execute to that superordinated
   ftplugins can append additional undo commands without causing "E216: No such
   group or event: undo_ftplugin_N|setlocal".
 - Add ingo/motion/helper.vim module.
+- Add ingo/motion/omap.vim module.
+- Add ingo/subst/pairs.vim module.
 
 1.015	28-Nov-2013
 - Add ingo/format.vim module.
