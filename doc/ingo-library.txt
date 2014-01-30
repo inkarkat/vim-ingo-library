@@ -79,7 +79,7 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.016	RELEASEME
+1.016	22-Jan-2014
 - Add ingo#window#quickfix#GetList() and ingo#window#quickfix#SetList().
 - Add ingo/cursor.vim module.
 - Add ingo#text#Insert() and ingo#text#Remove().
