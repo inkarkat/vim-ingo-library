@@ -31,6 +31,7 @@ Other authors have published separate support libraries, too:
 - l9 (vimscript #3252) by Takeshi Nishida
 - anwolib (vimscript #3800) by Andy Wokula
 - vim-misc (vimscript #4597) by Peter Odding
+- maktaba (https://github.com/google/maktaba) by Google
 
 There have been initiatives to gather and consolidate useful functions into a
 "standard Vim library", but these efforts have mostly fizzled out.
