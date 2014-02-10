@@ -8,6 +8,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.009.002	14-Jun-2013	Minor: Make matchlist() robust against
+"				'ignorecase'.
 "   1.007.001	01-Jun-2013	file creation from ingofileargs.vim
 
 function! ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands( arguments )
@@ -33,7 +35,7 @@ function! ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands( arguments )
 "   it can be directly concatenated with filename, the second argument.
 "*******************************************************************************
     return matchlist(a:arguments,
-    \   '^\(' .
+    \   '\C^\(' .
     \       '\%(++\%(ff\|fileformat\|enc\|encoding\|bin\|binary\|nobin\|nobinary\|bad\|edit\)\%(=\S*\)\?\s\+\)*' .
     \	    '\%(+.\{-}\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<! \s*\)\?' .
     \   '\)\(.*\)$'
