@@ -3,12 +3,17 @@
 " DEPENDENCIES:
 "   - ingo/os.vim autoload script
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.017.007	13-Feb-2014	ingo#fs#path#Normalize(): Also ensure uppercase
+"				C: drive letter.
+"   1.014.006	26-Sep-2013	ingo#fs#path#Normalize(): Also convert between
+"				the different D:\ and /cygdrive/d/ notations on
+"				Windows and Cygwin.
 "   1.013.005	13-Sep-2013	Use operating system detection functions from
 "				ingo/os.vim.
 "   1.011.004	01-Aug-2013	Extract ingo#fs#path#IsUncPathRoot().
@@ -27,6 +32,8 @@ function! ingo#fs#path#Normalize( filespec, ... )
 "* PURPOSE:
 "   Change all path separators in a:filespec to the passed or the typical format
 "   for the current platform.
+"   On Windows and Cygwin, also converts between the different D:\ and
+"   /cygdrive/d/ notations.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -39,7 +46,16 @@ function! ingo#fs#path#Normalize( filespec, ... )
 "******************************************************************************
     let l:pathSeparator = (a:0 ? a:1 : ingo#fs#path#Separator())
     let l:badSeparator = (l:pathSeparator ==# '/' ? '\' : '/')
-    return tr(a:filespec, l:badSeparator, l:pathSeparator)
+    let l:result = tr(a:filespec, l:badSeparator, l:pathSeparator)
+
+    if ingo#os#IsWinOrDos()
+	let l:result = substitute(l:result, '^\l:', '\u&', '')
+	let l:result = substitute(l:result, '^[/\\]cygdrive[/\\]\(\a\)\ze[/\\]', '\u\1:', '')
+    elseif ingo#os#IsCygwin()
+	let l:result = substitute(l:result, '^\(\a\):', '/cygdrive/\l\1', '')
+    endif
+
+    return l:result
 endfunction
 
 function! ingo#fs#path#Combine( first, ... )
