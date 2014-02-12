@@ -3,14 +3,12 @@
 " DEPENDENCIES:
 "   - ingo/os.vim autoload script
 "
-" Copyright: (C) 2012-2014 Ingo Karkat
+" Copyright: (C) 2012-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.017.007	13-Feb-2014	ingo#fs#path#Normalize(): Also ensure uppercase
-"				C: drive letter.
 "   1.014.006	26-Sep-2013	ingo#fs#path#Normalize(): Also convert between
 "				the different D:\ and /cygdrive/d/ notations on
 "				Windows and Cygwin.
@@ -49,7 +47,6 @@ function! ingo#fs#path#Normalize( filespec, ... )
     let l:result = tr(a:filespec, l:badSeparator, l:pathSeparator)
 
     if ingo#os#IsWinOrDos()
-	let l:result = substitute(l:result, '^\l:', '\u&', '')
 	let l:result = substitute(l:result, '^[/\\]cygdrive[/\\]\(\a\)\ze[/\\]', '\u\1:', '')
     elseif ingo#os#IsCygwin()
 	let l:result = substitute(l:result, '^\(\a\):', '/cygdrive/\l\1', '')
