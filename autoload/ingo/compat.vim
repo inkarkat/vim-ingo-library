@@ -167,18 +167,29 @@ else
 	    call setpos('.', l:save_cursor)
 	    return 0
 	elseif a:expr ==# "'>"
-	    let l:status = setpos('.', a:list)
-	    if l:status != 0 | return l:status | endif
-	    if s:IsOnOrAfter(getpos("'<"), a:list)
-		execute "normal! vg`<o\<Esc>"
-	    else
-		" We cannot maintain the position of the start of the selection,
-		" as it is _after_ the new end, and would therefore make Vim
-		" swap the two mark positions.
-		execute "normal! v\<Esc>"
+	    if &selection ==# 'exclusive' && empty(&virtualedit)
+		" We may have to select the last character in a line.
+		let l:save_virtualedit = &virtualedit
+		set virtualedit=onemore
 	    endif
-	    call setpos('.', l:save_cursor)
-	    return 0
+	    try
+		let l:status = setpos('.', a:list)
+		if l:status != 0 | return l:status | endif
+		if s:IsOnOrAfter(getpos("'<"), a:list)
+		    execute "normal! vg`<o\<Esc>"
+		else
+		    " We cannot maintain the position of the start of the selection,
+		    " as it is _after_ the new end, and would therefore make Vim
+		    " swap the two mark positions.
+		    execute "normal! v\<Esc>"
+		endif
+		call setpos('.', l:save_cursor)
+		return 0
+	    finally
+		if exists('l:save_virtualedit')
+		    let &virtualedit = l:save_virtualedit
+		endif
+	    endtry
 	else
 	    return setpos(a:expr, a:list)
 	endif
