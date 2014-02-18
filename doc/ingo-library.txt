@@ -80,6 +80,11 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.017	RELEASEME
+- CHG: Make ingo#cmdargs#file#FilterFileOptionsAndCommands() return the
+  options and commands in a List, not as a joined String. This allows clients
+  to easily re-escape them and handle multiple ones, e.g. ++ff=dos +setf\ foo.
+
 1.016	22-Jan-2014
 - Add ingo#window#quickfix#GetList() and ingo#window#quickfix#SetList().
 - Add ingo/cursor.vim module.
