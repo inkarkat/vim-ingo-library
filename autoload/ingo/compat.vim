@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/strdisplaywidth.vim autoload script
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -64,11 +64,19 @@ function! ingo#compat#fnameescape( filespec )
 "   Escaped filespec to be passed as a {file} argument to an Ex command.
 "*******************************************************************************
     if exists('*fnameescape')
-	return fnameescape(a:filespec)
+	if ingo#os#IsWindows()
+	    " XXX: fnameescape() on Windows mistakenly escapes the "!"
+	    " character, which makes Vim treat the "foo!bar" filespec as if a
+	    " file "!bar" existed in an intermediate directory "foo". Cp.
+	    " http://article.gmane.org/gmane.editors.vim.devel/22421
+	    return substitute(fnameescape(a:filespec), '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\!', '!', 'g')
+	else
+	    return fnameescape(a:filespec)
+	endif
     else
 	" Note: On Windows, backslash path separators and some other Unix
 	" shell-specific characters mustn't be escaped.
-	return escape(a:filespec, " \t\n*?`%#'\"|!<" . (ingo#os#IsWinOrDos() ? '' : '[{$\'))
+	return escape(a:filespec, " \t\n*?`%#'\"|<[" . (ingo#os#IsWinOrDos() ? '' : '!{$\'))
     endif
 endfunction
 
