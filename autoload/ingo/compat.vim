@@ -9,6 +9,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.017.007	19-Feb-2014	Add workarounds for fnameescape() bugs on
+"				Windows for ! and [] characters.
 "   1.015.006	20-Nov-2013	Add ingo#compat#setpos().
 "   1.012.005	02-Sep-2013	FIX: Contrary to the old maparg(), <SID> doesn't
 "				get automatically translated into <SNR>NNN_
@@ -65,18 +67,31 @@ function! ingo#compat#fnameescape( filespec )
 "*******************************************************************************
     if exists('*fnameescape')
 	if ingo#os#IsWindows()
+	    let l:filespec = a:filespec
+
 	    " XXX: fnameescape() on Windows mistakenly escapes the "!"
 	    " character, which makes Vim treat the "foo!bar" filespec as if a
 	    " file "!bar" existed in an intermediate directory "foo". Cp.
 	    " http://article.gmane.org/gmane.editors.vim.devel/22421
-	    return substitute(fnameescape(a:filespec), '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\!', '!', 'g')
+	    let l:filespec = substitute(fnameescape(l:filespec), '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\!', '!', 'g')
+
+	    " XXX: fnameescape() on Windows does not escape the "[" character
+	    " (like on Linux), but Windows understands this wildcard and expands
+	    " it to an existing file. As escaping with \ does not work (it is
+	    " treated like a path separator), turn this into the neutral [[],
+	    " but only if the file actually exists.
+	    if a:filespec =~# '\[[^/\\]\+\]' && filereadable(a:filespec)
+		let l:filespec = substitute(l:filespec, '\[', '[[]', 'g')
+	    endif
+
+	    return l:filespec
 	else
 	    return fnameescape(a:filespec)
 	endif
     else
 	" Note: On Windows, backslash path separators and some other Unix
 	" shell-specific characters mustn't be escaped.
-	return escape(a:filespec, " \t\n*?`%#'\"|<[" . (ingo#os#IsWinOrDos() ? '' : '!{$\'))
+	return escape(a:filespec, " \t\n*?`%#'\"|<" . (ingo#os#IsWinOrDos() ? '' : '![{$\'))
     endif
 endfunction
 
