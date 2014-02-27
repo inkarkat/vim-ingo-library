@@ -20,6 +20,7 @@ autoload/ingo/collections/unique.vim
 autoload/ingo/comments.vim
 autoload/ingo/compat.vim
 autoload/ingo/compat/complete.vim
+autoload/ingo/compat/shellcommand.vim
 autoload/ingo/cursor.vim
 autoload/ingo/cursor/move.vim
 autoload/ingo/date.vim
@@ -55,6 +56,7 @@ autoload/ingo/msg.vim
 autoload/ingo/number.vim
 autoload/ingo/os.vim
 autoload/ingo/plugin/cmdcomplete.vim
+autoload/ingo/plugin/compiler.vim
 autoload/ingo/plugin/marks.vim
 autoload/ingo/plugin/setting.vim
 autoload/ingo/print.vim
