@@ -78,6 +78,7 @@ autoload/ingo/selection/frompattern.vim
 autoload/ingo/selection/position.vim
 autoload/ingo/selection/patternmatch.vim
 autoload/ingo/str.vim
+autoload/ingo/str/restricted.vim
 autoload/ingo/str/split.vim
 autoload/ingo/strdisplaywidth.vim
 autoload/ingo/strdisplaywidth/pad.vim
