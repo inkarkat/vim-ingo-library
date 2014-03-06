@@ -88,6 +88,9 @@ HISTORY							*ingo-library-history*
 - Add workarounds for fnameescape() bugs on Windows for ! and [] characters.
 - Add ingo#escape#UnescapeExpr().
 - Add ingo/str/restricted.vim module.
+- Make ingo#query#get#Char() only abort on <Esc> when that character is not in
+  the validExpr (to allow to explicitly query it).
+- Add ingo/query/substitute.vim module.
 
 1.016	22-Jan-2014
 - Add ingo#window#quickfix#GetList() and ingo#window#quickfix#SetList().
