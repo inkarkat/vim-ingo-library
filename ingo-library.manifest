@@ -63,6 +63,7 @@ autoload/ingo/print.vim
 autoload/ingo/query/confirm.vim
 autoload/ingo/query/file.vim
 autoload/ingo/query/get.vim
+autoload/ingo/query/substitute.vim
 autoload/ingo/range.vim
 autoload/ingo/regexp.vim
 autoload/ingo/regexp/comments.vim
