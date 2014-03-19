@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -93,7 +93,7 @@ function! ingo#text#Insert( pos, text )
     if l:col > len(l:line) + 1
 	return 0
     elseif l:col <= 1
-	throw 'Insert(): Column must be at least 1'
+	throw 'Insert: Column must be at least 1'
     endif
     return (setline(l:lnum, strpart(l:line, 0, l:col - 1) . a:text . strpart(l:line, l:col - 1)) == 0)
 endfunction
