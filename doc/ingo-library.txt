@@ -81,7 +81,7 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.017	RELEASEME
+1.017	13-Mar-2014
 - CHG: Make ingo#cmdargs#file#FilterFileOptionsAndCommands() return the
   options and commands in a List, not as a joined String. This allows clients
   to easily re-escape them and handle multiple ones, e.g. ++ff=dos +setf\ foo.
