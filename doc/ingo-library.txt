@@ -81,6 +81,11 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.018	RELEASEME
+- FIX: Off-by-one: Allow column 1 in ingo#text#Insert(). Add special cases for
+  insertion at front and end of line (in the hope that this is more
+  efficient).
+
 1.017	13-Mar-2014
 - CHG: Make ingo#cmdargs#file#FilterFileOptionsAndCommands() return the
   options and commands in a List, not as a joined String. This allows clients
