@@ -8,10 +8,6 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.018.005	06-Apr-2014	I18N: Correctly capture last multi-byte
-"				character in ingo#text#Get(); don't just add one
-"				to the end column, but instead match at the
-"				column itself, too.
 "   1.018.004	20-Mar-2014	FIX: Off-by-one: Allow column 1 in
 "				ingo#text#Insert().
 "				Add special cases for insertion at front and end
@@ -45,7 +41,7 @@ function! ingo#text#Get( startPos, endPos )
     let l:text = ''
     while 1
 	if l:line == l:endLine
-	    let l:text .= matchstr(getline(l:line) . "\n", '\%' . l:column . 'c' . '.*\%' . l:endColumn . 'c.')
+	    let l:text .= matchstr(getline(l:line) . "\n", '\%' . l:column . 'c' . '.*\%' . (l:endColumn + 1) . 'c')
 	    break
 	else
 	    let l:text .= matchstr(getline(l:line) . "\n", '\%' . l:column . 'c' . '.*')
