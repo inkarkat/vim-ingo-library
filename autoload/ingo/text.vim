@@ -8,6 +8,15 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.018.005	06-Apr-2014	I18N: Correctly capture last multi-byte
+"				character in ingo#text#Get(); don't just add one
+"				to the end column, but instead match at the
+"				column itself, too.
+"   1.018.004	20-Mar-2014	FIX: Off-by-one: Allow column 1 in
+"				ingo#text#Insert().
+"				Add special cases for insertion at front and end
+"				of line (in the hope that this is more
+"				efficient).
 "   1.016.003	16-Dec-2013	Add ingo#text#Insert() and ingo#text#Remove().
 "   1.014.002	21-Oct-2013	Add ingo#text#GetChar().
 "   1.011.001	23-Jul-2013	file creation from ingocommands.vim.
@@ -36,7 +45,7 @@ function! ingo#text#Get( startPos, endPos )
     let l:text = ''
     while 1
 	if l:line == l:endLine
-	    let l:text .= matchstr(getline(l:line) . "\n", '\%' . l:column . 'c' . '.*\%' . (l:endColumn + 1) . 'c')
+	    let l:text .= matchstr(getline(l:line) . "\n", '\%' . l:column . 'c' . '.*\%' . l:endColumn . 'c.')
 	    break
 	else
 	    let l:text .= matchstr(getline(l:line) . "\n", '\%' . l:column . 'c' . '.*')
@@ -92,8 +101,14 @@ function! ingo#text#Insert( pos, text )
     let l:line = getline(l:lnum)
     if l:col > len(l:line) + 1
 	return 0
-    elseif l:col <= 1
+    elseif l:col < 1
 	throw 'Insert: Column must be at least 1'
+    elseif l:col == 1
+	return (setline(l:lnum, a:text . l:line) == 0)
+    elseif l:col == len(l:line) + 1
+	return (setline(l:lnum, l:line . a:text) == 0)
+    elseif l:col == len(l:line) + 1
+	return (setline(l:lnum, l:line . a:text) == 0)
     endif
     return (setline(l:lnum, strpart(l:line, 0, l:col - 1) . a:text . strpart(l:line, l:col - 1)) == 0)
 endfunction
