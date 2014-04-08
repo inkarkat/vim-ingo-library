@@ -11,6 +11,7 @@ autoload/ingo/cmdargs/file.vim
 autoload/ingo/cmdargs/glob.vim
 autoload/ingo/cmdargs/pattern.vim
 autoload/ingo/cmdargs/range.vim
+autoload/ingo/cmdargs/register.vim
 autoload/ingo/cmdargs/substitute.vim
 autoload/ingo/cmdline/showmode.vim
 autoload/ingo/cmdrangeconverter.vim
@@ -84,6 +85,7 @@ autoload/ingo/str/split.vim
 autoload/ingo/strdisplaywidth.vim
 autoload/ingo/strdisplaywidth/pad.vim
 autoload/ingo/subst.vim
+autoload/ingo/subst/expr/emulation.vim
 autoload/ingo/subst/pairs.vim
 autoload/ingo/syntaxitem.vim
 autoload/ingo/system.vim
