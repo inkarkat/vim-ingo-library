@@ -25,12 +25,13 @@ function! ingo#cursor#Set( lnum, virtcol )
 "   a:virtcol   Screen column; if no such column is available, will put the
 "		cursor on the last character in the line.
 "* RETURN VALUES:
-"   None.
+"   1 if the desired virtual column has been reached; 0 otherwise.
 "******************************************************************************
     if a:lnum != 0
 	call cursor(a:lnum, 0)
     endif
     execute 'normal!' a:virtcol . '|'
+    return (virtcol('.') == a:virtcol)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
