@@ -66,10 +66,19 @@ function! ingo#buffer#temprange#Execute( lines, command )
 	    " any potential modification outside the temporary range is also
 	    " eliminated. And this doesn't pollute the undo history. Only
 	    " explicitly delete the temporary range as a fallback.
-	    if l:undoSequenceNumber <= 0 | throw CannotUndo | endif
-	    silent execute 'undo' l:undoSequenceNumber
+	    if l:undoSequenceNumber <= 0
+		throw 'CannotUndo'
+	    endif
+	    " XXX: Inside a function invocation, no separate change is created.
+	    if ! exists('*undotree') || undotree().seq_cur > l:undoSequenceNumber
+		silent execute 'undo' l:undoSequenceNumber
+	    endif
 	    if ! exists('*undotree')
 		silent undo " Need one more undo here.
+	    endif
+	    if line('$') > l:finalLnum
+		" Fallback in case the undo somehow failed.
+		throw 'CannotUndo'
 	    endif
 	catch /^CannotUndo$\|^Vim\%((\a\+)\)\=:E/
 	    silent! execute l:tempRange . 'delete _'
