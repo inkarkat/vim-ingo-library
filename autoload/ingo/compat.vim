@@ -80,7 +80,7 @@ function! ingo#compat#fnameescape( filespec )
 	    " it to an existing file. As escaping with \ does not work (it is
 	    " treated like a path separator), turn this into the neutral [[],
 	    " but only if the file actually exists.
-	    if a:filespec =~# '\[[^/\\]\+\]' && filereadable(a:filespec)
+	    if a:filespec =~# '\[[^/\\]\+\]' && filereadable(fnamemodify(a:filespec, ':p')) " Need to expand to absolute path (but not use expand() because of the glob!) because filereadable() does not understand stuff like "~/...".
 		let l:filespec = substitute(l:filespec, '\[', '[[]', 'g')
 	    endif
 
