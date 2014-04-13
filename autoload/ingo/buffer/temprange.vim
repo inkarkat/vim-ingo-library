@@ -8,9 +8,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.018.002	12-Apr-2014	Add optional a:undoCnt argument.
 "	001	09-Apr-2014	file creation from visualrepeat.vim
 
-function! ingo#buffer#temprange#Execute( lines, command )
+function! ingo#buffer#temprange#Execute( lines, command, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Invoke an Ex command on temporarily added lines in the current buffer.
@@ -32,6 +33,9 @@ function! ingo#buffer#temprange#Execute( lines, command )
 "		ensure that no lines above that line are modified! In
 "		particular, the number of existing lines must not be changed (or
 "		the line capture will return the wrong lines).
+"   a:undoCnt   Optional number of changes that a:command will do. If this is a
+"		fixed number and you know it, passing this is slightly more
+"		efficient.
 "* RETURN VALUES:
 "   a:lines, as modified by a:command.
 "******************************************************************************
@@ -39,16 +43,18 @@ function! ingo#buffer#temprange#Execute( lines, command )
     " range later modifies the cursor position.
     let l:save_view = winsaveview()
     let l:finalLnum = line('$')
-    if exists('*undotree')
-	let l:undoSequenceNumber = undotree().seq_cur
-    else
-	" Cannot directly get the current undo sequence number from :undolist;
-	" must create a new undo point, and later undo beyond that.
-	call setline('$', getline('$'))
-	redir => l:undolistOutput
-	    silent! undolist
-	redir END
-	let l:undoSequenceNumber = str2nr(split(l:undolistOutput, "\n")[-1])
+    if ! a:0
+	if exists('*undotree')
+	    let l:undoSequenceNumber = undotree().seq_cur
+	else
+	    " Cannot directly get the current undo sequence number from :undolist;
+	    " must create a new undo point, and later undo beyond that.
+	    call setline('$', getline('$'))
+	    redir => l:undolistOutput
+		silent! undolist
+	    redir END
+	    let l:undoSequenceNumber = str2nr(split(l:undolistOutput, "\n")[-1])
+	endif
     endif
 
     let l:tempRange = (l:finalLnum + 1) . ',$'
@@ -66,16 +72,23 @@ function! ingo#buffer#temprange#Execute( lines, command )
 	    " any potential modification outside the temporary range is also
 	    " eliminated. And this doesn't pollute the undo history. Only
 	    " explicitly delete the temporary range as a fallback.
-	    if l:undoSequenceNumber <= 0
-		throw 'CannotUndo'
+	    if a:0
+		for l:i in range(a:1)
+		    silent undo
+		endfor
+	    else
+		if l:undoSequenceNumber <= 0
+		    throw 'CannotUndo'
+		endif
+		" XXX: Inside a function invocation, no separate change is created.
+		if ! exists('*undotree') || undotree().seq_cur > l:undoSequenceNumber
+		    silent execute 'undo' l:undoSequenceNumber
+		endif
+		if ! exists('*undotree')
+		    silent undo " Need one more undo here.
+		endif
 	    endif
-	    " XXX: Inside a function invocation, no separate change is created.
-	    if ! exists('*undotree') || undotree().seq_cur > l:undoSequenceNumber
-		silent execute 'undo' l:undoSequenceNumber
-	    endif
-	    if ! exists('*undotree')
-		silent undo " Need one more undo here.
-	    endif
+
 	    if line('$') > l:finalLnum
 		" Fallback in case the undo somehow failed.
 		throw 'CannotUndo'
@@ -87,8 +100,8 @@ function! ingo#buffer#temprange#Execute( lines, command )
 	call winrestview(l:save_view)
     endtry
 endfunction
-function! ingo#buffer#temprange#Call( lines, Funcref, arguments )
-    return ingo#buffer#temprange#Execute(a:lines, 'call call(' . string(a:Funcref) . ',' . string(a:arguments) . ')')
+function! ingo#buffer#temprange#Call( lines, Funcref, arguments, ... )
+    return call('ingo#buffer#temprange#Execute', [a:lines, 'call call(' . string(a:Funcref) . ',' . string(a:arguments) . ')'] + a:000)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
