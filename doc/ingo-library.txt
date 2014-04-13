@@ -93,6 +93,8 @@ HISTORY							*ingo-library-history*
   the text is a hen-and-egg problem.
 - Add ingo/buffer/temprange.vim module.
 - Add ingo#cursor#IsAtEndOfLine().
+- FIX: Off-by-one in emulated ingo#compat#strdisplaywidth() reported one too
+  few.
 
 1.017	13-Mar-2014
 - CHG: Make ingo#cmdargs#file#FilterFileOptionsAndCommands() return the
