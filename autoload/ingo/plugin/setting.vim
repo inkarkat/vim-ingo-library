@@ -17,16 +17,34 @@
 "	001	04-Sep-2009	file creation
 
 function! ingo#plugin#setting#GetFromScope( variableName, scopeList, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Get a configuration variable that can be defined in multiple scopes.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:variableName  Name of the variable.
+"   a:scopeList     List of variable scope prefixes. These are tried in
+"		    sequential order.
+"   a:defaultValue  Optional value to be returned when no a:variableName is
+"		    defined in any of the a:scopeList. If omitted, an exception
+"		    is thrown instead.
+"* RETURN VALUES:
+"   Value of a:variableName from the first scope in a:scopeList where it is
+"   defined, or a:defaultValue, or exception.
+"******************************************************************************
     for l:scope in a:scopeList
 	let l:variable = l:scope . ':' . a:variableName
 	if exists( l:variable )
-	    execute 'return ' . l:variable
+	    execute 'return' l:variable
 	endif
     endfor
     if a:0
 	return a:1
     else
-	throw "GetFromScope: No variable named '" . a:variableName . "' defined. "
+	throw 'GetFromScope: No variable named "' . a:variableName . '" defined.'
     endif
 endfunction
 
