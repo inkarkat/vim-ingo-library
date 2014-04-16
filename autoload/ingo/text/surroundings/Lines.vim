@@ -11,6 +11,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	004	06-Nov-2013	FIX: Uninitialized l:beforeLines l:afterLines.
 "	003	05-Nov-2013	ENH: Support dynamic a:beforeLines and
 "				a:afterLines.
 "				Do not invoke the a:Transformer once per line if
@@ -93,6 +94,8 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transform
 	endtry
     endif
 
+    let l:beforeLines = []
+    let l:afterLines = []
     if ! empty(a:afterLines)
 	let l:afterLines = ingo#actions#ValueOrFunc(a:afterLines)
 	silent call ingo#lines#PutWrapper(l:endLnum, 'put', l:afterLines)
