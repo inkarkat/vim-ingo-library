@@ -81,6 +81,9 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.019	RELEASEME
+- Add ingo#plugin#setting#BooleanToStringValue().
+
 1.018	14-Apr-2014
 - FIX: Off-by-one: Allow column 1 in ingo#text#Insert(). Add special cases for
   insertion at front and end of line (in the hope that this is more
