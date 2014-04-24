@@ -83,6 +83,7 @@ function! ingo#buffer#temprange#Execute( lines, command, ... )
 		" XXX: Inside a function invocation, no separate change is created.
 		if ! exists('*undotree') || undotree().seq_cur > l:undoSequenceNumber
 		    silent execute 'undo' l:undoSequenceNumber
+"****D else | echomsg '**** no new undo sequence number'
 		endif
 		if ! exists('*undotree')
 		    silent undo " Need one more undo here.
@@ -95,6 +96,7 @@ function! ingo#buffer#temprange#Execute( lines, command, ... )
 	    endif
 	catch /^CannotUndo$\|^Vim\%((\a\+)\)\=:E/
 	    silent! execute l:tempRange . 'delete _'
+"****D echomsg '**** falling back to delete'
 	endtry
 
 	call winrestview(l:save_view)
