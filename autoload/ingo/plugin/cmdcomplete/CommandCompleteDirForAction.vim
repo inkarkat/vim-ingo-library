@@ -28,8 +28,8 @@
 "   ~/.vim/autoload).
 
 " DEPENDENCIES:
-"   - escapings.vim autoload script
 "   - ingo/cmdargs/file.vim autoload script
+"   - ingo/compat.vim autoload script
 "   - ingo/fs/path.vim autoload script
 "   - ingo/msg.vim autoload script
 
@@ -39,6 +39,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	019	08-Aug-2013	Move escapings.vim into ingo-library.
 "	018	26-Jun-2013	Use ingo/fs/path.vim.
 "	017	10-Jun-2013	Better handling for errors from :echoerr.
 "	016	01-Jun-2013	Move ingofileargs.vim into ingo-library.
@@ -178,7 +179,7 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 
 	    return map(
 	    \   l:filespecs,
-	    \   'escapings#fnameescape(s:RemoveDirspec(v:val, l:resolvedDirspecs))'
+	    \   'ingo#compat#fnameescape(s:RemoveDirspec(v:val, l:resolvedDirspecs))'
 	    \)
 	else
 	    return map(
@@ -186,7 +187,7 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 	    \	    l:filespecs,
 	    \	    '! isdirectory(v:val)'
 	    \   ),
-	    \   'escapings#fnameescape(fnamemodify(v:val, ":t"))'
+	    \   'ingo#compat#fnameescape(fnamemodify(v:val, ":t"))'
 	    \)
 	endif
     finally
@@ -218,7 +219,7 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 	    else
 		let l:unescapedFilename = a:DefaultFilename
 	    endif
-	    let l:filename = escapings#fnameescape(l:unescapedFilename)
+	    let l:filename = ingo#compat#fnameescape(l:unescapedFilename)
 	endif
 
 	if ! empty(a:FilenameProcessingFunction)
@@ -239,9 +240,9 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 	endif
 
 	if type(a:Action) == 2
-	    call call(a:Action, [escapings#fnameescape(l:dirspec), l:filename, l:fileOptionsAndCommands])
+	    call call(a:Action, [ingo#compat#fnameescape(l:dirspec), l:filename, l:fileOptionsAndCommands])
 	else
-	    execute a:Action l:fileOptionsAndCommands . escapings#fnameescape(l:dirspec) . l:filename
+	    execute a:Action l:fileOptionsAndCommands . ingo#compat#fnameescape(l:dirspec) . l:filename
 	endif
 
 	if ! empty(a:PostAction)
