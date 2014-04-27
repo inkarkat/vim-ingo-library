@@ -5,12 +5,13 @@
 "   - ingo/lines.vim autoload script
 "   - ingo/msg.vim autoload script
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	005	17-Apr-2014	ENH: Allow to pass a Funcref as a:Command, too.
 "	004	06-Nov-2013	FIX: Uninitialized l:beforeLines l:afterLines.
 "	003	05-Nov-2013	ENH: Support dynamic a:beforeLines and
 "				a:afterLines.
@@ -26,7 +27,7 @@
 "				3,7call call(a:Transformer, [])"
 "	001	04-Apr-2013	file creation from ftplugin/mail_ingomappings.vim
 
-function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transformer, count, startLnum, endLnum, command )
+function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transformer, count, startLnum, endLnum, Command )
 "******************************************************************************
 "* PURPOSE:
 "   Surround the lines between a:startLnum and a:endLnum with added
@@ -48,23 +49,28 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transform
 "		    arguments.
 "   a:startLnum     Begin of the range to be surrounded.
 "   a:endLnum       End of the range to be surrounded.
-"   a:command       When not empty, is executed as an Ex command, and the
-"		    modified range is used instead of a:startLnum,a:endLnum.
+"   a:Command       A Funcref is passed the a:startLnum, a:endLnum and is
+"		    expected to return a likewise List, which is then used. A
+"		    non-empty String is executed as an Ex command, and the
+"		    modified range is used instead of a:startLnum, a:endLnum.
 "* RETURN VALUES:
 "   None.
 "******************************************************************************
-    if empty(a:command)
-	if a:count == -1
-	    " When no [range] is passed, -range=-1 defaults to <count> == -1.
-	    let [l:startLnum, l:endLnum] = [line("'["), line("']")]
-	else
-	    let [l:startLnum, l:endLnum] = [a:startLnum, a:endLnum]
-	endif
+    if a:count == -1
+	" When no [range] is passed, -range=-1 defaults to <count> == -1.
+	let [l:startLnum, l:endLnum] = [line("'["), line("']")]
     else
+	let [l:startLnum, l:endLnum] = [a:startLnum, a:endLnum]
+    endif
+    if ! empty(a:Command)
 	try
-	    execute a:command
-	    let [l:startLnum, l:endLnum] = [line("'["), line("']")]
-	catch /^Vim\%((\a\+)\)\=:E/
+	    if type(a:Command) == type(function('tr'))
+		let [l:startLnum, l:endLnum] = call(a:Command, [l:startLnum, l:endLnum])
+	    else
+		execute a:Command
+		let [l:startLnum, l:endLnum] = [line("'["), line("']")]
+	    endif
+	catch /^Vim\%((\a\+)\)\=:/
 	    call ingo#msg#VimExceptionMsg()
 	    return
 	endtry
