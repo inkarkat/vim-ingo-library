@@ -2,6 +2,7 @@
 "
 " DEPENDENCIES:
 "   - ingo/buffer/temp.vim autoload script
+"   - ingo/compat.vim autoload script
 "
 " Copyright: (C) 2011-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -9,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.012.005	08-Aug-2013	Move escapings.vim into ingo-library.
 "   1.009.004	14-Jun-2013	Minor: Make matchstr() robust against
 "				'ignorecase'.
 "   1.008.003	12-Jun-2013	Change implementation from doing a :substitute
@@ -39,7 +41,7 @@ function! ingo#regexp#previoussubstitution#Get()
     let l:save_viminfo = &viminfo
     set viminfo='0,/1,:0,<0,@0,s0
     try
-	execute 'wviminfo!' escapings#fnameescape(l:tempfile)
+	execute 'wviminfo!' ingo#compat#fnameescape(l:tempfile)
 	let l:viminfo = join(readfile(l:tempfile), "\n")
 	let l:previousSubstitution = matchstr(l:viminfo, '\C\n# Last Substitute String:\n\$\zs\_.\{-}\ze\n\n# .* (newest to oldest):\n')
     catch /^Vim\%((\a\+)\)\=:E/
