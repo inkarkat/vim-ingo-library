@@ -94,6 +94,7 @@ autoload/ingo/tabstops.vim
 autoload/ingo/text.vim
 autoload/ingo/text/frompattern.vim
 autoload/ingo/text/replace.vim
+autoload/ingo/undo.vim
 autoload/ingo/units.vim
 autoload/ingo/window/cmdwin.vim
 autoload/ingo/window/dimensions.vim
