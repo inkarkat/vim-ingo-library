@@ -8,6 +8,14 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.018.005	06-Apr-2014	I18N: Correctly capture last multi-byte
+"				character in ingo#text#Get(); don't just add one
+"				to the end column, but instead match at the
+"				column itself, too.
+"				Add optional a:isExclusive flag to
+"				ingo#text#Get(), as clients may end up with that
+"				position, and doing a correct I18N-safe decrease
+"				before getting the text is a hen-and-egg problem.
 "   1.018.004	20-Mar-2014	FIX: Off-by-one: Allow column 1 in
 "				ingo#text#Insert().
 "				Add special cases for insertion at front and end
@@ -17,7 +25,7 @@
 "   1.014.002	21-Oct-2013	Add ingo#text#GetChar().
 "   1.011.001	23-Jul-2013	file creation from ingocommands.vim.
 
-function! ingo#text#Get( startPos, endPos )
+function! ingo#text#Get( startPos, endPos, ... )
 "*******************************************************************************
 "* PURPOSE:
 "   Extract the text between a:startPos and a:endPos from the current buffer.
@@ -29,19 +37,23 @@ function! ingo#text#Get( startPos, endPos )
 "* INPUTS:
 "   a:startPos	    [line, col]
 "   a:endPos	    [line, col]
+"   a:isExclusive   Flag whether a:endPos is exclusive; by default, the
+"		    character at that position is included; pass 1 to exclude
+"		    it.
 "* RETURN VALUES:
 "   string text
 "*******************************************************************************
+    let [l:exclusiveOffset, l:exclusiveMatch] = (a:0 && a:1 ? [1, ''] : [0, '.'])
     let [l:line, l:column] = a:startPos
     let [l:endLine, l:endColumn] = a:endPos
-    if l:line > l:endLine || (l:line == l:endLine && l:column > l:endColumn)
+    if l:line > l:endLine || (l:line == l:endLine && l:column > l:endColumn + l:exclusiveOffset)
 	return ''
     endif
 
     let l:text = ''
     while 1
 	if l:line == l:endLine
-	    let l:text .= matchstr(getline(l:line) . "\n", '\%' . l:column . 'c' . '.*\%' . (l:endColumn + 1) . 'c')
+	    let l:text .= matchstr(getline(l:line) . "\n", '\%' . l:column . 'c' . '.*\%' . l:endColumn . 'c' . l:exclusiveMatch)
 	    break
 	else
 	    let l:text .= matchstr(getline(l:line) . "\n", '\%' . l:column . 'c' . '.*')
