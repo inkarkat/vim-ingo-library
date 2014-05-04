@@ -8,29 +8,56 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.009.005	21-Jun-2013	:echomsg sets v:statusmsg itself when there's no
+"				current highlighting; no need to do that then in
+"				ingo#msg#StatusMsg(). Instead, allow to set a
+"				custom highlight group for the message.
+"				Add ingo#msg#HighlightMsg() and use that in the
+"				other functions.
 "   1.009.004	14-Jun-2013	Minor: Make substitute() robust against
 "				'ignorecase'.
 "   1.006.003	06-May-2013	Add ingo#msg#StatusMsg().
 "   1.003.002	13-Mar-2013	Add ingo#msg#ShellError().
 "   1.000.001	22-Jan-2013	file creation
 
-function! ingo#msg#StatusMsg( text )
-    let v:statusmsg = a:text
-    echomsg v:statusmsg
+function! ingo#msg#HighlightMsg( text, hlgroup )
+    execute 'echohl' a:hlgroup
+    echomsg a:text
+    echohl None
+endfunction
+
+function! ingo#msg#StatusMsg( text, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Echo a message, optionally with a custom highlight group, and store the
+"   message in v:statusmsg. (Vim only does this automatically when there's no
+"   active highlighting.)
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:text  The message to be echoed and added to the message history.
+"* RETURN VALUES:
+"   None.
+"******************************************************************************
+    if a:0
+	let v:statusmsg = a:text
+	call ingo#msg#HighlightMsg(a:text, a:1)
+    else
+	echohl None
+	echomsg a:text
+    endif
 endfunction
 
 function! ingo#msg#WarningMsg( text )
     let v:warningmsg = a:text
-    echohl WarningMsg
-    echomsg v:warningmsg
-    echohl None
+    call ingo#msg#HighlightMsg(v:warningmsg, 'WarningMsg')
 endfunction
 
 function! ingo#msg#ErrorMsg( text )
     let v:errmsg = a:text
-    echohl ErrorMsg
-    echomsg v:errmsg
-    echohl None
+    call ingo#msg#HighlightMsg(v:errmsg, 'ErrorMsg')
 endfunction
 
 function! ingo#msg#MsgFromVimException()
