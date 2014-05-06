@@ -87,6 +87,7 @@ HISTORY							*ingo-library-history*
 - Add ingo/undo.vim module.
 - Add ingo/query.vim module.
 - Add ingo/pos.vim module.
+- Add optional a:isBeep argument to ingo#msg#ErrorMsg().
 
 1.018	14-Apr-2014
 - FIX: Off-by-one: Allow column 1 in ingo#text#Insert(). Add special cases for
