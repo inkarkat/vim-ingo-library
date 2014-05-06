@@ -3,12 +3,16 @@
 " DEPENDENCIES:
 "   - ingo/os.vim autoload script
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.019.007	07-May-2014	ingo#fs#path#Normalize(): Don't normalize to
+"				Cygwin /cygdrive/x/... when the chosen path
+"				separator is "\". This would result in a mixed
+"				separator style that is not actually handled.
 "   1.014.006	26-Sep-2013	ingo#fs#path#Normalize(): Also convert between
 "				the different D:\ and /cygdrive/d/ notations on
 "				Windows and Cygwin.
@@ -48,7 +52,7 @@ function! ingo#fs#path#Normalize( filespec, ... )
 
     if ingo#os#IsWinOrDos()
 	let l:result = substitute(l:result, '^[/\\]cygdrive[/\\]\(\a\)\ze[/\\]', '\u\1:', '')
-    elseif ingo#os#IsCygwin()
+    elseif ingo#os#IsCygwin() && l:pathSeparator ==# '/'
 	let l:result = substitute(l:result, '^\(\a\):', '/cygdrive/\l\1', '')
     endif
 
