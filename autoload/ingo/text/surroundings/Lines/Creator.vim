@@ -11,6 +11,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	006	06-Jul-2013	BUG: Visual mode mappings also apply to the
+"				wrong range. Must apply the wrapping in :execute
+"				for the visual mode mapping, too.
 "	005	28-Apr-2013	BUG: Found the root cause of wrong range
 "				application of <Leader>qq mapping: Because an
 "				a:commandName that is defined through
@@ -64,8 +67,8 @@ function! surroundings#Lines#Creator#MakeMapping( mapArgs, keys, commandName, ma
     execute printf('nnoremap %s %s :<Home>execute ''<End><C-r><C-r>=v:count ? "" : "."<CR>%s''<CR>',
     \   a:mapArgs, l:lineMappingKeys, substitute(a:commandName, "'", "''", 'g')
     \)
-    execute printf('xnoremap %s %s :%s<CR>',
-    \   a:mapArgs, a:keys, a:commandName
+    execute printf('xnoremap %s %s :<Home>execute "<End>" . ''%s''<CR>',
+    \   a:mapArgs, a:keys, substitute(a:commandName, "'", "''", 'g')
     \)
 
     silent! call repeatableMapping#makeCrossRepeatable(
