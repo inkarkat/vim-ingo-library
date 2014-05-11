@@ -91,7 +91,7 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transform
 	catch /^Vim\%((\a\+)\)\=:E16/ " E16: Invalid range
 	    call ingo#msg#ErrorMsg(printf('Invalid last modified range: %d,%d', l:startLnum, l:endLnum))
 	    return
-	catch /^Vim\%((\a\+)\)\=:E/
+	catch /^Vim\%((\a\+)\)\=:/
 	    call ingo#msg#VimExceptionMsg()
 	    return
 	catch
