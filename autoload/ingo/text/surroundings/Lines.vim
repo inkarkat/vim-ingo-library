@@ -54,7 +54,8 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transform
 "		    non-empty String is executed as an Ex command, and the
 "		    modified range is used instead of a:startLnum, a:endLnum.
 "* RETURN VALUES:
-"   None.
+"   1 in case of success; 0 if an error occurred. Use ingo#err#Get() to obtain
+"   (and :echoerr) the message.
 "******************************************************************************
     if a:count == -1
 	" When no [range] is passed, -range=-1 defaults to <count> == -1.
@@ -71,8 +72,8 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transform
 		let [l:startLnum, l:endLnum] = [line("'["), line("']")]
 	    endif
 	catch /^Vim\%((\a\+)\)\=:/
-	    call ingo#msg#VimExceptionMsg()
-	    return
+	    call ingo#err#SetVimException()
+	    return 0
 	endtry
     endif
 
@@ -82,21 +83,21 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transform
 		" Note: When going through call(), the Funcref is invoked once
 		" for each line, even when the referenced function is defined
 		" with the "range" attribute! Therefore, the transformer needs
-		" to be invoked directly. (Fortunately, we have to arguments to
+		" to be invoked directly. (Fortunately, we have no arguments to
 		" pass.)
 		execute l:startLnum . ',' . l:endLnum . 'call ' . ingo#funcref#ToString(a:Transformer) . '()'
 	    else
 		execute l:startLnum . ',' . l:endLnum . a:Transformer
 	    endif
 	catch /^Vim\%((\a\+)\)\=:E16/ " E16: Invalid range
-	    call ingo#msg#ErrorMsg(printf('Invalid last modified range: %d,%d', l:startLnum, l:endLnum))
-	    return
+	    call ingo#err#Set(printf('Invalid last modified range: %d,%d', l:startLnum, l:endLnum))
+	    return 0
 	catch /^Vim\%((\a\+)\)\=:/
-	    call ingo#msg#VimExceptionMsg()
-	    return
+	    call ingo#err#SetVimException()
+	    return 0
 	catch
-	    call ingo#msg#ErrorMsg(v:exception)
-	    return
+	    call ingo#err#SetCustomException(v:exception)
+	    return 0
 	endtry
     endif
 
@@ -115,6 +116,8 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, Transform
     " was added last.
     call setpos("'[", [0, l:startLnum, 1, 0])
     call setpos("']", [0, l:endLnum + len(l:beforeLines) + len(l:afterLines), 1, 0])
+
+    return 1
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
