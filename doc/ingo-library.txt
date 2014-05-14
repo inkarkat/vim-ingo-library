@@ -88,6 +88,11 @@ HISTORY							*ingo-library-history*
 - Add ingo/query.vim module.
 - Add ingo/pos.vim module.
 - Add optional a:isBeep argument to ingo#msg#ErrorMsg().
+- ingo#fs#path#Normalize(): Don't normalize to Cygwin /cygdrive/x/... when the
+  chosen path separator is "\". This would result in a mixed separator style
+  that is not actually handled.
+- ingo#fs#path#Normalize(): Add special normalization to "C:/" on Cygwin via
+  ":/" path separator argument.
 
 1.018	14-Apr-2014
 - FIX: Off-by-one: Allow column 1 in ingo#text#Insert(). Add special cases for
