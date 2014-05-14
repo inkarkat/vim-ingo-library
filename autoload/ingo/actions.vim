@@ -8,6 +8,13 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.015.007	18-Nov-2013	CHG: Pass _all_ additional arguments of
+"				ingo#actions#ValueOrFunc(),
+"				ingo#actions#NormalOrFunc(),
+"				ingo#actions#ExecuteOrFunc(),
+"				ingo#actions#EvaluateOrFunc() instead of only
+"				the first (interpreted as a List of arguments)
+"				when passed a Funcref as a:Action.
 "   1.014.006	05-Nov-2013	Add ingo#actions#ValueOrFunc().
 "   1.011.005	01-Aug-2013	Add ingo#actions#EvaluateWithValOrFunc().
 "   1.010.004	04-Jul-2013	Add ingo#actions#EvaluateWithVal().
@@ -19,14 +26,14 @@
 
 function! ingo#actions#ValueOrFunc( Action, ... )
     if type(a:Action) == type(function('tr'))
-	return call(a:Action, (a:0 ? a:1 : []))
+	return call(a:Action, a:000)
     else
 	return a:Action
     endif
 endfunction
 function! ingo#actions#NormalOrFunc( Action, ... )
     if type(a:Action) == type(function('tr'))
-	return call(a:Action, (a:0 ? a:1 : []))
+	return call(a:Action, a:000)
     else
 	execute 'normal!' a:Action
 	return ''
@@ -34,7 +41,7 @@ function! ingo#actions#NormalOrFunc( Action, ... )
 endfunction
 function! ingo#actions#ExecuteOrFunc( Action, ... )
     if type(a:Action) == type(function('tr'))
-	return call(a:Action, (a:0 ? a:1 : []))
+	return call(a:Action, a:000)
     else
 	execute a:Action
 	return ''
@@ -56,7 +63,7 @@ function! ingo#actions#EvaluateOrFunc( Action, ... )
 "   Result of evaluating a:Action.
 "******************************************************************************
     if type(a:Action) == type(function('tr'))
-	return call(a:Action, (a:0 ? a:1 : []))
+	return call(a:Action, a:000)
     else
 	return eval(a:Action)
     endif
@@ -97,7 +104,7 @@ function! ingo#actions#EvaluateWithValOrFunc( Action, ... )
 "   Result of evaluating a:Action.
 "******************************************************************************
     if type(a:Action) == type(function('tr'))
-	return call(a:Action, (a:0 ? a:000 : []))
+	return call(a:Action, a:000)
     else
 	let l:val = (a:0 == 1 ? a:1 : a:000)
 	return get(map([l:val], a:Action), 0, '')
