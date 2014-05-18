@@ -25,7 +25,10 @@ function! ingo#lines#PutWrapper( lnum, putCommand, lines )
 "   To suppress a potential message based on 'report', invoke this function with
 "   :silent.
 "* INPUTS:
-"	? Explanation of each argument that isn't obvious.
+"   a:lnum  Address for a:putCommand.
+"   a:putCommand    The :put[!] command that is used.
+"   a:lines         List of lines or string (where lines are separated by \n
+"		    characters).
 "* RETURN VALUES:
 "   None.
 "******************************************************************************
