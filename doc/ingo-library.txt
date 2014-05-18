@@ -93,6 +93,9 @@ HISTORY							*ingo-library-history*
   that is not actually handled.
 - ingo#fs#path#Normalize(): Add special normalization to "C:/" on Cygwin via
   ":/" path separator argument.
+- In ingo#actions#EvaluateWithValOrFunc(), remove any occurrence of "v:val"
+  instead of passing an empty list or empty string. This is useful for
+  invoking functions (an expression, not Funcref) with optional arguments.
 
 1.018	14-Apr-2014
 - FIX: Off-by-one: Allow column 1 in ingo#text#Insert(). Add special cases for
