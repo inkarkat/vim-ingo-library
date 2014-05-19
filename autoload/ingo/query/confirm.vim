@@ -13,7 +13,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let s:acceleratorPattern = '[[:alnum:]]'
-function! ingo#query#confirm#AutoAccelerators( choices )
+function! ingo#query#confirm#AutoAccelerators( choices, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Automatically add unique accelerators (&Accelerator) for the passed
@@ -25,9 +25,12 @@ function! ingo#query#confirm#AutoAccelerators( choices )
 "   Modifies a:choices.
 "* INPUTS:
 "   a:choices   List of choices where the accelerators should be inserted.
+"   a:defaultChoice Number (i.e. index + 1) of the default in a:choices. It is
+"		    assumed that that item does not need an accelerator.
 "* RETURN VALUES:
 "   Modified a:choices.
 "******************************************************************************
+    let l:defaultChoice = (a:0 ? a:1 : 0)
     let l:usedAccelerators = filter(
     \   map(
     \       copy(a:choices),
@@ -36,8 +39,8 @@ function! ingo#query#confirm#AutoAccelerators( choices )
     \   '! empty(v:val)'
     \)
 
-    call   map(a:choices, 's:AddAccelerator(l:usedAccelerators, v:val, 1)')
-    return map(a:choices, 's:AddAccelerator(l:usedAccelerators, v:val, 0)')
+    call   map(a:choices, 'v:key + 1 == l:defaultChoice ? v:val : s:AddAccelerator(l:usedAccelerators, v:val, 1)')
+    return map(a:choices, 'v:key + 1 == l:defaultChoice ? v:val : s:AddAccelerator(l:usedAccelerators, v:val, 0)')
 endfunction
 function! s:AddAccelerator( usedAccelerators, value, isWantFirstCharacter )
     if a:value =~# '&' . s:acceleratorPattern
