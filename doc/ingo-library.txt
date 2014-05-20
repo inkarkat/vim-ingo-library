@@ -98,6 +98,11 @@ HISTORY							*ingo-library-history*
   invoking functions (an expression, not Funcref) with optional arguments.
 - ENH: Make ingo#lines#Replace() handle replacement with nothing (empty List)
   and replacing the entire buffer (without leaving an additional empty line).
+- Correct ingo#query#confirm#AutoAccelerators() default choice when not given
+  (1 instead of 0). Avoid using the default choice's first character as
+  accelerator unless in GUI dialog, as the plain text confirm() assigns a
+  default accelerator.
+- Move subs/URL.vim into ingo-library as ingo/codec/URL.vim module.
 
 1.018	14-Apr-2014
 - FIX: Off-by-one: Allow column 1 in ingo#text#Insert(). Add special cases for
@@ -354,6 +359,7 @@ Started development of shared autoload functionality.
 
 ==============================================================================
 Copyright: (C) 2009-2014 Ingo Karkat
+Contains URL encoding / decoding algorithms written by Tim Pope.
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
