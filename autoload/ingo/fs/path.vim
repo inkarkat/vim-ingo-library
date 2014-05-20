@@ -13,6 +13,8 @@
 "				Cygwin /cygdrive/x/... when the chosen path
 "				separator is "\". This would result in a mixed
 "				separator style that is not actually handled.
+"				Add special normalization to "C:/" on Cygwin via
+"				":/" path separator argument.
 "   1.014.006	26-Sep-2013	ingo#fs#path#Normalize(): Also convert between
 "				the different D:\ and /cygdrive/d/ notations on
 "				Windows and Cygwin.
@@ -41,18 +43,20 @@ function! ingo#fs#path#Normalize( filespec, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:filespec  Filespec, potentially with mixed / and \ path separators.
-"   a:pathSeparator Optional path separator to be used.
+"   a:filespec      Filespec, potentially with mixed / and \ path separators.
+"   a:pathSeparator Optional path separator to be used. With the special value
+"		    of ":/", normalizes to "/", but keeps a "C:/" drive letter
+"		    prefix instead of translating to "/cygdrive/c/".
 "* RETURN VALUES:
 "   a:filespec with uniform path separators, according to the platform.
 "******************************************************************************
-    let l:pathSeparator = (a:0 ? a:1 : ingo#fs#path#Separator())
+    let l:pathSeparator = (a:0 ? (a:1 ==# ':/' ? '/' : a:1) : ingo#fs#path#Separator())
     let l:badSeparator = (l:pathSeparator ==# '/' ? '\' : '/')
     let l:result = tr(a:filespec, l:badSeparator, l:pathSeparator)
 
     if ingo#os#IsWinOrDos()
 	let l:result = substitute(l:result, '^[/\\]cygdrive[/\\]\(\a\)\ze[/\\]', '\u\1:', '')
-    elseif ingo#os#IsCygwin() && l:pathSeparator ==# '/'
+    elseif ingo#os#IsCygwin() && l:pathSeparator ==# '/' && ! (a:0 && a:1 ==# ':/')
 	let l:result = substitute(l:result, '^\(\a\):', '/cygdrive/\l\1', '')
     endif
 
