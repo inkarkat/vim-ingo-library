@@ -103,6 +103,11 @@ HISTORY							*ingo-library-history*
   accelerator unless in GUI dialog, as the plain text confirm() assigns a
   default accelerator.
 - Move subs/URL.vim into ingo-library as ingo/codec/URL.vim module.
+- Allow optional a:ignorecase argument for ingo#str#StartsWith() and
+  ingo#str#EndsWith().
+- Add ingo#fs#path#IsCaseInsensitive().
+- Add ingo#str#Equals() for when it's convenient to pass in the a:ignorecase
+  flag. This avoids coding the conditional between ==# and ==? yourself.
 
 1.018	14-Apr-2014
 - FIX: Off-by-one: Allow column 1 in ingo#text#Insert(). Add special cases for
