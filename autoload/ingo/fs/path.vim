@@ -9,6 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.019.008	21-May-2014	Add ingo#fs#path#IsCaseInsensitive().
 "   1.019.007	07-May-2014	ingo#fs#path#Normalize(): Don't normalize to
 "				Cygwin /cygdrive/x/... when the chosen path
 "				separator is "\". This would result in a mixed
@@ -130,14 +131,16 @@ function! ingo#fs#path#GetRootDir( filespec )
     return l:dir
 endfunction
 
-if ingo#os#IsWinOrDos()
-    function! ingo#fs#path#Equals( p1, p2 )
+function! ingo#fs#path#IsCaseInsensitive( ... )
+    return ingo#os#IsWinOrDos() " Note: Check based on path not yet implemented.
+endfunction
+
+function! ingo#fs#path#Equals( p1, p2 )
+    if ingo#fs#path#IsCaseInsensitive(a:p1) || ingo#fs#path#IsCaseInsensitive(a:p2)
 	return a:p1 ==? a:p2 || ingo#fs#path#Normalize(fnamemodify(a:p1, ':p')) ==? ingo#fs#path#Normalize(fnamemodify(a:p2, ':p'))
-    endfunction
-else
-    function! ingo#fs#path#Equals( p1, p2 )
+    else
 	return a:p1 ==# a:p2 || ingo#fs#path#Normalize(fnamemodify(resolve(a:p1), ':p')) ==# ingo#fs#path#Normalize(fnamemodify(resolve(a:p2), ':p'))
-    endfunction
-endif
+    endif
+endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
