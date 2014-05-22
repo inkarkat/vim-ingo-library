@@ -3,13 +3,14 @@
 " DEPENDENCIES:
 "   - ingo/os.vim autoload script
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"	001	08-Aug-2013	file creation
+"   1.018.002	21-Mar-2014	Add ingo#escape#file#wildcardescape().
+"   1.012.001	08-Aug-2013	file creation
 
 function! ingo#escape#file#bufnameescape( filespec, ... )
 "*******************************************************************************
@@ -24,7 +25,7 @@ function! ingo#escape#file#bufnameescape( filespec, ... )
 "* EFFECTS / POSTCONDITIONS:
 "	? List of the procedure's effect on each external variable, control, or other element.
 "* INPUTS:
-"   a:filespec	    normal filespec
+"   a:filespec	    Normal filespec
 "   a:isFullMatch   Optional flag whether only the full filespec should be
 "		    matched (default=1). If 0, the escaped filespec will not be
 "		    anchored.
@@ -114,6 +115,23 @@ function! ingo#escape#file#autocmdescape( filespec )
     " of the filespec as the file and interpreting the remainder of the filespec
     " as part of the command.
     return escape(l:filespec, ' ')
+endfunction
+
+function! ingo#escape#file#wildcardescape( filespec )
+"******************************************************************************
+"* PURPOSE:
+"   Escape a normal filespec for (literal) use in glob(). Escapes [, ?, * and
+"   **.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:filespec	    Normal filespec
+"* RETURN VALUES:
+"   Escaped filespec to be passed as an argument to glob().
+"******************************************************************************
+    return substitute(escape(a:filespec, '?*'), '[[]', '[[]', 'g')
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
