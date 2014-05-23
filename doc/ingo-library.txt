@@ -109,6 +109,8 @@ HISTORY							*ingo-library-history*
 - Add ingo#str#Equals() for when it's convenient to pass in the a:ignorecase
   flag. This avoids coding the conditional between ==# and ==? yourself.
 - Add ingo/fs/path/split.vim module.
+- Add ingo#fs#path#Exists().
+- FIX: Correct ingo#escape#file#wildcardescape() of * and ? on Windows.
 
 1.018	14-Apr-2014
 - FIX: Off-by-one: Allow column 1 in ingo#text#Insert(). Add special cases for
