@@ -3,6 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/cursor/move.vim autoload script
 "   - ingo/msg.vim autoload script
+"   - ingo/register.vim autoload script
 "
 " Copyright: (C) 2008-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -10,6 +11,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	015	18-Nov-2013	Use ingo#register#KeepRegisterExecuteOrFunc().
 "	014	03-Jul-2013	Move ingocursormove.vim into ingo-library.
 "	013	08-May-2013	Use ingo-library for warning messages.
 "				FIX: Used :normal clobbers used [count];
@@ -241,6 +243,14 @@ endfunction
 
 
 
+function! surroundings#DoSurround( textBefore, textAfter )
+    normal! gv""s$
+
+    " Set paste type to characterwise; otherwise, linewise selections would be
+    " pasted _below_ the surrounded characters.
+    call setreg('"', '', 'av')
+    execute 'normal! "_s' . a:textBefore . "\<C-R>\<C-O>\"" . a:textAfter . "\<Esc>"
+endfunction
 function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
     if a:selectionType ==# 'z'
 	" This special selection type assumes that the surrounded text has
@@ -268,21 +278,7 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 	    silent! execute "normal! g`[\<C-V>g`]". (&selection ==# 'exclusive' ? 'l' : '') . "\<Esc>"
 	endif
 
-
-	let l:save_clipboard = &clipboard
-	set clipboard= " Avoid clobbering the selection and clipboard registers.
-	let l:save_reg = getreg('"')
-	let l:save_regmode = getregtype('"')
-
-	normal! gv""s$
-
-	" Set paste type to characterwise; otherwise, linewise selections would
-	" be pasted _below_ the surrounded characters.
-	call setreg('"', '', 'av')
-	execute 'normal! "_s' . a:textBefore . "\<C-R>\<C-O>\"" . a:textAfter . "\<Esc>"
-
-	call setreg('"', l:save_reg, l:save_regmode)
-	let &clipboard = l:save_clipboard
+	call ingo#register#KeepRegisterExecuteOrFunc(function('surroundings#DoSurround'), a:textBefore, a:textAfter)
 
 	" Mark the changed area.
 	" The start of the change is already right, but the end is one after the
