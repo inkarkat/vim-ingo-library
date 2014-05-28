@@ -118,6 +118,9 @@ function! ingo#regexp#FromWildcard( wildcardExpr, additionalEscapeCharacters )
 "* PURPOSE:
 "   Convert a shell-like a:wildcardExpr which may contain wildcards ? and * into
 "   a regular expression.
+"
+"   The ingo#regexp#fromwildcard#Convert() supports the full range of wildcards
+"   and considers the path separators on different platforms.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
