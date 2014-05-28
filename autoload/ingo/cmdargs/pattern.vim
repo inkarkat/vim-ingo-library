@@ -1,23 +1,75 @@
 " ingo/cmdargs/pattern.vim: Functions for parsing of pattern arguments of commands.
 "
 " DEPENDENCIES:
+"   - ingo/escape.vim autoload script
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.020.003	29-May-2014	Use ingo#escape#Unescape() in
+"				ingo#cmdargs#pattern#Unescape().
+"				Add ingo#cmdargs#pattern#ParseUnescaped() to
+"				avoid the double and inefficient
+"				ingo#cmdargs#pattern#Unescape(ingo#cmdargs#pattern#Parse())
+"				so far used by many clients.
+"   1.011.002	24-Jul-2013	FIX: Use the rules for the /pattern/ separator
+"				as stated in :help E146.
 "   1.007.001	01-Jun-2013	file creation
 
 function! ingo#cmdargs#pattern#Parse( arguments, ... )
-    let l:match = matchlist(a:arguments, '^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . (a:0 ? a:1 : '') . '$')
+"******************************************************************************
+"* PURPOSE:
+"   Parse a:arguments as a pattern delimited by optional /.../ (or similar)
+"   characters, and with optional following flags match.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:arguments Command arguments to parse.
+"   a:flagsExpr Pattern that captures any optional part after the pattern.
+"* RETURN VALUES:
+"   [separator, escapedPattern]; if a:flagsExpr is given
+"   [separator, escapedPattern, flags]. In a:escapedPattern, the a:separator is
+"   consistently escaped (i.e. also when the original arguments haven't been
+"   enclosed in such).
+"******************************************************************************
+    let l:match = matchlist(a:arguments, '^\([[:alnum:]\\"|]\@![\x00-\xFF]\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . (a:0 ? a:1 : '') . '$')
     if empty(l:match)
 	return ['/', escape(a:arguments, '/')] + (a:0 ? [''] : [])
     else
 	return l:match[1: (a:0 ? 3 : 2)]
     endif
 endfunction
+function! ingo#cmdargs#pattern#ParseUnescaped( arguments, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Parse a:arguments as a pattern delimited by optional /.../ (or similar)
+"   characters, and with optional following flags match.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:arguments Command arguments to parse.
+"   a:flagsExpr Pattern that captures any optional part after the pattern.
+"* RETURN VALUES:
+"   unescapedPattern (String); if a:flagsExpr is given instead List of
+"   [unescapedPattern, flags]. In a:unescapedPattern, any separator used in
+"   a:arguments is unescaped.
+"******************************************************************************
+    let l:match = matchlist(a:arguments, '^\([[:alnum:]\\"|]\@![\x00-\xFF]\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . (a:0 ? a:1 : '') . '$')
+    if empty(l:match)
+	return (a:0 ? [a:arguments, ''] : a:arguments)
+    else
+	let l:unescapedPattern = ingo#escape#Unescape(l:match[2], l:match[1])
+	return (a:0 ? [l:unescapedPattern, l:match[3]] : l:unescapedPattern)
+    endif
+endfunction
+
 function! ingo#cmdargs#pattern#Unescape( parsedArguments )
 "******************************************************************************
 "* PURPOSE:
@@ -42,7 +94,7 @@ function! ingo#cmdargs#pattern#Unescape( parsedArguments )
     let l:separator = a:parsedArguments[0]
     let l:unescapedPattern = (empty(l:separator) ?
     \   a:parsedArguments[1] :
-    \   substitute(a:parsedArguments[1], '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\V\C' . l:separator, l:separator, 'g')
+    \   ingo#escape#Unescape(a:parsedArguments[1], l:separator)
     \)
 
     return (len(a:parsedArguments) > 2 ? [l:unescapedPattern] + a:parsedArguments[2:] : l:unescapedPattern)
