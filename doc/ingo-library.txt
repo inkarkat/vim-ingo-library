@@ -81,7 +81,7 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.019	RELEASEME
+1.019	24-May-2014
 - Add ingo#plugin#setting#BooleanToStringValue().
 - Add ingo#strdisplaywidth#GetMinMax().
 - Add ingo/undo.vim module.
