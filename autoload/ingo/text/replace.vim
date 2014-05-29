@@ -3,13 +3,12 @@
 " DEPENDENCIES:
 "   - ingo/msg.vim autoload script
 "
-" Copyright: (C) 2012-2014 Ingo Karkat
+" Copyright: (C) 2012-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.020.006	30-May-2014	Expose ingo#text#Replace#AreaInLine().
 "   1.011.005	23-Jul-2013	Move into ingo-library.
 "	004	11-Apr-2013	ENH: ingoreplacer#ReplaceText() returns
 "				structure with the original and replaced text.
@@ -28,7 +27,7 @@ function! s:ReplaceRange( source, startIdx, endIdx, string )
     return strpart(a:source, 0, a:startIdx) . a:string . strpart(a:source, a:endIdx + 1)
 endfunction
 
-function! ingo#text#Replace#AreaInLine( startIdx, endIdx, text )
+function! s:ReplaceTextInRange( startIdx, endIdx, text )
     let l:line = getline('.')
     let l:currentText = strpart(l:line, a:startIdx, (a:endIdx - a:startIdx + 1))
 "**** echo 'current ' . l:currentText . ', new ' . a:text
@@ -84,7 +83,7 @@ function! ingo#text#replace#PatternWithText( pattern, text, ... )
 		let l:endIdx = matchend(l:line, a:pattern, 0, l:count) - 1
 		if l:startIdx <= l:cursorIdx && l:cursorIdx <= l:endIdx
 "****D echomsg '**** cursor match from ' . l:startIdx . ' to ' . l:endIdx
-		    let l:originalText = ingo#text#Replace#AreaInLine(l:startIdx, l:endIdx, l:text)
+		    let l:originalText = s:ReplaceTextInRange(l:startIdx, l:endIdx, l:text)
 		    if ! empty(l:originalText)
 			return {'startIdx': l:startIdx, 'endIdx': l:endIdx, 'original': l:originalText, 'replacement': l:text, 'where': '%s at cursor position'}
 		    endif
@@ -103,7 +102,7 @@ function! ingo#text#replace#PatternWithText( pattern, text, ... )
 		let l:endIdx = matchend(l:line, a:pattern, l:cursorIdx, l:count) - 1
 "****D echomsg '**** next match from ' . l:startIdx . ' to ' . l:endIdx
 		if l:startIdx != -1
-		    let l:originalText = ingo#text#Replace#AreaInLine(l:startIdx, l:endIdx, l:text)
+		    let l:originalText = s:ReplaceTextInRange(l:startIdx, l:endIdx, l:text)
 		    if ! empty(l:originalText)
 			call cursor(line('.'), l:startIdx + 1)
 			return {'startIdx': l:startIdx, 'endIdx': l:endIdx, 'original': l:originalText, 'replacement': l:text, 'where': 'next %s in line'}
@@ -120,7 +119,7 @@ function! ingo#text#replace#PatternWithText( pattern, text, ... )
 		let l:endIdx = matchend(l:line, a:pattern, 0, l:count) - 1
 "****D echomsg '**** last match from ' . l:startIdx . ' to ' . l:endIdx . ' at count ' . l:count
 		if l:startIdx != -1
-		    let l:originalText = ingo#text#Replace#AreaInLine(l:startIdx, l:endIdx, l:text)
+		    let l:originalText = s:ReplaceTextInRange(l:startIdx, l:endIdx, l:text)
 		    if ! empty(l:originalText)
 			call cursor(line('.'), l:startIdx + 1)
 			return {'startIdx': l:startIdx, 'endIdx': l:endIdx, 'original': l:originalText, 'replacement': l:text, 'where': 'last %s in line'}
