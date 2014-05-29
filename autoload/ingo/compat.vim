@@ -9,6 +9,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.018.008	12-Apr-2014	FIX: Off-by-one in emulated
+"				ingo#compat#strdisplaywidth() reported one too
+"				few.
 "   1.017.007	19-Feb-2014	Add workarounds for fnameescape() bugs on
 "				Windows for ! and [] characters.
 "   1.015.006	20-Nov-2013	Add ingo#compat#setpos().
@@ -34,7 +37,7 @@ else
 	let i = 1
 	while 1
 	    if ! ingo#strdisplaywidth#HasMoreThan(l:expr, i)
-		return i - 1 - (a:0 ? a:1 : 0)
+		return i - (a:0 ? a:1 : 0)
 	    endif
 	    let i += 1
 	endwhile
