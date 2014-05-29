@@ -30,6 +30,7 @@ autoload/ingo/date.vim
 autoload/ingo/date/epoch.vim
 autoload/ingo/date/format.vim
 autoload/ingo/dict.vim
+autoload/ingo/dict/find.vim
 autoload/ingo/err.vim
 autoload/ingo/escape.vim
 autoload/ingo/escape/command.vim
