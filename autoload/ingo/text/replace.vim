@@ -3,12 +3,18 @@
 " DEPENDENCIES:
 "   - ingo/msg.vim autoload script
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.020.006	30-May-2014	Factor out and expose ingo#text#Replace#Area().
+"				Allow a:Text Funcref in
+"				ingo#text#replace#PatternWithText().
+"				CHG: When replacing at the cursor position, also
+"				jump to the beginning of the replacement. This
+"				is more consistent with Vim's default behavior.
 "   1.011.005	23-Jul-2013	Move into ingo-library.
 "	004	11-Apr-2013	ENH: ingoreplacer#ReplaceText() returns
 "				structure with the original and replaced text.
@@ -27,20 +33,59 @@ function! s:ReplaceRange( source, startIdx, endIdx, string )
     return strpart(a:source, 0, a:startIdx) . a:string . strpart(a:source, a:endIdx + 1)
 endfunction
 
-function! s:ReplaceTextInRange( startIdx, endIdx, text )
-    let l:line = getline('.')
-    let l:currentText = strpart(l:line, a:startIdx, (a:endIdx - a:startIdx + 1))
-"**** echo 'current ' . l:currentText . ', new ' . a:text
-    if l:currentText !=# a:text
-	return (setline('.', s:ReplaceRange(l:line, a:startIdx, a:endIdx, a:text)) ? '' : l:currentText)
+function! ingo#text#replace#Area( startPos, endPos, Text )
+"******************************************************************************
+"* PURPOSE:
+"   Replace the text between a:startPos and a:endPos from the current buffer
+"   with a:Text.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Modifies current buffer.
+"* INPUTS:
+"   a:startPos  [line, col]
+"   a:endPos    [line, col]
+"   a:Text      Replacement text, or Funcref that gets passed the text to
+"		replace, and returns the replacement text.
+"* RETURN VALUES:
+"   List of [originalText, replacementText, didReplacement].
+"******************************************************************************
+    if a:startPos[0] != a:endPos[0]
+	throw 'Multi-line replacement not implemented yet'
+    endif
+
+    let l:line = getline(a:startPos[0])
+    let l:currentText = strpart(l:line, a:startPos[1], (a:endPos[1] - a:startPos[1] + 1))
+    if type(a:Text) == type(function('tr'))
+	let l:text = call(a:Text, [l:currentText])
+    else
+	let l:text = a:Text
+    endif
+
+    " Because of setline(), we can only (easily) handle text replacement in a
+    " single line, so replace with the first (non-empty) line only should the
+    " replacement text consist of multiple lines.
+    let l:text = split(l:text, "\n")[0]
+
+    if l:currentText !=# l:text
+	return [l:currentText, l:text, (setline('.', s:ReplaceRange(l:line, a:startPos[1], a:endPos[1], l:text)) == 0)]
     else
 	" The range already contains the new text in the correct format, no
 	" replacement was done.
-	return ''
+	return [l:currentText, l:text, 0]
+    endif
+endfunction
+function! s:ReplaceTextInRange( startIdx, endIdx, Text, where )
+    let [l:originalText, l:replacementText, l:didReplacement] = ingo#text#replace#Area([line('.'), a:startIdx], [line('.'), a:endIdx], a:Text)
+    if l:didReplacement
+	call cursor(line('.'), a:startIdx + 1)
+	return {'startIdx': a:startIdx, 'endIdx': a:endIdx, 'original': l:originalText, 'replacement': l:replacementText, 'where': a:where}
+    else
+	return []
     endif
 endfunction
 
-function! ingo#text#replace#PatternWithText( pattern, text, ... )
+function! ingo#text#replace#PatternWithText( pattern, Text, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Replace occurrences of a:pattern in the current line with a:text.
@@ -50,7 +95,8 @@ function! ingo#text#replace#PatternWithText( pattern, text, ... )
 "   Changes the current line.
 "* INPUTS:
 "   a:pattern   Regular expression that defines the text to replace.
-"   a:text      Replacement text.
+"   a:Text      Replacement text, or Funcref that gets passed the text to
+"		replace, and returns the replacement text.
 "   a:strategy  Array of locations where in the current line a:pattern will
 "		match. Possible values: 'current', 'next', 'last'. The default
 "		is ['current', 'next'], to have the same behavior as the
@@ -60,11 +106,6 @@ function! ingo#text#replace#PatternWithText( pattern, text, ... )
 "   'replacement', 'where'}, or empty Dictionary if no replacement was done.
 "******************************************************************************
     let l:strategy = (a:0 ? copy(a:1) : ['current', 'next'])
-
-    " Because of setline(), we can only (easily) handle text replacement in a
-    " single line, so replace with the first (non-empty) line only should the
-    " replacement text consists of multiple lines.
-    let l:text = split(a:text, "\n")[0]
 
     " Substitute any of the text patterns with the current text in the current
     " text format.
@@ -83,10 +124,8 @@ function! ingo#text#replace#PatternWithText( pattern, text, ... )
 		let l:endIdx = matchend(l:line, a:pattern, 0, l:count) - 1
 		if l:startIdx <= l:cursorIdx && l:cursorIdx <= l:endIdx
 "****D echomsg '**** cursor match from ' . l:startIdx . ' to ' . l:endIdx
-		    let l:originalText = s:ReplaceTextInRange(l:startIdx, l:endIdx, l:text)
-		    if ! empty(l:originalText)
-			return {'startIdx': l:startIdx, 'endIdx': l:endIdx, 'original': l:originalText, 'replacement': l:text, 'where': '%s at cursor position'}
-		    endif
+		    let l:result = s:ReplaceTextInRange(l:startIdx, l:endIdx, a:Text, '%s at cursor position')
+		    if ! empty(l:result) | return l:result | endif
 		endif
 	    endwhile
 	    let l:maxCount = l:count
@@ -102,11 +141,8 @@ function! ingo#text#replace#PatternWithText( pattern, text, ... )
 		let l:endIdx = matchend(l:line, a:pattern, l:cursorIdx, l:count) - 1
 "****D echomsg '**** next match from ' . l:startIdx . ' to ' . l:endIdx
 		if l:startIdx != -1
-		    let l:originalText = s:ReplaceTextInRange(l:startIdx, l:endIdx, l:text)
-		    if ! empty(l:originalText)
-			call cursor(line('.'), l:startIdx + 1)
-			return {'startIdx': l:startIdx, 'endIdx': l:endIdx, 'original': l:originalText, 'replacement': l:text, 'where': 'next %s in line'}
-		    endif
+		    let l:result = s:ReplaceTextInRange(l:startIdx, l:endIdx, a:Text, 'next %s in line')
+		    if ! empty(l:result) | return l:result | endif
 		endif
 	    endwhile
 	elseif l:location ==# 'last'
@@ -119,11 +155,8 @@ function! ingo#text#replace#PatternWithText( pattern, text, ... )
 		let l:endIdx = matchend(l:line, a:pattern, 0, l:count) - 1
 "****D echomsg '**** last match from ' . l:startIdx . ' to ' . l:endIdx . ' at count ' . l:count
 		if l:startIdx != -1
-		    let l:originalText = s:ReplaceTextInRange(l:startIdx, l:endIdx, l:text)
-		    if ! empty(l:originalText)
-			call cursor(line('.'), l:startIdx + 1)
-			return {'startIdx': l:startIdx, 'endIdx': l:endIdx, 'original': l:originalText, 'replacement': l:text, 'where': 'last %s in line'}
-		    endif
+		    let l:result = s:ReplaceTextInRange(l:startIdx, l:endIdx, a:Text, 'last %s in line')
+		    if ! empty(l:result) | return l:result | endif
 		endif
 		let l:count -= 1
 	    endwhile
