@@ -8,7 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"	001	08-Apr-2013	file creation from autoload/ingowindow.vim
+"   1.004.001	08-Apr-2013	file creation from autoload/ingowindow.vim
 
 function! ingo#window#preview#OpenPreview( ... )
     " Note: We do not use :pedit to open the current file in the preview window,
