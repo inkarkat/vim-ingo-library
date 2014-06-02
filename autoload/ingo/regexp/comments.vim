@@ -9,6 +9,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.013.002	12-Sep-2013	Avoid using \ze in
+"				ingo#regexp#comments#CommentToExpression(). It
+"				may be used in a larger expression that still
+"				wants to match after the prefix.
 "   1.009.001	18-Jun-2013	file creation from
 "				AdvancedJoiners/CommentJoin.vim
 
@@ -26,7 +30,7 @@ function! ingo#regexp#comments#CommentToExpression( comment )
     " Will be joined to			>cular.
     " # This is text.			Will be joined to
     "					>This is spectacular.
-    return (l:flags =~# 'b' ? l:comment . '\ze\%(\s\|\$\)': l:comment)
+    return (l:flags =~# 'b' ? l:comment . '\%(\s\|\$\)\@=': l:comment)
 endfunction
 function! ingo#regexp#comments#FromSetting()
     if empty(&l:comments)
