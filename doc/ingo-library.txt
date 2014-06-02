@@ -81,6 +81,32 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.020	RELEASEME
+- Add ingo/dict/find.vim module.
+- Use ingo#escape#Unescape() in ingo#cmdargs#pattern#Unescape(). Add
+  ingo#cmdargs#pattern#ParseUnescaped() to avoid the double and inefficient
+  ingo#cmdargs#pattern#Unescape(ingo#cmdargs#pattern#Parse()) so far used by
+  many clients.
+- Add ingo#cmdargs#pattern#ParseUnescapedWithLiteralWholeWord() for the common
+  [/]{pattern}[/ behavior as built-in commands like |:djump|]. When the
+  pattern isn't delimited by /.../, the returned pattern is modified so that
+  only literal whole words are matched. so far used by many clients.
+- CHG: At ingo#regexp#FromLiteralText(), add the a:isWholeWordSearch also on
+  either side, or when there are non-keyword characters in the middle of the
+  text. The * command behavior where this is modeled after only handles a
+  smaller subset, and this extension looks sensible and DWIM.
+- Add ingo#compat#abs().
+- Factor out and expose ingo#text#Replace#Area().
+- CHG: When replacing at the cursor position, also jump to the beginning of
+  the replacement. This is more consistent with Vim's default behavior.
+- Add ingo/record.vim module.
+- ENH: Allow passing optional a:tabnr to
+  ingo#window#preview#IsPreviewWindowVisible().
+- Factor out ingo#window#preview#OpenBuffer().
+- CHG: Change optional a:cursor argument of
+  ingo#window#preview#SplitToPreview() from 4-tuple getpos()-style to [lnum,
+  col]-style.
+
 1.019	24-May-2014
 - Add ingo#plugin#setting#BooleanToStringValue().
 - Add ingo#strdisplaywidth#GetMinMax().
