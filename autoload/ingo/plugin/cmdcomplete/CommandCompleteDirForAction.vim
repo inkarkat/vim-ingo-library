@@ -252,7 +252,7 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 		execute a:PostAction
 	    endif
 	endif
-    catch /^Vim\%((\a\+)\)\=:E/
+    catch /^Vim\%((\a\+)\)\=:/
 	call ingo#msg#VimExceptionMsg()
     catch
 	call ingo#msg#ErrorMsg(v:exception)
