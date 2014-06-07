@@ -2,12 +2,17 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.019.008	15-May-2014	In ingo#actions#EvaluateWithValOrFunc(), remove
+"				any occurrence of "v:val" instead of passing an
+"				empty list or empty string. This is useful for
+"				invoking functions (an expression, not Funcref)
+"				with optional arguments.
 "   1.015.007	18-Nov-2013	CHG: Pass _all_ additional arguments of
 "				ingo#actions#ValueOrFunc(),
 "				ingo#actions#NormalOrFunc(),
@@ -105,6 +110,12 @@ function! ingo#actions#EvaluateWithValOrFunc( Action, ... )
 "******************************************************************************
     if type(a:Action) == type(function('tr'))
 	return call(a:Action, a:000)
+    elseif a:0 == 0
+	" No arguments have been specified. Remove any occurrence of "v:val"
+	" instead of passing an empty list or empty string. This is useful for
+	" invoking functions (an expression, not Funcref) with optional
+	" arguments.
+	return eval(substitute(a:Action, '\w\@<!v:val\w\@!', '', 'g'))
     else
 	let l:val = (a:0 == 1 ? a:1 : a:000)
 	return get(map([l:val], a:Action), 0, '')
