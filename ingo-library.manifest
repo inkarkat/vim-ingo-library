@@ -59,6 +59,7 @@ autoload/ingo/motion/helper.vim
 autoload/ingo/motion/omap.vim
 autoload/ingo/msg.vim
 autoload/ingo/number.vim
+autoload/ingo/option.vim
 autoload/ingo/os.vim
 autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/compiler.vim
@@ -69,6 +70,7 @@ autoload/ingo/print.vim
 autoload/ingo/query.vim
 autoload/ingo/query/confirm.vim
 autoload/ingo/query/file.vim
+autoload/ingo/query/fromlist.vim
 autoload/ingo/query/get.vim
 autoload/ingo/query/substitute.vim
 autoload/ingo/range.vim
