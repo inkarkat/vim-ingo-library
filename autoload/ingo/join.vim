@@ -9,8 +9,6 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.020.002	08-Jun-2014	Do not clobber the default register when joining
-"				lines with separator and not keeping spaces.
 "   1.020.001	08-Jun-2014	file creation from ingocommands.vim
 
 function! ingo#join#Lines( lnum, isKeepSpace, separator )
@@ -30,7 +28,7 @@ function! ingo#join#Lines( lnum, isKeepSpace, separator )
 	execute a:lnum
 	normal! J
 	if ! empty(a:separator)
-	    execute 'normal! "_ciw' . a:separator . "\<Esc>"
+	    execute 'normal! ciw' . a:separator . "\<Esc>"
 	endif
     endif
 endfunction
