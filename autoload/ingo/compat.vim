@@ -9,6 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.020.009	30-May-2014	Add ingo#compat#abs().
 "   1.018.008	12-Apr-2014	FIX: Off-by-one in emulated
 "				ingo#compat#strdisplaywidth() reported one too
 "				few.
@@ -51,6 +52,16 @@ if exists('*strchars')
 else
     function! ingo#compat#strchars( expr )
 	return len(split(a:expr, '\zs'))
+    endfunction
+endif
+
+if exists('*abs')
+    function! ingo#compat#abs( expr )
+	return abs(a:expr)
+    endfunction
+else
+    function! ingo#compat#abs( expr )
+	return (a:expr < 0 ? -1 : 1) * a:expr
     endfunction
 endif
 
