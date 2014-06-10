@@ -3,12 +3,14 @@
 " DEPENDENCIES:
 "   - ingo/cmdargs/commandcommands.vim autoload script
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.020.007	10-Jun-2014	ENH: Add a:options.commandExpr to
+"				ingo#cmdargs#range#Parse().
 "   1.010.006	08-Jul-2013	Move into ingo-library.
 "   	005	14-Jun-2013	Minor: Make matchlist() robust against
 "				'ignorecase'.
@@ -48,6 +50,10 @@ function! ingo#cmdargs#range#Parse( commandLine, ... )
 "   a:commandLine   Ex command line containing a command.
 "   a:options.isAllowEmptyCommand   Flag whether a sole range should be matched.
 "				    True by default.
+"   a:options.commandExpr           Custom pattern for matching commands /
+"				    anything that follows the range. Mutually
+"				    exclusive with
+"				    a:options.isAllowEmptyCommand.
 "   a:options.isParseFirstRange     Flag whether the first range should be
 "				    parsed. False by default.
 "* RETURN VALUES:
@@ -66,13 +72,15 @@ function! ingo#cmdargs#range#Parse( commandLine, ... )
     let l:options = (a:0 ? a:1 : {})
     let l:isAllowEmptyCommand = get(l:options, 'isAllowEmptyCommand', 1)
     let l:isParseFirstRange = get(l:options, 'isParseFirstRange', 0)
+    let l:commandExpr = get(l:options, 'commandExpr', (l:isAllowEmptyCommand ? '\(\h\w*.*\|$\)' : '\(\h\w*.*\)'))
 
-    return matchlist(a:commandLine,
+    let l:parseExpr =
     \	(l:isParseFirstRange ? '\C^\(\s*\)' : '\C^\(.*\\\@<!|\)\?\s*') .
     \	'\(' . ingo#cmdargs#commandcommands#GetExpr() . '\)\?' .
     \	'\(' . ingo#cmdargs#range#RangeExpr() . '\)\s*' .
-    \   (l:isAllowEmptyCommand ? '\(\h\w*.*\|$\)' : '\(\h\w*.*\)')
-    \)[0:4]
+    \   l:commandExpr
+echomsg '****' string(l:parseExpr)
+    return matchlist(a:commandLine, l:parseExpr)[0:4]
 endfunction
 
 let &cpo = s:save_cpo
