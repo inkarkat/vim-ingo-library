@@ -2,6 +2,7 @@
 "
 " DEPENDENCIES:
 "   - ingo/strdisplaywidth.vim autoload script
+"   - ingo/collections.vim autoload script
 "
 " Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -9,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.021.010	11-Jun-2014	Add ingo#compat#uniq().
 "   1.020.009	30-May-2014	Add ingo#compat#abs().
 "   1.018.008	12-Apr-2014	FIX: Off-by-one in emulated
 "				ingo#compat#strdisplaywidth() reported one too
@@ -62,6 +64,16 @@ if exists('*abs')
 else
     function! ingo#compat#abs( expr )
 	return (a:expr < 0 ? -1 : 1) * a:expr
+    endfunction
+endif
+
+if exists('*uniq')
+    function ingo#compat#uniq( list )
+	return uniq(a:list)
+    endfunction
+else
+    function ingo#compat#uniq( list )
+	return ingo#collections#UniqueSorted(a:list)
     endfunction
 endif
 
