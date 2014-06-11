@@ -81,7 +81,10 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.020	RELEASEME
+1.021	RELEASEME
+- Add ingo#compat#uniq().
+
+1.020	11-Jun-2014
 - Add ingo/dict/find.vim module.
 - Use ingo#escape#Unescape() in ingo#cmdargs#pattern#Unescape(). Add
   ingo#cmdargs#pattern#ParseUnescaped() to avoid the double and inefficient
