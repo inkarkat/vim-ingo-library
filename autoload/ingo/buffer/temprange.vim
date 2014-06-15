@@ -1,6 +1,7 @@
 " ingo/buffer/temprange.vim: Functions to execute stuff in a temp area in the same buffer.
 "
 " DEPENDENCIES:
+"   - ingo/undo.vim autoload script
 "
 " Copyright: (C) 2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -8,6 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.019.003	25-Apr-2014	Factor out ingo#undo#GetChangeNumber().
 "   1.018.002	12-Apr-2014	Add optional a:undoCnt argument.
 "	001	09-Apr-2014	file creation from visualrepeat.vim
 
@@ -44,17 +46,7 @@ function! ingo#buffer#temprange#Execute( lines, command, ... )
     let l:save_view = winsaveview()
     let l:finalLnum = line('$')
     if ! a:0
-	if exists('*undotree')
-	    let l:undoSequenceNumber = undotree().seq_cur
-	else
-	    " Cannot directly get the current undo sequence number from :undolist;
-	    " must create a new undo point, and later undo beyond that.
-	    call setline('$', getline('$'))
-	    redir => l:undolistOutput
-		silent! undolist
-	    redir END
-	    let l:undoSequenceNumber = str2nr(split(l:undolistOutput, "\n")[-1])
-	endif
+	let l:undoChangeNumber = ingo#undo#GetChangeNumber()
     endif
 
     let l:tempRange = (l:finalLnum + 1) . ',$'
@@ -77,13 +69,13 @@ function! ingo#buffer#temprange#Execute( lines, command, ... )
 		    silent undo
 		endfor
 	    else
-		if l:undoSequenceNumber <= 0
+		if l:undoChangeNumber < 0
 		    throw 'CannotUndo'
 		endif
 		" XXX: Inside a function invocation, no separate change is created.
-		if ! exists('*undotree') || undotree().seq_cur > l:undoSequenceNumber
-		    silent execute 'undo' l:undoSequenceNumber
-"****D else | echomsg '**** no new undo sequence number'
+		if ! exists('*undotree') || undotree().seq_cur > l:undoChangeNumber
+		    silent execute 'undo' l:undoChangeNumber
+"****D else | echomsg '**** no new undo change number'
 		endif
 		if ! exists('*undotree')
 		    silent undo " Need one more undo here.
