@@ -83,6 +83,7 @@ HISTORY							*ingo-library-history*
 
 1.021	RELEASEME
 - Add ingo#compat#uniq().
+- Add ingo#option#Contains() and ingo#option#ContainsOneOf().
 
 1.020	11-Jun-2014
 - Add ingo/dict/find.vim module.
