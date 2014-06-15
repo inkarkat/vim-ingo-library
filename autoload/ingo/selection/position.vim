@@ -2,13 +2,15 @@
 "
 " DEPENDENCIES:
 "   - ingo/cursor/move.vim autoload script
+"   - ingo/pos.vim autoload script
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.019.002	30-Apr-2014	Use ingo/pos.vim.
 "   1.010.001	04-Jul-2013	file creation
 
 function! ingo#selection#position#Get()
@@ -27,7 +29,7 @@ function! ingo#selection#position#Get()
 "   [[start lnum, start col], [end lnum, end col]]
 "******************************************************************************
     if &selection ==# 'exclusive'
-	let l:isCursorAfterSelection = (line('.') > line("'>") || line('.') == line("'>") && col('.') >= col("'>"))
+	let l:isCursorAfterSelection = ingo#pos#IsOnOrAfter(getpos('.')[1:2], getpos("'>"))
 	let l:endPos = searchpos('\_.\%''>', (l:isCursorAfterSelection ? 'b' : '') . 'cnW', line("'>") + (l:isCursorAfterSelection ? -1 : 0))
 	if l:endPos == [0, 0]
 	    " This happens with a linewise selection, where col = 0x7FFFFFFF. No
