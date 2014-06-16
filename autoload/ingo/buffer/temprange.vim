@@ -9,6 +9,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.021.004	16-Jun-2014	ingo#buffer#temprange#Execute(): Replace
+"				ingo#undo#GetChangeNumber() with the built-in
+"				changenr().
 "   1.019.003	25-Apr-2014	Factor out ingo#undo#GetChangeNumber().
 "   1.018.002	12-Apr-2014	Add optional a:undoCnt argument.
 "	001	09-Apr-2014	file creation from visualrepeat.vim
@@ -46,7 +49,7 @@ function! ingo#buffer#temprange#Execute( lines, command, ... )
     let l:save_view = winsaveview()
     let l:finalLnum = line('$')
     if ! a:0
-	let l:undoChangeNumber = ingo#undo#GetChangeNumber()
+	let l:undoChangeNumber = changenr()
     endif
 
     let l:tempRange = (l:finalLnum + 1) . ',$'
@@ -73,12 +76,9 @@ function! ingo#buffer#temprange#Execute( lines, command, ... )
 		    throw 'CannotUndo'
 		endif
 		" XXX: Inside a function invocation, no separate change is created.
-		if ! exists('*undotree') || undotree().seq_cur > l:undoChangeNumber
+		if changenr() > l:undoChangeNumber
 		    silent execute 'undo' l:undoChangeNumber
 "****D else | echomsg '**** no new undo change number'
-		endif
-		if ! exists('*undotree')
-		    silent undo " Need one more undo here.
 		endif
 	    endif
 
