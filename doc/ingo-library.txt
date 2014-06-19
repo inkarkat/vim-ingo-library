@@ -86,10 +86,16 @@ HISTORY							*ingo-library-history*
 - Add ingo#option#Contains() and ingo#option#ContainsOneOf().
 - BUG: Wrong position type causes ingo#selection#position#get() to be one-off
   with :set selection=exclusive and when the cursor is after the selection.
-- ingo#buffer#temprange#Execute(): Replace ingo#undo#GetChangeNumber() with
-  the built-in changenr().
-- Retire ingo#undo#GetChangeNumber(); this is provided by the built-in
-  changenr() since Vim version 7.0.
+- Use built-in changenr() in ingo#undo#GetChangeNumber(); actually, the entire
+  function could be replaced by the built-in, if it would not just return one
+  less than the number of the undone change after undo. We want the result to
+  represent the current change, regardless of what undo / redo was done
+  earlier. Change the implementation to test for whether the current change is
+  the last in the buffer, and if not, make a no-op change to get to an
+  explicit change state.
+- Simplify ingo#buffer#temprange#Execute() by using changenr(). Keep using
+  ingo#undo#GetChangeNumber() because we need to create a new no-op change
+  when there was a previous :undo.
 
 1.020	11-Jun-2014
 - Add ingo/dict/find.vim module.
