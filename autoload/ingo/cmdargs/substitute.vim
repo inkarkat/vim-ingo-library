@@ -1,6 +1,7 @@
 " ingo/cmdargs/substitute.vim: Functions for parsing of :substitute arguments.
 "
 " DEPENDENCIES:
+"   - ingo/list.vim autoload script
 "
 " Copyright: (C) 2012-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -8,6 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.014.010	15-Oct-2013	Factor out s:EnsureList() to ingo/list.vim.
 "   1.011.009	24-Jul-2013	FIX: Use the rules for the /pattern/ separator
 "				as stated in :help E146.
 "   1.009.008	14-Jun-2013	Minor: Make matchlist() robust against
@@ -53,9 +55,6 @@
 "				PatternsOnText.vim.
 "	001	25-Nov-2012	file creation from CaptureClipboard.vim.
 
-function! s:EnsureList( val )
-    return (type(a:val) == type([]) ? a:val : [a:val])
-endfunction
 function! s:ApplyEmptyFlags( emptyFlags, parsedFlags)
     return (empty(filter(copy(a:parsedFlags), '! empty(v:val)')) ? a:emptyFlags : a:parsedFlags)
 endfunction
@@ -148,7 +147,7 @@ function! ingo#cmdargs#substitute#Parse( arguments, ... )
 	let l:matches = matchlist(a:arguments, '\C^' . l:flagsExpr . '$')
 	if ! empty(l:matches)
 	    " Special case of {flags} without /pat/string/.
-	    return ['/', l:emptyPattern, escape(l:emptyReplacement, '/')] + s:ApplyEmptyFlags(s:EnsureList(l:emptyFlags), l:matches[1:(l:flagsMatchCount)])
+	    return ['/', l:emptyPattern, escape(l:emptyReplacement, '/')] + s:ApplyEmptyFlags(ingo#list#Make(l:emptyFlags), l:matches[1:(l:flagsMatchCount)])
 	endif
     endif
 
@@ -163,7 +162,7 @@ function! ingo#cmdargs#substitute#Parse( arguments, ... )
 	endif
     else
 	" Nothing.
-	return ['/', l:emptyPattern, escape(l:emptyReplacement, '/')] + (l:isParseFlags ? s:EnsureList(l:emptyFlags) : [])
+	return ['/', l:emptyPattern, escape(l:emptyReplacement, '/')] + (l:isParseFlags ? ingo#list#Make(l:emptyFlags) : [])
     endif
 endfunction
 
