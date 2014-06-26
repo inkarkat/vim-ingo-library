@@ -90,6 +90,7 @@ autoload/ingo/selection.vim
 autoload/ingo/selection/frompattern.vim
 autoload/ingo/selection/position.vim
 autoload/ingo/selection/patternmatch.vim
+autoload/ingo/smartcase.vim
 autoload/ingo/str.vim
 autoload/ingo/str/restricted.vim
 autoload/ingo/str/split.vim
