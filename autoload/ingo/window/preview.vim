@@ -18,9 +18,6 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! s:OpenDummyPreview( ... )
-    execute 'silent' (exists('g:previewwindowsplitmode') ? g:previewwindowsplitmode : '') (a:0 ? a:1 : '') 'pedit +setlocal\ buftype=nofile\ bufhidden=wipe\ nobuflisted\ noswapfile [No\ Name]'
-endfunction
 function! ingo#window#preview#OpenPreview( ... )
     " Note: We do not use :pedit to open the current file in the preview window,
     " because that command reloads the current buffer, which would fail (nobang)
@@ -31,14 +28,9 @@ function! ingo#window#preview#OpenPreview( ... )
 	wincmd P
     catch /^Vim\%((\a\+)\)\=:E441/
 	" Else, temporarily open a dummy file. (There's no :popen command.)
-	call call('s:OpenDummyPreview', a:000)
+	execute 'silent' (exists('g:previewwindowsplitmode') ? g:previewwindowsplitmode : '') (a:0 ? a:1 : '') 'pedit +setlocal\ buftype=nofile\ bufhidden=wipe\ nobuflisted\ noswapfile [No\ Name]'
 	wincmd P
     endtry
-endfunction
-function! ingo#window#preview#OpenPreviewKeepCurrent( ... )
-    if ! ingo#window#preview#IsPreviewWindowVisible()
-	call call('s:OpenDummyPreview', a:000)
-    endif
 endfunction
 function! ingo#window#preview#OpenBuffer( bufnr, ... )
     if ! &l:previewwindow
