@@ -8,6 +8,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.021.003	03-Jul-2014	Add ingo#window#preview#OpenFilespec(), a
+"				wrapper around :pedit that performs the
+"				fnameescape() and obeys the custom
+"				g:previewwindowsplitmode.
 "   1.020.002	02-Jun-2014	ENH: Allow passing optional a:tabnr to
 "				ingo#window#preview#IsPreviewWindowVisible().
 "				Factor out ingo#window#preview#OpenBuffer().
@@ -41,6 +45,14 @@ function! ingo#window#preview#OpenBuffer( bufnr, ... )
     if bufnr('') != a:bufnr
 	silent execute a:bufnr . 'buffer'
     endif
+
+    if a:0
+	call cursor(a:1)
+    endif
+endfunction
+function! ingo#window#preview#OpenFilespec( filespec, ... )
+    " Load the passed filespec in the preview window.
+    execute 'silent' (exists('g:previewwindowsplitmode') ? g:previewwindowsplitmode : '') 'pedit' ingo#compat#fnameescape(a:filespec)
 
     if a:0
 	call cursor(a:1)
