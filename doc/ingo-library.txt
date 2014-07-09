@@ -102,6 +102,8 @@ HISTORY							*ingo-library-history*
 - ENH: Allow to pass path separator to ingo#regexp#fromwildcard#Convert() and
   ingo#regexp#fromwildcard#IsWildcardPathPattern().
 - Add ingo/collections/permute.vim module.
+- Add ingo#window#preview#OpenFilespec(), a wrapper around :pedit that
+  performs the fnameescape() and obeys the custom g:previewwindowsplitmode.
 
 1.020	11-Jun-2014
 - Add ingo/dict/find.vim module.
