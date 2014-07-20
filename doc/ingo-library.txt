@@ -81,7 +81,7 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.021	RELEASEME
+1.021	10-Jul-2014
 - Add ingo#compat#uniq().
 - Add ingo#option#Contains() and ingo#option#ContainsOneOf().
 - BUG: Wrong position type causes ingo#selection#position#get() to be one-off
