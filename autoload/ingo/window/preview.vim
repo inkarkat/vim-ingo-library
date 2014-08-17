@@ -8,6 +8,12 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.021.004	06-Jul-2014	Support all imaginable argument variants of
+"				ingo#window#preview#OpenFilespec(), so that it
+"				can be used as a wrapper that encapsulates the
+"				g:previewwindowsplitmode config and the
+"				workaround for the absolute filespec due to the
+"				CWD.
 "   1.021.003	03-Jul-2014	Add ingo#window#preview#OpenFilespec(), a
 "				wrapper around :pedit that performs the
 "				fnameescape() and obeys the custom
@@ -32,7 +38,7 @@ function! ingo#window#preview#OpenPreview( ... )
 	wincmd P
     catch /^Vim\%((\a\+)\)\=:E441/
 	" Else, temporarily open a dummy file. (There's no :popen command.)
-	execute 'silent' (exists('g:previewwindowsplitmode') ? g:previewwindowsplitmode : '') (a:0 ? a:1 : '') 'pedit +setlocal\ buftype=nofile\ bufhidden=wipe\ nobuflisted\ noswapfile [No\ Name]'
+	execute 'silent' (exists('g:previewwindowsplitmode') ? g:previewwindowsplitmode : '') (a:0 ? a:1 : '') 'pedit! +setlocal\ buftype=nofile\ bufhidden=wipe\ nobuflisted\ noswapfile [No\ Name]'
 	wincmd P
     endtry
 endfunction
@@ -52,11 +58,28 @@ function! ingo#window#preview#OpenBuffer( bufnr, ... )
 endfunction
 function! ingo#window#preview#OpenFilespec( filespec, ... )
     " Load the passed filespec in the preview window.
-    execute 'silent' (exists('g:previewwindowsplitmode') ? g:previewwindowsplitmode : '') 'pedit' ingo#compat#fnameescape(a:filespec)
-
-    if a:0
-	call cursor(a:1)
+    let l:options = (a:0 ? a:1 : {})
+    let l:isSilent = get(l:options, 'isSilent', 1)
+    let l:isBang = get(l:options, 'isBang', 1)
+    let l:prefixCommand = get(l:options, 'prefixCommand', '')
+    let l:exFileOptionsAndCommands = get(l:options, 'exFileOptionsAndCommands', '')
+    let l:cursor = get(l:options, 'cursor', [])
+    if ! empty(l:cursor)
+	let l:exFileOptionsAndCommands = (empty(l:exFileOptionsAndCommands) ? '+' : l:exFileOptionsAndCommands . '|') .
+	\   printf('call\ cursor(%d,%d)', l:cursor[0], l:cursor[1])
     endif
+
+    execute (l:isSilent ? 'silent' : '')
+    \   (exists('g:previewwindowsplitmode') ? g:previewwindowsplitmode : '')
+    \   l:prefixCommand
+    \   'pedit' . (l:isBang ? '!' : '')
+    \   l:exFileOptionsAndCommands
+    \   ingo#compat#fnameescape(a:filespec)
+
+    " XXX: :pedit uses the CWD of the preview window. If that already contains a
+    " file with another CWD, the shortened command is wrong. Always use the
+    " absolute filespec instead of shortening it via
+    " fnamemodify(a:filespec, " ':~:.')
 endfunction
 function! ingo#window#preview#SplitToPreview( ... )
     if &l:previewwindow
