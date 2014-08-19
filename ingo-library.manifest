@@ -18,6 +18,7 @@ autoload/ingo/cmdline/showmode.vim
 autoload/ingo/cmdrangeconverter.vim
 autoload/ingo/codec/URL.vim
 autoload/ingo/collections.vim
+autoload/ingo/collections/permute.vim
 autoload/ingo/collections/rotate.vim
 autoload/ingo/collections/unique.vim
 autoload/ingo/comments.vim
