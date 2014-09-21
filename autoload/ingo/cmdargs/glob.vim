@@ -2,6 +2,7 @@
 "
 " DEPENDENCIES:
 "   - ingo/cmdargs/file.vim autoload script
+"   - ingo/os.vim autoload script
 "
 " Copyright: (C) 2012-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -9,6 +10,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.013.002	13-Sep-2013	Use operating system detection functions from
+"				ingo/os.vim.
 "   1.007.001	01-Jun-2013	file creation from ingofileargs.vim
 
 function! ingo#cmdargs#glob#ExpandSingle( fileglob, ... )
@@ -75,7 +78,7 @@ endfunction
 
 function! s:ContainsNoWildcards( fileglob )
     " Note: This is only an empirical approximation; it is not perfect.
-    if has('win32') || has('win64')
+    if ingo#os#IsWinOrDos()
 	return a:fileglob !~ '[*?]'
     else
 	return a:fileglob !~ '\\\@<![*?{[]'
