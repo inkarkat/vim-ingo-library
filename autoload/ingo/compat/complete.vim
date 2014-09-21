@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2009-2013 Ingo Karkat
+" Copyright: (C) 2009-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -49,7 +49,7 @@ endfunction
 "   Use like this:
 "   try
 "	command -complete=filetype ...
-"   catch /^Vim\%((\a\+)\)\=:E180/ " E180: Invalid complete value
+"   catch /^Vim\%((\a\+)\)\=:E180:/ " E180: Invalid complete value
 "	command -complete=customlist,ingo#compat#complete#FileType ...
 "   endtry
     call ingo#msg#VimExceptionMsg()
