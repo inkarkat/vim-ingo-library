@@ -30,6 +30,7 @@
 " DEPENDENCIES:
 "   - ingo/cmdargs/file.vim autoload script
 "   - ingo/compat.vim autoload script
+"   - ingo/err.vim autoload script
 "   - ingo/fs/path.vim autoload script
 "   - ingo/msg.vim autoload script
 
@@ -39,6 +40,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	020	07-Jun-2014	Abort on error.
 "	019	08-Aug-2013	Move escapings.vim into ingo-library.
 "	018	26-Jun-2013	Use ingo/fs/path.vim.
 "	017	10-Jun-2013	Better handling for errors from :echoerr.
@@ -225,7 +227,7 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 	if ! empty(a:FilenameProcessingFunction)
 	    let l:processedFilename = call(a:FilenameProcessingFunction, [l:filename, l:fileOptionsAndCommands])
 	    if empty(l:processedFilename) || empty(l:processedFilename[0])
-		return
+		return 1
 	    else
 		let [l:filename, l:fileOptionsAndCommands] = l:processedFilename
 	    endif
@@ -233,7 +235,7 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 	if ! empty(a:FilespecProcessingFunction)
 	    let l:processedFilespec = call(a:FilespecProcessingFunction, [l:dirspec, l:filename, l:fileOptionsAndCommands])
 	    if empty(l:processedFilespec) || empty(join(l:processedFilespec[0:1], ''))
-		return
+		return 1
 	    else
 		let [l:dirspec, l:filename, l:fileOptionsAndCommands] = l:processedFilespec
 	    endif
@@ -252,10 +254,13 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 		execute a:PostAction
 	    endif
 	endif
+	return 1
     catch /^Vim\%((\a\+)\)\=:/
-	call ingo#msg#VimExceptionMsg()
+	call ingo#err#SetVimException()
+	return 0
     catch
-	call ingo#msg#ErrorMsg(v:exception)
+	call ingo#err#Set(v:exception)
+	return 0
     finally
 	unlet! g:CommandCompleteDirForAction_Context
     endtry
@@ -295,12 +300,12 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "	    Or Funcref to a function that takes the dirspec, filename (both
 "	    already escaped for use in an Ex command), and potential
 "	    fileOptionsAndCommands (e.g. ++enc=latin1 +set\ ft=c) and performs
-"	    the action itself.
+"	    the action itself. Throw an error message if needed.
 "   a:parameters.postAction
 "	    Ex command to be invoked after the file has been opened via
 "	    a:parameters.action. Default empty.
 "	    Or Funcref to a function that takes no arguments and performs the
-"	    post actions itself.
+"	    post actions itself. Throw an error message if needed.
 "   a:parameters.browsefilter
 "	    File wildcard (e.g. '*.txt') used for filtering the files in
 "	    a:dirspec. Default is empty string to include all (non-hidden) files.
@@ -320,7 +325,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "	    The special value "%" will be replaced with the current buffer's
 "	    filename.
 "	    Or Funcref to a function that takes the dirspec and returns the
-"	    filename.
+"	    filename. Throw an error message if needed.
 "	    This can resolve to an empty string; however, then your
 "	    a:parameters.action has to cope with that (e.g. by putting up a
 "	    browse dialog).
@@ -364,7 +369,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \	    string(a:dirspec), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
     \	) .    "endfunction"
 
-    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s call <SID>Command(<bang>0, %s, %s, %s, %s, %s, %s, <q-args>)',
+    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, %s, %s, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
     \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'),
     \   l:completeFunctionName,
     \   l:commandAttributes,
