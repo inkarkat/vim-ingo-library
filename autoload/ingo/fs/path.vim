@@ -2,6 +2,7 @@
 "
 " DEPENDENCIES:
 "   - ingo/os.vim autoload script
+"   - ingo/escape/file.vim autoload script
 "
 " Copyright: (C) 2012-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -9,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.019.009	23-May-2014	Add ingo#fs#path#Exists().
 "   1.019.008	21-May-2014	Add ingo#fs#path#IsCaseInsensitive().
 "   1.019.007	07-May-2014	ingo#fs#path#Normalize(): Don't normalize to
 "				Cygwin /cygdrive/x/... when the chosen path
@@ -140,6 +142,41 @@ function! ingo#fs#path#Equals( p1, p2 )
 	return a:p1 ==? a:p2 || ingo#fs#path#Normalize(fnamemodify(a:p1, ':p')) ==? ingo#fs#path#Normalize(fnamemodify(a:p2, ':p'))
     else
 	return a:p1 ==# a:p2 || ingo#fs#path#Normalize(fnamemodify(resolve(a:p1), ':p')) ==# ingo#fs#path#Normalize(fnamemodify(resolve(a:p2), ':p'))
+    endif
+endfunction
+
+function! ingo#fs#path#Exists( filespec )
+"******************************************************************************
+"* PURPOSE:
+"   Test whether the passed a:filespec exists (as a file or directory). This is
+"   like the combination of filereadable() and isdirectory(), but without the
+"   requirement that the file must be readable.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:filespec      Filespec or dirspec.
+"* RETURN VALUES:
+"   0 if there's no such file or directory, 1 if it exists.
+"******************************************************************************
+    " I suppose these are faster than the glob(), and this avoids any escaping
+    " issues, too, so it is more robust.
+    if filereadable(a:filespec) || isdirectory(a:filespec)
+	return 1
+    endif
+
+    let l:filespec = ingo#escape#file#wildcardescape(a:filespec)
+    if v:version == 702 && has('patch051') || v:version > 702
+	return ! empty(glob(l:filespec, 1))
+    else
+	let l:save_wildignore = &wildignore
+	set wildignore=
+	try
+	    return ! empty(glob(l:filespec))
+	finally
+	    let &wildignore = l:save_wildignore
+	endtry
     endif
 endfunction
 
