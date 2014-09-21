@@ -3,6 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/actions.vim autoload script
 "   - ingo/fs/path.vim autoload script
+"   - ingo/os.vim autoload script
 "
 " Copyright: (C) 2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -10,6 +11,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.013.004	13-Sep-2013	Use operating system detection functions from
+"				ingo/os.vim.
 "   1.011.003	01-Aug-2013	Make a:path argument optional and default to the
 "				current buffer's directory (as all existing
 "				clients use that).
@@ -46,7 +49,7 @@ function! ingo#fs#traversal#FindDirUpwards( Predicate, ... )
 	endif
 
 	" Stop iterating after reaching the file system root.
-	if (has('win32') || has('win64')) && ingo#fs#path#IsUncPathRoot(l:dir)
+	if ingo#os#IsWindows() && ingo#fs#path#IsUncPathRoot(l:dir)
 	    break
 	endif
 	let l:prevDir = l:dir
@@ -82,7 +85,7 @@ function! ingo#fs#traversal#FindLastContainedInUpDir( expr, ... )
 	endif
 	let l:prevDir = l:dir
 	let l:dir = fnamemodify(l:dir, ':h')
-	if (has('win32') || has('win64')) && ingo#fs#path#IsUncPathRoot(l:dir)
+	if ingo#os#IsWindows() && ingo#fs#path#IsUncPathRoot(l:dir)
 	    break
 	endif
     endwhile
