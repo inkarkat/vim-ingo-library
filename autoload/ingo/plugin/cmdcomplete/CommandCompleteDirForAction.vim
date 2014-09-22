@@ -40,6 +40,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	021	22-Sep-2014	Use ingo#compat#glob().
 "	020	07-Jun-2014	Abort on error.
 "	019	08-Aug-2013	Move escapings.vim into ingo-library.
 "	018	26-Jun-2013	Use ingo/fs/path.vim.
@@ -155,19 +156,19 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 	let &wildignore = a:wildignore
     endif
     try
-	let l:filespecs = split(glob(l:filespecWildcard), "\n")
+	let l:filespecs = ingo#compat#glob(l:filespecWildcard, 0, 1)
 
 	if a:isIncludeSubdirs
 	    " If the l:dirspec itself contains wildcards, there may be multiple
 	    " matches.
-	    let l:resolvedDirspecs = split(glob(l:dirspec), "\n")
+	    let l:resolvedDirspecs = ingo#compat#glob(l:dirspec, 0, 1)
 
 	    " If there is a browsefilter, we need to add all directories
 	    " separately, as most of them probably have been filtered away by
 	    " the (file-based) a:browsefilter.
 	    if ! empty(a:browsefilter)
 		let l:dirspecWildcard = l:dirspec . a:argLead . '*' . ingo#fs#path#Separator()
-		call extend(l:filespecs, split(glob(l:dirspecWildcard), "\n"))
+		call extend(l:filespecs, ingo#compat#glob(l:dirspecWildcard), 0, 1)
 		call sort(l:filespecs) " Weave the directories into the files.
 	    else
 		" glob() doesn't add a trailing path separator on directories
