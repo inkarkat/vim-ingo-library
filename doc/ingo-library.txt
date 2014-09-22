@@ -86,6 +86,7 @@ HISTORY							*ingo-library-history*
 - Move LineJuggler#FoldClosed() and LineJuggler#FoldClosedEnd() into
   ingo-library as ingo#range#NetStart() and ingo#range#NetEnd().
 - Add ingo/regexp/pairs.vim module.
+- Add ingo#compat#glob() and ingo#compat#globpath().
 
 1.021	10-Jul-2014
 - Add ingo#compat#uniq().
