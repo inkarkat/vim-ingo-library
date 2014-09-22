@@ -32,11 +32,13 @@ function! ingo#range#lines#Get( startLnum, endLnum, range )
 "******************************************************************************
 "* PURPOSE:
 "   Determine the line numbers and start and end lines of a:range that fall
-"   inside a:startLnum and a:endLnum.
+"   inside a:startLnum and a:endLnum. Closed folds do not affect the recorded
+"   lines; only the actually matched lines are considered.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
-"   None.
+"   Changes the cursor position in the buffer (to the beginning of the last line
+"   within the range).
 "* INPUTS:
 "   a:startLnum First line number to be considered.
 "   a:endLnum   Last line number to be considered.
