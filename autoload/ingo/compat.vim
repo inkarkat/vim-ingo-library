@@ -11,6 +11,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.022.013	23-Sep-2014	FIX: globpath() with {list} argument is only
+"				available with Vim 7.4.279.
 "   1.022.012	22-Sep-2014	Add ingo#compat#glob() and
 "				ingo#compat#globpath().
 "   1.021.011	12-Jun-2014	Make test for 'virtualedit' option values also
@@ -173,13 +175,23 @@ function! ingo#compat#shellescape( filespec, ... )
     endif
 endfunction
 
-if v:version == 703 && has('patch465') || v:version > 703
+if v:version == 704 && has('patch279') || v:version > 704
     " This one has both {nosuf} and {list}.
     function! ingo#compat#glob( ... )
 	return call('glob', a:000)
     endfunction
     function! ingo#compat#globpath( ... )
 	return call('globpath', a:000)
+    endfunction
+elseif v:version == 703 && has('patch465') || v:version > 703
+    " This one has glob() with both {nosuf} and {list}.
+    function! ingo#compat#glob( ... )
+	return call('glob', a:000)
+    endfunction
+    function! ingo#compat#globpath( ... )
+	let l:list = (a:0 > 3 && a:4)
+	let l:result = call('globpath', a:000[0:2])
+	return (l:list ? split(l:result, '\n') : l:result)
     endfunction
 elseif v:version == 702 && has('patch051') || v:version > 702
     " This one has {nosuf}.
