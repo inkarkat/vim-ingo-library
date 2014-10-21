@@ -81,6 +81,10 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.023	RELEASEME
+- ENH: Make ingo#selection#frompattern#GetPositions() automatically convert
+  \%# in the passed a:pattern to the hard-coded cursor column.
+
 1.022	26-Sep-2014
 - Add ingo#pos#Before() and ingo#pos#After().
 - Move LineJuggler#FoldClosed() and LineJuggler#FoldClosedEnd() into
