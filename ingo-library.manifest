@@ -82,6 +82,7 @@ autoload/ingo/regexp.vim
 autoload/ingo/regexp/comments.vim
 autoload/ingo/regexp/fromwildcard.vim
 autoload/ingo/regexp/magic.vim
+autoload/ingo/regexp/pairs.vim
 autoload/ingo/regexp/previoussubstitution.vim
 autoload/ingo/register.vim
 autoload/ingo/search/buffer.vim
