@@ -2,6 +2,7 @@
 "
 " DEPENDENCIES:
 "   - ingo/dict.vim autoload script
+"   - ingo/list.vim autoload script
 "
 " Copyright: (C) 2011-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -9,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.014.011	15-Oct-2013	Use the extracted ingo#list#AddOrExtend().
 "   1.011.010	12-Jul-2013	Make ingo#collections#ToDict() handle empty list
 "				items via an optional a:emptyValue argument.
 "				This also distinguishes it from
@@ -261,11 +263,7 @@ endfunction
 function! ingo#collections#Flatten1( list )
     let l:result = []
     for l:item in a:list
-	if type(l:item) == type([])
-	    call extend(l:result, l:item)
-	else
-	    call add(l:result, l:item)
-	endif
+	call ingo#list#AddOrExtend(l:result, l:item)
 	unlet l:item
     endfor
     return l:result
