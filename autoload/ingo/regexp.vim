@@ -2,12 +2,18 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2010-2013 Ingo Karkat
+" Copyright: (C) 2010-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.020.012	29-May-2014	CHG: At ingo#regexp#FromLiteralText(), add the
+"				a:isWholeWordSearch also on either side, or when
+"				there are non-keyword characters in the middle
+"				of the text. The * command behavior where this
+"				is modeled after only handles a smaller subset,
+"				and this extension looks sensible and DWIM.
 "   1.013.011	13-Sep-2013	ingo#regexp#FromWildcard(): Limit * glob
 "				matching to individual path components and add
 "				** for cross-directory matching.
@@ -74,12 +80,19 @@ endfunction
 
 function! s:MakeWholeWordSearch( text, pattern )
     " The star command only creates a \<whole word\> search pattern if the
-    " <cword> actually only consists of keyword characters.
-    if a:text =~# '^\k\+$'
-	return '\<' . a:pattern . '\>'
-    else
-	return a:pattern
+    " <cword> actually only consists of keyword characters. Since
+    " ingo#regexp#FromLiteralText() could handle a superset (e.g. also
+    " "foo...bar"), just ensure that the keyword boundaries can be enforced at
+    " either side, to avoid enclosing a non-keyword side and making a match
+    " impossible with it (e.g. "\<..bar\>").
+    let l:pattern = a:pattern
+    if a:text =~# '^\k'
+	let l:pattern = '\<' . l:pattern
     endif
+    if a:text =~# '\k$'
+	let l:pattern .= '\>'
+    endif
+    return l:pattern
 endfunction
 function! ingo#regexp#FromLiteralText( text, isWholeWordSearch, additionalEscapeCharacters )
 "*******************************************************************************
