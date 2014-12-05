@@ -93,6 +93,7 @@ HISTORY							*ingo-library-history*
   used).
 - ENH: Also support optional a:isEnsureUniqueness flag for
   ingo#dict#FromItems().
+- Expose ingo#regexp#MakeWholeWordSearch().
 
 1.022	26-Sep-2014
 - Add ingo#pos#Before() and ingo#pos#After().
