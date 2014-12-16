@@ -9,6 +9,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.019.003	23-May-2014	FIX: Correct ingo#escape#file#wildcardescape()
+"				of * and ? on Windows.
 "   1.018.002	21-Mar-2014	Add ingo#escape#file#wildcardescape().
 "   1.012.001	08-Aug-2013	file creation
 
@@ -16,7 +18,10 @@ function! ingo#escape#file#bufnameescape( filespec, ... )
 "*******************************************************************************
 "* PURPOSE:
 "   Escape a normal filespec syntax so that it can be used for the bufname(),
-"   bufnr(), bufwinnr(), ... commands.
+"   bufnr(), bufwinnr() commands.
+"   Note: bufexists(), buflisted() and bufloaded() do not need
+"   ingo#escape#file#bufnameescape() escaping; they only match relative or full
+"   paths, anyway.
 "   Ensure that there are no double (back-/forward) slashes inside the path; the
 "   anchored pattern doesn't match in those cases!
 "
@@ -30,7 +35,7 @@ function! ingo#escape#file#bufnameescape( filespec, ... )
 "		    matched (default=1). If 0, the escaped filespec will not be
 "		    anchored.
 "* RETURN VALUES:
-"   Filespec escaped for the buf...() commands.
+"   Filespec escaped for the bufname() etc. commands listed above.
 "*******************************************************************************
     let l:isFullMatch = (a:0 ? a:1 : 1)
 
@@ -131,7 +136,15 @@ function! ingo#escape#file#wildcardescape( filespec )
 "* RETURN VALUES:
 "   Escaped filespec to be passed as an argument to glob().
 "******************************************************************************
-    return substitute(escape(a:filespec, '?*'), '[[]', '[[]', 'g')
+    " On Unix, * and ? can be escaped via backslash; this doesn't work on
+    " Windows, though, so we use the alternative [*]. We only need to ensure
+    " that the wildcard is deactivated, as Windows file systems cannot contain
+    " literal * and ? characters, anyway.
+    if ingo#os#IsWinOrDos()
+	return substitute(a:filespec, '[[?*]', '[&]', 'g')
+    else
+	return substitute(escape(a:filespec, '?*'), '[[]', '[[]', 'g')
+    endif
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
