@@ -1,6 +1,7 @@
 " ingo/range/Lines.vim: Functions for retrieving line numbers of ranges.
 "
 " DEPENDENCIES:
+"   - ingo/range.vim autoload script
 "
 " Copyright: (C) 2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -8,6 +9,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.022.002	23-Sep-2014	ingo#range#lines#Get() needs to consider and
+"				temporarily disable closed folds when resolving
+"				/{pattern}/ ranges.
 "   1.020.001	10-Jun-2014	file creation from
 "				autoload/PatternsOnText/Ranges.vim
 
@@ -56,25 +60,33 @@ function! ingo#range#lines#Get( startLnum, endLnum, range )
 "			    call histdel('search', -1) at the end of the client
 "			    function once.
 "******************************************************************************
+    let [l:startLnum, l:endLnum] = [ingo#range#NetStart(a:startLnum), ingo#range#NetEnd(a:endLnum)]
     let l:recordedLines = {}
     let l:startLines = []
     let l:endLines = []
 
     if a:range =~# '^[/?]'
 	" For patterns, we need :global to find _all_ (not just the first)
-	" matching ranges.
-	execute printf('silent! %d,%dglobal %s call <SID>RecordLines(l:recordedLines, l:startLines, l:endLines, %d, %d)',
-	\  a:startLnum, a:endLnum,
-	\  a:range,
-	\  a:startLnum, a:endLnum
-	\)
+	" matching ranges. For that, folds must be open / disabled. And because
+	" of that, the actual ranges must be determined first.
+	let l:save_foldenable = &l:foldenable
+	setlocal nofoldenable
+	try
+	    execute printf('silent! %d,%dglobal %s call <SID>RecordLines(l:recordedLines, l:startLines, l:endLines, %d, %d)',
+	    \  l:startLnum, l:endLnum,
+	    \  a:range,
+	    \  l:startLnum, l:endLnum
+	    \)
+	finally
+	    let &l:foldenable = l:save_foldenable
+	endtry
 	let l:didClobberSearchHistory = 1
     else
 	" For line number, marks, etc., we can just record them (limited to
 	" those that fall into the command's range).
 	execute printf('silent! %s call <SID>RecordLines(l:recordedLines, l:startLines, l:endLines, %d, %d)',
 	\  a:range,
-	\  a:startLnum, a:endLnum
+	\  l:startLnum, l:endLnum
 	\)
 	let l:didClobberSearchHistory = 0
     endif
