@@ -94,7 +94,7 @@ function! ingo#avoidprompt#TruncateTo( text, length )
 	    let l:frontCol = a:length / 2
 	    let l:backCol  = (a:length % 2 == 0 ? (l:frontCol - 1) : l:frontCol)
 "**** echomsg '**** ' a:length ':' l:frontCol '-' l:backCol
-	    let l:text =  ingo#strdisplaywidth#strleft(l:text, l:frontCol) . '...' . ingo#strdisplaywidth#strright(l:text, l:backCol)
+	    let l:text = ingo#strdisplaywidth#strleft(l:text, l:frontCol) . '...' . ingo#strdisplaywidth#strright(l:text, l:backCol)
 	endif
     finally
 	let &l:tabstop = l:save_ts
