@@ -3,12 +3,13 @@
 " DEPENDENCIES:
 "   - ingo/str.vim autoload script
 "
-" Copyright: (C) 2008-2013 Ingo Karkat
+" Copyright: (C) 2008-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.019.003	17-Apr-2014	Add ingo#strdisplaywidth#GetMinMax().
 "   1.011.002	26-Jul-2013	FIX: Off-by-one in
 "				ingo#strdisplaywidth#HasMoreThan() and
 "				ingo#strdisplaywidth#strleft().
@@ -18,6 +19,13 @@
 function! ingo#strdisplaywidth#HasMoreThan( expr, virtCol )
     return (match(a:expr, '^.*\%>' . (a:virtCol + 1) . 'v') != -1)
 endfunction
+
+function! ingo#strdisplaywidth#GetMinMax( lines, ... )
+    let l:col = (a:0 ? a:1 : 0)
+    let l:widths = map(copy(a:lines), 'ingo#compat#strdisplaywidth(v:val, l:col)')
+    return [min(l:widths), max(l:widths)]
+endfunction
+
 function! ingo#strdisplaywidth#strleft( expr, virtCol )
     " Must add 1 because a "before-column" pattern is used in case the exact
     " column cannot be matched (because its halfway through a tab or other wide
