@@ -45,9 +45,9 @@ endfunction
 function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, replacement, isOnlyFirstMatch, isUnique )
 "******************************************************************************
 "* PURPOSE:
-"   Extract all matches of a:pattern in the a:firstLine, a:lastLine range and
-"   return them (optionally a submatch / replacement, or only first or unique
-"   matches) as a List.
+"   Extract all non-overlapping matches of a:pattern in the a:firstLine,
+"   a:lastLine range and return them (optionally a submatch / replacement, or
+"   only first or unique matches) as a List.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
