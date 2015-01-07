@@ -40,6 +40,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	022	23-Sep-2014	Fix typo.
 "	021	22-Sep-2014	Use ingo#compat#glob().
 "	020	07-Jun-2014	Abort on error.
 "	019	08-Aug-2013	Move escapings.vim into ingo-library.
@@ -168,7 +169,7 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 	    " the (file-based) a:browsefilter.
 	    if ! empty(a:browsefilter)
 		let l:dirspecWildcard = l:dirspec . a:argLead . '*' . ingo#fs#path#Separator()
-		call extend(l:filespecs, ingo#compat#glob(l:dirspecWildcard), 0, 1)
+		call extend(l:filespecs, ingo#compat#glob(l:dirspecWildcard, 0, 1))
 		call sort(l:filespecs) " Weave the directories into the files.
 	    else
 		" glob() doesn't add a trailing path separator on directories
