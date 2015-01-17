@@ -12,7 +12,7 @@
 " REVISION	DATE		REMARKS
 "   1.020.001	03-Jun-2014	file creation
 
-function! ingo#query#fromlist#Query( what, list )
+function! ingo#query#fromlist#Query( what, list, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Query for one entry from a:list; elements can be selected by accelerator key
@@ -24,14 +24,17 @@ function! ingo#query#fromlist#Query( what, list )
 "* INPUTS:
 "   a:what  Description of what is queried.
 "   a:list  List of elements. Accelerators can be preset by prefixing with "&".
+"   a:defaultIndex  Default element (which will be chosed via <Enter>); -1 for
+"		    no default.
 "* RETURN VALUES:
 "   Index of the chosen element of a:list, or -1 if the query was aborted.
 "******************************************************************************
+    let l:defaultIndex = (a:0 ? a:1 : -1)
     let l:confirmList = ingo#query#confirm#AutoAccelerators(copy(a:list), -1)
     let l:accelerators = map(copy(l:confirmList), 'matchstr(v:val, "&\\zs.")')
     let l:list = []
     for l:i in range(len(l:confirmList))
-	call add(l:list, (l:i + 1) . ':' . substitute(l:confirmList[l:i], '&\(.\)', '(\1)', ''))
+	call add(l:list, (l:i + 1) . ':' . substitute(l:confirmList[l:i], '&\(.\)', (l:i == l:defaultIndex ? '[\1]' : '(\1)'), ''))
     endfor
 
     echohl Question
@@ -39,7 +42,7 @@ function! ingo#query#fromlist#Query( what, list )
     echohl None
 
     let l:choice = ingo#query#get#Char()
-    let l:count = index(l:accelerators, l:choice) + 1
+    let l:count = index(l:accelerators, l:choice, 0, 1) + 1
     if l:count == 0
 	let l:count = str2nr(l:choice)
 	if l:count < 1 || l:count > len(a:list)
