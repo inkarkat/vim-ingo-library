@@ -102,6 +102,7 @@ HISTORY							*ingo-library-history*
 - Add ingo#strdisplaywidth#TruncateTo().
 - Add ingo/str/frompattern.vim module.
 - Add ingo/folds/persistence.vim module.
+- Add ingo#cmdargs#pattern#IsDelimited().
 
 1.022	26-Sep-2014
 - Add ingo#pos#Before() and ingo#pos#After().
