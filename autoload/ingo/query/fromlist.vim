@@ -4,12 +4,14 @@
 "   - ingo/query/confirm.vim autoload script
 "   - ingo/query/get.vim autoload script
 "
-" Copyright: (C) 2014 Ingo Karkat
+" Copyright: (C) 2014-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.023.002	18-Jan-2015	Support ingo#query#get#Number() querying of more
+"				than 10 elements by number.
 "   1.020.001	03-Jun-2014	file creation
 
 function! ingo#query#fromlist#Query( what, list, ... )
@@ -24,7 +26,7 @@ function! ingo#query#fromlist#Query( what, list, ... )
 "* INPUTS:
 "   a:what  Description of what is queried.
 "   a:list  List of elements. Accelerators can be preset by prefixing with "&".
-"   a:defaultIndex  Default element (which will be chosed via <Enter>); -1 for
+"   a:defaultIndex  Default element (which will be chosen via <Enter>); -1 for
 "		    no default.
 "* RETURN VALUES:
 "   Index of the chosen element of a:list, or -1 if the query was aborted.
@@ -45,6 +47,20 @@ function! ingo#query#fromlist#Query( what, list, ... )
     let l:count = index(l:accelerators, l:choice, 0, 1) + 1
     if l:count == 0
 	let l:count = str2nr(l:choice)
+	if len(a:list) > 10 * l:count
+	    " Need to query more numbers to be able to address all choices.
+	    echon ' ' . l:count
+
+	    while len(a:list) > 10 * l:count
+		let l:digit = ingo#query#get#Number(9)
+		if l:digit == -1
+		    redraw | echo ''
+		    return -1
+		endif
+		let l:count = 10 * l:count + l:digit
+	    endwhile
+	endif
+
 	if l:count < 1 || l:count > len(a:list)
 	    redraw | echo ''
 	    return -1
