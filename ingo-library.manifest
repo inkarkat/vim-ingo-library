@@ -41,6 +41,7 @@ autoload/ingo/escape/shellcommand.vim
 autoload/ingo/external.vim
 autoload/ingo/filetype.vim
 autoload/ingo/folds.vim
+autoload/ingo/folds/persistence.vim
 autoload/ingo/foldtext.vim
 autoload/ingo/format.vim
 autoload/ingo/fs/path.vim
