@@ -8,6 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.023.006	06-Dec-2014	Add ingo#plugin#setting#GetTabLocal().
 "   1.019.005	16-Apr-2014	Add ingo#plugin#setting#BooleanToStringValue().
 "   1.010.004	08-Jul-2013	Add prefix to exception thrown from
 "				ingo#plugin#setting#GetFromScope().
@@ -54,6 +55,9 @@ function! ingo#plugin#setting#GetBufferLocal( variableName, ... )
 endfunction
 function! ingo#plugin#setting#GetWindowLocal( variableName, ... )
     return call('ingo#plugin#setting#GetFromScope', [a:variableName, ['w', 'g']] + a:000)
+endfunction
+function! ingo#plugin#setting#GetTabLocal( variableName, ... )
+    return call('ingo#plugin#setting#GetFromScope', [a:variableName, ['t', 'g']] + a:000)
 endfunction
 
 function! ingo#plugin#setting#BooleanToStringValue( settingName, ... )
