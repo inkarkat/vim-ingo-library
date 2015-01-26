@@ -28,6 +28,7 @@ function! ingo#selection#Get()
 "* SEE ALSO:
 "   To execute an action while keeping the default register contents, use
 "   ingo#register#KeepRegisterExecuteOrFunc().
+"   To retrieve the contents of lines in a range, use ingo#range#Get().
 "******************************************************************************
     let l:save_clipboard = &clipboard
     set clipboard= " Avoid clobbering the selection and clipboard registers.
