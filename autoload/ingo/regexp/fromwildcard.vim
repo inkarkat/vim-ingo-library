@@ -2,12 +2,15 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.021.002	23-Jun-2014	ENH: Allow to pass path separator to
+"				ingo#regexp#fromwildcard#Convert() and
+"				ingo#regexp#fromwildcard#IsWildcardPathPattern().
 "   1.014.001	26-Oct-2013	file creation from
 "				autoload/EditSimilar/Substitute.vim
 
@@ -36,10 +39,10 @@ function! s:AdaptCollection()
 
     return l:result
 endfunction
-function! s:CanonicalizeWildcard( expr )
+function! s:CanonicalizeWildcard( expr, pathSeparator )
     let l:expr = escape(a:expr, '\')
 
-    if exists('+shellslash') && ! &shellslash
+    if a:pathSeparator ==# '\'
 	" On Windows, when the 'shellslash' option isn't set (i.e. backslashes
 	" are used as path separators), still allow using forward slashes as
 	" path separators, like Vim does.
@@ -68,10 +71,13 @@ function! ingo#regexp#fromwildcard#Convert( wildcardExpr, ... )
 "				    of the search direction; this is how Vim
 "				    escapes it, too. For use in search(), pass
 "				    nothing / omit the argument.
+"   a:pathSeparator Optional fixed value for the path separator, to use instead
+"		    of the platform's default one.
 "* RETURN VALUES:
 "   Regular expression for matching a:wildcardExpr.
 "*******************************************************************************
-    let l:expr = s:CanonicalizeWildcard(a:wildcardExpr)
+    let l:pathSeparator = (a:0 > 1 ? a:2 : s:pathSeparator)
+    let l:expr = s:CanonicalizeWildcard(a:wildcardExpr, l:pathSeparator)
 
     " [...] wildcards
     let l:expr = substitute(l:expr, '\[\(\%(\^\?\]\)\?\(\\\\\]\|[^]]\)*\)\]', '\="\\%(\\%(\\[". s:AdaptCollection() . "]\\\&' . s:notPathSeparatorPattern . '\\)\\|[". s:AdaptCollection() . "]\\)"', 'g')
@@ -95,7 +101,7 @@ function! ingo#regexp#fromwildcard#Convert( wildcardExpr, ... )
     " Note: The regexp .\{0,}/\@= later substitutes twice if nothing precedes
     " it?! To fix this, we add the ^ anchor when the ** wildcard appears at the
     " beginning.
-    if s:pathSeparator ==# '\'
+    if l:pathSeparator ==# '\'
 	" If backslash is the path separator, one cannot escape the ** wildcard.
 	" That isn't necessary, anyway, because Windows doesn't allow the '*'
 	" character in filespecs.
@@ -118,9 +124,10 @@ function! ingo#regexp#fromwildcard#Convert( wildcardExpr, ... )
     let l:additionalEscapeCharacters = (a:0 ? a:1 : '')
     return '\V' . escape(l:expr, l:additionalEscapeCharacters)
 endfunction
-function! ingo#regexp#fromwildcard#IsWildcardPathPattern( expr )
-    let l:expr = s:CanonicalizeWildcard(a:expr)
-    let l:pathSeparatorExpr = escape(s:pathSeparator, '\')
+function! ingo#regexp#fromwildcard#IsWildcardPathPattern( expr, ... )
+    let l:pathSeparator = (a:0 ? a:1 : s:pathSeparator)
+    let l:expr = s:CanonicalizeWildcard(a:expr, l:pathSeparator)
+    let l:pathSeparatorExpr = escape(l:pathSeparator, '\')
 
     " Check for ** wildcard.
     if l:expr =~ '\%(^\|'. l:pathSeparatorExpr . '\)\zs\*\*\ze\%(' . l:pathSeparatorExpr . '\|$\)'
