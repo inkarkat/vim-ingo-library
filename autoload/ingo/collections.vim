@@ -4,7 +4,7 @@
 "   - ingo/dict.vim autoload script
 "   - ingo/list.vim autoload script
 "
-" Copyright: (C) 2011-2014 Ingo Karkat
+" Copyright: (C) 2011-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -100,6 +100,9 @@ function! ingo#collections#UniqueSorted( list )
 "* PURPOSE:
 "   Filter the sorted a:list so that each element is contained only once.
 "   Equality check is done on the list elements, always case-sensitive.
+"* SEE ALSO:
+"   - ingo#compat#uniq() is a compatibility wrapper around the uniq() function
+"     introduced in Vim 7.4.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
