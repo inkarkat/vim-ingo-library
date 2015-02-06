@@ -1,6 +1,7 @@
 " ingo/text.vim: Function for getting and setting text in the current buffer.
 "
 " DEPENDENCIES:
+"   - ingo/pos.vim autoload script
 "
 " Copyright: (C) 2012-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -8,6 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.019.006	30-Apr-2014	Use ingo/pos.vim.
 "   1.018.005	06-Apr-2014	I18N: Correctly capture last multi-byte
 "				character in ingo#text#Get(); don't just add one
 "				to the end column, but instead match at the
@@ -46,7 +48,7 @@ function! ingo#text#Get( startPos, endPos, ... )
     let [l:exclusiveOffset, l:exclusiveMatch] = (a:0 && a:1 ? [1, ''] : [0, '.'])
     let [l:line, l:column] = a:startPos
     let [l:endLine, l:endColumn] = a:endPos
-    if l:line > l:endLine || (l:line == l:endLine && l:column > l:endColumn + l:exclusiveOffset)
+    if ingo#pos#IsAfter([l:line, l:column], [l:endLine, l:endColumn + l:exclusiveOffset])
 	return ''
     endif
 
