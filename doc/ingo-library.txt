@@ -81,7 +81,7 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.023	RELEASEME
+1.023	09-Feb-2015
 - ENH: Make ingo#selection#frompattern#GetPositions() automatically convert
   \%# in the passed a:pattern to the hard-coded cursor column.
 - Add ingo#collections#mapsort().
