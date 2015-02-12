@@ -2,12 +2,16 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2014 Ingo Karkat
+" Copyright: (C) 2012-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.024.005	12-Feb-2015	FIX: Also correctly set change marks when
+"				replacing entire buffer with
+"				ingo#lines#Replace(). (The :delete clobbered
+"				them.)
 "   1.019.004	19-May-2014	ENH: Make ingo#lines#Replace() handle
 "				replacement with nothing (empty List) and
 "				replacing the entire buffer (without leaving an
@@ -65,6 +69,9 @@ function! ingo#lines#Replace( startLnum, endLnum, lines, ... )
 	silent call ingo#lines#PutBefore(a:startLnum, a:lines)
 	if l:isEntireBuffer
 	    silent $delete _
+
+	    call setpos("'[", [0, 1, 1, 0])
+	    call setpos("']", [0, line('$'), 1, 0])
 	endif
     endif
 endfunction
