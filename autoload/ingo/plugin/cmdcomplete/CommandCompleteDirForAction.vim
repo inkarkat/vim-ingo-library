@@ -40,6 +40,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	023	08-Jan-2015	ENH: Support multiple and fnamemodify()'ed
+"				placement of the filespec in a:parameters.action
+"				similar to 'makeprg'.
 "	022	23-Sep-2014	Fix typo.
 "	021	22-Sep-2014	Use ingo#compat#glob().
 "	020	07-Jun-2014	Abort on error.
@@ -243,8 +246,16 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 	    endif
 	endif
 
+	let l:expandExpr = '\%(^\|\s\zs\|"\)%\%(:\S\+\)\?\%("\|\ze\s\|$\)'
 	if type(a:Action) == 2
 	    call call(a:Action, [ingo#compat#fnameescape(l:dirspec), l:filename, l:fileOptionsAndCommands])
+	elseif a:Action =~# l:expandExpr
+	    " Similar to 'makeprg', the location of the inserted filespec can be
+	    " controlled via "%".
+	    let l:escapedFilespec = ingo#compat#fnameescape(l:dirspec) . l:filename
+	    let l:unescapedFilespec = l:dirspec . ingo#escape#file#fnameunescape(l:filename)
+	    let l:action = substitute(a:Action, l:expandExpr, '\=s:Expand(submatch(0), l:fileOptionsAndCommands, l:escapedFilespec, l:unescapedFilespec)', 'g')
+	    execute l:action
 	else
 	    execute a:Action l:fileOptionsAndCommands . ingo#compat#fnameescape(l:dirspec) . l:filename
 	endif
@@ -266,6 +277,21 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
     finally
 	unlet! g:CommandCompleteDirForAction_Context
     endtry
+endfunction
+function! s:Expand( expr, fileOptionsAndCommands, escapedFilespec, unescapedFilespec )
+    if a:expr ==# '%:+'
+	return a:fileOptionsAndCommands
+    elseif a:expr ==# '"%"'
+	return string(a:unescapedFilespec)
+    elseif a:expr =~# '^"%:.*"$'
+	return string(fnamemodify(a:unescapedFilespec, a:expr[2:-2]))
+    elseif a:expr ==# '%'
+	return a:escapedFilespec
+    elseif a:expr =~# '^%:.*$'
+	return fnamemodify(a:escapedFilespec, a:expr[1:])
+    else
+	return a:expr
+    endif
 endfunction
 
 let s:count = 0
