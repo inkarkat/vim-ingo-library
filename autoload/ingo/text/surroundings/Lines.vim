@@ -55,7 +55,7 @@ function! s:Transform( startLnum, endLnum, Transformer )
 
 	let l:offset = line('$') - l:originalLineNum
 	return [1, l:offset]
-    catch /^Vim\%((\a\+)\)\=:E16/ " E16: Invalid range
+    catch /^Vim\%((\a\+)\)\=:E16:/ " E16: Invalid range
 	call ingo#err#Set(printf('Invalid last modified range: %d,%d', a:startLnum, a:endLnum))
 	return [0, 0]
     catch /^Vim\%((\a\+)\)\=:/
