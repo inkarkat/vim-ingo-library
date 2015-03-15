@@ -88,6 +88,7 @@ HISTORY							*ingo-library-history*
 - Add ingo/compat/regexp.vim module.
 - Add ingo/encoding.vim module.
 - Add ingo/str/join.vim module.
+- Add ingo#option#SplitAndUnescape().
 
 1.023	09-Feb-2015
 - ENH: Make ingo#selection#frompattern#GetPositions() automatically convert
