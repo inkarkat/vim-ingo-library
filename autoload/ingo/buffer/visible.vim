@@ -2,12 +2,16 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.023.002	07-Feb-2015	Use :close! in ingo#buffer#visible#Execute() to
+"				handle modified buffers when :set nohidden, too.
+"				ENH: Keep previous (last accessed) window on
+"				ingo#buffer#visible#Execute().
 "   1.008.001	11-Jun-2013	file creation from ingobuffer.vim
 
 function! ingo#buffer#visible#Execute( bufnr, command )
@@ -40,16 +44,18 @@ function! ingo#buffer#visible#Execute( bufnr, command )
 	try
 	    execute a:command
 	finally
-	    noautocmd silent close
+	    noautocmd silent close!
 	    silent! execute l:originalWindowLayout
 	endtry
     else
 	" The buffer is visible in at least one window on this tab page.
 	let l:currentWinNr = winnr()
+	let l:previousWinNr = winnr('#') ? winnr('#') : 1
 	execute l:winnr . 'wincmd w'
 	try
 	    execute a:command
 	finally
+	    execute l:previousWinNr . 'wincmd w'
 	    execute l:currentWinNr . 'wincmd w'
 	endtry
     endif
