@@ -61,7 +61,7 @@ function! ingo#buffer#visible#Execute( bufnr, command )
     endif
 endfunction
 function! ingo#buffer#visible#Call( bufnr, Funcref, arguments )
-    return ingo#buffer#visible#Execute(a:bufnr, 'call call(' . string(a:Funcref) . ',' . string(a:arguments) . ')')
+    return ingo#buffer#visible#Execute(a:bufnr, 'return call(' . string(a:Funcref) . ',' . string(a:arguments) . ')')
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
