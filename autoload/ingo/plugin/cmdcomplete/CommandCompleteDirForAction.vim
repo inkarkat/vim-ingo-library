@@ -32,6 +32,7 @@
 "   - ingo/compat.vim autoload script
 "   - ingo/err.vim autoload script
 "   - ingo/fs/path.vim autoload script
+"   - ingo/list.vim autoload script
 "   - ingo/msg.vim autoload script
 
 " Copyright: (C) 2009-2013 Ingo Karkat
@@ -40,6 +41,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	024	13-Feb-2015	ENH: Support List of a:parameters.browsefilter.
 "	023	08-Jan-2015	ENH: Support multiple and fnamemodify()'ed
 "				placement of the filespec in a:parameters.action
 "				similar to 'makeprg'.
@@ -153,14 +155,13 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 	return []
     endtry
 
-    let l:browsefilter = (empty(a:browsefilter) ? '*' : a:browsefilter)
-    let l:filespecWildcard = l:dirspec . a:argLead . l:browsefilter
+    let l:browsefilter = (empty(a:browsefilter) ? ['*'] : ingo#list#Make(a:browsefilter))
     let l:save_wildignore = &wildignore
     if type(a:wildignore) == type('')
 	let &wildignore = a:wildignore
     endif
     try
-	let l:filespecs = ingo#compat#glob(l:filespecWildcard, 0, 1)
+	let l:filespecs = []
 
 	if a:isIncludeSubdirs
 	    " If the l:dirspec itself contains wildcards, there may be multiple
@@ -172,9 +173,17 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 	    " the (file-based) a:browsefilter.
 	    if ! empty(a:browsefilter)
 		let l:dirspecWildcard = l:dirspec . a:argLead . '*' . ingo#fs#path#Separator()
-		call extend(l:filespecs, ingo#compat#glob(l:dirspecWildcard, 0, 1))
-		call sort(l:filespecs) " Weave the directories into the files.
-	    else
+		let l:filespecs += ingo#compat#glob(l:dirspecWildcard, 0, 1)
+	    endif
+	endif
+
+	for l:filter in l:browsefilter
+	    let l:filespecWildcard = l:dirspec . a:argLead . l:filter
+	    let l:filespecs += ingo#compat#glob(l:filespecWildcard, 0, 1)
+	endfor
+
+	if a:isIncludeSubdirs
+	    if empty(a:browsefilter)
 		" glob() doesn't add a trailing path separator on directories
 		" unless the glob pattern has one at the end. Append the path
 		" separator here to be consistent with the alternative block
@@ -184,19 +193,21 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 		call map(l:filespecs, 'isdirectory(v:val) ? v:val . ingo#fs#path#Separator() : v:val')
 	    endif
 
-	    return map(
+	    call map(
 	    \   l:filespecs,
 	    \   'ingo#compat#fnameescape(s:RemoveDirspec(v:val, l:resolvedDirspecs))'
 	    \)
 	else
-	    return map(
+	    call map(
 	    \   filter(
-	    \	    l:filespecs,
-	    \	    '! isdirectory(v:val)'
+	    \       l:filespecs,
+	    \       '! isdirectory(v:val)'
 	    \   ),
 	    \   'ingo#compat#fnameescape(fnamemodify(v:val, ":t"))'
 	    \)
 	endif
+
+	return ingo#compat#uniq(sort(l:filespecs))
     finally
 	let &wildignore = l:save_wildignore
     endtry
@@ -336,8 +347,10 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "	    post actions itself. Throw an error message if needed.
 "   a:parameters.browsefilter
 "	    File wildcard (e.g. '*.txt') used for filtering the files in
-"	    a:dirspec. Default is empty string to include all (non-hidden) files.
-"	    Does not apply to subdirectories.
+"	    a:dirspec. Multiple can be specified as a List. Default is empty
+"	    string to include all (non-hidden) files. Does not apply to
+"	    subdirectory names (but applies to the files inside the
+"	    subdirectories).
 "   a:parameters.wildignore
 "	    Comma-separated list of file extensions to be ignored. This is
 "	    similar to a:parameters.browsefilter, but with inverted semantics,
