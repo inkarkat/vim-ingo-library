@@ -147,7 +147,7 @@ function! ingo#collections#UniqueStable( list, ... )
     let l:itemDict = {}
     let l:result = []
     for l:item in a:list
-	let l:key = ('' . l:item ==# '' ? l:emptyValue : l:item)
+	let l:key = '' . (l:item ==# '' ? l:emptyValue : l:item)
 	if ! has_key(l:itemDict, l:key)
 	    let l:itemDict[l:key] = 1
 	    call add(l:result, l:item)
