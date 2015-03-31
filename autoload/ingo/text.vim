@@ -3,12 +3,14 @@
 " DEPENDENCIES:
 "   - ingo/pos.vim autoload script
 "
-" Copyright: (C) 2012-2014 Ingo Karkat
+" Copyright: (C) 2012-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.023.007	07-Feb-2015	Minor: ingo#text#Remove(): Correct exception
+"				prefix.
 "   1.019.006	30-Apr-2014	Use ingo/pos.vim.
 "   1.018.005	06-Apr-2014	I18N: Correctly capture last multi-byte
 "				character in ingo#text#Get(); don't just add one
@@ -145,7 +147,7 @@ function! ingo#text#Remove( pos, len )
     if l:col > len(l:line)
 	return 0
     elseif l:col <= 1
-	throw 'Remove(): Column must be at least 1'
+	throw 'Remove: Column must be at least 1'
     endif
     return (setline(l:lnum, strpart(l:line, 0, l:col - 1) . strpart(l:line, l:col - 1 + a:len)) == 0)
 endfunction
