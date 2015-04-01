@@ -1,5 +1,4 @@
-" CommandCompleteDirForAction.vim: Define custom command to complete files from
-" a specified directory.
+" CommandCompleteDirForAction.vim: Define custom command to complete files from a specified directory.
 "
 " DESCRIPTION:
 "   In GVIM, one can define a menu item which uses browse() in combination with
@@ -162,6 +161,7 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
     endif
     try
 	let l:filespecs = []
+	let l:sourceCnt = 0
 
 	if a:isIncludeSubdirs
 	    " If the l:dirspec itself contains wildcards, there may be multiple
@@ -174,12 +174,14 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 	    if ! empty(a:browsefilter)
 		let l:dirspecWildcard = l:dirspec . a:argLead . '*' . ingo#fs#path#Separator()
 		let l:filespecs += ingo#compat#glob(l:dirspecWildcard, 0, 1)
+		let l:sourceCnt += 1
 	    endif
 	endif
 
 	for l:filter in l:browsefilter
 	    let l:filespecWildcard = l:dirspec . a:argLead . l:filter
 	    let l:filespecs += ingo#compat#glob(l:filespecWildcard, 0, 1)
+	    let l:sourceCnt += 1
 	endfor
 
 	if a:isIncludeSubdirs
@@ -207,10 +209,18 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 	    \)
 	endif
 
-	return ingo#compat#uniq(sort(l:filespecs))
+	if l:sourceCnt > 1
+	    return ingo#compat#uniq(sort(l:filespecs), 's:SuffixesSort') " Maintain lower priority of 'suffixes' while sorting.
+	else
+	    return l:filespecs
+	endif
     finally
 	let &wildignore = l:save_wildignore
     endtry
+endfunction
+function! s:SuffixesSort( f1, f2 )
+    " TODO
+    return 0
 endfunction
 
 function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspec, filename )
