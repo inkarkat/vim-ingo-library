@@ -3,12 +3,13 @@
 " DEPENDENCIES:
 "   - ingo/escape.vim autoload script
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.023.004	03-Jan-2015	Add ingo#cmdargs#pattern#IsDelimited().
 "   1.020.003	29-May-2014	Use ingo#escape#Unescape() in
 "				ingo#cmdargs#pattern#Unescape().
 "				Add ingo#cmdargs#pattern#ParseUnescaped() to
@@ -139,4 +140,23 @@ function! ingo#cmdargs#pattern#Unescape( parsedArguments )
     return (len(a:parsedArguments) > 2 ? [l:unescapedPattern] + a:parsedArguments[2:] : l:unescapedPattern)
 endfunction
 
+function! ingo#cmdargs#pattern#IsDelimited( arguments, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Test whether a:arguments is delimited by pattern separators (and optionally
+"   appended flags).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:arguments Command arguments to parse.
+"   a:flagsExpr Pattern that captures any optional part after the pattern.
+"* RETURN VALUES:
+"   1 if delimited by suitable, identical characters (plus any flags as
+"   specified by a:flagsExpr), else 0.
+"******************************************************************************
+    let l:match = call('s:Parse', [a:arguments] + a:000)
+    return (! empty(l:match))
+endfunction
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
