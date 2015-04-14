@@ -5,19 +5,12 @@
 "   - ingo/escape/file.vim autoload script
 "   - ingo/fs/path.vim autoload script
 "
-" Copyright: (C) 2009-2015 Ingo Karkat
+" Copyright: (C) 2009-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.024.022	15-Apr-2015	BUG: ingo#buffer#scratch#Create() with existing
-"				scratch buffer yields "E95: Buffer with this
-"				name already exists" instead of reusing the
-"				buffer. Use new a:isFile flag to
-"				ingo#escape#file#bufnameescape() and set
-"				a:isFullMatch to 1 instead of emulating the
-"				full-match for non-existing scratch buffers.
 "   1.012.021	08-Aug-2013	Move escapings.vim into ingo-library.
 "   1.010.020	08-Jul-2013	Move into ingo-library.
 "	019	11-Jun-2013	Move ingobuffer#ExecuteIn...() and
@@ -132,7 +125,7 @@ function! s:Bufnr( dirspec, filename, isFile )
 	" this name in the Vim session.
 	" Do a partial search for the buffer name matching any file name in any
 	" directory.
-	return bufnr(ingo#escape#file#bufnameescape(a:filename, 1, 0))
+	return bufnr('/'. ingo#escape#file#bufnameescape(a:filename, 0) . '$')
     else
 	return bufnr(
 	\   ingo#escape#file#bufnameescape(
