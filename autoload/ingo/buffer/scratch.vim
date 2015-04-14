@@ -5,12 +5,19 @@
 "   - ingo/escape/file.vim autoload script
 "   - ingo/fs/path.vim autoload script
 "
-" Copyright: (C) 2009-2013 Ingo Karkat
+" Copyright: (C) 2009-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.024.022	15-Apr-2015	BUG: ingo#buffer#scratch#Create() with existing
+"				scratch buffer yields "E95: Buffer with this
+"				name already exists" instead of reusing the
+"				buffer. Use new a:isFile flag to
+"				ingo#escape#file#bufnameescape() and set
+"				a:isFullMatch to 1 instead of emulating the
+"				full-match for non-existing scratch buffers.
 "   1.012.021	08-Aug-2013	Move escapings.vim into ingo-library.
 "   1.010.020	08-Jul-2013	Move into ingo-library.
 "	019	11-Jun-2013	Move ingobuffer#ExecuteIn...() and
@@ -125,7 +132,7 @@ function! s:Bufnr( dirspec, filename, isFile )
 	" this name in the Vim session.
 	" Do a partial search for the buffer name matching any file name in any
 	" directory.
-	return bufnr('/'. ingo#escape#file#bufnameescape(a:filename, 0) . '$')
+	return bufnr(ingo#escape#file#bufnameescape(a:filename, 1, 0))
     else
 	return bufnr(
 	\   ingo#escape#file#bufnameescape(
@@ -221,6 +228,9 @@ function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIs
 "   2	Jumped to open scratch buffer window.
 "   3	Loaded existing scratch buffer in new window.
 "   4	Created scratch buffer in new window.
+"   Note: To handle errors caused by a:scratchCommand, you need to put this
+"   method call into a try..catch block and :close the scratch buffer when an
+"   exception is thrown
 "*******************************************************************************
     let l:currentWinNr = winnr()
     let l:status = 0
