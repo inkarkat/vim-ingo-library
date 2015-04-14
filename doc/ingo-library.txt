@@ -33,6 +33,8 @@ Other authors have published separate support libraries, too:
 - vim-misc (vimscript #4597) by Peter Odding
 - maktaba (https://github.com/google/maktaba) by Google
 - vital (https://github.com/vim-jp/vital.vim) by the Japanese Vim user group
+- underscore.vim (vimscript #5149) by haya14busa provides functional
+  programming functions and depends on the (rather complex) vital library
 
 There have been initiatives to gather and consolidate useful functions into a
 "standard Vim library", but these efforts have mostly fizzled out.
@@ -95,6 +97,9 @@ HISTORY							*ingo-library-history*
   window when the buffer isn't visible yet. Add a check that the command
   hasn't switched to another window (and go back if true) before closing the
   split window.
+- Add ingo/regexp/virtcols.vim module.
+- Add ingo#str#GetVirtCols() and ingo#text#RemoveVirtCol().
+- FIX: Off-by-one: Allow column 1 in ingo#text#Remove().
 
 1.023	09-Feb-2015
 - ENH: Make ingo#selection#frompattern#GetPositions() automatically convert
