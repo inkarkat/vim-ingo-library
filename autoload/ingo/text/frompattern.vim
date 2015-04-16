@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -48,6 +48,9 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, replacement, 
 "   Extract all non-overlapping matches of a:pattern in the a:firstLine,
 "   a:lastLine range and return them (optionally a submatch / replacement, or
 "   only first or unique matches) as a List.
+"* SEE ALSO:
+"   - ingo#str#frompattern#Get() extracts matches from a string / List of lines
+"     instead of the current buffer.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
