@@ -100,6 +100,10 @@ HISTORY							*ingo-library-history*
 - Add ingo/regexp/virtcols.vim module.
 - Add ingo#str#GetVirtCols() and ingo#text#RemoveVirtCol().
 - FIX: Off-by-one: Allow column 1 in ingo#text#Remove().
+- BUG: ingo#buffer#scratch#Create() with existing scratch buffer yields "E95:
+  Buffer with this name already exists" instead of reusing the buffer.
+- Keep current cursor position when ingo#buffer#scratch#Create() removes the
+  first empty line in the scratch buffer.
 
 1.023	09-Feb-2015
 - ENH: Make ingo#selection#frompattern#GetPositions() automatically convert
