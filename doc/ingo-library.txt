@@ -104,6 +104,8 @@ HISTORY							*ingo-library-history*
   Buffer with this name already exists" instead of reusing the buffer.
 - Keep current cursor position when ingo#buffer#scratch#Create() removes the
   first empty line in the scratch buffer.
+- ingo#text#frompattern#GetHere(): Do not move the cursor (to the end of the
+  matched pattern); this is unexpected and can be easily avoided.
 
 1.023	09-Feb-2015
 - ENH: Make ingo#selection#frompattern#GetPositions() automatically convert
