@@ -11,6 +11,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.022.014	25-Sep-2014	FIX: Non-list argument to glob() for old Vim
+"				versions.
 "   1.022.013	23-Sep-2014	FIX: globpath() with {list} argument is only
 "				available with Vim 7.4.279.
 "   1.022.012	22-Sep-2014	Add ingo#compat#glob() and
@@ -216,7 +218,7 @@ else
 	    set wildignore=
 	endif
 	try
-	    let l:result = call('glob', a:1)
+	    let l:result = call('glob', [a:1])
 	    return (l:list ? split(l:result, '\n') : l:result)
 	finally
 	    if exists('l:save_wildignore')
