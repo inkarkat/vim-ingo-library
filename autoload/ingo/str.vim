@@ -1,13 +1,15 @@
 " ingo/str.vim: String functions.
 "
 " DEPENDENCIES:
+"   - ingo/regexp/virtcols.vim autoload script
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.024.005	01-Apr-2015	Add ingo#str#GetVirtCols().
 "   1.019.004	21-May-2014	Allow optional a:ignorecase argument for
 "				ingo#str#StartsWith() and ingo#str#EndsWith().
 "				Add ingo#str#Equals() for when it's convenient
@@ -63,6 +65,31 @@ function! ingo#str#Equals( string1, string2, ...)
     else
 	return a:string1 ==# a:string2
     endif
+endfunction
+
+function! ingo#str#GetVirtCols( string, virtcol, width, isAllowSmaller )
+"******************************************************************************
+"* PURPOSE:
+"   Get a:width screen columns of a:string at a:virtcol.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:virtcol   First virtual column (first column is 1); the character must
+"		begin exactly at that column.
+"   a:width     Width in screen columns.
+"   a:isAllowSmaller    Boolean flag whether less characters can be matched if
+"			the end doesn't fall on a character border, or there
+"			aren't that many characters. Else, exactly a:width
+"			screen columns must be matched.
+"* RETURN VALUES:
+"   Text starting at a:virtcol with a (maximal) width of a:width.
+"******************************************************************************
+    if a:virtcol < 1
+	throw 'GetVirtCols: Column must be at least 1'
+    endif
+    return matchstr(a:string, ingo#regexp#virtcols#ExtractCells(a:virtcol, a:width, a:isAllowSmaller))
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
