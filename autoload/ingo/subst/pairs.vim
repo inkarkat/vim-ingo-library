@@ -9,10 +9,12 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.016.002	17-Jan-2014	Change s:pairPattern so that the first, not the
+"				last = is used as the pair delimiter.
 "   1.016.001	16-Jan-2014	file creation from
 "				autoload/EditSimilar/Substitute.vim
 
-let s:pairPattern = '\(^.\+\)=\(.*$\)'
+let s:pairPattern = '\(^[^=]\+\)=\(.*$\)'
 function! s:SplitPair( pair )
     if a:pair !~# s:pairPattern
 	throw 'Substitute: Not a substitution: ' . a:pair
