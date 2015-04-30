@@ -249,6 +249,9 @@ function! ingo#collections#numsort( i1, i2, ... )
 "* PURPOSE:
 "   Numerical (through str2nr()) sort function for numbers; text after the
 "   number is silently ignored.
+"* ALTERNATIVE:
+"   Since Vim 7.4.341, the built-in sort() function supports a special {func}
+"   value of "n" for numerical sorting.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
