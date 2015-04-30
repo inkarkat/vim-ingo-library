@@ -83,6 +83,10 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.025	RELEASEME
+- Add ingo#str#Contains().
+- Add ingo#fs#path#split#Contains().
+
 1.024	23-Apr-2015
 - FIX: Also correctly set change marks when replacing entire buffer with
   ingo#lines#Replace().
