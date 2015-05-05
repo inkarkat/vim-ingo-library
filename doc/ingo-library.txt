@@ -86,6 +86,12 @@ HISTORY							*ingo-library-history*
 1.025	RELEASEME
 - Add ingo#str#Contains().
 - Add ingo#fs#path#split#Contains().
+- ingo#subst#pairs#Substitute(): Canonicalize path separators in
+  {replacement}, too. This is important to match further pairs, too, as the
+  pattern is always in canonical form, so the replacement has to be, too.
+- ENH: ingo#subst#pairs#Substitute(): Allow passing to [wildcard, replacement]
+  Lists instead of {wildcard}={replacement} Strings, too.
+- Add ingo#collections#Partition().
 
 1.024	23-Apr-2015
 - FIX: Also correctly set change marks when replacing entire buffer with
