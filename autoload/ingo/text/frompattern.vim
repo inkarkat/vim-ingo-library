@@ -2,12 +2,15 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.024.003	17-Apr-2015	ingo#text#frompattern#GetHere(): Do not move the
+"				cursor (to the end of the matched pattern); this
+"				is unexpected and can be easily avoided.
 "   1.014.002	27-Sep-2013	Add ingo#text#frompattern#GetHere().
 "   1.012.001	03-Sep-2013	file creation
 
@@ -29,7 +32,7 @@ function! ingo#text#frompattern#GetHere( pattern, ... )
 "   Matched text, or empty string.
 "******************************************************************************
     let l:startPos = getpos('.')[1:2]
-    let l:endPos = searchpos(a:pattern, 'ceW', (a:0 ? a:1 : line('.')))
+    let l:endPos = searchpos(a:pattern, 'cenW', (a:0 ? a:1 : line('.')))
     if l:endPos == [0, 0]
 	return ''
     endif
