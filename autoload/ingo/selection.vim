@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -20,7 +20,7 @@ function! ingo#selection#Get()
 "* ASSUMPTIONS / PRECONDITIONS:
 "   Visual selection is / has been made.
 "* EFFECTS / POSTCONDITIONS:
-"   None.
+"   Moves the cursor to the beginning of the selected text.
 "* INPUTS:
 "   None.
 "* RETURN VALUES:
@@ -38,7 +38,7 @@ function! ingo#selection#Get()
     endif
 	let l:save_reg = getreg('"')
 	let l:save_regmode = getregtype('"')
-	    execute 'silent! normal! gvy'
+	    execute 'silent! keepjumps normal! gvy'
 	    let l:selection = @"
 	call setreg('"', l:save_reg, l:save_regmode)
     if exists('l:save_cpoptions')
