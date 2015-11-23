@@ -27,11 +27,16 @@ function! ingo#lines#PutWrapper( lnum, putCommand, lines )
 "* PURPOSE:
 "   Insert a:lines into the current buffer at a:lnum without clobbering the
 "   expression register.
+"* SEE ALSO:
+"   If you don't need the 'report' message, setting of change marks, and
+"   handling of a string containing newlines, you can just use built-in
+"   append().
 "* ASSUMPTIONS / PRECONDITIONS:
 "   Current buffer is modifiable.
 "* EFFECTS / POSTCONDITIONS:
 "   To suppress a potential message based on 'report', invoke this function with
 "   :silent.
+"   Sets change marks '[,'] to the inserted lines.
 "* INPUTS:
 "   a:lnum  Address for a:putCommand.
 "   a:putCommand    The :put[!] command that is used.
@@ -63,6 +68,24 @@ function! ingo#lines#PutBefore( lnum, lines )
     endif
 endfunction
 function! ingo#lines#Replace( startLnum, endLnum, lines, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Replace the range of a:startLnum,a:endLnum with the List of lines (or string
+"   where lines are separated by \n characters).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   Current buffer is modifiable.
+"* EFFECTS / POSTCONDITIONS:
+"   Sets change marks '[,'] to the replaced lines.
+"* INPUTS:
+"   a:startLnum     First line to be replaced.
+"   a:endLnum       Last line to be replaced.
+"   a:lines         List of lines or string (where lines are separated by \n
+"		    characters).
+"   a:register      Optional register to store the replaced lines. By default
+"		    goes into black-hole.
+"* RETURN VALUES:
+"   None.
+"******************************************************************************
     let l:isEntireBuffer = (a:startLnum <= 1 && a:endLnum == line('$'))
     silent execute printf('%s,%sdelete %s', a:startLnum, a:endLnum, (a:0 ? a:1 : '_'))
     if ! empty(a:lines)
