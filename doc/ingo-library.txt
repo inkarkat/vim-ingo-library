@@ -89,9 +89,15 @@ HISTORY							*ingo-library-history*
 - ingo#subst#pairs#Substitute(): Canonicalize path separators in
   {replacement}, too. This is important to match further pairs, too, as the
   pattern is always in canonical form, so the replacement has to be, too.
-- ENH: ingo#subst#pairs#Substitute(): Allow passing to [wildcard, replacement]
+- ingo#subst#pairs#Substitute() and ingo#subst#pairs#Split(): Only
+  canonicalize path separators in {replacement} on demand, via additional
+  a:isCanonicalizeReplacement argument. Some clients may not need iterative
+  replacement, and treat the wildcard as a convenient regexp-shorthand, not
+  overly filesystem-related.
+- ENH: Allow passing to ingo#subst#pairs#Substitute() [wildcard, replacement]
   Lists instead of {wildcard}={replacement} Strings, too.
 - Add ingo#collections#Partition().
+- Add ingo#text#frompattern#GetAroundHere().
 
 1.024	23-Apr-2015
 - FIX: Also correctly set change marks when replacing entire buffer with
