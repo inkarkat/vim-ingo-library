@@ -98,6 +98,10 @@ HISTORY							*ingo-library-history*
   Lists instead of {wildcard}={replacement} Strings, too.
 - Add ingo#collections#Partition().
 - Add ingo#text#frompattern#GetAroundHere().
+- Add ingo#cmdline#showmode#TemporaryNoShowMode() variant of
+  ingo#cmdline#showmode#OneLineTemporaryNoShowMode().
+- ENH: Enable customization of ingo#window#special#IsSpecialWindow() via
+  g:IngoLibrary_SpecialWindowPredicates.
 
 1.024	23-Apr-2015
 - FIX: Also correctly set change marks when replacing entire buffer with
@@ -525,7 +529,7 @@ First published version as separate shared library.
 Started development of shared autoload functionality.
 
 ==============================================================================
-Copyright: (C) 2009-2015 Ingo Karkat
+Copyright: (C) 2009-2016 Ingo Karkat
 Contains URL encoding / decoding algorithms written by Tim Pope.
 The VIM LICENSE applies to this plugin; see |copyright|.
 
