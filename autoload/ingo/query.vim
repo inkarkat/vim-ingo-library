@@ -8,6 +8,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.019.002	20-May-2014	confirm() automatically presets the first
+"				character with an accelerator when no "&"
+"				present; do that for s:EchoEmulatedConfirm(),
+"				too.
 "   1.019.001	30-Apr-2014	file creation from
 "				autoload/IndentConsistencyCop.vim and
 "				autoload/DropQuery.vim
@@ -20,7 +24,7 @@ endfunction
 function! s:EchoEmulatedConfirm( msg, choices, defaultIndex )
     let l:defaultChoice = (a:defaultIndex > 0 ? get(a:choices, a:defaultIndex - 1) : '')
     echo a:msg
-    echo join(map(copy(a:choices), 'substitute(v:val, "&\\(.\\)", (v:val ==# l:defaultChoice ? "[\\1]" : "(\\1)"), "g")'), ', ') . ': '
+    echo join(map(copy(a:choices), 'substitute(v:val, "\\%(^\\%(.*&.*$\\)\\@!\\|&\\)\\(.\\)", (v:val ==# l:defaultChoice ? "[\\1]" : "(\\1)"), "g")'), ', ') . ': '
 endfunction
 
 function! ingo#query#Confirm( msg, ... )
