@@ -102,6 +102,7 @@ HISTORY							*ingo-library-history*
   ingo#cmdline#showmode#OneLineTemporaryNoShowMode().
 - ENH: Enable customization of ingo#window#special#IsSpecialWindow() via
   g:IngoLibrary_SpecialWindowPredicates.
+- Add ingo#query#Question().
 
 1.024	23-Apr-2015
 - FIX: Also correctly set change marks when replacing entire buffer with
