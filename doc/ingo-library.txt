@@ -103,6 +103,8 @@ HISTORY							*ingo-library-history*
 - ENH: Enable customization of ingo#window#special#IsSpecialWindow() via
   g:IngoLibrary_SpecialWindowPredicates.
 - Add ingo#query#Question().
+- ENH: Make ingo#window#special#SaveSpecialWindowSize() return sum of special
+  windows' widths and sum of special windows' heights.
 
 1.024	23-Apr-2015
 - FIX: Also correctly set change marks when replacing entire buffer with
