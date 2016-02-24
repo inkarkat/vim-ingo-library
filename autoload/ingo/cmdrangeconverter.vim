@@ -9,8 +9,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.005.002	17-Apr-2013	Add ingo#cmdrangeconverter#LineToBufferRange().
-"   1.005.001	17-Apr-2013	file creation from ingointegration.vim
+"   1.006.002	17-Apr-2013	Add ingo#cmdrangeconverter#LineToBufferRange().
+"   1.006.001	17-Apr-2013	file creation from ingointegration.vim
 
 function! ingo#cmdrangeconverter#BufferToLineRange( cmd ) range
 "******************************************************************************
