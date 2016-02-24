@@ -8,6 +8,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.004	06-May-2015	Add ingo#text#frompattern#GetAroundHere(),
+"				inspired by
+"				http://stackoverflow.com/questions/30073662/vim-copy-match-with-cursor-position-atom-to-local-variable
 "   1.024.003	17-Apr-2015	ingo#text#frompattern#GetHere(): Do not move the
 "				cursor (to the end of the matched pattern); this
 "				is unexpected and can be easily avoided.
@@ -32,6 +35,37 @@ function! ingo#text#frompattern#GetHere( pattern, ... )
 "   Matched text, or empty string.
 "******************************************************************************
     let l:startPos = getpos('.')[1:2]
+    let l:endPos = searchpos(a:pattern, 'cenW', (a:0 ? a:1 : line('.')))
+    if l:endPos == [0, 0]
+	return ''
+    endif
+    return ingo#text#Get(l:startPos, l:endPos)
+endfunction
+function! ingo#text#frompattern#GetAroundHere( pattern, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Extract the match of a:pattern starting the match from the current cursor
+"   position, but (unlike ingo#text#frompattern#GetHere()), also include matched
+"   characters _before_ the current position.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:pattern       Regular expression to search. 'ignorecase', 'smartcase' and
+"		    'magic' applies. When empty, the last search pattern |"/| is
+"		    used.
+"   a:lastLine      End line number to search for the start of the pattern.
+"		    Optional; defaults to the current line.
+"   a:firstLine     First line number to search for the start of the pattern.
+"		    Optional; defaults to the current line.
+"* RETURN VALUES:
+"   Matched text, or empty string.
+"******************************************************************************
+    let l:startPos = searchpos(a:pattern, 'bcnW', (a:0 >= 2 ? a:2 : line('.')))
+    if l:startPos == [0, 0]
+	return ''
+    endif
     let l:endPos = searchpos(a:pattern, 'cenW', (a:0 ? a:1 : line('.')))
     if l:endPos == [0, 0]
 	return ''
