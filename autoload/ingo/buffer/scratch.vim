@@ -5,12 +5,22 @@
 "   - ingo/escape/file.vim autoload script
 "   - ingo/fs/path.vim autoload script
 "
-" Copyright: (C) 2009-2013 Ingo Karkat
+" Copyright: (C) 2009-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.024.022	15-Apr-2015	BUG: ingo#buffer#scratch#Create() with existing
+"				scratch buffer yields "E95: Buffer with this
+"				name already exists" instead of reusing the
+"				buffer. Use new a:isFile flag to
+"				ingo#escape#file#bufnameescape() and set
+"				a:isFullMatch to 1 instead of emulating the
+"				full-match for non-existing scratch buffers.
+"				Keep current cursor position when
+"				ingo#buffer#scratch#Create() removes the first
+"				empty line in the scratch buffer.
 "   1.012.021	08-Aug-2013	Move escapings.vim into ingo-library.
 "   1.010.020	08-Jul-2013	Move into ingo-library.
 "	019	11-Jun-2013	Move ingobuffer#ExecuteIn...() and
@@ -125,7 +135,7 @@ function! s:Bufnr( dirspec, filename, isFile )
 	" this name in the Vim session.
 	" Do a partial search for the buffer name matching any file name in any
 	" directory.
-	return bufnr('/'. ingo#escape#file#bufnameescape(a:filename, 0) . '$')
+	return bufnr(ingo#escape#file#bufnameescape(a:filename, 1, 0))
     else
 	return bufnr(
 	\   ingo#escape#file#bufnameescape(
@@ -274,8 +284,11 @@ function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIs
 	execute a:scratchCommand
 	" ^ Keeps the existing line at the top of the buffer, if :1{cmd} is used.
 	" v Deletes it.
-	if empty(getline(1)) | silent 1delete _ | endif
-	" Note: ':silent' to suppress deletion message if ':set report=0'.
+	if empty(getline(1))
+	    let l:save_cursor = getpos('.')
+		silent 1delete _    " Note: ':silent' to suppress deletion message if ':set report=0'.
+	    call cursor(l:save_cursor[1] - 1, l:save_cursor[2])
+	endif
 
 	setlocal readonly
     endif
