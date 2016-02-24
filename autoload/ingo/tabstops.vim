@@ -9,6 +9,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.009.008	27-Jun-2013	FIX: ingo#tabstops#RenderMultiLine() doesn't
+"				pass an optional second a:startColumn argument.
+"				Rewrite the forwarding.
 "   1.009.007	26-Jun-2013	Add ingo#tabstops#RenderMultiLine(), as
 "				ingo#tabstops#Render() does not properly render
 "				multi-line text.
@@ -104,7 +107,7 @@ function! ingo#tabstops#RenderMultiLine( text, ... )
     \   join(
     \       map(
     \           split(a:text, '\n', 1),
-    \           'ingo#tabstops#Render(v:val' . (a:0 ? ', ' . string(a:1) : '') . ')'
+    \           'call("ingo#tabstops#Render", [v:val] + a:000)'
     \       ),
     \       "\n"
     \   )
