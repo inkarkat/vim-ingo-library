@@ -9,6 +9,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.020.007	31-May-2014	Also set the change marks to the replaced area.
+"				Make col argument 1-based for consistency.
 "   1.020.006	30-May-2014	Factor out and expose ingo#text#Replace#Area().
 "				Allow a:Text Funcref in
 "				ingo#text#replace#PatternWithText().
@@ -42,6 +44,7 @@ function! ingo#text#replace#Area( startPos, endPos, Text )
 "   None.
 "* EFFECTS / POSTCONDITIONS:
 "   Modifies current buffer.
+"   Sets the change marks '[,'] to the modified area.
 "* INPUTS:
 "   a:startPos  [line, col]
 "   a:endPos    [line, col]
@@ -55,7 +58,7 @@ function! ingo#text#replace#Area( startPos, endPos, Text )
     endif
 
     let l:line = getline(a:startPos[0])
-    let l:currentText = strpart(l:line, a:startPos[1], (a:endPos[1] - a:startPos[1] + 1))
+    let l:currentText = strpart(l:line, a:startPos[1] - 1, (a:endPos[1] - a:startPos[1] + 1))
     if type(a:Text) == type(function('tr'))
 	let l:text = call(a:Text, [l:currentText])
     else
@@ -68,7 +71,10 @@ function! ingo#text#replace#Area( startPos, endPos, Text )
     let l:text = split(l:text, "\n")[0]
 
     if l:currentText !=# l:text
-	return [l:currentText, l:text, (setline('.', s:ReplaceRange(l:line, a:startPos[1], a:endPos[1], l:text)) == 0)]
+	call setline('.', s:ReplaceRange(l:line, a:startPos[1] - 1, a:endPos[1] - 1, l:text))
+	call setpos("'[", [0, a:startPos[0], a:startPos[1], 0])
+	call setpos("']", [0, a:startPos[0], a:startPos[1] + len(l:text) - len(matchstr(l:text, '.$')), 0])
+	return [l:currentText, l:text, 1]
     else
 	" The range already contains the new text in the correct format, no
 	" replacement was done.
@@ -76,7 +82,7 @@ function! ingo#text#replace#Area( startPos, endPos, Text )
     endif
 endfunction
 function! s:ReplaceTextInRange( startIdx, endIdx, Text, where )
-    let [l:originalText, l:replacementText, l:didReplacement] = ingo#text#replace#Area([line('.'), a:startIdx], [line('.'), a:endIdx], a:Text)
+    let [l:originalText, l:replacementText, l:didReplacement] = ingo#text#replace#Area([line('.'), a:startIdx + 1], [line('.'), a:endIdx + 1], a:Text)
     if l:didReplacement
 	call cursor(line('.'), a:startIdx + 1)
 	return {'startIdx': a:startIdx, 'endIdx': a:endIdx, 'original': l:originalText, 'replacement': l:replacementText, 'where': a:where}
