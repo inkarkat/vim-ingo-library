@@ -8,6 +8,12 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.021.003	24-Jun-2014	ENH: For a single word that so far didn't change
+"				the SmartCase pattern, allow for an optional
+"				preceding or trailing non-alphabetic keyword
+"				separator. This makes the
+"				ChangeGloballySmartCase replacement of "foo"
+"				also work correctly on FOO_BAR.
 "   1.021.002	20-Jun-2014	Also handle regexp atoms in
 "				ingo#smartcase#FromPattern(). This isn't
 "				required by the (literal text, very nomagic)
@@ -42,6 +48,16 @@ function! ingo#smartcase#FromPattern( pattern, ... )
     \)
     " Allow delimiters between CamelCase fragments to catch all variants.
     let l:pattern = substitute(l:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\(\l\)\(\u\)', '\1\\A\\=\2', 'g')
+
+    if l:pattern ==# a:pattern
+	" The smartcase'ing failed to extend the pattern. This is a single
+	" all-lower or -uppercase alphabetic word. Allow for an optional
+	" preceding or trailing non-alphabetic keyword separator.
+	" Limit to keywords here to only match stuff like "_", but not arbitrary
+	" stuff around (e.g. "'foo" in "'foo bar'", which would result in
+	" "'foo'quux bar" instead of the desired "'fooQuux bar").
+	let l:pattern = printf('\%%(\%%(\A\&\k\)\=%s\|%s\%%(\A\&\k\)\=\)', l:pattern, l:pattern)
+    endif
 
     return '\c' . l:pattern
 endfunction
