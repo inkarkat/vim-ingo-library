@@ -10,6 +10,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.021.003	16-Jun-2014	BUG: Wrong position type causes
+"				ingo#selection#position#Get() to be one-off with
+"				:set selection=exclusive and when the cursor is
+"				after the selection.
 "   1.019.002	30-Apr-2014	Use ingo/pos.vim.
 "   1.010.001	04-Jul-2013	file creation
 
@@ -29,7 +33,7 @@ function! ingo#selection#position#Get()
 "   [[start lnum, start col], [end lnum, end col]]
 "******************************************************************************
     if &selection ==# 'exclusive'
-	let l:isCursorAfterSelection = ingo#pos#IsOnOrAfter(getpos('.')[1:2], getpos("'>"))
+	let l:isCursorAfterSelection = ingo#pos#IsOnOrAfter(getpos('.')[1:2], getpos("'>")[1:2])
 	let l:endPos = searchpos('\_.\%''>', (l:isCursorAfterSelection ? 'b' : '') . 'cnW', line("'>") + (l:isCursorAfterSelection ? -1 : 0))
 	if l:endPos == [0, 0]
 	    " This happens with a linewise selection, where col = 0x7FFFFFFF. No
