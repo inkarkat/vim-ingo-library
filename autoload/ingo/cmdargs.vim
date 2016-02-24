@@ -2,12 +2,20 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2014 Ingo Karkat
+" Copyright: (C) 2012-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.024.008	22-Apr-2015	FIX: ingo#cmdargs#GetStringExpr(): Escape
+"				(unescaped) double quotes when the argument
+"				contains backslashes; else, the expansion of \x
+"				will silently fail.
+"				Add ingo#cmdargs#GetUnescapedExpr(); when
+"				there's no need for empty expressions, the
+"				removal of the (single / double) quotes may be
+"				unexpected.
 "   1.007.007	01-Jun-2013	Move functions from ingo/cmdargs.vim to
 "				ingo/cmdargs/pattern.vim and
 "				ingo/cmdargs/substitute.vim.
@@ -49,14 +57,27 @@
 "				PatternsOnText.vim.
 "	001	25-Nov-2012	file creation from CaptureClipboard.vim.
 
+function! ingo#cmdargs#GetUnescapedExpr( argument )
+    try
+	if a:argument =~# '\\'
+	    " The argument contains escape characters, evaluate them.
+	    execute 'let l:expr = "' . substitute(a:argument, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!"', '\\"', 'g') . '"'
+	else
+	    let l:expr = a:argument
+	endif
+    catch /^Vim\%((\a\+)\)\=:/
+	let l:expr = a:argument
+    endtry
+    return l:expr
+endfunction
 function! ingo#cmdargs#GetStringExpr( argument )
     try
 	if a:argument =~# '^\([''"]\).*\1$'
-	    " The argument is quotes, evaluate it.
+	    " The argument is quoted, evaluate it.
 	    execute 'let l:expr =' a:argument
 	elseif a:argument =~# '\\'
 	    " The argument contains escape characters, evaluate them.
-	    execute 'let l:expr = "' . a:argument . '"'
+	    execute 'let l:expr = "' . substitute(a:argument, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!"', '\\"', 'g') . '"'
 	else
 	    let l:expr = a:argument
 	endif
