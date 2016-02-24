@@ -1,41 +1,42 @@
-" ingomarks.vim: Custom utility functions for marks handling. 
+" ingo/plugin/marks.vim: Functions for reserving marks for plugin use.
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2010 Ingo Karkat
-"   The VIM LICENSE applies to this script; see ':help copyright'. 
+" Copyright: (C) 2010-2013 Ingo Karkat
+"   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
-" REVISION	DATE		REMARKS 
+" REVISION	DATE		REMARKS
+"   1.010.002	08-Jul-2013	Move into ingo-library.
 "	001	29-Sep-2010	file creation from CommandWithMutableRange.vim
 
 function! s:FindUnusedMark()
     for l:mark in split('abcdefghijklmnopqrstuvwxyz', '\zs')
 	if getpos("'" . l:mark) == [0, 0, 0, 0]
-	    " Reserve mark so that the next invocation doesn't return it again. 
+	    " Reserve mark so that the next invocation doesn't return it again.
 	    execute 'normal! m' . l:mark
 	    return l:mark
 	endif
     endfor
-    throw 'ingomarks: Ran out of unused marks!'
+    throw 'ReserveMarks: Ran out of unused marks!'
 endfunction
-function! ingomarks#ReserveMarks( number, ... )
+function! ingo#plugin#marks#Reserve( number, ... )
 "******************************************************************************
 "* PURPOSE:
-"   Reserve a:number of available marks for use and return undo information. 
+"   Reserve a:number of available marks for use and return undo information.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   None. 
+"   None.
 "* EFFECTS / POSTCONDITIONS:
 "   Sets reserved marks to avoid finding them again. The client will probably
-"   override the mark location, anyway. 
+"   override the mark location, anyway.
 "* INPUTS:
-"   a:number	Number of marks to be reserved. 
-"* RETURN VALUES: 
+"   a:number	Number of marks to be reserved.
+"* RETURN VALUES:
 "   l:reservedMarksRecord   Marks record. Use keys(l:reservedMarksRecord) to get
 "			    the names of the reserved marks.  The records object
 "			    must also be passed back to
-"			    ingomarks#UnreserveMarks(). 
+"			    ingo#plugin#marks#Unreserve().
 "******************************************************************************
     let l:marksRecord = {}
     for l:cnt in range(0, (a:number - 1))
@@ -49,19 +50,19 @@ function! ingomarks#ReserveMarks( number, ... )
     endfor
     return l:marksRecord
 endfunction
-function! ingomarks#UnreserveMarks( marksRecord )
+function! ingo#plugin#marks#Unreserve( marksRecord )
 "******************************************************************************
 "* PURPOSE:
-"   Unreserve marks and restore the original mark position. 
+"   Unreserve marks and restore the original mark position.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   None. 
+"   None.
 "* EFFECTS / POSTCONDITIONS:
-"   Resets reserved marks. 
+"   Resets reserved marks.
 "* INPUTS:
 "   a:marksRecord   Undo information object handed out by
-"		    ingomarks#ReserveMarks(). 
-"* RETURN VALUES: 
-"   None. 
+"		    ingo#plugin#marks#Reserve().
+"* RETURN VALUES:
+"   None.
 "******************************************************************************
     for l:mark in keys(a:marksRecord)
 	call setpos("'" . l:mark, a:marksRecord[l:mark])
