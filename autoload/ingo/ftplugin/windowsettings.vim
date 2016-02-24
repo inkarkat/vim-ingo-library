@@ -2,12 +2,17 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.016.005	09-Jan-2014	BUG: Wrap :autocmd! undo_ftplugin_N in :execute
+"				to that superordinated ftplugins can append
+"				additional undo commands without causing "E216:
+"				No such group or event:
+"				undo_ftplugin_N|setlocal".
 "   1.011.004	23-Jul-2013	Move into ingo-library.
 "	003	23-Nov-2012	ENH: Correctly unset the window-local settings
 "				when doing a :split otherfile, and when the
@@ -89,7 +94,7 @@ function! ingo#ftplugin#windowsettings#Undo( windowSettings )
 	\   endif
     augroup END
 
-    let b:undo_ftplugin = (exists('b:undo_ftplugin') ? b:undo_ftplugin . '|' : '') . 'setlocal ' . l:windowUndoSettings . ' | autocmd! ' . l:augroupName
+    let b:undo_ftplugin = (exists('b:undo_ftplugin') ? b:undo_ftplugin . '|' : '') . 'setlocal ' . l:windowUndoSettings . ' | execute "autocmd! ' . l:augroupName . '"'
 endfunction
 
 let &cpo = s:save_cpo
