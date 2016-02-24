@@ -79,7 +79,6 @@ function! ingo#cmdargs#range#Parse( commandLine, ... )
     \	'\(' . ingo#cmdargs#commandcommands#GetExpr() . '\)\?' .
     \	'\(' . ingo#cmdargs#range#RangeExpr() . '\)\s*' .
     \   l:commandExpr
-echomsg '****' string(l:parseExpr)
     return matchlist(a:commandLine, l:parseExpr)[0:4]
 endfunction
 
