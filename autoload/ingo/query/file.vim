@@ -1,6 +1,7 @@
 " ingo/query/file.vim: Functions to query files from the user.
 "
 " DEPENDENCIES:
+"   - ingo/compat.vim autoload script
 "
 " Copyright: (C) 2012-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -8,6 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.012.006	08-Aug-2013	Move escapings.vim into ingo-library.
 "   1.009.005	28-Jun-2013	FIX: Avoid E108: No such variable:
 "				"b:browsefilter".
 "   1.008.004	06-Jun-2013	Fix missing argument error for
@@ -43,7 +45,7 @@ function! ingo#query#file#BrowseDirForAction( action, title, dirspec, browsefilt
 	if type(a:action) == type(function('tr'))
 	    call call(a:action, [l:filespec])
 	else
-	    execute a:action escapings#fnameescape(l:filespec)
+	    execute a:action ingo#compat#fnameescape(l:filespec)
 	endif
     else
 	echomsg 'Canceled opening of file.'
