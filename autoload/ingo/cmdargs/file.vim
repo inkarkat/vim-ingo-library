@@ -2,12 +2,18 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.017.003	11-Feb-2014	CHG: Make
+"				ingo#cmdargs#file#FilterFileOptionsAndCommands()
+"				return the options and commands in a List, not
+"				as a joined String. This allows clients to
+"				easily re-escape them and handle multiple ones,
+"				e.g. ++ff=dos +setf\ foo.
 "   1.009.002	14-Jun-2013	Minor: Make matchlist() robust against
 "				'ignorecase'.
 "   1.007.001	01-Jun-2013	file creation from ingofileargs.vim
@@ -61,12 +67,12 @@ function! ingo#cmdargs#file#FilterFileOptionsAndCommands( fileglobs )
 "		use ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands().
 "* RETURN VALUES:
 "   [a:fileglobs, fileOptionsAndCommands]	First element is the passed
-"   list, with any file options and commands removed. Second element is a string
+"   list, with any file options and commands removed. Second element is a List
 "   containing all removed file options and commands.
 "   Note: If the file arguments were obtained through
 "   ingo#cmdargs#file#SplitAndUnescape(), these must be re-escaped for use
 "   in another Ex command:
-"	escape(l:fileOptionsAndCommands, '\ ')
+"	join(map(l:fileOptionsAndCommands, "escape(v:val, '\\ ')"))
 "*******************************************************************************
     let l:startIdx = 0
     while get(a:fileglobs, l:startIdx, '') =~# '^+\{1,2}'
@@ -80,9 +86,9 @@ function! ingo#cmdargs#file#FilterFileOptionsAndCommands( fileglobs )
     endwhile
 
     if l:startIdx == 0
-	return [a:fileglobs, '']
+	return [a:fileglobs, []]
     else
-	return [a:fileglobs[l:startIdx : ], join(a:fileglobs[ : (l:startIdx - 1)], ' ')]
+	return [a:fileglobs[l:startIdx : ], a:fileglobs[ : (l:startIdx - 1)]]
     endif
 endfunction
 
