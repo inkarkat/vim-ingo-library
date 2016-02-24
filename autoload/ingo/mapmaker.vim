@@ -8,7 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.005.001	17-Apr-2013	file creation from ingointegration.vim
+"   1.006.001	17-Apr-2013	file creation from ingointegration.vim
 
 function! s:OpfuncExpression( opfunc )
     let &opfunc = a:opfunc
