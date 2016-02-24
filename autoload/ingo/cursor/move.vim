@@ -1,4 +1,4 @@
-" ingocursormove.vim: Custom cursor moves.
+" ingo/cursor/move.vim: Functions for moving the cursor.
 "
 " DEPENDENCIES:
 "
@@ -8,6 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.010.004	03-Jul-2013	Move into ingo-library.
 "	003	08-Jan-2013	Reimplement wrapping by temporarily changing
 "				'whichwrap' and 'virtualedit'; it's more robust
 "				than the explicit checks and allows arbitrary
@@ -19,7 +20,7 @@
 "				multi-byte character at the end of the line.
 "	001	07-Jan-2013	file creation from autoload/surroundings.vim
 
-function! ingocursormove#Move( movement )
+function! ingo#cursor#move#Move( movement )
     let l:save_whichwrap = &whichwrap
     let l:save_virtualedit = &virtualedit
     set whichwrap=b,s,h,l,<,>,[,]
@@ -36,14 +37,14 @@ endfunction
 
 " Helper: move cursor one position left; with possible wrap to preceding line.
 " Cursor does not move if at top of file.
-function! ingocursormove#Left( ... )
-    return ingocursormove#Move((a:0 ? a:1 : '') . 'h')
+function! ingo#cursor#move#Left( ... )
+    return ingo#cursor#move#Move((a:0 ? a:1 : '') . 'h')
 endfunction
 
 " Helper: move cursor one position right; with possible wrap to following line.
 " Cursor does not move if at end of file.
-function! ingocursormove#Right( ... )
-    return ingocursormove#Move((a:0 ? a:1 : '') . 'l')
+function! ingo#cursor#move#Right( ... )
+    return ingo#cursor#move#Move((a:0 ? a:1 : '') . 'l')
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
