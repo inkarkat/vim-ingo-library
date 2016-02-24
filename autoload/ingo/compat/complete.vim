@@ -1,6 +1,7 @@
 " ingo/compat/complete.vim: Function to retrofit :command -complete=filetype.
 "
 " DEPENDENCIES:
+"   - ingo/compat.vim autoload script
 "
 " Copyright: (C) 2009-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -8,6 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.022.002	22-Sep-2014	Use ingo#compat#globpath().
 "   1.007.001	05-Jun-2013	file creation from ingocommands.vim
 
 function! s:GenerateRuntimeFiletypes()
@@ -22,7 +24,7 @@ function! s:GenerateRuntimeFiletypes()
 	call extend(l:runtimeFiletypes,
 	\	filter(
 	\	    map(
-	\		split(globpath(&runtimepath, l:kind . '/*.vim'), "\n"),
+	\		ingo#compat#globpath(&runtimepath, l:kind . '/*.vim', 0, 1),
 	\		'fnamemodify(v:val, ":t:r")'
 	\	    ),
 	\	    'v:val !~# "_"'
