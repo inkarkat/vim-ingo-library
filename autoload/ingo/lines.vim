@@ -77,8 +77,10 @@ function! ingo#lines#Replace( startLnum, endLnum, lines, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   Sets change marks '[,'] to the replaced lines.
 "* INPUTS:
-"   a:startLnum     First line to be replaced.
-"   a:endLnum       Last line to be replaced.
+"   a:startLnum     First line to be replaced. Use ingo#range#NetStart() if
+"		    necessary.
+"   a:endLnum       Last line to be replaced. Use ingo#range#NetEnd() if
+"		    necessary.
 "   a:lines         List of lines or string (where lines are separated by \n
 "		    characters).
 "   a:register      Optional register to store the replaced lines. By default
