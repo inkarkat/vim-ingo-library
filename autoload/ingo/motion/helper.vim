@@ -1,6 +1,7 @@
 " ingo/motion/helper.vim: Functions for implementing custom motions.
 "
 " DEPENDENCIES:
+"   - ingo/option.vim autoload script
 "
 " Copyright: (C) 2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -8,6 +9,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.021.002	12-Jun-2014	Make test for 'virtualedit' option values also
+"				account for multiple values.
 "   1.016.001	11-Jan-2014	file creation
 
 function! ingo#motion#helper#AdditionalMovement( ... )
@@ -38,14 +41,14 @@ function! ingo#motion#helper#AdditionalMovement( ... )
     " out the last character in the line.
     let l:save_ww = &whichwrap
     set whichwrap+=l
-    if l:isSpecialLastLineTreatment && line('.') == line('$') && &virtualedit !=# 'onemore' && &virtualedit !=# 'all'
+    if l:isSpecialLastLineTreatment && line('.') == line('$') && ! ingo#option#ContainsOneOf(&virtualedit, ['all', 'onemore'])
 	" For the last line in the buffer, that still doesn't work in
 	" operator-pending mode, unless we can do virtual editing.
-	let l:save_ve = &virtualedit
+	let l:save_virtualedit = &virtualedit
 	set virtualedit=onemore
 	normal! l
 	augroup IngoLibraryTempVirtualEdit
-	    execute 'autocmd! CursorMoved * set virtualedit=' . l:save_ve . ' | autocmd! IngoLibraryTempVirtualEdit'
+	    execute 'autocmd! CursorMoved * set virtualedit=' . l:save_virtualedit . ' | autocmd! IngoLibraryTempVirtualEdit'
 	augroup END
     else
 	normal! l
