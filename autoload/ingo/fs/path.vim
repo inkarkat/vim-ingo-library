@@ -1,6 +1,7 @@
 " ingo/fs/path.vim: Functions for manipulating a file system path.
 "
 " DEPENDENCIES:
+"   - ingo/compat.vim autoload script
 "   - ingo/os.vim autoload script
 "   - ingo/escape/file.vim autoload script
 "
@@ -10,6 +11,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.022.010	22-Sep-2014	Use new ingo#compat#glob().
 "   1.019.009	23-May-2014	Add ingo#fs#path#Exists().
 "   1.019.008	21-May-2014	Add ingo#fs#path#IsCaseInsensitive().
 "   1.019.007	07-May-2014	ingo#fs#path#Normalize(): Don't normalize to
@@ -167,17 +169,7 @@ function! ingo#fs#path#Exists( filespec )
     endif
 
     let l:filespec = ingo#escape#file#wildcardescape(a:filespec)
-    if v:version == 702 && has('patch051') || v:version > 702
-	return ! empty(glob(l:filespec, 1))
-    else
-	let l:save_wildignore = &wildignore
-	set wildignore=
-	try
-	    return ! empty(glob(l:filespec))
-	finally
-	    let &wildignore = l:save_wildignore
-	endtry
-    endif
+    return ! empty(ingo#compat#glob(l:filespec, 1))
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
