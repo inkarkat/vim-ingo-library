@@ -2,12 +2,16 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.023.003	01-Oct-2014	ENH: Make
+"				ingo#selection#frompattern#GetPositions()
+"				automatically convert \%# in the passed
+"				a:pattern to the hard-coded cursor column.
 "   1.012.002	07-Aug-2013	CHG: Change return value format of
 "				ingo#selection#frompattern#GetPositions() to
 "				better match the arguments of functions like
@@ -25,23 +29,25 @@ function! ingo#selection#frompattern#GetPositions( pattern, ... )
 "   None.
 "* INPUTS:
 "   a:pattern   Regular expression to match at the cursor position.
-"		Note: If you want to match the cursor position itself, do not
-"		use the \%# atom; instead, hard-code the current cursor
-"		position, e.g. '\%' . col('.') . 'c'.
 "   a:stopline  Optional line number where the search will stop. To get a
 "		behavior like <cword>, pass in line('.').
 "   a:timeout   Optional timeout when the search will stop.
 "* RETURN VALUES:
 "   [[startLnum, startCol], [endLnum, endCol]] or [[0, 0], [0, 0]]
 "******************************************************************************
+    " To match the cursor position itself, the \%# atom cannot be used directly
+    " (because of the jumping around); instead, the current cursor column must
+    " be hard-coded.
+    let l:pattern = substitute(a:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%#', '\\%' . col('.') . 'c', 'g')
+
     let l:selection = [[0, 0], [0, 0]]
     let l:save_view = winsaveview()
-	let l:endPos = call('searchpos', [a:pattern, 'ceW'] + a:000)
+	let l:endPos = call('searchpos', [l:pattern, 'ceW'] + a:000)
 	if l:endPos == [0, 0]
 	    return l:selection
 	endif
 
-	let l:startPos = call('searchpos', [a:pattern, 'bcnW'] + a:000)
+	let l:startPos = call('searchpos', [l:pattern, 'bcnW'] + a:000)
 	if l:startPos != [0, 0]
 	    let l:selection = [l:startPos, l:endPos]
 	endif
