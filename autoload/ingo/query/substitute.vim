@@ -1,19 +1,19 @@
 " ingo/query/substitute.vim: Functions for confirming a command like :substitute//c.
 "
 " DEPENDENCIES:
+"   - ingo/query.vim autoload script
 "
-" Copyright: (C) 2014 Ingo Karkat
+" Copyright: (C) 2014-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.002	27-Jan-2016	Refactoring: Factor out ingo#query#Question().
 "   1.017.001	04-Mar-2014	file creation
 
 function! s:Question( msg )
-    echohl Question
-    echo a:msg . ' (y/n/a/q/l/^E/^Y)?'
-    echohl None
+    call ingo#query#Question(a:msg . ' (y/n/a/q/l/^E/^Y)?')
 endfunction
 function! ingo#query#substitute#Get( msg )
 "******************************************************************************
