@@ -1,4 +1,4 @@
-" ingo/search/buffer.vim: Functions for searching the buffer.
+" ingo/search/buffer.vim: Functions for searching a buffer.
 "
 " DEPENDENCIES:
 "
