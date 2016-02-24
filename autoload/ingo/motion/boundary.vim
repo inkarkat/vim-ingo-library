@@ -1,13 +1,16 @@
-" ingomotion.vim: Custom motions.
+" ingo/motion/boundary.vim: Functions to go to the first / last of something.
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012 Ingo Karkat
+" Copyright: (C) 2012-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.012.003	08-Aug-2013	Move into ingo-library.
+"				Add the remaining motions from
+"				UniversalIteratorMapping.vim.
 "	002	01-Aug-2012	Avoid cursor movement when there's no change /
 "				spell checking is not enabled by trying a jump
 "				before moving the cursor to the beginning / end
@@ -30,7 +33,7 @@ function! s:TryGotoChange()
 
     return 1
 endfunction
-function! ingomotion#GotoFirstChange( count )
+function! ingo#motion#boundary#FirstChange( count )
     " Try to locate any change before moving the cursor.
     if ! s:TryGotoChange()
 	execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
@@ -44,7 +47,7 @@ function! ingomotion#GotoFirstChange( count )
 	execute 'normal!' (v:count - 1) . ']c'
     endif
 endfunction
-function! ingomotion#GotoLastChange( count )
+function! ingo#motion#boundary#LastChange( count )
     " Try to locate any change before moving the cursor.
     if ! s:TryGotoChange()
 	execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
@@ -71,7 +74,7 @@ endfunction
 " beginning of the last word.)
 " When typed, ']s' et al. open the fold at the search result, but inside a
 " mapping or :normal this must be done explicitly via 'zv'.
-function! ingomotion#GotoFirstMisspelling( count )
+function! ingo#motion#boundary#FirstMisspelling( count )
     let l:save_wrapscan = &wrapscan
     try
 	" Do a jump to any misspelling first to force the "E756: Spell checking
@@ -92,7 +95,7 @@ function! ingomotion#GotoFirstMisspelling( count )
 
     normal! zv
 endfunction
-function! ingomotion#GotoLastMisspelling( count )
+function! ingo#motion#boundary#LastMisspelling( count )
     let l:save_wrapscan = &wrapscan
     try
 	" Do a jump to any misspelling first to force the "E756: Spell checking
@@ -108,6 +111,42 @@ function! ingomotion#GotoLastMisspelling( count )
 
     if a:count > 1
 	execute 'normal!' (v:count - 1) . '[s'
+    endif
+
+    normal! zv
+endfunction
+
+function! ingo#motion#boundary#FirstArgument( count )
+    if a:count <= 1
+	first
+    else
+	execute a:count 'argument'
+    endif
+endfunction
+function! ingo#motion#boundary#LastArgument( count )
+    if a:count <= 1
+	last
+    elseif a:count > argc()
+	throw 'E164: Cannot go before first file'
+    else
+	execute (argc() - a:count + 1) . 'argument'
+    endif
+endfunction
+
+function! ingo#motion#boundary#LastQuickfix( count )
+    if a:count <= 1
+	clast
+    else
+	execute max([1, (len(getqflist()) - a:count + 1)]) . 'cfirst'
+    endif
+
+    normal! zv
+endfunction
+function! ingo#motion#boundary#LastLocationList( count )
+    if a:count <= 1
+	llast
+    else
+	execute max([1, (len(getqflist()) - a:count + 1)]) . 'lfirst'
     endif
 
     normal! zv
