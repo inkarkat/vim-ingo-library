@@ -3,23 +3,32 @@
 " DEPENDENCIES:
 "   - ingo/os.vim autoload script
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.024.004	22-Apr-2015	Rename ingo#date#format#Human() to
+"				ingo#date#format#Preferred(), default to %x
+"				value for strftime(), and allow to customize
+"				that (even dynamically, maybe based on
+"				'spelllang').
 "   1.014.003	16-Sep-2013	Allow to pass optional date to all functions.
 "   1.014.002	13-Sep-2013	Move into ingo-library.
 "				Use operating system detection functions from
 "				ingo/os.vim.
 "	001	14-Apr-2012	file creation from InsertDate.vim
 
+if ! exists('g:IngoLibrary_PreferredDateFormat')
+    let g:IngoLibrary_PreferredDateFormat = '%x'
+endif
+
 function! ingo#date#format#International( ... )
     return call('strftime', ['%d-%b-%Y'] + a:000)
 endfunction
-function! ingo#date#format#Human( ... )
-    return call('strftime', ['%d. %b %Y'] + a:000)
+function! ingo#date#format#Preferred( ... )
+    return call('strftime', [ingo#actions#ValueOrFunc(ingo#plugin#setting#GetBufferLocal('IngoLibrary_PreferredDateFormat'))] + a:000)
 endfunction
 function! ingo#date#format#Sortable( ... )
     return call('strftime', ['%Y-%m-%d'] + a:000)
