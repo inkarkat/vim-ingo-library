@@ -1,4 +1,4 @@
-" ingo/number.vim: summary
+" ingo/number.vim: Functions for dealing with numbers.
 "
 " DEPENDENCIES:
 "
