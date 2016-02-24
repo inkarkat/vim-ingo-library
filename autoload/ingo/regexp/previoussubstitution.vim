@@ -4,7 +4,7 @@
 "   - ingo/buffer/temp.vim autoload script
 "   - ingo/compat.vim autoload script
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -44,7 +44,7 @@ function! ingo#regexp#previoussubstitution#Get()
 	execute 'wviminfo!' ingo#compat#fnameescape(l:tempfile)
 	let l:viminfo = join(readfile(l:tempfile), "\n")
 	let l:previousSubstitution = matchstr(l:viminfo, '\C\n# Last Substitute String:\n\$\zs\_.\{-}\ze\n\n# .* (newest to oldest):\n')
-    catch /^Vim\%((\a\+)\)\=:E/
+    catch /^Vim\%((\a\+)\)\=:/
 	" Fallback.
 	let l:previousSubstitution = ingo#buffer#temp#Execute('substitute/^/' . (&magic ? '~' : '\~') . '/')
 	call histdel('search', -1)
