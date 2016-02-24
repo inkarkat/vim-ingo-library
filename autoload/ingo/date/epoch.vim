@@ -4,13 +4,13 @@
 "   - ingo/compat.vim autoload script
 "   - ingo/os.vim autoload script
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"	001	27-Sep-2013	file creation
+"   1.014.001	27-Sep-2013	file creation
 
 function! ingo#date#epoch#ConvertTo( date )
     " Unfortunately, Vim doesn't have a built-in function to convert an
