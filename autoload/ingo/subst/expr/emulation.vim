@@ -14,9 +14,13 @@
 function! s:Submatch( idx )
     return get(s:submatches, a:idx, '')
 endfunction
-function! s:EmulateSubmatch( expr, pat, sub )
+function! s:EmulateSubmatch( originalExpr, expr, pat, sub )
     let s:submatches = matchlist(a:expr, a:pat)
-	let l:innerReplacement = eval(a:sub)
+	if empty(s:submatches)
+	    let l:innerReplacement = a:originalExpr
+	else
+	    let l:innerReplacement = eval(a:sub)
+	endif
     unlet s:submatches
     return l:innerReplacement
 endfunction
@@ -33,19 +37,32 @@ function! ingo#subst#expr#emulation#Substitute( expr, pat, sub, flags )
 	    " from the surrounding text, and process each match in turn.
 	    let l:innerParts = ingo#collections#SplitKeepSeparators(a:expr, a:pat, 1)
 	    let l:replacement = ''
+	    let l:innerPrefix = ''
 	    while ! empty(l:innerParts)
 		let l:innerSurroundingText = remove(l:innerParts, 0)
 		if empty(l:innerParts)
 		    let l:replacement .= l:innerSurroundingText
 		else
 		    let l:innerExpr = remove(l:innerParts, 0)
-		    let l:replacement .= l:innerSurroundingText . s:EmulateSubmatch(l:innerExpr, a:pat, l:emulatedSub)
+
+		    " To enable the use of lookahead and lookbehind, include the
+		    " text before the current match (but nothing more, as that
+		    " processed match would else match again) as well as all the
+		    " text after it.
+		    let l:augmentedInnerExpr = l:innerPrefix . l:innerSurroundingText . l:innerExpr . join(l:innerParts, '')
+
+		    let l:replacement .= l:innerSurroundingText . s:EmulateSubmatch(l:innerExpr, l:augmentedInnerExpr, a:pat, l:emulatedSub)
 		endif
+
+		" To avoid that the ^ anchor matches on subsequent iterations,
+		" invalidate the match position by prepending a dummy text that
+		" is unlikely to be ever matched by a real pattern.
+		let l:innerPrefix = "\<C-_>"
 	    endwhile
 	else
 	    " For a first-only replacement, just match and replace once.
 	    let s:submatches = matchlist(a:expr, a:pat)
-	    let l:innerReplacement = s:EmulateSubmatch(a:expr, a:pat, l:emulatedSub)
+	    let l:innerReplacement = s:EmulateSubmatch(a:expr, a:expr, a:pat, l:emulatedSub)
 	    let l:replacement = substitute(a:expr, a:pat, escape(l:innerReplacement, '\&'), '')
 	endif
     else
