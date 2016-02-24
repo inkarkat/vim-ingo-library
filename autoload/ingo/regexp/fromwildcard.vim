@@ -2,12 +2,14 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.023.003	30-Jan-2015	Add
+"				ingo#regexp#fromwildcard#AnchoredToPathBoundaries().
 "   1.021.002	23-Jun-2014	ENH: Allow to pass path separator to
 "				ingo#regexp#fromwildcard#Convert() and
 "				ingo#regexp#fromwildcard#IsWildcardPathPattern().
@@ -50,32 +52,7 @@ function! s:CanonicalizeWildcard( expr, pathSeparator )
     endif
     return l:expr
 endfunction
-function! ingo#regexp#fromwildcard#Convert( wildcardExpr, ... )
-"*******************************************************************************
-"* PURPOSE:
-"   Convert a shell-like a:wildcardExpr which may contain wildcards (?, *, **,
-"   [...]) into a regular expression.
-"
-"   In constrast to the simpler ingo#regexp#FromWildcard(), this handles the
-"   full range of wildcards and considers the path separators on different
-"   platforms.
-"* ASSUMPTIONS / PRECONDITIONS:
-"   None.
-"* EFFECTS / POSTCONDITIONS:
-"   None.
-"* INPUTS:
-"   a:wildcardExpr  Text containing file wildcards.
-"   a:additionalEscapeCharacters    For use in the / command, add '/', for the
-"				    backward search command ?, add '?'. For
-"				    assignment to @/, always add '/', regardless
-"				    of the search direction; this is how Vim
-"				    escapes it, too. For use in search(), pass
-"				    nothing / omit the argument.
-"   a:pathSeparator Optional fixed value for the path separator, to use instead
-"		    of the platform's default one.
-"* RETURN VALUES:
-"   Regular expression for matching a:wildcardExpr.
-"*******************************************************************************
+function! s:Convert( wildcardExpr, ... )
     let l:pathSeparator = (a:0 > 1 ? a:2 : s:pathSeparator)
     let l:expr = s:CanonicalizeWildcard(a:wildcardExpr, l:pathSeparator)
 
@@ -122,8 +99,74 @@ function! ingo#regexp#fromwildcard#Convert( wildcardExpr, ... )
     let l:expr = substitute(l:expr, '\\\\\*', '*', 'g')
 
     let l:additionalEscapeCharacters = (a:0 ? a:1 : '')
+    return [l:expr, l:additionalEscapeCharacters, l:pathSeparator]
+endfunction
+function! ingo#regexp#fromwildcard#Convert( ... )
+"*******************************************************************************
+"* PURPOSE:
+"   Convert a shell-like a:wildcardExpr which may contain wildcards (?, *, **,
+"   [...]) into an (unanchored!) regular expression.
+"
+"   In constrast to the simpler ingo#regexp#FromWildcard(), this handles the
+"   full range of wildcards and considers the path separators on different
+"   platforms.
+"
+"* SEE ALSO:
+"   For automatic anchoring, use
+"   ingo#regexp#fromwildcard#AnchoredToPathBoundaries().
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:wildcardExpr  Text containing file wildcards.
+"   a:additionalEscapeCharacters    For use in the / command, add '/', for the
+"				    backward search command ?, add '?'. For
+"				    assignment to @/, always add '/', regardless
+"				    of the search direction; this is how Vim
+"				    escapes it, too. For use in search(), pass
+"				    nothing / omit the argument.
+"   a:pathSeparator Optional fixed value for the path separator, to use instead
+"		    of the platform's default one.
+"* RETURN VALUES:
+"   Regular expression for matching a:wildcardExpr.
+"*******************************************************************************
+    let [l:expr, l:additionalEscapeCharacters, l:pathSeparator] = call('s:Convert', a:000)
     return '\V' . escape(l:expr, l:additionalEscapeCharacters)
 endfunction
+function! ingo#regexp#fromwildcard#AnchoredToPathBoundaries( ... )
+"*******************************************************************************
+"* PURPOSE:
+"   Convert a shell-like a:wildcardExpr which may contain wildcards (?, *, **,
+"   [...]) into a regular expression anchored to path boundaries; i.e.
+"   a:wildcardExpr must match complete path components delimited by the
+"   a:pathSeparator or the start / end of the String.
+"
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:wildcardExpr  Text containing file wildcards.
+"   a:additionalEscapeCharacters    For use in the / command, add '/', for the
+"				    backward search command ?, add '?'. For
+"				    assignment to @/, always add '/', regardless
+"				    of the search direction; this is how Vim
+"				    escapes it, too. For use in search(), pass
+"				    nothing / omit the argument.
+"   a:pathSeparator Optional fixed value for the path separator, to use instead
+"		    of the platform's default one.
+"* RETURN VALUES:
+"   Regular expression for matching a:wildcardExpr.
+"*******************************************************************************
+    let [l:expr, l:additionalEscapeCharacters, l:pathSeparator] = call('s:Convert', a:000)
+    let l:pathSeparator = escape(l:pathSeparator, '\')
+
+    let l:prefix = printf('\%%(\^\|%s\@<=\)', l:pathSeparator)
+    let l:suffix = printf('\%%(\$\|%s\@=\)', l:pathSeparator)
+    return '\V' . escape(l:prefix . l:expr . l:suffix, l:additionalEscapeCharacters)
+endfunction
+
 function! ingo#regexp#fromwildcard#IsWildcardPathPattern( expr, ... )
     let l:pathSeparator = (a:0 ? a:1 : s:pathSeparator)
     let l:expr = s:CanonicalizeWildcard(a:expr, l:pathSeparator)
