@@ -21,6 +21,7 @@ function! ingo#selection#Get()
 "   Visual selection is / has been made.
 "* EFFECTS / POSTCONDITIONS:
 "   Moves the cursor to the beginning of the selected text.
+"   Clobbers v:count.
 "* INPUTS:
 "   None.
 "* RETURN VALUES:
