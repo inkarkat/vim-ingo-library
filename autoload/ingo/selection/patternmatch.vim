@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -23,6 +23,7 @@ function! ingo#selection#patternmatch#AdaptEmptySelection()
 "   A visual selection has previously been established.
 "* EFFECTS / POSTCONDITIONS:
 "   Changes the visual selection.
+"   Clobbers v:count when active.
 "* INPUTS:
 "   None.
 "* RETURN VALUES:
