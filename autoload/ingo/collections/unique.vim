@@ -2,12 +2,14 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.003	17-Feb-2016	Add ingo#collections#unique#Insert() and
+"				ingo#collections#unique#Add().
 "   1.010.002	03-Jul-2013	Add ingo#collections#unique#AddNew() and
 "				ingo#collections#unique#InsertNew().
 "   1.009.001	25-Jun-2013	file creation
@@ -95,6 +97,45 @@ function! ingo#collections#unique#ExtendWithNew( expr1, expr2, ... )
 "******************************************************************************
     let l:newItems = filter(copy(a:expr2), 'index(a:expr1, v:val) == -1')
     return call('extend', [a:expr1, l:newItems] + a:000)
+endfunction
+
+function! ingo#collections#unique#Insert( list, expr, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Insert a:expr at the start of a:list (if a:idx is specified before the item
+"   with index a:idx), and remove any other elements equal to a:expr from the
+"   list (which effectively moves a:expr to the front).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:list  List to be modified.
+"   a:expr  Item to be added.
+"   a:idx   Optional index before which a:expr is inserted.
+"* RETURN VALUES:
+"   a:list
+"******************************************************************************
+    call filter(a:list, 'v:val isnot# a:expr')
+    return call('insert', [a:list, a:expr] + a:000)
+endfunction
+function! ingo#collections#unique#Add( list, expr )
+"******************************************************************************
+"* PURPOSE:
+"   Append a:expr to a:list, and remove any other elements equal to a:expr from
+"   the list (which effectively moves a:expr to the back).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:list  List to be modified.
+"   a:expr  Item to be added.
+"* RETURN VALUES:
+"   a:list
+"******************************************************************************
+    call filter(a:list, 'v:val isnot# a:expr')
+    return add(a:list, a:expr)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
