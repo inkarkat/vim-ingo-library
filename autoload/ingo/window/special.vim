@@ -8,6 +8,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.003	28-Jan-2016	ENH: Make
+"				ingo#window#special#SaveSpecialWindowSize()
+"				return sum of special windows' widths and sum of
+"				special windows' heights.
 "   1.025.002	26-Jan-2016	ENH: Enable customization of
 "				ingo#window#special#IsSpecialWindow() via
 "				g:IngoLibrary_SpecialWindowPredicates.
@@ -41,12 +45,32 @@ function! ingo#window#special#IsSpecialWindow( ... )
     \   ))
 endfunction
 function! ingo#window#special#SaveSpecialWindowSize()
+"******************************************************************************
+"* PURPOSE:
+"   Calculate widths and heights of visible special windows, and store those for
+"   later restoration.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Stores window numbers of special windows, and their current widths and
+"   heights.
+"* INPUTS:
+"   None.
+"* RETURN VALUES:
+"   [sum of special windows' widths, sum of special windows' heights]
+"******************************************************************************
     let s:specialWindowSizes = {}
+    let [l:specialWidths, l:specialHeights] = [0, 0]
     for l:w in range(1, winnr('$'))
 	if ingo#window#special#IsSpecialWindow(l:w)
-	    let s:specialWindowSizes[l:w] = [winwidth(l:w), winheight(l:w)]
+	    let [l:width, l:height] = [winwidth(l:w), winheight(l:w)]
+	    let s:specialWindowSizes[l:w] = [l:width, l:height]
+
+	    let l:specialWidths += l:width
+	    let l:specialHeights += l:height
 	endif
     endfor
+    return [l:specialWidths, l:specialHeights]
 endfunction
 function! ingo#window#special#RestoreSpecialWindowSize()
     for l:w in keys(s:specialWindowSizes)
