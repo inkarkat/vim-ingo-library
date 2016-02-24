@@ -9,9 +9,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.021.004	16-Jun-2014	ingo#buffer#temprange#Execute(): Replace
-"				ingo#undo#GetChangeNumber() with the built-in
-"				changenr().
+"   1.021.005	17-Jun-2014	Simplify ingo#buffer#temprange#Execute() by
+"				using changenr(). Keep using
+"				ingo#undo#GetChangeNumber() because we need to
+"				create a new no-op change when there was a
+"				previous :undo.
 "   1.019.003	25-Apr-2014	Factor out ingo#undo#GetChangeNumber().
 "   1.018.002	12-Apr-2014	Add optional a:undoCnt argument.
 "	001	09-Apr-2014	file creation from visualrepeat.vim
@@ -49,7 +51,7 @@ function! ingo#buffer#temprange#Execute( lines, command, ... )
     let l:save_view = winsaveview()
     let l:finalLnum = line('$')
     if ! a:0
-	let l:undoChangeNumber = changenr()
+	let l:undoChangeNumber = ingo#undo#GetChangeNumber()
     endif
 
     let l:tempRange = (l:finalLnum + 1) . ',$'
