@@ -1,13 +1,16 @@
-" ingo/range.vim: Function for retrieving the contents of a range.
+" ingo/range.vim: Function for dealing with ranges and their contents.
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.022.002	08-Aug-2014	Move LineJuggler#FoldClosed() and
+"				LineJuggler#FoldClosedEnd() into ingo-library as
+"				ingo#range#NetStart() and ingo#range#NetEnd().
 "   1.011.001	23-Jul-2013	file creation from ingointegration.vim.
 
 function! ingo#range#Get( range )
@@ -37,6 +40,15 @@ function! ingo#range#Get( range )
     endtry
 
     return l:contents
+endfunction
+
+function! ingo#range#NetStart( ... )
+    let l:lnum = (a:0 ? a:1 : line('.'))
+    return foldclosed(l:lnum) == -1 ? l:lnum : foldclosed(l:lnum)
+endfunction
+function! ingo#range#NetEnd( ... )
+    let l:lnum = (a:0 ? a:1 : line('.'))
+    return foldclosedend(l:lnum) == -1 ? l:lnum : foldclosedend(l:lnum)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
