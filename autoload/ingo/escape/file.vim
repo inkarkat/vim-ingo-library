@@ -9,6 +9,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.023.004	17-Dec-2014	ENH: Add a:isFile flag to
+"				ingo#escape#file#bufnameescape() in order to do
+"				full matching on scratch buffer names. There,
+"				the expansion to a full absolute path must be
+"				skipped in order to match.
 "   1.019.003	23-May-2014	FIX: Correct ingo#escape#file#wildcardescape()
 "				of * and ? on Windows.
 "   1.018.002	21-Mar-2014	Add ingo#escape#file#wildcardescape().
@@ -34,15 +39,19 @@ function! ingo#escape#file#bufnameescape( filespec, ... )
 "   a:isFullMatch   Optional flag whether only the full filespec should be
 "		    matched (default=1). If 0, the escaped filespec will not be
 "		    anchored.
+"   a:isFile        Optional flag whether a:filespec represents a file
+"		    (default=1). Set to 0 to search for (scratch) buffers with
+"		    'buftype' set to "nofile" with a:isFullMatch = 1.
 "* RETURN VALUES:
 "   Filespec escaped for the bufname() etc. commands listed above.
 "*******************************************************************************
     let l:isFullMatch = (a:0 ? a:1 : 1)
+    let l:isFile = (a:0 >= 2 ? a:2 : 1)
 
     " For a full match, the passed a:filespec must be converted to a full
     " absolute path (with symlinks resolved, just like Vim does on opening a
     " file) in order to match.
-    let l:escapedFilespec = (l:isFullMatch ? resolve(fnamemodify(a:filespec, ':p')) : a:filespec)
+    let l:escapedFilespec = (l:isFile ? resolve(fnamemodify(a:filespec, ':p')) : a:filespec)
 
     " Backslashes are converted to forward slashes, as the comparison is done with
     " these on all platforms, anyway (cp. :help file-pattern).
