@@ -3,12 +3,16 @@
 " DEPENDENCIES:
 "   - ingo/os.vim autoload script
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.005	01-Mar-2016	BUG: Unescaped backslash resulted in unclosed
+"				[...] regexp collection causing
+"				ingo#escape#file#fnameunescape() to fail to
+"				escape on Unix.
 "   1.023.004	17-Dec-2014	ENH: Add a:isFile flag to
 "				ingo#escape#file#bufnameescape() in order to do
 "				full matching on scratch buffer names. There,
@@ -100,7 +104,7 @@ function! ingo#escape#file#fnameunescape( exfilespec, ... )
 "   Unescaped, normal filespec.
 "*******************************************************************************
     let l:isMakeFullPath = (a:0 ? a:1 : 0)
-    return fnamemodify( a:exfilespec, ':gs+\\\([ \t\n*?`%#''"|!<' . (ingo#os#IsWinOrDos() ? '' : '[{$\') . ']\)+\1+' . (l:isMakeFullPath ? ':p' : ''))
+    return fnamemodify(a:exfilespec, ':gs+\\\([ \t\n*?`%#''"|!<' . (ingo#os#IsWinOrDos() ? '' : '[{$\\') . ']\)+\1+' . (l:isMakeFullPath ? ':p' : ''))
 endfunction
 
 function! ingo#escape#file#autocmdescape( filespec )
