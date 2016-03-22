@@ -9,6 +9,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.024.009	22-Apr-2015	ingo#text#Insert(): Also allow insertion one
+"				beyond the last line (in column 1), just like
+"				setline() allows.
 "   1.024.008	01-Apr-2015	Add ingo#text#RemoveVirtCol().
 "				FIX: Off-by-one: Allow column 1 in
 "				ingo#text#Remove().
@@ -106,10 +109,11 @@ function! ingo#text#Insert( pos, text )
 "   a:pos   [line, col]; col is the 1-based byte-index.
 "   a:text  String to insert.
 "* RETURN VALUES:
-"   Flag whether the position existed and insertion was done.
+"   Flag whether the position existed (inserting in column 1 of one line beyond
+"   the last one is also okay) and insertion was done.
 "******************************************************************************
     let [l:lnum, l:col] = a:pos
-    if l:lnum > line('$')
+    if l:lnum > line('$') + 1
 	return 0
     endif
 
