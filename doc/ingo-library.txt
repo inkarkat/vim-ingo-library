@@ -107,6 +107,8 @@ HISTORY							*ingo-library-history*
   windows' widths and sum of special windows' heights.
 - Add ingo/swap.vim module.
 - Add ingo#collections#unique#Insert() and ingo#collections#unique#Add().
+- BUG: Unescaped backslash resulted in unclosed [...] regexp collection
+  causing ingo#escape#file#fnameunescape() to fail to escape on Unix.
 
 1.024	23-Apr-2015
 - FIX: Also correctly set change marks when replacing entire buffer with
