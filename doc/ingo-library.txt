@@ -109,6 +109,8 @@ HISTORY							*ingo-library-history*
 - Add ingo#collections#unique#Insert() and ingo#collections#unique#Add().
 - BUG: Unescaped backslash resulted in unclosed [...] regexp collection
   causing ingo#escape#file#fnameunescape() to fail to escape on Unix.
+- Add ingo#text#GetCharBefore() variant of ingo#text#GetChar().
+- Add optional a:characterOffset to ingo#record#PositionAndLocation().
 
 1.024	23-Apr-2015
 - FIX: Also correctly set change marks when replacing entire buffer with
