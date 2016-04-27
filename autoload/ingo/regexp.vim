@@ -2,12 +2,15 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2010-2015 Ingo Karkat
+" Copyright: (C) 2010-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.014	28-Apr-2016	Add ingo#regexp#MakeStartWordSearch()
+"				ingo#regexp#MakeEndWordSearch() variants of
+"				ingo#regexp#MakeWholeWordSearch().
 "   1.023.013	25-Nov-2014	Expose ingo#regexp#MakeWholeWordSearch() (with
 "				the second a:pattern argument made optional).
 "   1.020.012	29-May-2014	CHG: At ingo#regexp#FromLiteralText(), add the
@@ -81,16 +84,50 @@ function! ingo#regexp#EscapeLiteralText( text, additionalEscapeCharacters )
 endfunction
 
 function! ingo#regexp#MakeWholeWordSearch( text, ... )
-    " The star command only creates a \<whole word\> search pattern if the
-    " <cword> actually only consists of keyword characters. Since
-    " ingo#regexp#FromLiteralText() could handle a superset (e.g. also
-    " "foo...bar"), just ensure that the keyword boundaries can be enforced at
-    " either side, to avoid enclosing a non-keyword side and making a match
-    " impossible with it (e.g. "\<..bar\>").
+"******************************************************************************
+"* PURPOSE:
+"   Generate a pattern that searches only for whole words of a:text, but only if
+"   a:text actually starts / ends with keyword characters (so that non-word
+"   a:text still matches (anywhere)).
+"   The star command only creates a \<whole word\> search pattern if the <cword>
+"   actually only consists of keyword characters. Since
+"   ingo#regexp#FromLiteralText() could handle a superset (e.g. also
+"   "foo...bar"), just ensure that the keyword boundaries can be enforced at
+"   either side, to avoid enclosing a non-keyword side and making a match
+"   impossible with it (e.g. "\<..bar\>").
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:text  Text / pattern to be searched for. Note that this isn't escaped in any form;
+"	    you probably want to escape backslashes beforehand and use \V "very
+"	    nomagic" on the result.
+"   a:pattern   If passed, this is adapted according to what a:text is about.
+"		Useful if the pattern has already been so warped (e.g. by
+"		enclosing in /\(...\|...\)/) that word boundary detection on the
+"		original text wouldn't work.
+"* RETURN VALUES:
+"   a:text / a:pattern, with additional \< / \> atoms if applicable.
+"******************************************************************************
+let l:pattern = (a:0 ? a:1 : a:text)
+    if a:text =~# '^\k'
+	let l:pattern = '\<' . l:pattern
+    endif
+    if a:text =~# '\k$'
+	let l:pattern .= '\>'
+    endif
+    return l:pattern
+endfunction
+function! ingo#regexp#MakeStartWordSearch( text, ... )
     let l:pattern = (a:0 ? a:1 : a:text)
     if a:text =~# '^\k'
 	let l:pattern = '\<' . l:pattern
     endif
+    return l:pattern
+endfunction
+function! ingo#regexp#MakeEndWordSearch( text, ... )
+    let l:pattern = (a:0 ? a:1 : a:text)
     if a:text =~# '\k$'
 	let l:pattern .= '\>'
     endif
