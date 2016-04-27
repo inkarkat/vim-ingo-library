@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2010-2014 Ingo Karkat
+" Copyright: (C) 2010-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -132,10 +132,11 @@ function! ingo#regexp#FromWildcard( wildcardExpr, additionalEscapeCharacters )
 "*******************************************************************************
 "* PURPOSE:
 "   Convert a shell-like a:wildcardExpr which may contain wildcards ? and * into
-"   a regular expression.
+"   an (unanchored!) regular expression.
 "
 "   The ingo#regexp#fromwildcard#Convert() supports the full range of wildcards
-"   and considers the path separators on different platforms.
+"   and considers the path separators on different platforms. An anchored
+"   version is ingo#regexp#fromwildcard#AnchoredToPathBoundaries().
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
