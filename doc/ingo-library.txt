@@ -111,6 +111,8 @@ HISTORY							*ingo-library-history*
   causing ingo#escape#file#fnameunescape() to fail to escape on Unix.
 - Add ingo#text#GetCharBefore() variant of ingo#text#GetChar().
 - Add optional a:characterOffset to ingo#record#PositionAndLocation().
+- Add ingo#regexp#MakeStartWordSearch() ingo#regexp#MakeEndWordSearch()
+  variants of ingo#regexp#MakeWholeWordSearch().
 
 1.024	23-Apr-2015
 - FIX: Also correctly set change marks when replacing entire buffer with
