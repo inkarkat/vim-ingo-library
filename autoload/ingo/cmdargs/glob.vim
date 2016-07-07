@@ -2,14 +2,16 @@
 "
 " DEPENDENCIES:
 "   - ingo/cmdargs/file.vim autoload script
+"   - ingo/compat.vim autoload script
 "   - ingo/os.vim autoload script
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.022.003	22-Sep-2014	Use ingo#compat#glob().
 "   1.013.002	13-Sep-2013	Use operating system detection functions from
 "				ingo/os.vim.
 "   1.007.001	01-Jun-2013	file creation from ingofileargs.vim
@@ -43,7 +45,7 @@ function! ingo#cmdargs#glob#ExpandSingle( fileglob, ... )
 	return [a:fileglob]
     else
 	" Filter out directories; we're usually only interested in files.
-	return filter(split((a:0 && a:1 ? expand(a:fileglob) : glob(a:fileglob)), "\n"), '! isdirectory(v:val)')
+	return filter((a:0 && a:1 ? split(expand(a:fileglob), '\n') : ingo#compat#glob(a:fileglob, 0, 1)), '! isdirectory(v:val)')
     endif
 endfunction
 function! ingo#cmdargs#glob#Expand( fileglobs, ... )
