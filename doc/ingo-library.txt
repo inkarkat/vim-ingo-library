@@ -113,6 +113,8 @@ HISTORY							*ingo-library-history*
 - Add optional a:characterOffset to ingo#record#PositionAndLocation().
 - Add ingo#regexp#MakeStartWordSearch() ingo#regexp#MakeEndWordSearch()
   variants of ingo#regexp#MakeWholeWordSearch().
+- Add ingo#pos#IsInsideVisualSelection().
+- Add ingo#escape#command#mapunescape().
 
 1.024	23-Apr-2015
 - FIX: Also correctly set change marks when replacing entire buffer with
