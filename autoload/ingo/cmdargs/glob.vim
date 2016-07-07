@@ -5,12 +5,16 @@
 "   - ingo/compat.vim autoload script
 "   - ingo/os.vim autoload script
 "
-" Copyright: (C) 2012-2014 Ingo Karkat
+" Copyright: (C) 2012-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.004	08-Jul-2016	ENH: Add second optional flag
+"				a:isKeepDirectories to
+"				ingo#cmdargs#glob#Expand() /
+"				ingo#cmdargs#glob#ExpandSingle().
 "   1.022.003	22-Sep-2014	Use ingo#compat#glob().
 "   1.013.002	13-Sep-2013	Use operating system detection functions from
 "				ingo/os.vim.
@@ -30,6 +34,7 @@ function! ingo#cmdargs#glob#ExpandSingle( fileglob, ... )
 "   a:isKeepNoMatch Optional flag that lets globs that have no matches be kept
 "		    and returned as-is, instead of being removed. Set this when
 "		    you want to support creating new files.
+"   a:isKeepDirectories Optional flag that keeps directories in the list.
 "* RETURN VALUES:
 "   List of normal filespecs; globs have been expanded. To consume this in
 "   another Vim command, use:
@@ -45,7 +50,8 @@ function! ingo#cmdargs#glob#ExpandSingle( fileglob, ... )
 	return [a:fileglob]
     else
 	" Filter out directories; we're usually only interested in files.
-	return filter((a:0 && a:1 ? split(expand(a:fileglob), '\n') : ingo#compat#glob(a:fileglob, 0, 1)), '! isdirectory(v:val)')
+	let l:specs = (a:0 && a:1 ? split(expand(a:fileglob), '\n') : ingo#compat#glob(a:fileglob, 0, 1))
+	return (a:0 >= 2 && a:2 ? l:specs : filter(l:specs, '! isdirectory(v:val)'))
     endif
 endfunction
 function! ingo#cmdargs#glob#Expand( fileglobs, ... )
@@ -64,6 +70,7 @@ function! ingo#cmdargs#glob#Expand( fileglobs, ... )
 "   a:isKeepNoMatch Optional flag that lets globs that have no matches be kept
 "		    and returned as-is, instead of being removed. Set this when
 "		    you want to support creating new files.
+"   a:isKeepDirectories Optional flag that keeps directories in the list.
 "* RETURN VALUES:
 "   List of filespecs; globs have been expanded. To consume this in another Vim
 "   command, use:
