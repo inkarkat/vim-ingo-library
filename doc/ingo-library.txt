@@ -115,6 +115,8 @@ HISTORY							*ingo-library-history*
   variants of ingo#regexp#MakeWholeWordSearch().
 - Add ingo#pos#IsInsideVisualSelection().
 - Add ingo#escape#command#mapunescape().
+- ENH: Add second optional flag a:isKeepDirectories to
+  ingo#cmdargs#glob#Expand() / ingo#cmdargs#glob#ExpandSingle().
 
 1.024	23-Apr-2015
 - FIX: Also correctly set change marks when replacing entire buffer with
