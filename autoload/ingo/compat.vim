@@ -5,12 +5,14 @@
 "   - ingo/options.vim autoload script
 "   - ingo/strdisplaywidth.vim autoload script
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.024.015	23-Apr-2015	Add ingo#compat#shiftwidth(), taken from :h
+"				shiftwidth().
 "   1.022.014	25-Sep-2014	FIX: Non-list argument to glob() for old Vim
 "				versions.
 "   1.022.013	23-Sep-2014	FIX: globpath() with {list} argument is only
@@ -38,6 +40,16 @@
 "   1.008.002	07-Jun-2013	Move EchoWithoutScrolling#DetermineVirtColNum()
 "				implementaion in here.
 "   1.004.001	04-Apr-2013	file creation
+
+if exists('*shiftwidth')
+    function ingo#compat#shiftwidth()
+	return shiftwidth()
+    endfunction
+else
+    function ingo#compat#shiftwidth()
+	return &shiftwidth
+    endfunction
+endif
 
 if exists('*strdisplaywidth')
     function! ingo#compat#strdisplaywidth( expr, ... )
