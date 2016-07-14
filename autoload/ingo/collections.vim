@@ -10,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.013	01-May-2015	Add ingo#collections#Partition().
 "   1.023.012	22-Oct-2014	Add ingo#collections#mapsort().
 "   1.014.011	15-Oct-2013	Use the extracted ingo#list#AddOrExtend().
 "   1.011.010	12-Jul-2013	Make ingo#collections#ToDict() handle empty list
@@ -308,6 +309,46 @@ function! ingo#collections#Flatten( list )
 	unlet l:item
     endfor
     return l:result
+endfunction
+
+function! ingo#collections#Partition( list, Predicate )
+"******************************************************************************
+"* PURPOSE:
+"   Separate a List / Dictionary into two, depending on whether a:Predicate is
+"   true for each member of the collection.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:list  List or Dictionary.
+"* RETURN VALUES:
+"   List of [in, out], which are disjunct sub-Lists / sub-Dictionaries
+"   containing the items where a:Predicate is true / is false.
+"******************************************************************************
+    if type(a:list) == type([])
+	let [l:in, l:out] = [[], []]
+	for l:item in a:list
+	    if ingo#actions#EvaluateWithValOrFunc(a:Predicate, l:item)
+		call add(l:in, l:item)
+	    else
+		call add(l:out, l:item)
+	    endif
+	endfor
+	return [l:in, l:out]
+    elseif type(a:list) == type({})
+	let [l:in, l:out] = [{}, {}]
+	for l:item in items(a:list)
+	    if ingo#actions#EvaluateWithValOrFunc(a:Predicate, l:item)
+		let l:in[l:item[0]] = l:item[1]
+	    else
+		let l:out[l:item[0]] = l:item[1]
+	    endif
+	endfor
+	return [l:in, l:out]
+    else
+	throw 'ASSERT: Invalid type for list'
+    endif
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
