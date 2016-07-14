@@ -2,12 +2,14 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.019.006	05-May-2014	Add optional a:isBeep argument to
+"				ingo#msg#ErrorMsg().
 "   1.009.005	21-Jun-2013	:echomsg sets v:statusmsg itself when there's no
 "				current highlighting; no need to do that then in
 "				ingo#msg#StatusMsg(). Instead, allow to set a
@@ -55,9 +57,13 @@ function! ingo#msg#WarningMsg( text )
     call ingo#msg#HighlightMsg(v:warningmsg, 'WarningMsg')
 endfunction
 
-function! ingo#msg#ErrorMsg( text )
+function! ingo#msg#ErrorMsg( text, ... )
     let v:errmsg = a:text
     call ingo#msg#HighlightMsg(v:errmsg, 'ErrorMsg')
+
+    if a:0 && a:1
+	execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
+    endif
 endfunction
 
 function! ingo#msg#MsgFromVimException()
