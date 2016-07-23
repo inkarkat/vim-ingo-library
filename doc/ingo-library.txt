@@ -118,6 +118,8 @@ HISTORY							*ingo-library-history*
 - ENH: Add second optional flag a:isKeepDirectories to
   ingo#cmdargs#glob#Expand() / ingo#cmdargs#glob#ExpandSingle().
 - Add ingo#range#borders#StartAndEndRange().
+- Add ingo#msg#VerboseMsg().
+- Add ingo#compat#sha256(), with a fallback to an external sha256sum command.
 
 1.024	23-Apr-2015
 - FIX: Also correctly set change marks when replacing entire buffer with
