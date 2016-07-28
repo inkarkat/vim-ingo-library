@@ -163,7 +163,7 @@ function! ingo#actions#iterations#ArgDo( alreadyVisitedBuffers, ... )
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
-"   None.
+"   Prints any Vim exception as error message.
 "* INPUTS:
 "   a:alreadyVisitedBuffers     Dictionary with already visited buffer numbers
 "				as keys. Will be added to, and the same buffers
@@ -173,8 +173,10 @@ function! ingo#actions#iterations#ArgDo( alreadyVisitedBuffers, ... )
 "				in each window.
 "   ...                         Arguments passed to an a:Action Funcref.
 "* RETURN VALUES:
-"   None.
+"   Number of Vim exceptions raised while iterating through the argument list
+"   (e.g. errors when loading buffers) or from executing a:Action.
 "******************************************************************************
+    let l:originalBufNr = bufnr('')
     let l:originalWindowLayout = winrestcmd()
     let l:originalWinNr = winnr()
     let l:previousWinNr = winnr('#') ? winnr('#') : 1
@@ -185,21 +187,43 @@ function! ingo#actions#iterations#ArgDo( alreadyVisitedBuffers, ... )
     endif
 
     let l:didSplit = 0
+    let l:failureCnt = 0
     try
-	execute 'noautocmd silent keepalt leftabove' l:nextArgNr . 'sargument'
-	let l:didSplit = 1
+	try
+	    execute 'noautocmd silent keepalt leftabove' l:nextArgNr . 'sargument'
+	    let l:didSplit = 1
+	catch
+	    call ingo#msg#VimExceptionMsg()
+	    let l:failureCnt += 1
+	    if bufnr('') == l:originalBufNr
+		" We failed to split to the target buffer; bail out, as we need
+		" the split.
+		return l:failureCnt
+	    endif
+	endtry
+
 	while 1
 	    let l:bufNr = bufnr('')
 	    if type(a:alreadyVisitedBuffers) == type({}) | let a:alreadyVisitedBuffers[bufnr('')] = 1 | endif
 
-	    call call(function('ingo#actions#ExecuteOrFunc'), a:000)
+	    try
+		call call(function('ingo#actions#ExecuteOrFunc'), a:000)
+	    catch
+		call ingo#msg#VimExceptionMsg()
+		let l:failureCnt += 1
+	    endtry
 
 	    let l:nextArgNr = s:GetNextArgNr(l:nextArgNr, a:alreadyVisitedBuffers)
 	    if l:nextArgNr == -1
 		break
 	    endif
 
-	    execute 'noautocmd silent keepalt' l:nextArgNr . 'argument'
+	    try
+		execute 'noautocmd silent keepalt' l:nextArgNr . 'argument'
+	    catch
+		call ingo#msg#VimExceptionMsg()
+		let l:failureCnt += 1
+	    endtry
 	endwhile
     finally
 	if l:didSplit
@@ -209,6 +233,8 @@ function! ingo#actions#iterations#ArgDo( alreadyVisitedBuffers, ... )
 	    silent! execute l:originalWindowLayout
 	endif
     endtry
+
+    return l:failureCnt
 endfunction
 
 function! s:GetNextBufNr( bufNr, alreadyVisitedBuffers )
@@ -235,7 +261,7 @@ function! ingo#actions#iterations#BufDo( alreadyVisitedBuffers, ... )
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
-"   None.
+"   Prints any Vim exception as error message.
 "* INPUTS:
 "   a:alreadyVisitedBuffers     Dictionary with already visited buffer numbers
 "				as keys. Will be added to. Pass 0 or {} to visit
@@ -244,7 +270,8 @@ function! ingo#actions#iterations#BufDo( alreadyVisitedBuffers, ... )
 "				in each buffer.
 "   ...                         Arguments passed to an a:Action Funcref.
 "* RETURN VALUES:
-"   None.
+"   Number of Vim exceptions raised while iterating through the buffer list
+"   (e.g. errors when loading buffers) or from executing a:Action.
 "******************************************************************************
     let l:originalWindowLayout = winrestcmd()
     let l:originalWinNr = winnr()
@@ -256,27 +283,48 @@ function! ingo#actions#iterations#BufDo( alreadyVisitedBuffers, ... )
     endif
 
     let l:didSplit = 0
+    let l:failureCnt = 0
     let l:save_switchbuf = &switchbuf | set switchbuf= | " :sbuffer should always open a new split (so we can :close it without checking).
     try
-	execute 'noautocmd silent keepalt leftabove' l:nextBufNr . 'sbuffer'
-	let &switchbuf = l:save_switchbuf | unlet l:save_switchbuf
+	try
+	    execute 'noautocmd silent keepalt leftabove' l:nextBufNr . 'sbuffer'
+	catch
+	    call ingo#msg#VimExceptionMsg()
+	    let l:failureCnt += 1
+	    if bufnr('') != l:nextBufNr
+		" We failed to split to the target buffer; bail out, as we need
+		" the split.
+		return l:failureCnt
+	    endif
+	finally
+	    let &switchbuf = l:save_switchbuf
+	endtry
 
 	let l:didSplit = 1
 	while 1
 	    let l:bufNr = bufnr('')
 	    if type(a:alreadyVisitedBuffers) == type({}) | let a:alreadyVisitedBuffers[bufnr('')] = 1 | endif
 
-	    call call(function('ingo#actions#ExecuteOrFunc'), a:000)
+	    try
+		call call(function('ingo#actions#ExecuteOrFunc'), a:000)
+	    catch
+		call ingo#msg#VimExceptionMsg()
+		let l:failureCnt += 1
+	    endtry
 
 	    let l:nextBufNr = s:GetNextBufNr(l:nextBufNr, a:alreadyVisitedBuffers)
 	    if l:nextBufNr == -1
 		break
 	    endif
 
-	    execute 'noautocmd silent keepalt' l:nextBufNr . 'buffer'
+	    try
+		execute 'noautocmd silent keepalt' l:nextBufNr . 'buffer'
+	    catch
+		call ingo#msg#VimExceptionMsg()
+		let l:failureCnt += 1
+	    endtry
 	endwhile
     finally
-	if exists('l:save_switchbuf') | let &switchbuf = l:save_switchbuf | endif
 	if l:didSplit
 	    noautocmd silent! close!
 	    noautocmd execute l:previousWinNr . 'wincmd w'
@@ -284,6 +332,8 @@ function! ingo#actions#iterations#BufDo( alreadyVisitedBuffers, ... )
 	    silent! execute l:originalWindowLayout
 	endif
     endtry
+
+    return l:failureCnt
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
