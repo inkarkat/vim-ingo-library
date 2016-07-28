@@ -11,17 +11,17 @@
 " REVISION	DATE		REMARKS
 "   1.025.001	29-Jul-2016	file creation
 
-function! ingo#actions#iterations#WinDo( alreadyVisistedBuffers, ... )
+function! ingo#actions#iterations#WinDo( alreadySearchedBuffers, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Invoke a:Action on each window in the current tab page, unless the buffer is
-"   in a:alreadyVisistedBuffers.
+"   in a:alreadySearchedBuffers.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:alreadyVisistedBuffers    Dictionary with already visited buffer numbers
+"   a:alreadySearchedBuffers    Dictionary with already visited buffer numbers
 "				as keys. Will be added to, and the same buffers
 "				in other windows will be skipped. Pass 0 to
 "				visit _all_ windows, regardless of the buffers
@@ -44,12 +44,12 @@ function! ingo#actions#iterations#WinDo( alreadyVisistedBuffers, ... )
     try
 	for l:winNr in range(1, winnr('$'))
 	    let l:bufNr = winbufnr(l:winNr)
-	    if a:alreadyVisistedBuffers is# 0 || ! has_key(a:alreadyVisistedBuffers, l:bufNr)
+	    if a:alreadySearchedBuffers is# 0 || ! has_key(a:alreadySearchedBuffers, l:bufNr)
 		if l:winNr != winnr()
 		    execute 'noautocmd' l:winNr . 'wincmd w'
 		    let l:didSwitchWindows = 1
 		endif
-		if type(a:alreadyVisistedBuffers) == type({}) | let a:alreadyVisistedBuffers[bufnr('')] = 1 | endif
+		if type(a:alreadySearchedBuffers) == type({}) | let a:alreadySearchedBuffers[bufnr('')] = 1 | endif
 
 		call call(function('ingo#actions#ExecuteOrFunc'), a:000)
 	    endif
@@ -62,21 +62,21 @@ function! ingo#actions#iterations#WinDo( alreadyVisistedBuffers, ... )
 	endif
     endtry
 endfunction
-function! ingo#actions#iterations#TabWinDo( alreadyVisistedTabPages, alreadyVisistedBuffers, ... )
+function! ingo#actions#iterations#TabWinDo( alreadySearchedTabPages, alreadySearchedBuffers, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Invoke a:Action on each window in each tab page, unless the buffer is in
-"   a:alreadyVisistedBuffers.
+"   a:alreadySearchedBuffers.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:alreadyVisistedTabPages   Dictionary with already visited tabpage numbers
+"   a:alreadySearchedTabPages   Dictionary with already visited tabpage numbers
 "				as keys. Will be added to, those tab pages will
 "				be skipped. Pass empty Dictionary to visit _all_
 "				tab pages.
-"   a:alreadyVisistedBuffers    Dictionary with already visited buffer numbers
+"   a:alreadySearchedBuffers    Dictionary with already visited buffer numbers
 "				as keys. Will be added to, and the same buffers
 "				in other windows / tab pages will be skipped.
 "				Pass 0 to visit _all_ windows and tab pages,
@@ -91,9 +91,9 @@ function! ingo#actions#iterations#TabWinDo( alreadyVisistedTabPages, alreadyVisi
     let l:didSwitchTabs = 0
     try
 	for l:tabNr in range(1, tabpagenr('$'))
-	    if ! has_key(a:alreadyVisistedTabPages, l:tabNr)
-		let a:alreadyVisistedTabPages[l:tabNr] = 1
-		if ! empty(a:alreadyVisistedBuffers) && ingo#collections#differences#ContainsLoosely(keys(a:alreadyVisistedBuffers), tabpagebuflist(l:tabNr))
+	    if ! has_key(a:alreadySearchedTabPages, l:tabNr)
+		let a:alreadySearchedTabPages[l:tabNr] = 1
+		if ! empty(a:alreadySearchedBuffers) && ingo#collections#differences#ContainsLoosely(keys(a:alreadySearchedBuffers), tabpagebuflist(l:tabNr))
 		    " All buffers of that tab page have already been visited; no
 		    " need to go there.
 		    continue
@@ -115,11 +115,11 @@ function! ingo#actions#iterations#TabWinDo( alreadyVisistedTabPages, alreadyVisi
 		try
 		    for l:winNr in range(1, winnr('$'))
 			let l:bufNr = winbufnr(l:winNr)
-			if a:alreadyVisistedBuffers is# 0 || ! has_key(a:alreadyVisistedBuffers, l:bufNr)
+			if a:alreadySearchedBuffers is# 0 || ! has_key(a:alreadySearchedBuffers, l:bufNr)
 			    execute 'noautocmd' l:winNr . 'wincmd w'
 
 			    let l:didSwitchWindows = 1
-			    if type(a:alreadyVisistedBuffers) == type({}) | let a:alreadyVisistedBuffers[bufnr('')] = 1 | endif
+			    if type(a:alreadySearchedBuffers) == type({}) | let a:alreadySearchedBuffers[bufnr('')] = 1 | endif
 
 			    call call(function('ingo#actions#ExecuteOrFunc'), a:000)
 			endif
