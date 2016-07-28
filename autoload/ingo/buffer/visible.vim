@@ -8,6 +8,13 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.024.003	17-Mar-2015	ingo#buffer#visible#Execute(): Restore the
+"				window layout when the buffer is visible but in
+"				a window with 0 height / width. And restore the
+"				previous window when the buffer isn't visible
+"				yet. Add a check that the command hasn't
+"				switched to another window (and go back if true)
+"				before closing the split window.
 "   1.023.002	07-Feb-2015	Use :close! in ingo#buffer#visible#Execute() to
 "				handle modified buffers when :set nohidden, too.
 "				ENH: Keep previous (last accessed) window on
@@ -35,30 +42,35 @@ function! ingo#buffer#visible#Execute( bufnr, command )
 "   None.
 "******************************************************************************
     let l:winnr = bufwinnr(a:bufnr)
-    if l:winnr == -1
-	" The buffer is hidden. Make it visible to execute the passed function.
-	" Use a temporary split window as ingo#buffer#temp#Execute() does, for
-	" all the reasons outlined there.
-	let l:originalWindowLayout = winrestcmd()
+    let l:originalWindowLayout = winrestcmd()
+    let l:currentWinNr = winnr()
+    let l:previousWinNr = winnr('#') ? winnr('#') : 1
+
+    try
+	if l:winnr == -1
+	    " The buffer is hidden. Make it visible to execute the passed function.
+	    " Use a temporary split window as ingo#buffer#temp#Execute() does, for
+	    " all the reasons outlined there.
 	    execute 'noautocmd silent keepalt leftabove sbuffer' a:bufnr
-	try
+	    let l:newWinNr = winnr()
+	    try
+		execute a:command
+	    finally
+		if winnr() != l:newWinNr
+		    noautocmd silent execute l:newWinNr . 'wincmd w'
+		endif
+		noautocmd silent close!
+	    endtry
+	else
+	    " The buffer is visible in at least one window on this tab page.
+	    execute l:winnr . 'wincmd w'
 	    execute a:command
-	finally
-	    noautocmd silent close!
-	    silent! execute l:originalWindowLayout
-	endtry
-    else
-	" The buffer is visible in at least one window on this tab page.
-	let l:currentWinNr = winnr()
-	let l:previousWinNr = winnr('#') ? winnr('#') : 1
-	execute l:winnr . 'wincmd w'
-	try
-	    execute a:command
-	finally
-	    execute l:previousWinNr . 'wincmd w'
-	    execute l:currentWinNr . 'wincmd w'
-	endtry
-    endif
+	endif
+    finally
+	silent execute l:previousWinNr . 'wincmd w'
+	silent execute l:currentWinNr . 'wincmd w'
+	silent! execute l:originalWindowLayout
+    endtry
 endfunction
 function! ingo#buffer#visible#Call( bufnr, Funcref, arguments )
     return ingo#buffer#visible#Execute(a:bufnr, 'return call(' . string(a:Funcref) . ',' . string(a:arguments) . ')')
