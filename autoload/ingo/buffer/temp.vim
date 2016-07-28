@@ -2,12 +2,15 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.023.003	07-Nov-2014	ENH: Add optional a:isReturnAsList flag to
+"				ingo#buffer#temp#Execute() and
+"				ingo#buffer#temp#Call().
 "   1.013.002	05-Sep-2013	Name the temp buffer for
 "				ingo#buffer#temp#Execute() and re-use previous
 "				instances to avoid increasing the buffer numbers
@@ -15,15 +18,15 @@
 "   1.008.001	11-Jun-2013	file creation from ingobuffer.vim
 
 let s:tempBufNr = 0
-function! ingo#buffer#temp#Execute( command, ...)
+function! ingo#buffer#temp#Execute( command, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Invoke an Ex command in an empty temporary scratch buffer and return the
 "   contents of the buffer after the execution.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   - a:command should have no side effects to the buffer, as it will be reused
-"     on subsequent invocations. If you change any buffer-local option, also
-"     undo the change!
+"   - a:command should have no side effects to the buffer (other than changing
+"     its contents), as it will be reused on subsequent invocations. If you
+"     change any buffer-local option, also undo the change!
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
@@ -31,8 +34,10 @@ function! ingo#buffer#temp#Execute( command, ...)
 "   a:isIgnoreOutput	Flag whether to skip capture of the scratch buffer
 "			contents and just execute a:command for its side
 "			effects.
+"   a:isReturnAsList	Flag whether to return the contents as a List of lines.
 "* RETURN VALUES:
-"   Contents of the buffer.
+"   Contents of the buffer, by default as one newline-delimited string, with
+"   a:isReturnAsList as a List, like getline() does.
 "******************************************************************************
     " It's hard to create a temp buffer in a safe way without side effects.
     " Switching the buffer can change the window view, may have a noticable
@@ -52,7 +57,8 @@ function! ingo#buffer#temp#Execute( command, ...)
     try
 	silent execute a:command
 	if ! a:0 || ! a:1
-	    return join(getline(1, line('$')), "\n")
+	    let l:lines = getline(1, line('$'))
+	    return (a:0 >= 2 && a:2 ? l:lines : join(l:lines, "\n"))
 	endif
     finally
 	noautocmd silent execute s:tempBufNr . 'bdelete!'
