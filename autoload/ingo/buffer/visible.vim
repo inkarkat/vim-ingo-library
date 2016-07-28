@@ -2,12 +2,15 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2015 Ingo Karkat
+" Copyright: (C) 2011-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.004	29-Jul-20167	FIX: Temporarily reset 'switchbuf' in
+"				ingo#buffer#visible#Execute(), to avoid that
+"				"usetab" switched to another tab page.
 "   1.024.003	17-Mar-2015	ingo#buffer#visible#Execute(): Restore the
 "				window layout when the buffer is visible but in
 "				a window with 0 height / width. And restore the
@@ -29,9 +32,11 @@ function! ingo#buffer#visible#Execute( bufnr, command )
 "   and must therefore be visible in a window to be invoked. This function
 "   ensures that the passed command is executed in the context of the passed
 "   buffer number.
-
+"* SEE ALSO:
+"   To execute an Action in all buffers (temporarily made visible), use
+"   ingo#actions#iterations#BufDo().
 "* ASSUMPTIONS / PRECONDITIONS:
-"	? List of any external variable, control, or other element whose state affects this procedure.
+"   None.
 "* EFFECTS / POSTCONDITIONS:
 "   The current window and buffer loaded into it remain the same.
 "* INPUTS:
@@ -51,7 +56,9 @@ function! ingo#buffer#visible#Execute( bufnr, command )
 	    " The buffer is hidden. Make it visible to execute the passed function.
 	    " Use a temporary split window as ingo#buffer#temp#Execute() does, for
 	    " all the reasons outlined there.
-	    execute 'noautocmd silent keepalt leftabove sbuffer' a:bufnr
+	    let l:save_switchbuf = &switchbuf | set switchbuf= | " :sbuffer should always open a new split / must not apply "usetab" (so we can :close it without checking).
+		execute 'noautocmd silent keepalt leftabove sbuffer' a:bufnr
+	    let &switchbuf = l:save_switchbuf | unlet l:save_switchbuf
 	    let l:newWinNr = winnr()
 	    try
 		execute a:command
@@ -67,6 +74,7 @@ function! ingo#buffer#visible#Execute( bufnr, command )
 	    execute a:command
 	endif
     finally
+	if exists('l:save_switchbuf') | let &switchbuf = l:save_switchbuf | endif
 	silent execute l:previousWinNr . 'wincmd w'
 	silent execute l:currentWinNr . 'wincmd w'
 	silent! execute l:originalWindowLayout
