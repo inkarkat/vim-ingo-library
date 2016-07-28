@@ -8,6 +8,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.015.004	18-Nov-2013	Make buffer argument of ingo#buffer#IsBlank()
+"				optional, defaulting to the current buffer.
+"				Allow use of ingo#buffer#IsEmpty() with other
+"				buffers.
 "   1.014.003	07-Oct-2013	Add ingo#buffer#IsPersisted(), taken from
 "				autoload/ShowTrailingWhitespace/Filter.vim.
 "   1.010.002	08-Jul-2013	Add ingo#buffer#IsEmpty().
@@ -15,14 +19,19 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! ingo#buffer#IsEmpty()
-    return line('$') == 1 && empty(getline(1))
+function! ingo#buffer#IsEmpty( ... )
+    if a:0
+	return (getbufline(a:1, 2) == [] && empty(get(getbufline(a:1, 1), 0, '')))
+    else
+	return (line('$') == 1 && empty(getline(1)))
+    endif
 endfunction
 
-function! ingo#buffer#IsBlank( bufnr )
-    return (empty(bufname(a:bufnr)) &&
-    \ getbufvar(a:bufnr, '&modified') == 0 &&
-    \ empty(getbufvar(a:bufnr, '&buftype'))
+function! ingo#buffer#IsBlank( ... )
+    let l:bufNr = (a:0 ? a:1 : '')
+    return (empty(bufname(l:bufNr)) &&
+    \ getbufvar(l:bufNr, '&modified') == 0 &&
+    \ empty(getbufvar(l:bufNr, '&buftype'))
     \)
 endfunction
 
