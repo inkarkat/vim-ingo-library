@@ -82,6 +82,7 @@ autoload/ingo/query/fromlist.vim
 autoload/ingo/query/get.vim
 autoload/ingo/query/substitute.vim
 autoload/ingo/range.vim
+autoload/ingo/range/borders.vim
 autoload/ingo/range/lines.vim
 autoload/ingo/range/merge.vim
 autoload/ingo/record.vim
