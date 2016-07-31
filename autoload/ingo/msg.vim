@@ -2,12 +2,13 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.007	15-Jul-2016	Add ingo#msg#VerboseMsg().
 "   1.019.006	05-May-2014	Add optional a:isBeep argument to
 "				ingo#msg#ErrorMsg().
 "   1.009.005	21-Jun-2013	:echomsg sets v:statusmsg itself when there's no
@@ -48,6 +49,25 @@ function! ingo#msg#StatusMsg( text, ... )
 	call ingo#msg#HighlightMsg(a:text, a:1)
     else
 	echohl None
+	echomsg a:text
+    endif
+endfunction
+
+function! ingo#msg#VerboseMsg( text, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Echo a message if 'verbose' is greater or equal 1 (or the optional
+"   a:verboselevel).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:text  The message to be echoed in verbose mode.
+"* RETURN VALUES:
+"   None.
+"******************************************************************************
+    if &verbose >= (a:0 ? a:1 : 1)
 	echomsg a:text
     endif
 endfunction
