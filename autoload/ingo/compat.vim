@@ -5,12 +5,14 @@
 "   - ingo/options.vim autoload script
 "   - ingo/strdisplaywidth.vim autoload script
 "
-" Copyright: (C) 2013-2015 Ingo Karkat
+" Copyright: (C) 2013-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.016	15-Jul-2016	Add ingo#compat#sha256(), with a fallback to an
+"				external sha256sum command.
 "   1.024.015	23-Apr-2015	Add ingo#compat#shiftwidth(), taken from :h
 "				shiftwidth().
 "   1.022.014	25-Sep-2014	FIX: Non-list argument to glob() for old Vim
@@ -42,11 +44,11 @@
 "   1.004.001	04-Apr-2013	file creation
 
 if exists('*shiftwidth')
-    function ingo#compat#shiftwidth()
+    function! ingo#compat#shiftwidth()
 	return shiftwidth()
     endfunction
 else
-    function ingo#compat#shiftwidth()
+    function! ingo#compat#shiftwidth()
 	return &shiftwidth
     endfunction
 endif
@@ -75,6 +77,32 @@ if exists('*strchars')
 else
     function! ingo#compat#strchars( expr )
 	return len(split(a:expr, '\zs'))
+    endfunction
+endif
+
+if exists('*strgetchar')
+    function! ingo#compat#strgetchar( expr, index )
+	return strgetchar(a:expr, a:index)
+    endfunction
+else
+    function! ingo#compat#strgetchar( expr, index )
+	return char2nr(matchstr(a:expr, '.\{' . a:index . '}\zs.'))
+    endfunction
+endif
+
+if exists('*strcharpart')
+    function! ingo#compat#strcharpart( src, start, ... )
+	return (a:0 ? strcharpart(a:src, a:start, a:1) : strcharpart(a:src, a:start))
+    endfunction
+else
+    function! ingo#compat#strcharpart( src, start, ... )
+	let [l:start, l:len] = [a:start, a:0 ? a:1 : 0]
+	if l:start < 0
+	    let l:len += l:start
+	    let l:start = 0
+	endif
+
+	return matchstr(a:src, '.\{' . l:start . '}\zs.' . (a:0 ? '\{,' . max([0, l:len]) . '}' : '*'))
     endfunction
 endif
 
@@ -331,6 +359,21 @@ else
 	else
 	    return setpos(a:expr, a:list)
 	endif
+    endfunction
+endif
+
+if exists('*sha256')
+    function! ingo#compat#sha256( string )
+	return sha256(a:string)
+    endfunction
+elseif executable('sha256sum')
+    let s:printStringCommandTemplate = (ingo#os#IsWinOrDos() ? 'echo.%s' : 'printf %%s %s')
+    function! ingo#compat#sha256( string )
+	return get(split(system(printf(s:printStringCommandTemplate . "|sha256sum", ingo#compat#shellescape(a:string)))), 0, '')
+    endfunction
+else
+    function! ingo#compat#sha256( string )
+	throw 'ingo#compat#sha256: Not implemented here'
     endfunction
 endif
 
