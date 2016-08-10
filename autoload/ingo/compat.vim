@@ -80,32 +80,6 @@ else
     endfunction
 endif
 
-if exists('*strgetchar')
-    function! ingo#compat#strgetchar( expr, index )
-	return strgetchar(a:expr, a:index)
-    endfunction
-else
-    function! ingo#compat#strgetchar( expr, index )
-	return char2nr(matchstr(a:expr, '.\{' . a:index . '}\zs.'))
-    endfunction
-endif
-
-if exists('*strcharpart')
-    function! ingo#compat#strcharpart( src, start, ... )
-	return (a:0 ? strcharpart(a:src, a:start, a:1) : strcharpart(a:src, a:start))
-    endfunction
-else
-    function! ingo#compat#strcharpart( src, start, ... )
-	let [l:start, l:len] = [a:start, a:0 ? a:1 : 0]
-	if l:start < 0
-	    let l:len += l:start
-	    let l:start = 0
-	endif
-
-	return matchstr(a:src, '.\{' . l:start . '}\zs.' . (a:0 ? '\{,' . max([0, l:len]) . '}' : '*'))
-    endfunction
-endif
-
 if exists('*abs')
     function! ingo#compat#abs( expr )
 	return abs(a:expr)
