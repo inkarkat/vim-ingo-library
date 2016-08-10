@@ -20,7 +20,7 @@
 " TODO:
 "   - Consider 'cmdheight', add argument isSingleLine.
 "
-" Copyright: (C) 2008-2013 Ingo Karkat
+" Copyright: (C) 2008-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -65,7 +65,12 @@ endfunction
 function! ingo#avoidprompt#TruncateTo( text, length )
 "*******************************************************************************
 "* PURPOSE:
-"   Truncate a:text to a maximum of a:length virtual columns.
+"   Truncate a:text to a maximum of a:length virtual columns by dropping text in
+"   the middle of a:text if necessary. This is based on what Vim does when for
+"   example echoing a very long search pattern during n/N.
+"* SEE ALSO:
+"   - ingo#strdisplaywidth#TruncateTo() does something similar, but truncates at
+"     the end, and doesn't account for buffer-local tabstop values.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   none
 "* EFFECTS / POSTCONDITIONS:
@@ -74,7 +79,7 @@ function! ingo#avoidprompt#TruncateTo( text, length )
 "   a:text	Text which may be truncated to fit.
 "   a:length	Maximum virtual columns for a:text.
 "* RETURN VALUES:
-"   None.
+"   Truncated a:text.
 "*******************************************************************************
     if a:length <= 0
 	return ''
