@@ -83,6 +83,19 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.026	11-Aug-2016
+- Add ingo#strdisplaywidth#pad#Middle().
+- Add ingo/format/columns.vim module.
+- ENH: ingo#avoidprompt#TruncateTo() and ingo#strdisplaywidth#TruncateTo()
+  have a configurable ellipsis string g:IngoLibrary_TruncateEllipsis, now
+  defaulting to a single-char UTF-8 variant if we're in such encoding. Thanks
+  to Daniel Hahler for sending a patch! It also handles pathologically small
+  lengths that only show / cut into the ellipsis.
+- Add ingo#compat#strgetchar() and ingo#compat#strcharpart(), introduced in
+  Vim 7.4.1730.
+- Support ingo#compat#strchars() optional {skipcc} argument, introduced in Vim
+  7.4.755.
+
 1.025	09-Aug-2016
 - Add ingo#str#Contains().
 - Add ingo#fs#path#split#Contains().
