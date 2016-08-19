@@ -2,12 +2,15 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2014 Ingo Karkat
+" Copyright: (C) 2011-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.004	29-Jul-20167	FIX: Temporarily reset 'switchbuf' in
+"				ingo#buffer#temp#Execute(), to avoid that
+"				"usetab" switched to another tab page.
 "   1.023.003	07-Nov-2014	ENH: Add optional a:isReturnAsList flag to
 "				ingo#buffer#temp#Execute() and
 "				ingo#buffer#temp#Call().
@@ -47,7 +50,12 @@ function! ingo#buffer#temp#Execute( command, ... )
     " window or tab. And autocmds may do all sorts of uncontrolled changes.
     let l:originalWindowLayout = winrestcmd()
 	if s:tempBufNr && bufexists(s:tempBufNr)
-	    noautocmd silent keepalt leftabove execute s:tempBufNr . 'sbuffer'
+	    let l:save_switchbuf = &switchbuf | set switchbuf= | " :sbuffer should always open a new split / must not apply "usetab" (so we can :close it without checking).
+	    try
+		noautocmd silent keepalt leftabove execute s:tempBufNr . 'sbuffer'
+	    finally
+		let &switchbuf = l:save_switchbuf
+	    endtry
 	    " The :bdelete got rid of the buffer contents; no need to clean the
 	    " revived buffer.
 	else
