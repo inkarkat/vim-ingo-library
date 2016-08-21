@@ -8,6 +8,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.008	01-Aug-2016	ingo#msg#HighlightMsg(): Make a:hlgroup
+"				optional, default to 'None' (so the function is
+"				useful to return to normal highlighting).
+"				Add ingo#msg#HighlightN(), an :echon variant.
 "   1.025.007	15-Jul-2016	Add ingo#msg#VerboseMsg().
 "   1.019.006	05-May-2014	Add optional a:isBeep argument to
 "				ingo#msg#ErrorMsg().
@@ -23,9 +27,14 @@
 "   1.003.002	13-Mar-2013	Add ingo#msg#ShellError().
 "   1.000.001	22-Jan-2013	file creation
 
-function! ingo#msg#HighlightMsg( text, hlgroup )
-    execute 'echohl' a:hlgroup
+function! ingo#msg#HighlightMsg( text, ... )
+    execute 'echohl' (a:0 ? a:1 : 'None')
     echomsg a:text
+    echohl None
+endfunction
+function! ingo#msg#HighlightN( text, ... )
+    execute 'echohl' (a:0 ? a:1 : 'None')
+    echon a:text
     echohl None
 endfunction
 
