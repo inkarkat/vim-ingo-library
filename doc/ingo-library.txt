@@ -83,6 +83,10 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.027	RELEASEME
+- Add ingo#buffer#temp#ExecuteWithText() and ingo#buffer#temp#CallWithText()
+  variants that pre-initialize the buffer (a common use case).
+
 1.026	11-Aug-2016
 - Add ingo#strdisplaywidth#pad#Middle().
 - Add ingo/format/columns.vim module.
