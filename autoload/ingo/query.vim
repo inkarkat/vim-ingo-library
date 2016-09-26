@@ -2,12 +2,13 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2014 Ingo Karkat
+" Copyright: (C) 2014-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.003	27-Jan-2016	Refactoring: Factor out ingo#query#Question().
 "   1.019.002	20-May-2014	confirm() automatically presets the first
 "				character with an accelerator when no "&"
 "				present; do that for s:EchoEmulatedConfirm(),
@@ -17,6 +18,13 @@
 "				autoload/DropQuery.vim
 let s:save_cpo = &cpo
 set cpo&vim
+
+function! ingo#query#Question( msg )
+    echohl Question
+    echomsg a:msg
+    echohl None
+endfunction
+
 
 function! s:StripAccellerator( choice )
     return substitute(a:choice, '&', '', 'g')
