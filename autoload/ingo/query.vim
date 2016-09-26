@@ -8,6 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.027.004	27-Sep-2016	Expose ingo#query#StripAccellerator().
 "   1.025.003	27-Jan-2016	Refactoring: Factor out ingo#query#Question().
 "   1.019.002	20-May-2014	confirm() automatically presets the first
 "				character with an accelerator when no "&"
@@ -26,7 +27,7 @@ function! ingo#query#Question( msg )
 endfunction
 
 
-function! s:StripAccellerator( choice )
+function! ingo#query#StripAccellerator( choice )
     return substitute(a:choice, '&', '', 'g')
 endfunction
 function! s:EchoEmulatedConfirm( msg, choices, defaultIndex )
@@ -59,7 +60,7 @@ function! ingo#query#Confirm( msg, ... )
 	" necesary.
 
 	let l:choices = (a:0 ? split(a:1, '\n', 1) : ['&Ok'])
-	let l:plainChoices = map(copy(l:choices), 's:StripAccellerator(v:val)')
+	let l:plainChoices = map(copy(l:choices), 'ingo#query#StripAccellerator(v:val)')
 
 	" Emulate the console output of confirm(), so that it looks for a test
 	" driver as if it were real.
@@ -104,7 +105,7 @@ function! ingo#query#ConfirmAsText( msg, choices, ... )
 "   Choice text without the shortcut key '&'. Empty string if the dialog was
 "   aborted.
 "******************************************************************************
-    let l:plainChoices = map(copy(a:choices), 's:StripAccellerator(v:val)')
+    let l:plainChoices = map(copy(a:choices), 'ingo#query#StripAccellerator(v:val)')
 
     let l:confirmArgs = [a:msg, join(a:choices, "\n")]
     if a:0
@@ -126,7 +127,7 @@ function! ingo#query#ConfirmAsText( msg, choices, ... )
 	return (type(l:choice) == type(0) ?
 	\   (l:choice == 0 ?
 	\       '' :
-	\       s:StripAccellerator(get(a:choices, l:choice - 1, ''))
+	\       ingo#query#StripAccellerator(get(a:choices, l:choice - 1, ''))
 	\   ) :
 	\   l:choice
 	\)
