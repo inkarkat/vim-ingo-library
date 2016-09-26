@@ -1,15 +1,17 @@
 " ingo/query/fromlist.vim: Functions for querying elements from a list.
 "
 " DEPENDENCIES:
+"   - ingo/query.vim autoload script
 "   - ingo/query/confirm.vim autoload script
 "   - ingo/query/get.vim autoload script
 "
-" Copyright: (C) 2014-2015 Ingo Karkat
+" Copyright: (C) 2014-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.004	27-Jan-2016	Refactoring: Factor out ingo#query#Question().
 "   1.023.003	19-Jan-2015	Break listing of query choices into multiple
 "				lines when the overall question doesn't fit in a
 "				single line.
@@ -53,16 +55,12 @@ function! ingo#query#fromlist#Query( what, list, ... )
 
     let l:renderedQuestion = printf('Select %s via [count] or (l)etter: %s ?', a:what, join(l:list, ', '))
     if ingo#compat#strdisplaywidth(l:renderedQuestion) + 3 > &columns
-	echohl Question
-	echomsg printf('Select %s via [count] or (l)etter:', a:what)
-	echohl None
+	call ingo#query#Question(printf('Select %s via [count] or (l)etter:', a:what))
 	for l:listItem in s:RenderList(l:confirmList, l:defaultIndex, '%3d: ')
 	    echo l:listItem
 	endfor
     else
-	echohl Question
-	echomsg l:renderedQuestion
-	echohl None
+	call ingo#query#Question(l:renderedQuestion)
     endif
 
     let l:choice = ingo#query#get#Char()
