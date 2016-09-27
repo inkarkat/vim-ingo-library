@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/list.vim autoload script
 "
-" Copyright: (C) 2012-2014 Ingo Karkat
+" Copyright: (C) 2012-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -110,7 +110,7 @@ function! ingo#cmdargs#substitute#Parse( arguments, ... )
 "   A list of [separator, pattern, replacement, flags, count] (default)
 "   A list of [separator, pattern, replacement] when a:options.flagsExpr is
 "   empty or a:options.flagsMatchCount is 0.
-"   A list of [separator, pattern, replacement, flags, count, submatch1, ...];
+"   A list of [separator, pattern, replacement, submatch1, ...];
 "   elements added depending on a:options.flagsMatchCount.
 "   flags and count are meant to be directly concatenated; count therefore keeps
 "   leading whitespace, but be aware that this is optional with :substitute,
