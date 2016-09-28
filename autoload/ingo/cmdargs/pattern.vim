@@ -159,4 +159,5 @@ function! ingo#cmdargs#pattern#IsDelimited( arguments, ... )
     let l:match = call('s:Parse', [a:arguments] + a:000)
     return (! empty(l:match))
 endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
