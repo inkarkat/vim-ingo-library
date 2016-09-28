@@ -87,6 +87,10 @@ HISTORY							*ingo-library-history*
 - Add ingo#buffer#temp#ExecuteWithText() and ingo#buffer#temp#CallWithText()
   variants that pre-initialize the buffer (a common use case).
 - Add ingo#msg#MsgFromShellError().
+- ENH: ingo#query#fromlist#Query(): Support headless (testing) mode via
+  g:IngoLibrary_QueryChoices, like ingo#query#Confirm() already does.
+- Expose ingo#query#fromlist#RenderList(). Expose
+  ingo#query#StripAccellerator().
 
 1.026	11-Aug-2016
 - Add ingo#strdisplaywidth#pad#Middle().
