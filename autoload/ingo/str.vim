@@ -9,6 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.006	30-Apr-2015	Add ingo#str#Contains().
 "   1.024.005	01-Apr-2015	Add ingo#str#GetVirtCols().
 "   1.019.004	21-May-2014	Allow optional a:ignorecase argument for
 "				ingo#str#StartsWith() and ingo#str#EndsWith().
@@ -64,6 +65,14 @@ function! ingo#str#Equals( string1, string2, ...)
 	return a:string1 ==? a:string2
     else
 	return a:string1 ==# a:string2
+    endif
+endfunction
+function! ingo#str#Contains( string, part, ...)
+    let l:ignorecase = (a:0 && a:1)
+    if l:ignorecase
+	return (stridx(a:string, a:part) != -1 || a:string =~? '\V' . escape(a:part, '\'))
+    else
+	return (stridx(a:string, a:part) != -1)
     endif
 endfunction
 
