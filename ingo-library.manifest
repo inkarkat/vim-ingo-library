@@ -50,6 +50,7 @@ autoload/ingo/folds.vim
 autoload/ingo/folds/persistence.vim
 autoload/ingo/foldtext.vim
 autoload/ingo/format.vim
+autoload/ingo/format/columns.vim
 autoload/ingo/fs/path.vim
 autoload/ingo/fs/path/split.vim
 autoload/ingo/fs/tempfile.vim
