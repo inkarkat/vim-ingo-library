@@ -1,14 +1,16 @@
 " ingo/str.vim: String functions.
 "
 " DEPENDENCIES:
+"   - ingo/regexp/collection.vim autoload script
 "   - ingo/regexp/virtcols.vim autoload script
 "
-" Copyright: (C) 2013-2015 Ingo Karkat
+" Copyright: (C) 2013-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.027.007	30-Sep-2016	Add ingo#str#trd().
 "   1.025.006	30-Apr-2015	Add ingo#str#Contains().
 "   1.024.005	01-Apr-2015	Add ingo#str#GetVirtCols().
 "   1.019.004	21-May-2014	Allow optional a:ignorecase argument for
@@ -99,6 +101,24 @@ function! ingo#str#GetVirtCols( string, virtcol, width, isAllowSmaller )
 	throw 'GetVirtCols: Column must be at least 1'
     endif
     return matchstr(a:string, ingo#regexp#virtcols#ExtractCells(a:virtcol, a:width, a:isAllowSmaller))
+endfunction
+
+function! ingo#str#trd( src, fromstr )
+"******************************************************************************
+"* PURPOSE:
+"   Delete characters in a:fromstr in a copy of a:src. Like tr -d, but the
+"   built-in tr() doesn't support this.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:src   Source string.
+"   a:fromstr   Characters that will each be removed from a:src.
+"* RETURN VALUES:
+"   Copy of a:src that has all instances of the characters in a:fromstr removed.
+"******************************************************************************
+    return substitute(a:src, '\C' . ingo#regexp#collection#LiteralToRegexp(a:fromstr), '', 'g')
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
