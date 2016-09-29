@@ -91,6 +91,9 @@ HISTORY							*ingo-library-history*
   g:IngoLibrary_QueryChoices, like ingo#query#Confirm() already does.
 - Expose ingo#query#fromlist#RenderList(). Expose
   ingo#query#StripAccellerator().
+- ENH: ingo#cmdargs#pattern#Parse(): Add second optional a:flagsMatchCount
+  argument, similar to what ingo#cmdargs#substitute#Parse() has in a:options.
+- Add ingo#cmdargs#pattern#RawParse().
 
 1.026	11-Aug-2016
 - Add ingo#strdisplaywidth#pad#Middle().
