@@ -3,12 +3,17 @@
 " DEPENDENCIES:
 "   - ingo/escape.vim autoload script
 "
-" Copyright: (C) 2013-2015 Ingo Karkat
+" Copyright: (C) 2013-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.027.005	29-Sep-2016	ENH: ingo#cmdargs#pattern#Parse(): Add second
+"				optional a:flagsMatchCount argument, similar to
+"				what ingo#cmdargs#substitute#Parse() has in
+"				a:options.
+"				Add ingo#cmdargs#pattern#RawParse().
 "   1.023.004	03-Jan-2015	Add ingo#cmdargs#pattern#IsDelimited().
 "   1.020.003	29-May-2014	Use ingo#escape#Unescape() in
 "				ingo#cmdargs#pattern#Unescape().
@@ -30,6 +35,33 @@
 function! s:Parse( arguments, ... )
     return matchlist(a:arguments, '^\([[:alnum:]\\"|]\@![\x00-\xFF]\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . (a:0 ? a:1 : '') . '$')
 endfunction
+function! ingo#cmdargs#pattern#RawParse( arguments, returnValueOnNoMatch, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Parse a:arguments as a pattern delimited by non-optional /.../ (or similar)
+"   characters, and with optional following flags match.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:arguments Command arguments to parse.
+"   a:returnValueOnNoMatch  Value that will be returned when a:arguments are not
+"			    a delimited pattern.
+"   a:flagsExpr Pattern that captures any optional part after the pattern.
+"   a:flagsMatchCount Number of capture groups returned from a:flagsExpr.
+"* RETURN VALUES:
+"   a:returnValueOnNoMatch if no match
+"   [separator, escapedPattern]; if a:flagsExpr is given
+"   [separator, escapedPattern, flags, ...].
+"******************************************************************************
+    let l:match = call('s:Parse', [a:arguments] + a:000)
+    if empty(l:match)
+	return a:returnValueOnNoMatch
+    else
+	return l:match[1: (a:0 ? (a:0 >= 2 ? a:2 + 2 : 3) : 2)]
+    endif
+endfunction
 function! ingo#cmdargs#pattern#Parse( arguments, ... )
 "******************************************************************************
 "* PURPOSE:
@@ -42,17 +74,20 @@ function! ingo#cmdargs#pattern#Parse( arguments, ... )
 "* INPUTS:
 "   a:arguments Command arguments to parse.
 "   a:flagsExpr Pattern that captures any optional part after the pattern.
+"   a:flagsMatchCount Number of capture groups returned from a:flagsExpr.
 "* RETURN VALUES:
 "   [separator, escapedPattern]; if a:flagsExpr is given
-"   [separator, escapedPattern, flags]. In a:escapedPattern, the a:separator is
-"   consistently escaped (i.e. also when the original arguments haven't been
-"   enclosed in such).
+"   [separator, escapedPattern, flags, ...].
+"   In a:escapedPattern, the a:separator is consistently escaped (i.e. also when
+"   the original arguments haven't been enclosed in such).
 "******************************************************************************
+    " Note: We could delegate to ingo#cmdargs#pattern#RawParse(), but let's
+    " duplicate this for now to avoid another redirection.
     let l:match = call('s:Parse', [a:arguments] + a:000)
     if empty(l:match)
-	return ['/', escape(a:arguments, '/')] + (a:0 ? [''] : [])
+	return ['/', escape(a:arguments, '/')] + (a:0 ? repeat([''], a:0 >= 2 ? a:2 : 1) : [])
     else
-	return l:match[1: (a:0 ? 3 : 2)]
+	return l:match[1: (a:0 ? (a:0 >= 2 ? a:2 + 2 : 3) : 2)]
     endif
 endfunction
 function! ingo#cmdargs#pattern#ParseUnescaped( arguments, ... )
