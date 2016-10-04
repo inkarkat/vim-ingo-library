@@ -9,6 +9,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.028.006	05-Oct-2016	ENH: Also support optional a:flagsMatchCount in
+"				ingo#cmdargs#pattern#ParseUnescaped() and
+"				ingo#cmdargs#pattern#ParseUnescapedWithLiteralWholeWord().
 "   1.027.005	29-Sep-2016	ENH: ingo#cmdargs#pattern#Parse(): Add second
 "				optional a:flagsMatchCount argument, similar to
 "				what ingo#cmdargs#substitute#Parse() has in
@@ -102,17 +105,18 @@ function! ingo#cmdargs#pattern#ParseUnescaped( arguments, ... )
 "* INPUTS:
 "   a:arguments Command arguments to parse.
 "   a:flagsExpr Pattern that captures any optional part after the pattern.
+"   a:flagsMatchCount Number of capture groups returned from a:flagsExpr.
 "* RETURN VALUES:
 "   unescapedPattern (String); if a:flagsExpr is given instead List of
-"   [unescapedPattern, flags]. In a:unescapedPattern, any separator used in
+"   [unescapedPattern, flags, ...]. In a:unescapedPattern, any separator used in
 "   a:arguments is unescaped.
 "******************************************************************************
     let l:match = call('s:Parse', [a:arguments] + a:000)
     if empty(l:match)
-	return (a:0 ? [a:arguments, ''] : a:arguments)
+	return [a:arguments] + (a:0 ? repeat([''], a:0 >= 2 ? a:2 : 1) : [])
     else
 	let l:unescapedPattern = ingo#escape#Unescape(l:match[2], l:match[1])
-	return (a:0 ? [l:unescapedPattern, l:match[3]] : l:unescapedPattern)
+	return [l:unescapedPattern] + l:match[3: (a:0 ? (a:0 >= 2 ? a:2 + 2 : 3) : 2)]
     endif
 endfunction
 function! ingo#cmdargs#pattern#ParseUnescapedWithLiteralWholeWord( arguments, ... )
@@ -130,18 +134,19 @@ function! ingo#cmdargs#pattern#ParseUnescapedWithLiteralWholeWord( arguments, ..
 "* INPUTS:
 "   a:arguments Command arguments to parse.
 "   a:flagsExpr Pattern that captures any optional part after the pattern.
+"   a:flagsMatchCount Number of capture groups returned from a:flagsExpr.
 "* RETURN VALUES:
 "   unescapedPattern (String); if a:flagsExpr is given instead List of
-"   [unescapedPattern, flags]. In a:unescapedPattern, any separator used in
+"   [unescapedPattern, flags, ...]. In a:unescapedPattern, any separator used in
 "   a:arguments is unescaped.
 "******************************************************************************
     let l:match = call('s:Parse', [a:arguments] + a:000)
     if empty(l:match)
 	let l:unescapedPattern = ingo#regexp#FromLiteralText(a:arguments, 1, '')
-	return (a:0 ? [l:unescapedPattern, ''] : l:unescapedPattern)
+	return [l:unescapedPattern] + l:match[3: (a:0 ? (a:0 >= 2 ? a:2 + 2 : 3) : 2)]
     else
 	let l:unescapedPattern = ingo#escape#Unescape(l:match[2], l:match[1])
-	return (a:0 ? [l:unescapedPattern, l:match[3]] : l:unescapedPattern)
+	return [l:unescapedPattern] + l:match[3: (a:0 ? (a:0 >= 2 ? a:2 + 2 : 3) : 2)]
     endif
 endfunction
 
