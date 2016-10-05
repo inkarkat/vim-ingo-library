@@ -12,6 +12,9 @@
 "   1.028.006	05-Oct-2016	ENH: Also support optional a:flagsMatchCount in
 "				ingo#cmdargs#pattern#ParseUnescaped() and
 "				ingo#cmdargs#pattern#ParseUnescapedWithLiteralWholeWord().
+"				Add missing
+"				ingo#cmdargs#pattern#ParseWithLiteralWholeWord()
+"				variant.
 "   1.027.005	29-Sep-2016	ENH: ingo#cmdargs#pattern#Parse(): Add second
 "				optional a:flagsMatchCount argument, similar to
 "				what ingo#cmdargs#substitute#Parse() has in
@@ -89,6 +92,38 @@ function! ingo#cmdargs#pattern#Parse( arguments, ... )
     let l:match = call('s:Parse', [a:arguments] + a:000)
     if empty(l:match)
 	return ['/', escape(a:arguments, '/')] + (a:0 ? repeat([''], a:0 >= 2 ? a:2 : 1) : [])
+    else
+	return l:match[1: (a:0 ? (a:0 >= 2 ? a:2 + 2 : 3) : 2)]
+    endif
+endfunction
+function! ingo#cmdargs#pattern#ParseWithLiteralWholeWord( arguments, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Parse a:arguments as a pattern delimited by optional /.../ (or similar)
+"   characters, and with optional following flags match. When the pattern isn't
+"   delimited by /.../, the returned pattern is modified so that only literal
+"   whole words are matched. Built-in commands like |:djump| also have this
+"   behavior: |:search-args|
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:arguments Command arguments to parse.
+"   a:flagsExpr Pattern that captures any optional part after the pattern.
+"   a:flagsMatchCount Number of capture groups returned from a:flagsExpr.
+"* RETURN VALUES:
+"   [separator, escapedPattern]; if a:flagsExpr is given
+"   [separator, escapedPattern, flags, ...].
+"   In a:escapedPattern, the a:separator is consistently escaped (i.e. also when
+"   the original arguments haven't been enclosed in such).
+"******************************************************************************
+    " Note: We could delegate to ingo#cmdargs#pattern#RawParse(), but let's
+    " duplicate this for now to avoid another redirection.
+    let l:match = call('s:Parse', [a:arguments] + a:000)
+    if empty(l:match)
+	let l:pattern = ingo#regexp#FromLiteralText(a:arguments, 1, '/')
+	return ['/', l:pattern] + (a:0 ? repeat([''], a:0 >= 2 ? a:2 : 1) : [])
     else
 	return l:match[1: (a:0 ? (a:0 >= 2 ? a:2 + 2 : 3) : 2)]
     endif
