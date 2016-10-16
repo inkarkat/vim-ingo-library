@@ -9,6 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.028.007	06-Oct-2016	Add ingo#cmdargs#pattern#Render().
 "   1.028.006	05-Oct-2016	ENH: Also support optional a:flagsMatchCount in
 "				ingo#cmdargs#pattern#ParseUnescaped() and
 "				ingo#cmdargs#pattern#ParseUnescapedWithLiteralWholeWord().
@@ -233,6 +234,23 @@ function! ingo#cmdargs#pattern#IsDelimited( arguments, ... )
 "******************************************************************************
     let l:match = call('s:Parse', [a:arguments] + a:000)
     return (! empty(l:match))
+endfunction
+
+function! ingo#cmdargs#pattern#Render( arguments )
+"******************************************************************************
+"* PURPOSE:
+"   Create a single string from the parsed pattern arguments.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:arguments Return value from any of the ...#Parse... methods defined here.
+"* RETURN VALUES:
+"   String with separator-delimited pattern, followed by any additional flags,
+"   etc.
+"******************************************************************************
+    return a:arguments[0] . a:arguments[1] . a:arguments[0] . join(a:arguments[2:], '')
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
