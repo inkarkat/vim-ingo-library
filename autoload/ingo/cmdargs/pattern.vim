@@ -9,6 +9,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.028.008	17-Oct-2016	BUG: Support of optional a:flagsMatchCount in
+"				ingo#cmdargs#pattern#ParseUnescaped() and
+"				ingo#cmdargs#pattern#ParseUnescapedWithLiteralWholeWord()
+"				broke no-flags String type return value by
+"				returning a one-element list.
 "   1.028.007	06-Oct-2016	Add ingo#cmdargs#pattern#Render().
 "   1.028.006	05-Oct-2016	ENH: Also support optional a:flagsMatchCount in
 "				ingo#cmdargs#pattern#ParseUnescaped() and
@@ -149,10 +154,10 @@ function! ingo#cmdargs#pattern#ParseUnescaped( arguments, ... )
 "******************************************************************************
     let l:match = call('s:Parse', [a:arguments] + a:000)
     if empty(l:match)
-	return [a:arguments] + (a:0 ? repeat([''], a:0 >= 2 ? a:2 : 1) : [])
+	return (a:0 ? [a:arguments] + repeat([''], a:0 >= 2 ? a:2 : 1) : a:arguments)
     else
 	let l:unescapedPattern = ingo#escape#Unescape(l:match[2], l:match[1])
-	return [l:unescapedPattern] + l:match[3: (a:0 ? (a:0 >= 2 ? a:2 + 2 : 3) : 2)]
+	return (a:0 ? [l:unescapedPattern] + l:match[3: (a:0 >= 2 ? a:2 + 2 : 3)] : l:unescapedPattern)
     endif
 endfunction
 function! ingo#cmdargs#pattern#ParseUnescapedWithLiteralWholeWord( arguments, ... )
@@ -179,10 +184,10 @@ function! ingo#cmdargs#pattern#ParseUnescapedWithLiteralWholeWord( arguments, ..
     let l:match = call('s:Parse', [a:arguments] + a:000)
     if empty(l:match)
 	let l:unescapedPattern = ingo#regexp#FromLiteralText(a:arguments, 1, '')
-	return [l:unescapedPattern] + l:match[3: (a:0 ? (a:0 >= 2 ? a:2 + 2 : 3) : 2)]
+	return (a:0 ? [l:unescapedPattern] + repeat([''], a:0 >= 2 ? a:2 : 1) : l:unescapedPattern)
     else
 	let l:unescapedPattern = ingo#escape#Unescape(l:match[2], l:match[1])
-	return [l:unescapedPattern] + l:match[3: (a:0 ? (a:0 >= 2 ? a:2 + 2 : 3) : 2)]
+	return (a:0 ? [l:unescapedPattern] + l:match[3: (a:0 >= 2 ? a:2 + 2 : 3)] : l:unescapedPattern)
     endif
 endfunction
 
