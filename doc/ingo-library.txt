@@ -83,6 +83,19 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.028	RELEASEME
+- ENH: Also support optional a:flagsMatchCount in
+  ingo#cmdargs#pattern#ParseUnescaped() and
+  ingo#cmdargs#pattern#ParseUnescapedWithLiteralWholeWord().
+- Add missing ingo#cmdargs#pattern#ParseWithLiteralWholeWord() variant.
+- ingo#codec#URL#Decode(): Also convert the character set to UTF-8 to properly
+  handle non-ASCII characters. For example, %C3%9C should decode to "Ü", not
+  to "É".
+- Add ingo#collections#SeparateItemsAndSeparators(), a variant of
+  ingo#collections#SplitKeepSeparators().
+- Add ingo/collections/fromsplit.vim module.
+- Add ingo#list#Join().
+
 1.027	30-Sep-2016
 - Add ingo#buffer#temp#ExecuteWithText() and ingo#buffer#temp#CallWithText()
   variants that pre-initialize the buffer (a common use case).
