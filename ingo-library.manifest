@@ -21,6 +21,7 @@ autoload/ingo/cmdrangeconverter.vim
 autoload/ingo/codec/URL.vim
 autoload/ingo/collections.vim
 autoload/ingo/collections/differences.vim
+autoload/ingo/collections/fromsplit.vim
 autoload/ingo/collections/memoized.vim
 autoload/ingo/collections/permute.vim
 autoload/ingo/collections/rotate.vim
