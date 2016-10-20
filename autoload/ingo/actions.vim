@@ -8,6 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.020.009	08-Jun-2014	Expose ingo#actions#GetValExpr().
 "   1.019.008	15-May-2014	In ingo#actions#EvaluateWithValOrFunc(), remove
 "				any occurrence of "v:val" instead of passing an
 "				empty list or empty string. This is useful for
@@ -91,6 +92,9 @@ function! ingo#actions#EvaluateWithVal( expression, val )
 "******************************************************************************
     return get(map([a:val], a:expression), 0, '')
 endfunction
+function! ingo#actions#GetValExpr()
+    return '\w\@<!v:val\w\@!'
+endfunction
 function! ingo#actions#EvaluateWithValOrFunc( Action, ... )
 "******************************************************************************
 "* PURPOSE:
@@ -115,7 +119,7 @@ function! ingo#actions#EvaluateWithValOrFunc( Action, ... )
 	" instead of passing an empty list or empty string. This is useful for
 	" invoking functions (an expression, not Funcref) with optional
 	" arguments.
-	return eval(substitute(a:Action, '\w\@<!v:val\w\@!', '', 'g'))
+	return eval(substitute(a:Action, '\C' . ingo#actions#GetValExpr(), '', 'g'))
     else
 	let l:val = (a:0 == 1 ? a:1 : a:000)
 	return get(map([l:val], a:Action), 0, '')
