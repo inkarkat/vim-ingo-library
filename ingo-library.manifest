@@ -31,6 +31,7 @@ autoload/ingo/compat.vim
 autoload/ingo/compat/complete.vim
 autoload/ingo/compat/regexp.vim
 autoload/ingo/compat/shellcommand.vim
+autoload/ingo/compat/window.vim
 autoload/ingo/cursor.vim
 autoload/ingo/cursor/move.vim
 autoload/ingo/date.vim
@@ -53,6 +54,7 @@ autoload/ingo/foldtext.vim
 autoload/ingo/format.vim
 autoload/ingo/format/columns.vim
 autoload/ingo/fs/path.vim
+autoload/ingo/fs/path/asfilename.vim
 autoload/ingo/fs/path/split.vim
 autoload/ingo/fs/tempfile.vim
 autoload/ingo/fs/traversal.vim
