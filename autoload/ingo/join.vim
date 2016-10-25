@@ -9,6 +9,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.020.002	08-Jun-2014	Do not clobber the default register when joining
+"				lines with separator and not keeping spaces.
 "   1.020.001	08-Jun-2014	file creation from ingocommands.vim
 
 function! ingo#join#Lines( lnum, isKeepSpace, separator )
@@ -28,14 +30,13 @@ function! ingo#join#Lines( lnum, isKeepSpace, separator )
 	execute a:lnum
 	normal! J
 	if ! empty(a:separator)
-	    execute 'normal! ciw' . a:separator . "\<Esc>"
+	    execute 'normal! "_ciw' . a:separator . "\<Esc>"
 	endif
     endif
 endfunction
 
-function! ingo#join#FoldedLines( isKeepSpace, startLnum, endLnum, separator )
-    let l:folds = ingo#folds#GetClosedFolds(a:startLnum, a:endLnum)
-    if empty(l:folds)
+function! ingo#join#Ranges( isKeepSpace, startLnum, endLnum, separator, ranges )
+    if empty(a:ranges)
 	return [0, 0]
     endif
 
@@ -43,17 +44,22 @@ function! ingo#join#FoldedLines( isKeepSpace, startLnum, endLnum, separator )
     let l:save_foldenable = &foldenable
     set nofoldenable
     try
-	for [l:foldStartLnum, l:foldEndLnum] in reverse(l:folds)
-	    let l:cnt = l:foldEndLnum - l:foldStartLnum
+	for [l:rangeStartLnum, l:rangeEndLnum] in reverse(a:ranges)
+	    let l:cnt = l:rangeEndLnum - l:rangeStartLnum
 	    for l:i in range(l:cnt)
-		call ingo#join#Lines(l:foldStartLnum, a:isKeepSpace, a:separator)
+		call ingo#join#Lines(l:rangeStartLnum, a:isKeepSpace, a:separator)
 	    endfor
 	    let l:joinCnt += l:cnt
 	endfor
     finally
 	let &foldenable = l:save_foldenable
     endtry
-    return [len(l:folds), l:joinCnt]
+    return [len(a:ranges), l:joinCnt]
+endfunction
+
+function! ingo#join#FoldedLines( isKeepSpace, startLnum, endLnum, separator )
+    let l:folds = ingo#folds#GetClosedFolds(a:startLnum, a:endLnum)
+    return ingo#join#Ranges(a:isKeepSpace, a:startLnum, a:endLnum, a:separator, l:folds)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
