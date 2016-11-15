@@ -8,9 +8,6 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.028.006	16-Nov-2016	FIX: Correct delegation in
-"				ingo#buffer#temp#Execute(); wrong recursive call
-"				was used (after 1.027).
 "   1.027.005	20-Aug-2016	Add ingo#buffer#temp#ExecuteWithText() and
 "				ingo#buffer#temp#CallWithText() variants that
 "				pre-initialize the buffer (a common use case).
@@ -53,7 +50,7 @@ function! ingo#buffer#temp#Execute( ... )
 "   Contents of the buffer, by default as one newline-delimited string, with
 "   a:isReturnAsList as a List, like getline() does.
 "******************************************************************************
-    return call('ingo#buffer#temp#ExecuteWithText', [''] + a:000)
+    return call('ingo#buffer#temp#Execute', [''] + a:000)
 endfunction
 function! ingo#buffer#temp#ExecuteWithText( text, command, ... )
 "******************************************************************************
