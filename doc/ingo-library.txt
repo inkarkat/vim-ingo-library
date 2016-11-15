@@ -98,6 +98,7 @@ HISTORY							*ingo-library-history*
 - Add ingo/compat/window.vim module.
 - Add ingo/fs/path/asfilename.vim module.
 - Add ingo/list/find.vim module.
+- Add ingo#option#Join().
 
 1.027	30-Sep-2016
 - Add ingo#buffer#temp#ExecuteWithText() and ingo#buffer#temp#CallWithText()
