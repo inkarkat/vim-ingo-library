@@ -8,6 +8,12 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.028.006	16-Nov-2016	FIX: Correct delegation in
+"				ingo#buffer#temp#Execute(); wrong recursive call
+"				was used (after 1.027).
+"   1.027.005	20-Aug-2016	Add ingo#buffer#temp#ExecuteWithText() and
+"				ingo#buffer#temp#CallWithText() variants that
+"				pre-initialize the buffer (a common use case).
 "   1.025.004	29-Jul-20167	FIX: Temporarily reset 'switchbuf' in
 "				ingo#buffer#temp#Execute(), to avoid that
 "				"usetab" switched to another tab page.
@@ -20,8 +26,13 @@
 "				and output of :ls!.
 "   1.008.001	11-Jun-2013	file creation from ingobuffer.vim
 
+function! s:SetBuffer( text )
+    if empty(a:text) | return | endif
+    call append(1, (type(a:text) == type([]) ? a:text : split(a:text, '\n', 1)))
+    silent 1delete _
+endfunction
 let s:tempBufNr = 0
-function! ingo#buffer#temp#Execute( command, ... )
+function! ingo#buffer#temp#Execute( ... )
 "******************************************************************************
 "* PURPOSE:
 "   Invoke an Ex command in an empty temporary scratch buffer and return the
@@ -33,6 +44,30 @@ function! ingo#buffer#temp#Execute( command, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
+"   a:command	Ex command to be invoked.
+"   a:isIgnoreOutput	Flag whether to skip capture of the scratch buffer
+"			contents and just execute a:command for its side
+"			effects.
+"   a:isReturnAsList	Flag whether to return the contents as a List of lines.
+"* RETURN VALUES:
+"   Contents of the buffer, by default as one newline-delimited string, with
+"   a:isReturnAsList as a List, like getline() does.
+"******************************************************************************
+    return call('ingo#buffer#temp#ExecuteWithText', [''] + a:000)
+endfunction
+function! ingo#buffer#temp#ExecuteWithText( text, command, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Invoke an Ex command in a temporary scratch buffer filled with a:text and
+"   return the contents of the buffer after the execution.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   - a:command should have no side effects to the buffer (other than changing
+"     its contents), as it will be reused on subsequent invocations. If you
+"     change any buffer-local option, also undo the change!
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:text      List of lines, or String with newline-delimited lines.
 "   a:command	Ex command to be invoked.
 "   a:isIgnoreOutput	Flag whether to skip capture of the scratch buffer
 "			contents and just execute a:command for its side
@@ -63,6 +98,7 @@ function! ingo#buffer#temp#Execute( command, ... )
 	    let s:tempBufNr = bufnr('')
 	endif
     try
+	call s:SetBuffer(a:text)
 	silent execute a:command
 	if ! a:0 || ! a:1
 	    let l:lines = getline(1, line('$'))
@@ -74,7 +110,10 @@ function! ingo#buffer#temp#Execute( command, ... )
     endtry
 endfunction
 function! ingo#buffer#temp#Call( Funcref, arguments, ... )
-    return call('ingo#buffer#temp#Execute', ['call call(' . string(a:Funcref) . ',' . string(a:arguments) . ')'] + a:000)
+    return call('ingo#buffer#temp#ExecuteWithText', ['', 'call call(' . string(a:Funcref) . ',' . string(a:arguments) . ')'] + a:000)
+endfunction
+function! ingo#buffer#temp#CallWithText( text, Funcref, arguments, ... )
+    return call('ingo#buffer#temp#ExecuteWithText', [a:text, 'call call(' . string(a:Funcref) . ',' . string(a:arguments) . ')'] + a:000)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
