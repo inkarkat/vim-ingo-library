@@ -8,6 +8,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.009.003	14-Jun-2013	Minor: Make substitute() robust against
+"				'ignorecase'.
 "   1.005.002	17-Apr-2013	Add ingo#err#IsSet() for those cases when
 "				wrapping the command in :if does not work (e.g.
 "				:call'ing a range function).
@@ -60,7 +62,7 @@ function! ingo#err#SetVimException()
     call ingo#err#Set(ingo#msg#MsgFromVimException())
 endfunction
 function! ingo#err#SetCustomException( customPrefixPattern )
-    call ingo#err#Set(substitute(v:exception, printf('^\%%(%s\):\s*', a:customPrefixPattern), '', ''))
+    call ingo#err#Set(substitute(v:exception, printf('^\C\%%(%s\):\s*', a:customPrefixPattern), '', ''))
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
