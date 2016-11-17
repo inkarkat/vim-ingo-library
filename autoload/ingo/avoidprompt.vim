@@ -27,6 +27,14 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.028.003	18-Nov-2016	ENH: Add optional a:reservedColumns also to
+"				ingo#avoidprompt#TruncateTo(), and pass this
+"				from ingo#avoidprompt#Truncate().
+"				ingo#avoidprompt#TruncateTo(): The strright()
+"				cannot precisely account for the rendering of
+"				tab widths. Check the result, and if necessary,
+"				remove further characters until we go below the
+"				limit.
 "   1.026.002	11-Aug-2016	ENH: ingo#avoidprompt#TruncateTo() has a
 "				configurable ellipsis string
 "				g:IngoLibrary_TruncateEllipsis, now defaulting
@@ -70,7 +78,7 @@ function! ingo#avoidprompt#MaxLength()
     return l:maxLength
 endfunction
 
-function! ingo#avoidprompt#TruncateTo( text, length )
+function! ingo#avoidprompt#TruncateTo( text, length, ... )
 "*******************************************************************************
 "* PURPOSE:
 "   Truncate a:text to a maximum of a:length virtual columns by dropping text in
@@ -86,12 +94,18 @@ function! ingo#avoidprompt#TruncateTo( text, length )
 "* INPUTS:
 "   a:text	Text which may be truncated to fit.
 "   a:length	Maximum virtual columns for a:text.
+"   a:reservedColumns	Optional number of columns that are already taken in the
+"			line (before a:text, this matters for tab rendering); if
+"			specified, a:text will be truncated to (MaxLength() -
+"			a:reservedColumns).
 "* RETURN VALUES:
 "   Truncated a:text.
 "*******************************************************************************
     if a:length <= 0
 	return ''
     endif
+    let l:reservedColumns = (a:0 > 0 ? a:1 : 0)
+    let l:reservedPadding = repeat(' ', l:reservedColumns)
 
     " The \%<23v regexp item uses the local 'tabstop' value to determine the
     " virtual column. As we want to echo with default tabstop 8, we need to
@@ -101,7 +115,7 @@ function! ingo#avoidprompt#TruncateTo( text, length )
 
     let l:text = a:text
     try
-	if ingo#strdisplaywidth#HasMoreThan(l:text, a:length)
+	if ingo#strdisplaywidth#HasMoreThan(l:reservedPadding . l:text, a:length + l:reservedColumns)
 	    let l:ellipsisLength = ingo#compat#strchars(g:IngoLibrary_TruncateEllipsis)
 
 	    " Handle pathological cases.
@@ -117,7 +131,25 @@ function! ingo#avoidprompt#TruncateTo( text, length )
 	    let l:frontCol = l:length / 2
 	    let l:backCol  = (l:length % 2 == 0 ? (l:frontCol - 1) : l:frontCol)
 "**** echomsg '**** ' a:length ':' l:frontCol '-' l:backCol
-	    let l:text = ingo#strdisplaywidth#strleft(l:text, l:frontCol) . g:IngoLibrary_TruncateEllipsis . ingo#strdisplaywidth#strright(l:text, l:backCol)
+	    while 1
+		let l:fullText =
+		\   ingo#strdisplaywidth#strleft(l:reservedPadding . l:text, l:frontCol) .
+		\   g:IngoLibrary_TruncateEllipsis .
+		\   ingo#strdisplaywidth#strright(l:text, l:backCol)
+
+		" The strright() cannot precisely account for the rendering of
+		" tab widths. Check the result, and if necessary, remove further
+		" characters until we go below the limit.
+		if ! ingo#strdisplaywidth#HasMoreThan(l:fullText, a:length + l:reservedColumns)
+		    let l:text = strpart(l:fullText, l:reservedColumns)
+		    break
+		endif
+		if l:backCol > 0
+		    let l:backCol -= 1
+		else
+		    let l:frontCol -= 1
+		endif
+	    endwhile
 	endif
     finally
 	let &l:tabstop = l:save_ts
@@ -137,8 +169,9 @@ function! ingo#avoidprompt#Truncate( text, ... )
 "* INPUTS:
 "   a:text	Text which may be truncated to fit.
 "   a:reservedColumns	Optional number of columns that are already taken in the
-"			line; if specified, a:text will be truncated to
-"			(MaxLength() - a:reservedColumns).
+"			line (before a:text, this matters for tab rendering); if
+"			specified, a:text will be truncated to (MaxLength() -
+"			a:reservedColumns).
 "* RETURN VALUES:
 "   Truncated a:text.
 "*******************************************************************************
@@ -151,7 +184,7 @@ function! ingo#avoidprompt#Truncate( text, ... )
     let l:reservedColumns = (a:0 > 0 ? a:1 : 0)
     let l:maxLength = ingo#avoidprompt#MaxLength() - l:reservedColumns
 
-    return ingo#avoidprompt#TruncateTo( a:text, l:maxLength )
+    return ingo#avoidprompt#TruncateTo( a:text, l:maxLength, l:reservedColumns )
 endfunction
 
 function! ingo#avoidprompt#TranslateLineBreaks( text )
