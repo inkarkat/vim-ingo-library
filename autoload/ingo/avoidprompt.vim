@@ -15,17 +15,25 @@
 "   and double-width characters (e.g. Japanese Kanji) are taken into account.
 
 " DEPENDENCIES:
+"   - ingo/compat.vim autoload script
 "   - ingo/strdisplaywidth.vim autoload script
 "
 " TODO:
 "   - Consider 'cmdheight', add argument isSingleLine.
 "
-" Copyright: (C) 2008-2014 Ingo Karkat
+" Copyright: (C) 2008-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.026.002	11-Aug-2016	ENH: ingo#avoidprompt#TruncateTo() has a
+"				configurable ellipsis string
+"				g:IngoLibrary_TruncateEllipsis, now defaulting
+"				to a single-char UTF-8 variant if we're in such
+"				encoding. Thanks to Daniel Hahler for sending a
+"				patch! It also handles pathologically small
+"				lengths that only show / cut into the ellipsis.
 "   1.008.001	07-Jun-2013	file creation from EchoWithoutScrolling.vim
 
 function! ingo#avoidprompt#MaxLength()
@@ -72,7 +80,7 @@ function! ingo#avoidprompt#TruncateTo( text, length )
 "   - ingo#strdisplaywidth#TruncateTo() does something similar, but truncates at
 "     the end, and doesn't account for buffer-local tabstop values.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   none
+"   The ellipsis can be configured by g:IngoLibrary_TruncateEllipsis.
 "* EFFECTS / POSTCONDITIONS:
 "   none
 "* INPUTS:
@@ -94,12 +102,22 @@ function! ingo#avoidprompt#TruncateTo( text, length )
     let l:text = a:text
     try
 	if ingo#strdisplaywidth#HasMoreThan(l:text, a:length)
-	    " We need 3 characters for the '...'; 1 must be added to both lengths
-	    " because columns start at 1, not 0.
-	    let l:frontCol = a:length / 2
-	    let l:backCol  = (a:length % 2 == 0 ? (l:frontCol - 1) : l:frontCol)
+	    let l:ellipsisLength = ingo#compat#strchars(g:IngoLibrary_TruncateEllipsis)
+
+	    " Handle pathological cases.
+	    if a:length == l:ellipsisLength
+		return g:IngoLibrary_TruncateEllipsis
+	    elseif a:length < l:ellipsisLength
+		return ingo#compat#strcharpart(g:IngoLibrary_TruncateEllipsis, 0, a:length)
+	    endif
+
+	    " Consider the length of the (configurable) "..." ellipsis.
+	    " 1 must be added because columns start at 1, not 0.
+	    let l:length = a:length - l:ellipsisLength + 1
+	    let l:frontCol = l:length / 2
+	    let l:backCol  = (l:length % 2 == 0 ? (l:frontCol - 1) : l:frontCol)
 "**** echomsg '**** ' a:length ':' l:frontCol '-' l:backCol
-	    let l:text = ingo#strdisplaywidth#strleft(l:text, l:frontCol) . '...' . ingo#strdisplaywidth#strright(l:text, l:backCol)
+	    let l:text = ingo#strdisplaywidth#strleft(l:text, l:frontCol) . g:IngoLibrary_TruncateEllipsis . ingo#strdisplaywidth#strright(l:text, l:backCol)
 	endif
     finally
 	let &l:tabstop = l:save_ts
