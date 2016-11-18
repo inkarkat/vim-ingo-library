@@ -12,6 +12,60 @@
 "				tab pages.
 "   1.028.001	18-Nov-2016	file creation
 
+function! s:FindBufferOnTabPage( isConsiderNearest, tabPageNr, bufNr )
+    let l:bufferNumbers = tabpagebuflist(a:tabPageNr)
+
+    if a:isConsiderNearest
+	let l:currentIdx = tabpagewinnr(a:tabPageNr) - 1
+	if l:bufferNumbers[l:currentIdx] == a:bufNr
+	    return l:currentIdx + 1
+	endif
+	let l:previousIdx = tabpagewinnr(a:tabPageNr, '#') - 1
+	if l:previousIdx >= 0 && l:bufferNumbers[l:previousIdx] == a:bufNr
+	    return l:previousIdx + 1
+	endif
+    endif
+
+    for l:i in range(len(l:bufferNumbers))
+	if l:bufferNumbers[l:i] == a:bufNr
+	    return l:i + 1
+	endif
+    endfor
+    return 0
+endfunction
+
+function! ingo#buffer#locate#BufTabPageWinNr( bufNr )
+"******************************************************************************
+"* PURPOSE:
+"   Locate the first window that contains a:bufNr, in this tab page (like
+"   bufwinnr()), or in other tab pages. Can be used to emulate the behavior of
+"   :sbuffer with 'switchbuf' containing "useopen,usetab".
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:bufNr                 Buffer number of the target buffer.
+"* RETURN VALUES:
+"   [tabpagenr, winnr] if the buffer is on a different tab page
+"   [0, winnr] if the buffer is on the current tab page
+"   [0, 0] if a:bufNr is not found in other windows
+"******************************************************************************
+    let l:winNr = bufwinnr(a:bufNr)
+    if l:winNr > 0
+	return [0, l:winNr]
+    endif
+
+    for l:tabPageNr in filter(range(1, tabpagenr('$')), 'v:val != ' . tabpagenr())
+	let l:winNr = s:FindBufferOnTabPage(0, l:tabPageNr, a:bufNr)
+	if l:winNr != 0
+	    return [l:tabPageNr, l:winNr]
+	endif
+    endfor
+
+    return [0, 0]
+endfunction
+
 function! ingo#buffer#locate#NearestWindow( isSearchOtherTabPages, bufNr )
 "******************************************************************************
 "* PURPOSE:
@@ -55,11 +109,11 @@ function! ingo#buffer#locate#NearestWindow( isSearchOtherTabPages, bufNr )
     let [l:currentTabPageNr, l:lastTabPageNr] = [tabpagenr(), tabpagenr('$')]
     let l:offset = 1
     while l:currentTabPageNr - l:offset > 0 || l:currentTabPageNr + l:offset <= l:lastTabPageNr
-	let l:winNr = s:FindBufferOnTabPage(l:currentTabPageNr - l:offset, a:bufNr)
+	let l:winNr = s:FindBufferOnTabPage(1, l:currentTabPageNr - l:offset, a:bufNr)
 	if l:winNr != 0
 	    return [l:currentTabPageNr - l:offset, l:winNr]
 	endif
-	let l:winNr = s:FindBufferOnTabPage(l:currentTabPageNr + l:offset, a:bufNr)
+	let l:winNr = s:FindBufferOnTabPage(1, l:currentTabPageNr + l:offset, a:bufNr)
 	if l:winNr != 0
 	    return [l:currentTabPageNr + l:offset, l:winNr]
 	endif
@@ -68,24 +122,40 @@ function! ingo#buffer#locate#NearestWindow( isSearchOtherTabPages, bufNr )
 
     return [0, 0]
 endfunction
-function! s:FindBufferOnTabPage( tabPageNr, bufNr )
-    let l:bufferNumbers = tabpagebuflist(a:tabPageNr)
 
-    let l:currentIdx = tabpagewinnr(a:tabPageNr) - 1
-    if l:bufferNumbers[l:currentIdx] == a:bufNr
-	return l:currentIdx + 1
-    endif
-    let l:previousIdx = tabpagewinnr(a:tabPageNr, '#') - 1
-    if l:previousIdx >= 0 && l:bufferNumbers[l:previousIdx] == a:bufNr
-	return l:previousIdx + 1
-    endif
-
-    for l:i in range(len(l:bufferNumbers))
-	if l:bufferNumbers[l:i] == a:bufNr
-	    return l:i + 1
+function! ingo#buffer#locate#Window( strategy, isSearchOtherTabPages, bufNr )
+"******************************************************************************
+"* PURPOSE:
+"   Locate a window that contains a:bufNr, with a:strategy to determine
+"   precedences. Similar to bufwinnr() with configurable precedences, and
+"   optionally looking into other tab pages.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:strategy              One of "first" or "nearest".
+"   a:isSearchOtherTabPages Flag whether windows in other tab pages should also
+"			    be considered.
+"   a:bufNr                 Buffer number of the target buffer.
+"* RETURN VALUES:
+"   [tabpagenr, winnr] if a:isSearchOtherTabPages and the buffer is on a
+"	different tab page
+"   [0, winnr] if the buffer is on the current tab page
+"   [0, 0] if a:bufNr is not found in other windows
+"******************************************************************************
+    if a:strategy ==# 'first'
+	if a:isSearchOtherTabPages
+	    return ingo#buffer#locate#BufTabPageWinNr(a:bufNr)
+	else
+	    let l:winNr = bufwinnr(a:bufNr)
+	    return (l:winNr > 0 ? [0, l:winNr] : [0, 0])
 	endif
-    endfor
-    return 0
+    elseif a:strategy ==# 'nearest'
+	return ingo#buffer#locate#NearestWindow(a:isSearchOtherTabPages, a:bufNr)
+    else
+	throw 'ASSERT: Unknown strategy ' . string(a:strategy)
+    endif
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
