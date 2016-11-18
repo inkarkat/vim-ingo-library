@@ -8,6 +8,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.028.002	19-Nov-2016	Also prefer current / previous window in other
+"				tab pages.
 "   1.028.001	18-Nov-2016	file creation
 
 function! ingo#buffer#locate#NearestWindow( isSearchOtherTabPages, bufNr )
@@ -68,6 +70,16 @@ function! ingo#buffer#locate#NearestWindow( isSearchOtherTabPages, bufNr )
 endfunction
 function! s:FindBufferOnTabPage( tabPageNr, bufNr )
     let l:bufferNumbers = tabpagebuflist(a:tabPageNr)
+
+    let l:currentIdx = tabpagewinnr(a:tabPageNr) - 1
+    if l:bufferNumbers[l:currentIdx] == a:bufNr
+	return l:currentIdx + 1
+    endif
+    let l:previousIdx = tabpagewinnr(a:tabPageNr, '#') - 1
+    if l:previousIdx >= 0 && l:bufferNumbers[l:previousIdx] == a:bufNr
+	return l:previousIdx + 1
+    endif
+
     for l:i in range(len(l:bufferNumbers))
 	if l:bufferNumbers[l:i] == a:bufNr
 	    return l:i + 1
