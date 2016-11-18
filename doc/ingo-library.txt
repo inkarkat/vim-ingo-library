@@ -102,6 +102,14 @@ HISTORY							*ingo-library-history*
 - FIX: Correct delegation in ingo#buffer#temp#Execute(); wrong recursive call
   was used (after 1.027).
 - ENH: Add optional a:isSilent argument to ingo#buffer#temp#Execute().
+- ENH: Add optional a:reservedColumns also to ingo#avoidprompt#TruncateTo(),
+  and pass this from ingo#avoidprompt#Truncate().
+- ingo#avoidprompt#TruncateTo(): The strright() cannot precisely account for
+  the rendering of tab widths. Check the result, and if necessary, remove
+  further characters until we go below the limit.
+- ENH: Add optional {context} to all ingo#err#... functions, in case other
+  custom commands can be called between error setting and checking, to avoid
+  clobbering of your error message.
 
 1.027	30-Sep-2016
 - Add ingo#buffer#temp#ExecuteWithText() and ingo#buffer#temp#CallWithText()
