@@ -65,6 +65,7 @@ autoload/ingo/gui/position.vim
 autoload/ingo/join.vim
 autoload/ingo/lines.vim
 autoload/ingo/list.vim
+autoload/ingo/list/find.vim
 autoload/ingo/mapmaker.vim
 autoload/ingo/matches.vim
 autoload/ingo/mbyte/virtcol.vim
