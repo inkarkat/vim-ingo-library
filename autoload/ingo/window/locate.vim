@@ -17,14 +17,8 @@ function! s:Match( winVarName, Predicate, winNr, ... )
     return !! ingo#actions#EvaluateWithValOrFunc(a:Predicate, l:value)
 endfunction
 
-function! s:CheckTabPageNearest( tabNr, winVarName, Predicate )
-    let [l:currentWinNr, l:previousWinNr, l:lastWinNr] = [tabpagewinnr(a:tabNr), tabpagewinnr(a:tabNr, '#'), tabpagewinnr(a:tabNr, '$')]
-    if s:Match(a:winVarName, a:Predicate, l:currentWinNr, a:tabNr)
-	return [a:tabNr, l:currentWinNr]
-    elseif s:Match(a:winVarName, a:Predicate, l:previousWinNr, a:tabNr)
-	return [a:tabNr, l:previousWinNr]
-    endif
-
+function! s:CheckTabPage( tabNr, winVarName, Predicate )
+    let [l:currentWinNr, l:lastWinNr] = [tabpagewinnr(a:tabNr), tabpagewinnr(a:tabNr, '$')]
     let l:offset = 1
     while l:currentWinNr - l:offset > 0 || l:currentWinNr + l:offset <= l:lastWinNr
 	if s:Match(a:winVarName, a:Predicate, l:currentWinNr - l:offset, a:tabNr)
@@ -65,7 +59,7 @@ function! ingo#window#locate#NearestByPredicate( isSearchOtherTabPages, winVarNa
 	return [tabpagenr(), l:lastWinNr]
     endif
 
-    let l:result = s:CheckTabPageNearest(tabpagenr(), a:winVarName, a:Predicate)
+    let l:result = s:CheckTabPage(tabpagenr(), a:winVarName, a:Predicate)
     if l:result != [0, 0] || ! a:isSearchOtherTabPages
 	return l:result
     endif
@@ -74,10 +68,10 @@ function! ingo#window#locate#NearestByPredicate( isSearchOtherTabPages, winVarNa
     let [l:currentTabPageNr, l:lastTabPageNr] = [tabpagenr(), tabpagenr('$')]
     let l:offset = 1
     while l:currentTabPageNr - l:offset > 0 || l:currentTabPageNr + l:offset <= l:lastTabPageNr
-	let l:result = s:CheckTabPageNearest(l:currentTabPageNr - l:offset, a:winVarName, a:Predicate)
+	let l:result = s:CheckTabPage(l:currentTabPageNr - l:offset, a:winVarName, a:Predicate)
 	if l:result != [0, 0] | return l:result | endif
 
-	let l:result = s:CheckTabPageNearest(l:currentTabPageNr + l:offset, a:winVarName, a:Predicate)
+	let l:result = s:CheckTabPage(l:currentTabPageNr + l:offset, a:winVarName, a:Predicate)
 	if l:result != [0, 0] | return l:result | endif
 
 	let l:offset += 1
