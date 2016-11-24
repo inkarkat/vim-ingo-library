@@ -11,6 +11,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.026.017	11-Aug-2016	Add ingo#compat#strgetchar() and
+"				ingo#compat#strcharpart(), introduced in Vim
+"				7.4.1730.
+"				Support ingo#compat#strchars() optional {skipcc}
+"				argument, introduced in Vim 7.4.755.
 "   1.025.016	15-Jul-2016	Add ingo#compat#sha256(), with a fallback to an
 "				external sha256sum command.
 "   1.024.015	23-Apr-2015	Add ingo#compat#shiftwidth(), taken from :h
@@ -71,12 +76,44 @@ else
 endif
 
 if exists('*strchars')
-    function! ingo#compat#strchars( expr )
-	return strchars(a:expr)
+    if v:version == 704 && has('patch755') || v:version > 704
+	function! ingo#compat#strchars( ... )
+	    return call('strchars', a:000)
+	endfunction
+    else
+	function! ingo#compat#strchars( expr, ... )
+	    return (a:0 && a:1 ? strlen(substitute(a:expr, ".", "x", "g")) : strchars(a:expr))
+	endfunction
+    endif
+else
+    function! ingo#compat#strchars( expr, ... )
+	return len(split(a:expr, '\zs'))
+    endfunction
+endif
+
+if exists('*strgetchar')
+    function! ingo#compat#strgetchar( expr, index )
+	return strgetchar(a:expr, a:index)
     endfunction
 else
-    function! ingo#compat#strchars( expr )
-	return len(split(a:expr, '\zs'))
+    function! ingo#compat#strgetchar( expr, index )
+	return char2nr(matchstr(a:expr, '.\{' . a:index . '}\zs.'))
+    endfunction
+endif
+
+if exists('*strcharpart')
+    function! ingo#compat#strcharpart( ... )
+	return call('strcharpart', a:000)
+    endfunction
+else
+    function! ingo#compat#strcharpart( src, start, ... )
+	let [l:start, l:len] = [a:start, a:0 ? a:1 : 0]
+	if l:start < 0
+	    let l:len += l:start
+	    let l:start = 0
+	endif
+
+	return matchstr(a:src, '.\{' . l:start . '}\zs.' . (a:0 ? '\{,' . max([0, l:len]) . '}' : '*'))
     endfunction
 endif
 
