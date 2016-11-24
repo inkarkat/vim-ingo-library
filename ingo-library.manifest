@@ -3,6 +3,7 @@ autoload/ingo/actions/iterations.vim
 autoload/ingo/actions/special.vim
 autoload/ingo/avoidprompt.vim
 autoload/ingo/buffer.vim
+autoload/ingo/buffer/locate.vim
 autoload/ingo/buffer/scratch.vim
 autoload/ingo/buffer/temp.vim
 autoload/ingo/buffer/temprange.vim
