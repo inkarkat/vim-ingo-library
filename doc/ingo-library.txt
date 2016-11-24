@@ -110,6 +110,7 @@ HISTORY							*ingo-library-history*
 - ENH: Add optional {context} to all ingo#err#... functions, in case other
   custom commands can be called between error setting and checking, to avoid
   clobbering of your error message.
+- Add ingo/buffer/locate.vim module.
 
 1.027	30-Sep-2016
 - Add ingo#buffer#temp#ExecuteWithText() and ingo#buffer#temp#CallWithText()
