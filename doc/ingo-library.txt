@@ -111,6 +111,9 @@ HISTORY							*ingo-library-history*
   custom commands can be called between error setting and checking, to avoid
   clobbering of your error message.
 - Add ingo/buffer/locate.vim module.
+- Add ingo/window/locate.vim module.
+- Add ingo/indent.vim module.
+- Add ingo#compat#getcurpos().
 
 1.027	30-Sep-2016
 - Add ingo#buffer#temp#ExecuteWithText() and ingo#buffer#temp#CallWithText()
