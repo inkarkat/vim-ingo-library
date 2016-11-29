@@ -46,7 +46,7 @@ function! s:ExpandOne( text, level )
 	let l:braceElements = ingo#collections#Flatten1(map(l:braceElements, 's:ExpandOne(v:val, a:level - 1)'))
     endif
 
-    return map(l:braceElements, 'l:pre . v:val . l:post')
+    return ingo#collections#Flatten1(map(l:braceElements, 's:ExpandOne(l:pre . v:val . l:post, a:level)'))
 endfunction
 function! subs#BraceExpansion#Do( text, ... )
     let l:joiner = (a:0 ? a:1 : ' ')
