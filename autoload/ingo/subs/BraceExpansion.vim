@@ -36,7 +36,10 @@ endfunction
 function! s:ExpandOne( text, level )
     let l:parse = matchlist(a:text, printf('^\(.\{-}\)%s\(.\{-}\)%s\(.*\)$', "\001<" . a:level . "\001", "\001" . a:level . ">\001"))
     if empty(l:parse)
-	return [a:text]
+	return (a:level > 1 ?
+	\   s:ExpandOne(a:text, a:level - 1) :
+	\   [a:text]
+	\)
     endif
 
     let [l:pre, l:braceList, l:post] = l:parse[1:3]
@@ -50,11 +53,16 @@ function! s:ExpandOne( text, level )
 endfunction
 function! subs#BraceExpansion#Do( text, ... )
     let l:joiner = (a:0 ? a:1 : ' ')
+    let l:result = []
 
-    let [l:nestingLevel, l:processedText] = s:ProcessBraces(a:text)
+    let l:words = split(a:text, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\V' . escape(l:joiner, '\'), 1)
+    for l:w in map(l:words, 'ingo#escape#UnescapeExpr(v:val, "\\V" . escape(l:joiner, "\\"))')
+	let [l:nestingLevel, l:processedText] = s:ProcessBraces(l:w)
+	let l:expansions = s:ExpandOne(l:processedText, l:nestingLevel)
+	let l:result += l:expansions
+    endfor
 
-    let l:expansions = s:ExpandOne(l:processedText, l:nestingLevel)
-    return join(l:expansions, l:joiner)
+    return join(l:result, l:joiner)
 endfunction
 
 let &cpo = s:save_cpo
