@@ -1,6 +1,8 @@
 " subs/BraceExpansion.vim: Generate arbitrary strings like in Bash.
 "
 " DEPENDENCIES:
+"   - ingo/collections.vim autoload script
+"   - ingo/escape.vim autoload script
 "
 " Copyright: (C) 2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -16,15 +18,21 @@ function! s:ProcessListInBraces( bracesText, iterationCnt )
     return ingo#escape#Unescape(substitute(a:bracesText, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!,', "\001" . a:iterationCnt . ";\001", "g"), ',')
 endfunction
 function! s:ProcessBraces( text )
+    " We need to process nested braces from the outside to the inside;
+    " unfortunately, with regexp parsing, we cannot skip over inner matching
+    " braces. To work around that, we process all braces from the inside out,
+    " and translate them into special tokens: ^A<N^A ... ^AN;^A ... ^AN>^A,
+    " where ^A is 0x01 (hopefully not occurring as this token in the text), N is
+    " the nesting level (1 = innermost), and < ; > are the substitutes for { , }
     let l:text = a:text
-    let l:previousText = 'X' . a:text
+    let l:previousText = 'X' . a:text   " Make this unequal to the current one, handle empty string.
 
     let l:iterationCnt = 1
     while l:previousText !=# l:text
 	let l:previousText = l:text
 	let l:text = substitute(
 	\   l:text,
-	\   '\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!{\(\%([^{}]\|\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\[{}]\)\+\)}',
+	\   '\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!{\(\%([^{}]\|\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\[{}]\)*,\%([^{}]\|\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\[{}]\)*\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!}',
 	\   '\=submatch(1) . "\001<" . l:iterationCnt . "\001" . s:ProcessListInBraces(submatch(2), l:iterationCnt) . "\001" . l:iterationCnt . ">\001"',
 	\   'g'
 	\)
@@ -62,6 +70,7 @@ function! subs#BraceExpansion#Do( text, ... )
 	let l:result += l:expansions
     endfor
 
+    call map(l:result, 'ingo#escape#Unescape(v:val, "\\{}")')
     return join(l:result, l:joiner)
 endfunction
 
