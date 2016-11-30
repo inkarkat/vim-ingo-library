@@ -60,11 +60,30 @@ function! s:ExpandOne( text, level )
     return ingo#collections#Flatten1(map(l:braceElements, 's:ExpandOne(l:pre . v:val . l:post, a:level)'))
 endfunction
 function! subs#BraceExpansion#Do( text, ... )
+"******************************************************************************
+"* PURPOSE:
+"	Expand "foo{x,y}" inside a:text to "foox fooy", like Bash's brace
+"	expansion.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:text  Source text with braces.
+"   a:joiner    Literal text to be used to join the expanded expressions;
+"		defaults to a <Space> character.
+"   a:braceSeparatorPattern Regular expression to separate the expressions where
+"			    braces are expanded; defaults to a:joiner.
+"* RETURN VALUES:
+"   a:text, separated by a:braceSeparatorPattern, each part had brace
+"   expressions expanded, then joined by a:joiner, and all put together again.
+"******************************************************************************
     let l:joiner = (a:0 ? a:1 : ' ')
+    let l:braceSeparatorPattern = (a:0 >= 2 ? a:2 : '\V' . escape(l:joiner, '\'))
     let l:result = []
 
-    let l:words = split(a:text, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\V' . escape(l:joiner, '\'), 1)
-    for l:w in map(l:words, 'ingo#escape#UnescapeExpr(v:val, "\\V" . escape(l:joiner, "\\"))')
+    let l:words = split(a:text, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!' . l:braceSeparatorPattern, 1)
+    for l:w in map(l:words, 'ingo#escape#UnescapeExpr(v:val, l:braceSeparatorPattern)')
 	let [l:nestingLevel, l:processedText] = s:ProcessBraces(l:w)
 	let l:expansions = s:ExpandOne(l:processedText, l:nestingLevel)
 	let l:result += l:expansions
