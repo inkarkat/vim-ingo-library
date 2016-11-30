@@ -2,6 +2,7 @@
 "
 " DEPENDENCIES:
 "   - ingo/collections.vim autoload script
+"   - ingo/collections/fromsplit.vim autoload script
 "   - ingo/escape.vim autoload script
 "
 " Copyright: (C) 2016 Ingo Karkat
@@ -41,11 +42,11 @@ function! s:ProcessBraces( text )
 
     return [l:iterationCnt - 2, l:text]
 endfunction
-function! s:ExpandOne( text, level )
+function! s:ExpandOneLevel( text, level )
     let l:parse = matchlist(a:text, printf('^\(.\{-}\)%s\(.\{-}\)%s\(.*\)$', "\001<" . a:level . "\001", "\001" . a:level . ">\001"))
     if empty(l:parse)
 	return (a:level > 1 ?
-	\   s:ExpandOne(a:text, a:level - 1) :
+	\   s:ExpandOneLevel(a:text, a:level - 1) :
 	\   [a:text]
 	\)
     endif
@@ -54,10 +55,16 @@ function! s:ExpandOne( text, level )
     let l:braceElements = split(l:braceList, "\001" . a:level . ";\001", 1)
 
     if a:level > 1
-	let l:braceElements = ingo#collections#Flatten1(map(l:braceElements, 's:ExpandOne(v:val, a:level - 1)'))
+	let l:braceElements = ingo#collections#Flatten1(map(l:braceElements, 's:ExpandOneLevel(v:val, a:level - 1)'))
     endif
 
-    return ingo#collections#Flatten1(map(l:braceElements, 's:ExpandOne(l:pre . v:val . l:post, a:level)'))
+    return ingo#collections#Flatten1(map(l:braceElements, 's:ExpandOneLevel(l:pre . v:val . l:post, a:level)'))
+endfunction
+function! subs#BraceExpansion#ExpandWord( word, joiner )
+    let [l:nestingLevel, l:processedText] = s:ProcessBraces(a:word)
+    let l:expansions = s:ExpandOneLevel(l:processedText, l:nestingLevel)
+    call map(l:expansions, 'ingo#escape#Unescape(v:val, "\\{}")')
+    return join(l:expansions, a:joiner)
 endfunction
 function! subs#BraceExpansion#Do( text, ... )
 "******************************************************************************
@@ -73,24 +80,22 @@ function! subs#BraceExpansion#Do( text, ... )
 "   a:joiner    Literal text to be used to join the expanded expressions;
 "		defaults to a <Space> character.
 "   a:braceSeparatorPattern Regular expression to separate the expressions where
-"			    braces are expanded; defaults to a:joiner.
+"			    braces are expanded; defaults to a:joiner or
+"			    any whitespace.
 "* RETURN VALUES:
 "   a:text, separated by a:braceSeparatorPattern, each part had brace
 "   expressions expanded, then joined by a:joiner, and all put together again.
 "******************************************************************************
     let l:joiner = (a:0 ? a:1 : ' ')
-    let l:braceSeparatorPattern = (a:0 >= 2 ? a:2 : '\V' . escape(l:joiner, '\'))
-    let l:result = []
+    let l:braceSeparatorPattern = (a:0 >= 2 ? a:2 : (a:0 ? '\V' . escape(l:joiner, '\') : '\_s\+'))
 
-    let l:words = split(a:text, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!' . l:braceSeparatorPattern, 1)
-    for l:w in map(l:words, 'ingo#escape#UnescapeExpr(v:val, l:braceSeparatorPattern)')
-	let [l:nestingLevel, l:processedText] = s:ProcessBraces(l:w)
-	let l:expansions = s:ExpandOne(l:processedText, l:nestingLevel)
-	let l:result += l:expansions
-    endfor
+    let l:result = ingo#collections#fromsplit#MapItems(
+    \   a:text,
+    \   '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!' . l:braceSeparatorPattern,
+    \   printf('subs#BraceExpansion#ExpandWord(ingo#escape#UnescapeExpr(v:val, %s), %s)', string(l:braceSeparatorPattern), string(l:joiner))
+    \)
 
-    call map(l:result, 'ingo#escape#Unescape(v:val, "\\{}")')
-    return join(l:result, l:joiner)
+    return join(l:result, '')
 endfunction
 
 let &cpo = s:save_cpo
