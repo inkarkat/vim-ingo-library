@@ -17,6 +17,10 @@
 "				changed ingo#comments#CheckComment() default
 "				behavior, this isn't necessary, and is
 "				unexpected.
+"				ingo#comments#RenderComment: When the text
+"				starts with indent identical to what
+"				'commentstring' would render, avoid having
+"				duplicate indent.
 "   1.005.004	02-May-2013	Move to ingo-library.
 "	003	24-May-2012	Add ingocomments#RemoveCommentPrefix().
 "	002	09-Nov-2011	Add ingocomments#CheckComment() and
@@ -116,6 +120,12 @@ function! ingo#comments#CheckComment( text, ... )
     return []
 endfunction
 
+function! s:AvoidDuplicateIndent( commentstring, text )
+    " When the text starts with indent identical to what 'commentstring' would
+    " render, avoid having duplicate indent.
+    let l:renderedIndent = matchstr(a:commentstring, '\s\+\ze%s')
+    return (a:text =~# '^\V' . l:renderedIndent ? strpart(a:text, len(l:renderedIndent)) : a:text)
+endfunction
 function! ingo#comments#RenderComment( text, checkComment )
 "******************************************************************************
 "* PURPOSE:
@@ -140,17 +150,17 @@ function! ingo#comments#RenderComment( text, checkComment )
     if &commentstring =~# '\V\C' . escape(l:commentprefix, '\') . (l:isBlankRequired ? '\s' : '')
 	" The found comment is the same as 'commentstring' will generate.
 	" Generate with the proper nesting.
-	let l:render = a:text
+	let l:render = s:AvoidDuplicateIndent(&commentstring, a:text)
 	for l:ii in range(max([1, l:nestingLevel]))
 	    let l:render = printf(&commentstring, l:render)
 	endfor
 	return l:render
     elseif ! empty(&commentstring)
 	" No match, just use 'commentstring'.
-	return printf(&commentstring, a:text)
+	return printf(&commentstring, s:AvoidDuplicateIndent(&commentstring, a:text))
     else
 	" No 'commentstring' defined, use same comment prefix.
-	return repeat(l:commentprefix . (l:isBlankRequired ? ' ' : ''), max([1, l:nestingLevel])) . (l:isBlankRequired ? '' : ' ') . a:text
+	return repeat(l:commentprefix . (l:isBlankRequired ? ' ' : ''), max([1, l:nestingLevel])) . (l:isBlankRequired ? '' : ' ') . s:AvoidDuplicateIndent(' %s', a:text)
     endif
 endfunction
 
