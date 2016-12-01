@@ -15,6 +15,7 @@
 "	002	01-Dec-2016	ENH: Keep original separators between words.
 "				ENH: Also handle numeric and character
 "				sequences.
+"				Add subs#BraceExpansion#Queried().
 "	001	30-Nov-2016	file creation
 let s:save_cpo = &cpo
 set cpo&vim
@@ -139,6 +140,13 @@ function! subs#BraceExpansion#Do( text, ... )
     \)
 
     return join(l:result, '')
+endfunction
+
+function! subs#BraceExpansion#Queried( text )
+    if ! g:TextTransformContext.isRepeat
+	let s:joiner = input('Enter separator string: ')
+    endif
+    return subs#BraceExpansion#Do(a:text, s:joiner)
 endfunction
 
 let &cpo = s:save_cpo
