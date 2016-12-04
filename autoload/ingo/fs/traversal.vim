@@ -2,15 +2,17 @@
 "
 " DEPENDENCIES:
 "   - ingo/actions.vim autoload script
+"   - ingo/compat.vim autoload script
 "   - ingo/fs/path.vim autoload script
 "   - ingo/os.vim autoload script
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.022.005	22-Sep-2014	Use ingo#compat#globpath().
 "   1.013.004	13-Sep-2013	Use operating system detection functions from
 "				ingo/os.vim.
 "   1.011.003	01-Aug-2013	Make a:path argument optional and default to the
@@ -80,7 +82,7 @@ function! ingo#fs#traversal#FindLastContainedInUpDir( expr, ... )
     let l:dir = (a:0 ? a:1 : expand('%:p:h'))
     let l:prevDir = ''
     while l:dir !=# l:prevDir
-	if empty(globpath(l:dir, a:expr, 1))
+	if empty(ingo#compat#globpath(l:dir, a:expr, 1))
 	    return l:prevDir
 	endif
 	let l:prevDir = l:dir
