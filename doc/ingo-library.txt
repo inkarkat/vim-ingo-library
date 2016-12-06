@@ -83,6 +83,18 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.029	RELEASEME
+- CHG: ingo#comments#RemoveCommentPrefix() isn't useful as it omits any indent
+  before the comment prefix. Change its implementation to just erase the
+  prefix itself.
+- Add ingo#comments#SplitIndentAndText() to provide what
+  ingo#comments#RemoveCommentPrefix() was previously used to: The line broken
+  into indent (before, after, and with the comment prefix), and the remaining
+  text.
+- Add ingo#indent#Split(), a simpler version of
+  ingo#comments#SplitIndentAndText().
+- Add ingo#fs#traversal#FindFirstContainedInUpDir().
+
 1.028	30-Nov-2016
 - ENH: Also support optional a:flagsMatchCount in
   ingo#cmdargs#pattern#ParseUnescaped() and
