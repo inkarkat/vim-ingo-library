@@ -9,6 +9,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.023.003	26-Dec-2014	ENH: Add a:isGetAllRanges optional argument to
+"				ingo#range#lines#Get().
 "   1.022.002	23-Sep-2014	ingo#range#lines#Get() needs to consider and
 "				temporarily disable closed folds when resolving
 "				/{pattern}/ ranges.
@@ -32,7 +34,7 @@ function! s:RecordLines( records, startLines, endLines, startLnum, endLnum ) ran
 	call add(a:endLines, min([a:lastline, a:endLnum]))
     endif
 endfunction
-function! ingo#range#lines#Get( startLnum, endLnum, range )
+function! ingo#range#lines#Get( startLnum, endLnum, range, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Determine the line numbers and start and end lines of a:range that fall
@@ -48,24 +50,28 @@ function! ingo#range#lines#Get( startLnum, endLnum, range )
 "   a:endLnum   Last line number to be considered.
 "   a:range     Range in any format supported by Vim, e.g. 'a,'b or
 "		/^fun/,/^endfun/
+"   a:isGetAllRanges    Optional flag whether (for pattern ranges like /.../),
+"			all (vs. only the next matching) ranges are determined.
+"			Defaults to 1; pass 0 to only get the next one.
 "* RETURN VALUES:
-"   [recordedLines, startLines, endLines, didClobberSearchHistory]
-"   recordedLines   Dictionary with all line numbers that fall into the range(s)
+"   [recordedLnums, startLnums, endLnums, didClobberSearchHistory]
+"   recordedLnums   Dictionary with all line numbers that fall into the range(s)
 "		    as keys.
-"   startLines      List of line numbers where a range starts. Can contain
+"   startLnums      List of line numbers where a range starts. Can contain
 "		    multiple elements if a /pattern/ range is used.
-"   endLines        List of line numbers where a range ends.
+"   endLnums        List of line numbers where a range ends.
 "   didClobberSearchHistory Flag whether a command was used that has added a
 "			    temporary pattern to the search history. If true,
 "			    call histdel('search', -1) at the end of the client
 "			    function once.
 "******************************************************************************
+    let l:isGetAllRanges = (! a:0 || a:1)
     let [l:startLnum, l:endLnum] = [ingo#range#NetStart(a:startLnum), ingo#range#NetEnd(a:endLnum)]
     let l:recordedLines = {}
     let l:startLines = []
     let l:endLines = []
 
-    if a:range =~# '^[/?]'
+    if l:isGetAllRanges && a:range =~# '^[/?]'
 	" For patterns, we need :global to find _all_ (not just the first)
 	" matching ranges. For that, folds must be open / disabled. And because
 	" of that, the actual ranges must be determined first.
