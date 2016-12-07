@@ -94,6 +94,11 @@ HISTORY							*ingo-library-history*
 - Add ingo#indent#Split(), a simpler version of
   ingo#comments#SplitIndentAndText().
 - Add ingo#fs#traversal#FindFirstContainedInUpDir().
+- ingo#range#lines#Get(): A single (a:isGetAllRanges = 0) /.../ range already
+  clobbers the last search pattern. Save and restore if necessary, and base
+  didClobberSearchHistory on that check.
+- ingo#range#lines#Get(): Drop the ^ anchor for the range check to also detect
+  /.../ as the end of the range.
 
 1.028	30-Nov-2016
 - ENH: Also support optional a:flagsMatchCount in
