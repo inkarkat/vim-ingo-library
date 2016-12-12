@@ -2,12 +2,17 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2008-2014 Ingo Karkat
+" Copyright: (C) 2008-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.005	13-Dec-2016	BUG: Optional a:position argument to
+"				ingo#window#preview#SplitToPreview() is
+"				mistakenly truncated to [1:2]. Inline the
+"				l:cursor and l:bufnr variables; they are only
+"				used in the function call, anyway.
 "   1.021.004	06-Jul-2014	Support all imaginable argument variants of
 "				ingo#window#preview#OpenFilespec(), so that it
 "				can be used as a wrapper that encapsulates the
@@ -87,12 +92,9 @@ function! ingo#window#preview#SplitToPreview( ... )
 	if &l:previewwindow | return 0 | endif
     endif
 
-    let l:cursor = getpos('.')
-    let l:bufnr = bufnr('')
-
     " Clone current cursor position to preview window (which now shows the same
     " file) or passed position.
-    call ingo#window#preview#OpenBuffer(l:bufnr, (a:0 ? a:1 : l:cursor)[1:2])
+    call ingo#window#preview#OpenBuffer(bufnr(''), (a:0 ? a:1 : getpos('.')[1:2]))
     return 1
 endfunction
 function! ingo#window#preview#GotoPreview()
