@@ -36,7 +36,7 @@ function! ingo#window#preview#OpenPreview( ... )
     try
 	" If the preview window is open, just go there.
 	wincmd P
-    catch /^Vim\%((\a\+)\)\=:E441/
+    catch /^Vim\%((\a\+)\)\=:E441:/
 	" Else, temporarily open a dummy file. (There's no :popen command.)
 	execute 'silent' (exists('g:previewwindowsplitmode') ? g:previewwindowsplitmode : '') (a:0 ? a:1 : '') 'pedit! +setlocal\ buftype=nofile\ bufhidden=wipe\ nobuflisted\ noswapfile [No\ Name]'
 	wincmd P
@@ -99,7 +99,7 @@ function! ingo#window#preview#GotoPreview()
     if &l:previewwindow | return | endif
     try
 	wincmd P
-    catch /^Vim\%((\a\+)\)\=:E441/
+    catch /^Vim\%((\a\+)\)\=:E441:/
 	call ingo#window#preview#SplitToPreview()
     endtry
 endfunction
