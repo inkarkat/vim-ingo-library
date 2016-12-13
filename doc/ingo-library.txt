@@ -101,6 +101,9 @@ HISTORY							*ingo-library-history*
   /.../ as the end of the range.
 - Add ingo#cmdargs#register#ParsePrependedWritableRegister() alternative to
   ingo#cmdargs#register#ParseAppendedWritableRegister().
+- BUG: Optional a:position argument to ingo#window#preview#SplitToPreview() is
+  mistakenly truncated to [1:2]. Inline the l:cursor and l:bufnr variables;
+  they are only used in the function call, anyway.
 
 1.028	30-Nov-2016
 - ENH: Also support optional a:flagsMatchCount in
