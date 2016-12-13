@@ -63,6 +63,7 @@ autoload/ingo/ftplugin/onbufwinenter.vim
 autoload/ingo/ftplugin/windowsettings.vim
 autoload/ingo/funcref.vim
 autoload/ingo/gui/position.vim
+autoload/ingo/indent.vim
 autoload/ingo/join.vim
 autoload/ingo/lines.vim
 autoload/ingo/list.vim
@@ -132,6 +133,7 @@ autoload/ingo/undo.vim
 autoload/ingo/units.vim
 autoload/ingo/window/cmdwin.vim
 autoload/ingo/window/dimensions.vim
+autoload/ingo/window/locate.vim
 autoload/ingo/window/preview.vim
 autoload/ingo/window/quickfix.vim
 autoload/ingo/window/special.vim
