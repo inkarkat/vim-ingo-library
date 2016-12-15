@@ -8,6 +8,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.004	16-Dec-2016	Add ingo#pos#SameLineIs[OnOr]After/Before()
+"				variants.
 "   1.025.003	29-Apr-2016	Add ingo#pos#IsInsideVisualSelection().
 "   1.022.002	21-Jul-2014	Add ingo#pos#Before() and ingo#pos#After().
 "   1.019.001	30-Apr-2014	file creation
@@ -52,6 +54,22 @@ endfunction
 function! ingo#pos#After( pos )
     let l:charAtPosition = matchstr(getline(a:pos[0]), '\%' . a:pos[1] . 'c.')
     return (empty(l:charAtPosition) ? [0, 0] : [a:pos[0], a:pos[1] + len(l:charAtPosition)])
+endfunction
+
+
+
+function! ingo#pos#SameLineIsOnOrAfter( posA, posB )
+    return (a:posA[0] == a:posB[0] && a:posA[1] >= a:posB[1])
+endfunction
+function! ingo#pos#SameLineIsAfter( posA, posB )
+    return (a:posA[0] == a:posB[0] && a:posA[1] > a:posB[1])
+endfunction
+
+function! ingo#pos#SameLineIsOnOrBefore( posA, posB )
+    return (a:posA[0] == a:posB[0] && a:posA[1] <= a:posB[1])
+endfunction
+function! ingo#pos#SameLineIsBefore( posA, posB )
+    return (a:posA[0] == a:posB[0] && a:posA[1] < a:posB[1])
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
