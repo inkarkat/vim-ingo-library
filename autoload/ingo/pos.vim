@@ -2,12 +2,13 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2014 Ingo Karkat
+" Copyright: (C) 2014-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.003	29-Apr-2016	Add ingo#pos#IsInsideVisualSelection().
 "   1.022.002	21-Jul-2014	Add ingo#pos#Before() and ingo#pos#After().
 "   1.019.001	30-Apr-2014	file creation
 
@@ -31,6 +32,16 @@ endfunction
 
 function! ingo#pos#IsInside( pos, start, end )
     return ! ingo#pos#IsOutside(a:pos, a:start, a:end)
+endfunction
+
+function! ingo#pos#IsInsideVisualSelection( pos, ... )
+    let l:start = (a:0 == 2 ? a:1 : getpos("'<")[1:2])
+    let l:end   = (a:0 == 2 ? a:2 : getpos("'>")[1:2])
+    if &selection ==# 'exclusive'
+	return ! (a:pos[0] < l:start[0] || a:pos[0] > l:end[0] || a:pos[0] == l:start[0] && a:pos[1] < l:start[1] || a:pos[0] == l:end[0] && a:pos[1] >= l:end[1])
+    else
+	return ! (a:pos[0] < l:start[0] || a:pos[0] > l:end[0] || a:pos[0] == l:start[0] && a:pos[1] < l:start[1] || a:pos[0] == l:end[0] && a:pos[1] > l:end[1])
+    endif
 endfunction
 
 
