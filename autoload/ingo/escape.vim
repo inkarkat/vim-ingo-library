@@ -2,17 +2,37 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.017.002	20-Feb-2014	Add ingo#escape#UnescapeExpr().
 "   1.009.001	15-Jun-2013	file creation
 
+function! ingo#escape#UnescapeExpr( string, expr )
 "******************************************************************************
 "* PURPOSE:
-"   Remove a leading backslash before all {chars} that occur in {string}, and
+"   Remove a leading backslash before all matches of a:expr that occur in
+"   a:string, and are not itself escaped.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:string    The text to unescape.
+"   a:expr      Regular expression to unescape.
+"* RETURN VALUES:
+"   Unescaped a:string.
+"******************************************************************************
+    return substitute(a:string, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\ze' . a:expr, '', 'g')
+endfunction
+
+function! ingo#escape#Unescape( string, chars )
+"******************************************************************************
+"* PURPOSE:
+"   Remove a leading backslash before all a:chars that occur in a:string, and
 "   are not itself escaped.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
@@ -25,7 +45,6 @@
 "* RETURN VALUES:
 "   Unescaped a:string.
 "******************************************************************************
-function! ingo#escape#Unescape( string, chars )
     return substitute(a:string, '\C\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\ze[' . escape(a:chars, ']^\-') . ']', '', 'g')
 endfunction
 
