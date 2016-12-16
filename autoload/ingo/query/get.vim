@@ -2,12 +2,15 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.017.006	04-Mar-2014	Make ingo#query#get#Char() only abort on <Esc>
+"				when that character is not in the validExpr (to
+"				allow to explicitly query it).
 "   1.007.005	31-May-2013	Move into ingo-library.
 "	004	21-Mar-2013	Handle non-8-bit characters in
 "				ingouserquery#GetChar(). Necessary to query
@@ -88,7 +91,7 @@ function! ingo#query#get#Char( ... )
 	let l:char = nr2char(l:char)
     endif
 
-    if l:char ==# "\<Esc>"
+    if l:char ==# "\<Esc>" && empty(l:validExpr) || l:char!~ l:validExpr
 	return ''
     elseif (! empty(l:validExpr) && l:char !~ l:validExpr) ||
     \   (! empty(l:invalidExpr) && l:char =~ l:invalidExpr)
