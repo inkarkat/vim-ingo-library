@@ -2,12 +2,16 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.028.004	18-Nov-2016	ENH: Add optional {context} to all ingo#err#...
+"				functions, in case other custom commands can be
+"				called between error setting and checking, to
+"				avoid clobbering of your error message.
 "   1.009.003	14-Jun-2013	Minor: Make substitute() robust against
 "				'ignorecase'.
 "   1.005.002	17-Apr-2013	Add ingo#err#IsSet() for those cases when
@@ -44,25 +48,38 @@
 "   command(s) between your function and the :echoerr, and also query
 "   ingo#err#IsSet() to avoid having to use a temporary variable to get the
 "   returned error flag across the command(s).
+"   If there's a chance that other custom commands (that may also use these
+"   error functions) are invoked between your error setting and checking (also
+"   maybe triggered by autocmds), you can pass an optional {context} (e.g. your
+"   plugin / command name) to any of the commands.
 "******************************************************************************
+let s:err = {}
 let s:errmsg = ''
-function! ingo#err#Get()
-    return s:errmsg
+function! ingo#err#Get( ... )
+    return (a:0 ? get(s:err, a:1, '') : s:errmsg)
 endfunction
-function! ingo#err#Clear()
-    let s:errmsg = ''
+function! ingo#err#Clear( ... )
+    if a:0
+	let s:err[a:1] = ''
+    else
+	let s:errmsg = ''
+    endif
 endfunction
-function! ingo#err#IsSet()
-    return ! empty(s:errmsg)
+function! ingo#err#IsSet( ... )
+    return ! empty(a:0 ? get(s:err, a:1, '') : s:errmsg)
 endfunction
-function! ingo#err#Set( errmsg )
-    let s:errmsg = a:errmsg
+function! ingo#err#Set( errmsg, ... )
+    if a:0
+	let s:err[a:1] = a:errmsg
+    else
+	let s:errmsg = a:errmsg
+    endif
 endfunction
-function! ingo#err#SetVimException()
-    call ingo#err#Set(ingo#msg#MsgFromVimException())
+function! ingo#err#SetVimException( ... )
+    call call('ingo#err#Set', [ingo#msg#MsgFromVimException()] + a:000)
 endfunction
-function! ingo#err#SetCustomException( customPrefixPattern )
-    call ingo#err#Set(substitute(v:exception, printf('^\C\%%(%s\):\s*', a:customPrefixPattern), '', ''))
+function! ingo#err#SetCustomException( customPrefixPattern, ... )
+    call call('ingo#err#Set', [substitute(v:exception, printf('^\C\%%(%s\):\s*', a:customPrefixPattern), '', '')] + a:000)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
