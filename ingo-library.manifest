@@ -113,7 +113,9 @@ autoload/ingo/selection/patternmatch.vim
 autoload/ingo/selection/position.vim
 autoload/ingo/smartcase.vim
 autoload/ingo/str.vim
+autoload/ingo/str/find.vim
 autoload/ingo/str/frompattern.vim
+autoload/ingo/str/fromrange.vim
 autoload/ingo/str/join.vim
 autoload/ingo/str/restricted.vim
 autoload/ingo/str/split.vim
