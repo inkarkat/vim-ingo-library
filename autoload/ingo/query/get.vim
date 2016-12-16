@@ -2,12 +2,16 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2014 Ingo Karkat
+" Copyright: (C) 2012-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.007	17-Dec-2016	FIX: ingo#query#get#Char() does not beep when
+"				validExpr is given and invalid character pressed.
+"				Add ingo#query#get#ValidChar() variant that
+"				loops until a valid character has been pressed.
 "   1.017.006	04-Mar-2014	Make ingo#query#get#Char() only abort on <Esc>
 "				when that character is not in the validExpr (to
 "				allow to explicitly query it).
@@ -62,6 +66,14 @@ function! ingo#query#get#Number( maxNum, ... )
     endwhile
 endfunction
 
+function! s:GetChar()
+    " TODO: Handle digraphs via <C-K>.
+    let l:char = getchar()
+    if type(l:char) == type(0)
+	let l:char = nr2char(l:char)
+    endif
+    return l:char
+endfunction
 function! ingo#query#get#Char( ... )
 "******************************************************************************
 "* PURPOSE:
@@ -73,7 +85,9 @@ function! ingo#query#get#Char( ... )
 "* INPUTS:
 "   a:options.isBeepOnInvalid   Flag whether to beep on invalid pattern (but not
 "				when aborting with <Esc>). Default on.
-"   a:options.validExpr         Pattern for valid characters.
+"   a:options.validExpr         Pattern for valid characters. Aborting with
+"				<Esc> is always possible, but if you add \e, it
+"				will be returned as ^[.
 "   a:options.invalidExpr       Pattern for invalid characters. Takes precedence
 "				over a:options.validExpr.
 "* RETURN VALUES:
@@ -85,13 +99,8 @@ function! ingo#query#get#Char( ... )
     let l:validExpr = get(l:options, 'validExpr', '')
     let l:invalidExpr = get(l:options, 'invalidExpr', '')
 
-    " TODO: Handle digraphs via <C-K>.
-    let l:char = getchar()
-    if type(l:char) == type(0)
-	let l:char = nr2char(l:char)
-    endif
-
-    if l:char ==# "\<Esc>" && empty(l:validExpr) || l:char!~ l:validExpr
+    let l:char = s:GetChar()
+    if l:char ==# "\<Esc>" && (empty(l:validExpr) || l:char !~ l:validExpr)
 	return ''
     elseif (! empty(l:validExpr) && l:char !~ l:validExpr) ||
     \   (! empty(l:invalidExpr) && l:char =~ l:invalidExpr)
@@ -100,6 +109,48 @@ function! ingo#query#get#Char( ... )
 	endif
 	return ''
     endif
+
+    return l:char
+endfunction
+function! ingo#query#get#ValidChar( ... )
+"******************************************************************************
+"* PURPOSE:
+"   Query a character from the user until a valid one has been pressed (or
+"   aborted with <Esc>).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:options.isBeepOnInvalid   Flag whether to beep on invalid pattern (but not
+"				when aborting with <Esc>). Default on.
+"   a:options.validExpr         Pattern for valid characters. Aborting with
+"				<Esc> is always possible, but if you add \e, it
+"				will be returned as ^[.
+"   a:options.invalidExpr       Pattern for invalid characters. Takes precedence
+"				over a:options.validExpr.
+"* RETURN VALUES:
+"   Either the valid character, or an empty string when aborted.
+"******************************************************************************
+    let l:options = (a:0 ? a:1 : {})
+    let l:isBeepOnInvalid = get(l:options, 'isBeepOnInvalid', 1)
+    let l:validExpr = get(l:options, 'validExpr', '')
+    let l:invalidExpr = get(l:options, 'invalidExpr', '')
+
+    while 1
+	let l:char = s:GetChar()
+
+	if l:char ==# "\<Esc>" && (empty(l:validExpr) || l:char !~ l:validExpr)
+	    return ''
+	elseif (! empty(l:validExpr) && l:char !~ l:validExpr) ||
+	\   (! empty(l:invalidExpr) && l:char =~ l:invalidExpr)
+	    if l:isBeepOnInvalid
+		execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
+	    endif
+	else
+	    break
+	endif
+    endwhile
 
     return l:char
 endfunction
