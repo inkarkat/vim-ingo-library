@@ -96,6 +96,7 @@ autoload/ingo/range/lines.vim
 autoload/ingo/range/merge.vim
 autoload/ingo/record.vim
 autoload/ingo/regexp.vim
+autoload/ingo/regexp/build.vim
 autoload/ingo/regexp/comments.vim
 autoload/ingo/regexp/collection.vim
 autoload/ingo/regexp/fromwildcard.vim
