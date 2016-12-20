@@ -107,6 +107,12 @@ HISTORY							*ingo-library-history*
 - Add ingo/str/find.vim module.
 - Add ingo/str/fromrange.vim module.
 - Add ingo#pos#SameLineIs[OnOr]After/Before() variants.
+- Add ingo/regexp/build.vim module.
+- Add ingo#err#SetAndBeep().
+- FIX: ingo#query#get#Char() does not beep when validExpr is given and invalid
+  character pressed.
+- Add ingo#query#get#ValidChar() variant that loops until a valid character
+  has been pressed.
 
 1.028	30-Nov-2016
 - ENH: Also support optional a:flagsMatchCount in
