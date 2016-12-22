@@ -3,12 +3,20 @@
 " DEPENDENCIES:
 "   - ingo/range.vim autoload script
 "
-" Copyright: (C) 2014 Ingo Karkat
+" Copyright: (C) 2014-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.004	07-Dec-2016	ingo#range#lines#Get(): A single
+"				(a:isGetAllRanges = 0) /.../ range already
+"				clobbers the last search pattern. Save and
+"				restore if necessary, and base
+"				didClobberSearchHistory on that check.
+"				ingo#range#lines#Get(): Drop the ^ anchor for
+"				the range check to also detect /.../ as the
+"				end of the range.
 "   1.023.003	26-Dec-2014	ENH: Add a:isGetAllRanges optional argument to
 "				ingo#range#lines#Get().
 "   1.022.002	23-Sep-2014	ingo#range#lines#Get() needs to consider and
@@ -70,8 +78,10 @@ function! ingo#range#lines#Get( startLnum, endLnum, range, ... )
     let l:recordedLines = {}
     let l:startLines = []
     let l:endLines = []
+    let l:save_search = @/
+    let l:didClobberSearchHistory = 0
 
-    if l:isGetAllRanges && a:range =~# '^[/?]'
+    if l:isGetAllRanges && a:range =~# '[/?]'
 	" For patterns, we need :global to find _all_ (not just the first)
 	" matching ranges. For that, folds must be open / disabled. And because
 	" of that, the actual ranges must be determined first.
@@ -86,7 +96,6 @@ function! ingo#range#lines#Get( startLnum, endLnum, range, ... )
 	finally
 	    let &l:foldenable = l:save_foldenable
 	endtry
-	let l:didClobberSearchHistory = 1
     else
 	" For line number, marks, etc., we can just record them (limited to
 	" those that fall into the command's range).
@@ -94,7 +103,11 @@ function! ingo#range#lines#Get( startLnum, endLnum, range, ... )
 	\  a:range,
 	\  l:startLnum, l:endLnum
 	\)
-	let l:didClobberSearchHistory = 0
+    endif
+
+    if @/ !=# l:save_search
+	let @/ = l:save_search
+	let l:didClobberSearchHistory = 1
     endif
 
     return [l:recordedLines, l:startLines, l:endLines, l:didClobberSearchHistory]
