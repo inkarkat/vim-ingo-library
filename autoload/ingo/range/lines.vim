@@ -1,6 +1,7 @@
 " ingo/range/Lines.vim: Functions for retrieving line numbers of ranges.
 "
 " DEPENDENCIES:
+"   - ingo/cmdsargs/pattern.vim autoload script
 "   - ingo/range.vim autoload script
 "
 " Copyright: (C) 2014-2016 Ingo Karkat
@@ -9,6 +10,13 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.005	23-Dec-2016	ingo#range#lines#Get(): If the range is a
+"				backwards-looking ?{pattern}?, we need to
+"				attempt the match on any line with :global/^/...
+"				Else, the border behavior is inconsistent:
+"				ranges that extend the passed range at the
+"				bottom are (partially) included, but ranges that
+"				extend at the front would not be.
 "   1.029.004	07-Dec-2016	ingo#range#lines#Get(): A single
 "				(a:isGetAllRanges = 0) /.../ range already
 "				clobbers the last search pattern. Save and
@@ -87,10 +95,20 @@ function! ingo#range#lines#Get( startLnum, endLnum, range, ... )
 	" of that, the actual ranges must be determined first.
 	let l:save_foldenable = &l:foldenable
 	setlocal nofoldenable
+
+	let l:searchRange = a:range
+	if ingo#cmdargs#pattern#RawParse(a:range, [''], '\s*[,;]\s*\S.*')[0] ==# '?'
+	    " If this is a simple /{pattern}/, we can just match that with
+	    " :global. But for actual ranges, these should extend both upwards
+	    " (?foo?,/bar/) as well as downwards (/foo/,/bar/). To handle the
+	    " former, we must make :global attempt a match at any line.
+	    let l:searchRange = '/^/' . a:range
+	endif
+
 	try
 	    execute printf('silent! %d,%dglobal %s call <SID>RecordLines(l:recordedLines, l:startLines, l:endLines, %d, %d)',
 	    \  l:startLnum, l:endLnum,
-	    \  a:range,
+	    \  l:searchRange,
 	    \  l:startLnum, l:endLnum
 	    \)
 	finally
