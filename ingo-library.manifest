@@ -65,6 +65,7 @@ autoload/ingo/funcref.vim
 autoload/ingo/gui/position.vim
 autoload/ingo/indent.vim
 autoload/ingo/join.vim
+autoload/ingo/line/replace.vim
 autoload/ingo/lines.vim
 autoload/ingo/list.vim
 autoload/ingo/list/find.vim
