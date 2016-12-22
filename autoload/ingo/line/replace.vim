@@ -16,6 +16,9 @@ function! ingo#line#replace#Substitute( lnum, pat, sub, flags )
 "   Substitute a pattern in a single line in the current buffer. Low-level
 "   alternative to :substitute without the need to suppress messages, undo
 "   search history clobbering, cursor move.
+"* SEE ALSO:
+"   - ingo#lines#replace#Substitute() handles multiple lines, but is more
+"     costly.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   Does not handle inserted newlines; i.e. no additional lines will be created,
 "   the newline will be persisted as-is (^@).
