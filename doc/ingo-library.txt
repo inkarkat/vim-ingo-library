@@ -114,7 +114,12 @@ HISTORY							*ingo-library-history*
 - Add ingo#query#get#ValidChar() variant that loops until a valid character
   has been pressed.
 - Add ingo/range/invert.vim module.
-- Add ingo/line/replace.vim module.
+- Add ingo/line/replace.vim and ingo/lines/replace.vim modules.
+- Extract ingo#range#merge#FromLnums() from ingo#range#merge#Merge().
+- ingo#range#lines#Get(): If the range is a backwards-looking ?{pattern}?, we
+  need to attempt the match on any line with :global/^/... Else, the border
+  behavior is inconsistent: ranges that extend the passed range at the bottom
+  are (partially) included, but ranges that extend at the front would not be.
 
 1.028	30-Nov-2016
 - ENH: Also support optional a:flagsMatchCount in
