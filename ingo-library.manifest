@@ -67,6 +67,7 @@ autoload/ingo/indent.vim
 autoload/ingo/join.vim
 autoload/ingo/line/replace.vim
 autoload/ingo/lines.vim
+autoload/ingo/lines/replace.vim
 autoload/ingo/list.vim
 autoload/ingo/list/find.vim
 autoload/ingo/mapmaker.vim
