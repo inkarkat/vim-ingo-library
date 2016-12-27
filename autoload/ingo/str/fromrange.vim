@@ -8,6 +8,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.002	28-Dec-2016	Split off
+"				ingo#str#fromrange#GetTranslationStrings() from
+"				ingo#str#fromrange#Tr().
 "   1.029.001	14-Dec-2016	file creation from subs/Homoglyphs.vim
 
 function! ingo#str#fromrange#GetAsList( ... )
@@ -51,16 +54,15 @@ function! s:RangeToString( start, end )
     \   ''
     \)
 endfunction
-function! ingo#str#fromrange#Tr( text, mirrorMode, ranges )
+function! ingo#str#fromrange#GetTranslationStrings( mirrorMode, ranges )
 "******************************************************************************
 "* PURPOSE:
-"   Translate the character ranges in a:ranges in a:text.
+"   Generate source and destination character ranges from a:ranges.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:text  Text to be modified.
 "   a:mirrorMode    0: Do not mirror
 "		    1: Mirror a:range so that translation also works in the
 "		       other direction.
@@ -68,7 +70,7 @@ function! ingo#str#fromrange#Tr( text, mirrorMode, ranges )
 "   a:ranges        List of ranges; one of (also mixed) [source, destination] or
 "		    [start, end, transformStart] codepoints.
 "* RETURN VALUES:
-"   Modified a:text.
+"   [sourceRangeString, destinationRangeString]
 "******************************************************************************
     let l:sources = ''
     let l:destinations = ''
@@ -94,8 +96,28 @@ function! ingo#str#fromrange#Tr( text, mirrorMode, ranges )
 	endif
     endfor
 
-    return tr(a:text, l:sources, l:destinations)
+    return [l:sources, l:destinations]
 endfunction
-
+function! ingo#str#fromrange#Tr( text, mirrorMode, ranges )
+"******************************************************************************
+"* PURPOSE:
+"   Translate the character ranges in a:ranges in a:text.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:text  Text to be modified.
+"   a:mirrorMode    0: Do not mirror
+"		    1: Mirror a:range so that translation also works in the
+"		       other direction.
+"		    2: Only mirror, i.e. only translate back.
+"   a:ranges        List of ranges; one of (also mixed) [source, destination] or
+"		    [start, end, transformStart] codepoints.
+"* RETURN VALUES:
+"   Modified a:text.
+"******************************************************************************
+    return call('tr', [a:text] + ingo#str#fromrange#GetTranslationStrings(a:mirrorMode, a:ranges))
+endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
