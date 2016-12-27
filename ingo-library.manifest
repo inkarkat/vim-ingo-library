@@ -72,6 +72,7 @@ autoload/ingo/list.vim
 autoload/ingo/list/find.vim
 autoload/ingo/mapmaker.vim
 autoload/ingo/matches.vim
+autoload/ingo/math.vim
 autoload/ingo/mbyte/virtcol.vim
 autoload/ingo/motion/boundary.vim
 autoload/ingo/motion/helper.vim
