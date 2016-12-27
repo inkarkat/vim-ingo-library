@@ -120,6 +120,7 @@ HISTORY							*ingo-library-history*
   need to attempt the match on any line with :global/^/... Else, the border
   behavior is inconsistent: ranges that extend the passed range at the bottom
   are (partially) included, but ranges that extend at the front would not be.
+- Add ingo/math.vim module.
 
 1.028	30-Nov-2016
 - ENH: Also support optional a:flagsMatchCount in
