@@ -1,13 +1,25 @@
 " ingo/comments.vim: Functions around comment handling.
 "
 " DEPENDENCIES:
+"   - ingo/compat.vim autoload script
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.006	02-Dec-2016	CHG: ingo#comments#RemoveCommentPrefix() isn't
+"				useful as it omits any indent before the comment
+"				prefix. Change its implementation to just erase
+"				the prefix itself.
+"				Add ingo#comments#SplitIndentAndText() to
+"				provide what ingo#comments#RemoveCommentPrefix()
+"				was previously used to: The line broken into
+"				indent (before, after, and with the comment
+"				prefix), and the remaining text.
+"				FIX: Wrong negation in a:options.isIgnoreIndent
+"				documentation.
 "   1.013.005	06-Sep-2013	CHG: Make a:isIgnoreIndent flag to
 "				ingo#comments#CheckComment() optional and add
 "				a:isStripNonEssentialWhiteSpaceFromCommentString,
@@ -48,9 +60,10 @@ function! ingo#comments#CheckComment( text, ... )
 "* INPUTS:
 "   a:text	The text to be checked. If the "b" flag is contained in
 "		'comments', the proper whitespace must exist.
-"   a:options.isIgnoreIndent	Flag; if set (the default), there must either be
-"				no leading whitespace or exactly the amount
-"				mandated by the indent of a three-piece comment.
+"   a:options.isIgnoreIndent	Flag; unless set (the default), there must
+"				either be no leading whitespace or exactly the
+"				amount mandated by the indent of a three-piece
+"				comment.
 "   a:options.isStripNonEssentialWhiteSpaceFromCommentString
 "				Flag; if set (the default), any trailing
 "				whitespace in the returned commentstring (e.g.
@@ -164,30 +177,66 @@ function! ingo#comments#RenderComment( text, checkComment )
     endif
 endfunction
 
-function! ingo#comments#RemoveCommentPrefix( text, checkComment )
+function! ingo#comments#RemoveCommentPrefix( line )
 "******************************************************************************
 "* PURPOSE:
-"   Remove the detected a:checkComment from a:text. Whitespace between the
-"   comment prefix and actual comment (that does not belong to the commentstring
-"   itself) is kept.
+"   Remove the comment prefix from a:line while keeping the overall indent.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:text  The text to be rendered comment-less.
-"   a:checkComment  Comment information returned by ingo#comments#CheckComment().
+"   a:line  The text of the line to be rendered comment-less.
 "* RETURN VALUES:
-"   Returns a:text unchanged if a:checkComment is empty.
-"   Otherwise, returns a:text rendered without the comment prefix.
+"   Return a:line rendered with the comment prefix erased and replaced by the
+"   appropriate whitespace.
 "******************************************************************************
+    let l:checkComment = ingo#comments#CheckComment(a:line)
+    if empty(l:checkComment)
+	return a:line
+    endif
+
+    let [l:indentWithCommentPrefix, l:text] = s:SplitIndentAndText(a:line, l:checkComment)
+    let l:indentNum = ingo#compat#strdisplaywidth(l:indentWithCommentPrefix)
+
+    let l:indent = repeat(' ', l:indentNum)
+    if ! &l:expandtab
+	let l:indent = substitute(l:indent, ' \{' . &l:tabstop . '}', '\t', 'g')
+    endif
+    return l:indent . l:text
+endfunction
+function! ingo#comments#SplitIndentAndText( line )
+"******************************************************************************
+"* PURPOSE:
+"   Split the line into any leading indent before the comment prefix, the prefix
+"   itself, and indent after it, and the text after it. If there's no comment,
+"   split indent from text.
+"* SEE ALSO:
+"   ingo#indent#Split() directly takes a line number and does not consider
+"   comment prefixes.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:line  The line to be split.
+"* RETURN VALUES:
+"   Returns [a:indent, a:text].
+"******************************************************************************
+    return s:SplitIndentAndText(a:line, ingo#comments#CheckComment(a:line))
+endfunction
+function! s:SplitIndentAndText( line, checkComment )
     if empty(a:checkComment)
-	return a:text
+	return matchlist(a:line, '^\(\s*\)\(.*\)$')[1:2]
     endif
 
     let [l:commentprefix, l:type, l:nestingLevel, l:isBlankRequired] = a:checkComment
 
-    return substitute(a:text, '\s*\V\C' . escape(l:commentprefix, '\') . (l:isBlankRequired ? '\s\@=' : ''), '', 'g')
+    return matchlist(
+    \   a:line,
+    \   '\V\C\^\(\s\*\%(' . escape(l:commentprefix, '\') . (l:isBlankRequired ? '\s\+' : '\s\*'). '\)\{' . (l:nestingLevel + 1) . '}\)' .
+    \       '\(\.\*\)\$'
+    \)[1:2]
 endfunction
 
 function! ingo#comments#GetCommentPrefixType( prefix )
