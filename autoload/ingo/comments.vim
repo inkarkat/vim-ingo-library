@@ -3,12 +3,14 @@
 " DEPENDENCIES:
 "   - ingo/compat.vim autoload script
 "
-" Copyright: (C) 2011-2016 Ingo Karkat
+" Copyright: (C) 2011-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.007	09-Jan-2017	Add ingo#comments#SplitAll(), a more powerful
+"				variant of ingo#comments#SplitIndentAndText().
 "   1.029.006	02-Dec-2016	CHG: ingo#comments#RemoveCommentPrefix() isn't
 "				useful as it omits any indent before the comment
 "				prefix. Change its implementation to just erase
@@ -208,9 +210,9 @@ endfunction
 function! ingo#comments#SplitIndentAndText( line )
 "******************************************************************************
 "* PURPOSE:
-"   Split the line into any leading indent before the comment prefix, the prefix
-"   itself, and indent after it, and the text after it. If there's no comment,
-"   split indent from text.
+"   Split the line into any leading indent before the comment prefix plus the
+"   prefix itself plus indent after it, and the text after it. If there's no
+"   comment, split indent from text.
 "* SEE ALSO:
 "   ingo#indent#Split() directly takes a line number and does not consider
 "   comment prefixes.
@@ -221,7 +223,7 @@ function! ingo#comments#SplitIndentAndText( line )
 "* INPUTS:
 "   a:line  The line to be split.
 "* RETURN VALUES:
-"   Returns [a:indent, a:text].
+"   Returns [indent, text].
 "******************************************************************************
     return s:SplitIndentAndText(a:line, ingo#comments#CheckComment(a:line))
 endfunction
@@ -237,6 +239,40 @@ function! s:SplitIndentAndText( line, checkComment )
     \   '\V\C\^\(\s\*\%(' . escape(l:commentprefix, '\') . (l:isBlankRequired ? '\s\+' : '\s\*'). '\)\{' . (l:nestingLevel + 1) . '}\)' .
     \       '\(\.\*\)\$'
     \)[1:2]
+endfunction
+function! ingo#comments#SplitAll( line )
+"******************************************************************************
+"* PURPOSE:
+"   Split the line into any leading indent before the comment prefix, the prefix
+"   (-es, if nested) itself, indent after it, and the text after it. If there's
+"   no comment, split indent from text.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:line  The line to be split.
+"* RETURN VALUES:
+"   Returns [indentBefore, commentPrefix, indentAfter, text, isBlankRequired].
+"******************************************************************************
+    let l:checkComment = ingo#comments#CheckComment(a:line)
+    if empty(l:checkComment)
+	let l:split = matchlist(a:line, '^\(\s*\)\(.*\)$')[1:2]
+	return [l:split[0], '', '', l:split[1]]
+    endif
+
+    let [l:commentprefix, l:type, l:nestingLevel, l:isBlankRequired] = l:checkComment
+
+    return matchlist(
+    \   a:line,
+    \   '\V\C\^\(\s\*\)\(' .
+    \       (l:nestingLevel > 1 ?
+    \           '\%(' . escape(l:commentprefix, '\') . (l:isBlankRequired ? '\s\+' : '\s\*') . '\)\{' . l:nestingLevel . '}\)' :
+    \           ''
+    \       ) . escape(l:commentprefix, '\') . '\)' .
+    \       '\(\s\*\)' .
+    \       '\(\.\*\)\$'
+    \)[1:4] + [l:isBlankRequired]
 endfunction
 
 function! ingo#comments#GetCommentPrefixType( prefix )
