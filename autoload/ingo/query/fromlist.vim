@@ -5,7 +5,7 @@
 "   - ingo/query/confirm.vim autoload script
 "   - ingo/query/get.vim autoload script
 "
-" Copyright: (C) 2014-2016 Ingo Karkat
+" Copyright: (C) 2014-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -43,6 +43,9 @@ function! ingo#query#fromlist#Query( what, list, ... )
 "   or the number of the element. Supports "headless mode", i.e. bypassing the
 "   actual dialog so that no user intervention is necessary (in automated
 "   tests).
+"* SEE ALSO:
+"   ingo#query#recall#Query() provides an alternative means to query one
+"   (longer) entry from a list.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   The headless mode is activated by defining a List of choices (either
 "   numerical return values of confirm(), or the choice text without the
