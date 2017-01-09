@@ -120,7 +120,9 @@ HISTORY							*ingo-library-history*
   need to attempt the match on any line with :global/^/... Else, the border
   behavior is inconsistent: ranges that extend the passed range at the bottom
   are (partially) included, but ranges that extend at the front would not be.
-- Add ingo/math.vim module.
+- Add ingo/math.vim, ingo/binary.vim and ingo/list/split.vim modules.
+- Add ingo#comments#SplitAll(), a more powerful variant of
+  ingo#comments#SplitIndentAndText().
 
 1.028	30-Nov-2016
 - ENH: Also support optional a:flagsMatchCount in
@@ -657,7 +659,7 @@ First published version as separate shared library.
 Started development of shared autoload functionality.
 
 ==============================================================================
-Copyright: (C) 2009-2016 Ingo Karkat
+Copyright: (C) 2009-2017 Ingo Karkat
 Contains URL encoding / decoding algorithms written by Tim Pope.
 The VIM LICENSE applies to this plugin; see |copyright|.
 
