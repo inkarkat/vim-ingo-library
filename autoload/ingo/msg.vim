@@ -2,12 +2,14 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2016 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.010	10-Jan-2017	Add ingo#msg#ColoredMsg() and
+"				ingo#msg#ColoredStatusMsg().
 "   1.027.009	22-Aug-2016	Add ingo#msg#MsgFromShellError().
 "   1.025.008	01-Aug-2016	ingo#msg#HighlightMsg(): Make a:hlgroup
 "				optional, default to 'None' (so the function is
@@ -51,6 +53,7 @@ function! ingo#msg#StatusMsg( text, ... )
 "   None.
 "* INPUTS:
 "   a:text  The message to be echoed and added to the message history.
+"   a:hlgroup   Optional highlight group name.
 "* RETURN VALUES:
 "   None.
 "******************************************************************************
@@ -61,6 +64,61 @@ function! ingo#msg#StatusMsg( text, ... )
 	echohl None
 	echomsg a:text
     endif
+endfunction
+
+function! ingo#msg#ColoredMsg( ... )
+"******************************************************************************
+"* PURPOSE:
+"   Echo a message that contains various, differently highlighted parts.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:part | [a:part, a:hlgroup], ...   Message parts or Pairs of message parts
+"					and highlight group names. For the
+"					former, reverts to "no highlighting".
+"* RETURN VALUES:
+"   None.
+"******************************************************************************
+    let l:isFirst = 1
+
+    for l:element in a:000
+	let [l:part, l:hlgroup] = (type(l:element) == type([]) ? l:element: [l:element, 'None'])
+	execute 'echohl' l:hlgroup
+	execute (l:isFirst ? 'echo' : 'echon') 'l:part'
+	let l:isFirst = 0
+    endfor
+    echohl None
+endfunction
+function! ingo#msg#ColoredStatusMsg( ... )
+"******************************************************************************
+"* PURPOSE:
+"   Echo a message that contains various, differently highlighted parts, and
+"   store the full message in v:statusmsg.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Performs a :redraw to put the message into the message history.
+"* INPUTS:
+"   a:part | [a:part, a:hlgroup], ...   Message parts or Pairs of message parts
+"					and highlight group names. For the
+"					former, reverts to "no highlighting".
+"* RETURN VALUES:
+"   None.
+"******************************************************************************
+    let l:elements = map(copy(a:000), "(type(v:val) == type([]) ? v:val: [v:val, 'None'])")
+    let l:text = join(map(copy(l:elements), 'v:val[0]'), '')
+    echomsg l:text
+    redraw
+
+    let l:isFirst = 1
+    for [l:part, l:hlgroup] in l:elements
+	execute 'echohl' l:hlgroup
+	execute (l:isFirst ? 'echo' : 'echon') 'l:part'
+	let l:isFirst = 0
+    endfor
+    echohl None
 endfunction
 
 function! ingo#msg#VerboseMsg( text, ... )
