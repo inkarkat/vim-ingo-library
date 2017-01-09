@@ -11,6 +11,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.028.018	25-Nov-2016	Add ingo#compat#getcurpos().
 "   1.026.017	11-Aug-2016	Add ingo#compat#strgetchar() and
 "				ingo#compat#strcharpart(), introduced in Vim
 "				7.4.1730.
@@ -134,6 +135,16 @@ if exists('*uniq')
 else
     function! ingo#compat#uniq( list )
 	return ingo#collections#UniqueSorted(a:list)
+    endfunction
+endif
+
+if exists('*getcurpos')
+    function! ingo#compat#getcurpos()
+	return getcurpos()
+    endfunction
+else
+    function! ingo#compat#getcurpos()
+	return getpos('.')
     endfunction
 endif
 
