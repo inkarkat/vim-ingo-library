@@ -123,6 +123,9 @@ HISTORY							*ingo-library-history*
 - Add ingo/math.vim, ingo/binary.vim and ingo/list/split.vim modules.
 - Add ingo#comments#SplitAll(), a more powerful variant of
   ingo#comments#SplitIndentAndText().
+- Add ingo#compat#systemlist().
+- Add ingo#msg#ColoredMsg() and ingo#msg#ColoredStatusMsg().
+- Add ingo/query/recall.vim module.
 
 1.028	30-Nov-2016
 - ENH: Also support optional a:flagsMatchCount in
