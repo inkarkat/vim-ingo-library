@@ -9,6 +9,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.015.003	18-Nov-2013	FIX: Actually return the result of a Funcref
+"				passed to
+"				ingo#register#KeepRegisterExecuteOrFunc().
 "   1.014.002	27-Oct-2013	Add ingo#register#KeepRegisterExecuteOrFunc().
 "   1.011.001	09-Jul-2013	file creation
 
@@ -47,7 +50,7 @@ function! ingo#register#KeepRegisterExecuteOrFunc( Action, ... )
     let l:save_reg = getreg('"')
     let l:save_regmode = getregtype('"')
     try
-	call call('ingo#actions#ExecuteOrFunc', [a:Action] + a:000)
+	return call('ingo#actions#ExecuteOrFunc', [a:Action] + a:000)
     finally
 	call setreg('"', l:save_reg, l:save_regmode)
 	if exists('l:save_cpoptions')
