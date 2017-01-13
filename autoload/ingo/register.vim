@@ -77,7 +77,7 @@ function! ingo#register#GetAsList( register )
 "   List of lines.
 "******************************************************************************
     let l:lines = split(getreg(a:register), '\n', 1)
-    if ! empty(l:lines) && empty(l:lines[-1])
+    if len(l:lines) > 1 && empty(l:lines[-1])
 	call remove(l:lines, -1)
     endif
     return l:lines
