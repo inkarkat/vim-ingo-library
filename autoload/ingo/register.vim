@@ -3,12 +3,13 @@
 " DEPENDENCIES:
 "   - ingo/actions.vim autoload script
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.004	13-Jan-2017	Add ingo#register#GetAsList().
 "   1.015.003	18-Nov-2013	FIX: Actually return the result of a Funcref
 "				passed to
 "				ingo#register#KeepRegisterExecuteOrFunc().
@@ -58,6 +59,28 @@ function! ingo#register#KeepRegisterExecuteOrFunc( Action, ... )
 	endif
 	let &clipboard = l:save_clipboard
     endtry
+endfunction
+
+function! ingo#register#GetAsList( register )
+"******************************************************************************
+"* PURPOSE:
+"   Get the contents of a:register as a List of lines. For a linewise register,
+"   there is no trailing empty element (so the returned List can be directly
+"   passed to append(), and it will insert just like :put {reg}.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:register  Name of register.
+"* RETURN VALUES:
+"   List of lines.
+"******************************************************************************
+    let l:lines = split(getreg(a:register), '\n', 1)
+    if ! empty(l:lines) && empty(l:lines[-1])
+	call remove(l:lines, -1)
+    endif
+    return l:lines
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
