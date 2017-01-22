@@ -9,6 +9,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.009.002	14-Jun-2013	Minor: Make substitute() robust against
+"				'ignorecase'.
 "   1.006.001	24-May-2013	file creation from ingosearch.vim.
 
 function! ingo#regexp#magic#GetNormalizeMagicnessAtom( pattern )
@@ -28,7 +30,7 @@ function! ingo#regexp#magic#GetNormalizeMagicnessAtom( pattern )
 "   Normalizing atom or empty string.
 "******************************************************************************
     let l:normalizingAtom = (&magic ? 'm' : 'M')
-    let l:magicChangeAtoms = substitute('vmMV', l:normalizingAtom, '', '')
+    let l:magicChangeAtoms = substitute('vmMV', '\C'.l:normalizingAtom, '', '')
 
     return (a:pattern =~# '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\[' . l:magicChangeAtoms . ']' ? '\' . l:normalizingAtom : '')
 endfunction
