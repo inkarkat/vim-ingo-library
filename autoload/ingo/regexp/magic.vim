@@ -2,13 +2,24 @@
 "
 " DEPENDENCIES:
 "   - ingo/collections.vim autoload script for ingo#regexp#magic#Normalize()
+"   - ingo/collections/fromsplit.vim autoload script
+"   - ingo/regexp/collection.vim autoload script
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.003	23-Jan-2017	BUG: ingo#regexp#magic#Normalize() also
+"				processes the contents of collections [...];
+"				especially the escaping of "]" wreaks havoc on
+"				the pattern. Rename s:ConvertMagicness() into
+"				ingo#regexp#magic#ConvertMagicnessOfElement()
+"				and introduce intermediate
+"				s:ConvertMagicnessOfFragment() that first
+"				separates collections from other elements and
+"				only invokes the former on those other elements.
 "   1.009.002	14-Jun-2013	Minor: Make substitute() robust against
 "				'ignorecase'.
 "   1.006.001	24-May-2013	file creation from ingosearch.vim.
@@ -45,9 +56,13 @@ let s:specialSearchCharacterExpressions = {
 \   'M': '[\\^$]',
 \   'V': '\\',
 \}
-function! s:ConvertMagicness( pattern, sourceSpecialCharacterExpr, targetSpecialCharacterExpr )
+function! s:ConvertMagicnessOfFragment( fragment, sourceSpecialCharacterExpr, targetSpecialCharacterExpr )
+    let l:elements = ingo#collections#fromsplit#MapItems(a:fragment, ingo#regexp#collection#Expr(), printf('ingo#regexp#magic#ConvertMagicnessOfElement(v:val, %s, %s)', string(a:sourceSpecialCharacterExpr), string(a:targetSpecialCharacterExpr)))
+    return join(l:elements, '')
+endfunction
+function! ingo#regexp#magic#ConvertMagicnessOfElement( element, sourceSpecialCharacterExpr, targetSpecialCharacterExpr )
     let l:isEscaped = 0
-    let l:chars = split(a:pattern, '\zs')
+    let l:chars = split(a:element, '\zs')
     for l:index in range(len(l:chars))
 	let l:char = l:chars[l:index]
 
@@ -109,7 +124,7 @@ function! ingo#regexp#magic#Normalize( pattern )
 	    continue
 	endif
 
-	let l:patternFragments[l:fragmentIndex] = s:ConvertMagicness(
+	let l:patternFragments[l:fragmentIndex] = s:ConvertMagicnessOfFragment(
 	\   l:fragment,
 	\   s:specialSearchCharacterExpressions[l:currentMagicMode],
 	\   s:specialSearchCharacterExpressions[l:defaultMagicMode]
