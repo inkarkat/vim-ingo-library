@@ -11,6 +11,12 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.004	24-Jan-2017	Test failure in
+"				PatternsOnText/t7580-SubstituteMultiple-magic.vim
+"				alerted me to the fact that \V[1] needs to be
+"				escaped as \[1]. Also process the collections
+"				through new
+"				ingo#regexp#magic#ConvertMagicnessOfCollection().
 "   1.029.003	23-Jan-2017	BUG: ingo#regexp#magic#Normalize() also
 "				processes the contents of collections [...];
 "				especially the escaping of "]" wreaks havoc on
@@ -23,6 +29,8 @@
 "   1.009.002	14-Jun-2013	Minor: Make substitute() robust against
 "				'ignorecase'.
 "   1.006.001	24-May-2013	file creation from ingosearch.vim.
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! ingo#regexp#magic#GetNormalizeMagicnessAtom( pattern )
 "******************************************************************************
@@ -57,8 +65,21 @@ let s:specialSearchCharacterExpressions = {
 \   'V': '\\',
 \}
 function! s:ConvertMagicnessOfFragment( fragment, sourceSpecialCharacterExpr, targetSpecialCharacterExpr )
-    let l:elements = ingo#collections#fromsplit#MapItems(a:fragment, ingo#regexp#collection#Expr(), printf('ingo#regexp#magic#ConvertMagicnessOfElement(v:val, %s, %s)', string(a:sourceSpecialCharacterExpr), string(a:targetSpecialCharacterExpr)))
+    let l:elements = ingo#collections#fromsplit#MapItemsAndSeparators(a:fragment, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\?' . ingo#regexp#collection#Expr(),
+    \	printf('ingo#regexp#magic#ConvertMagicnessOfElement(v:val, %s, %s)', string(a:sourceSpecialCharacterExpr), string(a:targetSpecialCharacterExpr)),
+    \	printf('ingo#regexp#magic#ConvertMagicnessOfCollection(v:val, %s, %s)', string(a:sourceSpecialCharacterExpr), string(a:targetSpecialCharacterExpr))
+    \)
     return join(l:elements, '')
+endfunction
+function! ingo#regexp#magic#ConvertMagicnessOfCollection( collection, sourceSpecialCharacterExpr, targetSpecialCharacterExpr )
+    let l:isEscaped = (a:collection =~# '^\\\[')
+    if l:isEscaped && '[' =~# a:sourceSpecialCharacterExpr && '[' !~# a:targetSpecialCharacterExpr
+	return a:collection[1:]
+    elseif ! l:isEscaped && '[' !~# a:sourceSpecialCharacterExpr && '[' =~# a:targetSpecialCharacterExpr
+	return '\' . a:collection
+    else
+	return a:collection
+    endif
 endfunction
 function! ingo#regexp#magic#ConvertMagicnessOfElement( element, sourceSpecialCharacterExpr, targetSpecialCharacterExpr )
     let l:isEscaped = 0
@@ -134,4 +155,6 @@ function! ingo#regexp#magic#Normalize( pattern )
     return join(l:patternFragments, '')
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
