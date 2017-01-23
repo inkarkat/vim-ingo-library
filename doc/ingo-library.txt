@@ -126,6 +126,20 @@ HISTORY							*ingo-library-history*
 - Add ingo#compat#systemlist().
 - Add ingo#msg#ColoredMsg() and ingo#msg#ColoredStatusMsg().
 - Add ingo/query/recall.vim module.
+- Add ingo#register#GetAsList().
+- FIX: ingo#format#Format(): An invalid %0$ references the last passed
+  argument instead of yielding the empty string (as [argument-index$] is
+  1-based). Add bounds check to avoid that
+- FIX: ingo#format#Format(): Also support escaping via "%%", as in printf().
+- Add ingo#subst#FirstSubstitution(), ingo#subst#FirstPattern(),
+  ingo#subst#FirstParameter().
+- Add ingo#regexp#collection#Expr().
+- BUG: ingo#regexp#magic#Normalize() also processes the contents of
+  collections [...]; especially the escaping of "]" wreaks havoc on the
+  pattern. Rename s:ConvertMagicness() into
+  ingo#regexp#magic#ConvertMagicnessOfElement() and introduce intermediate
+  s:ConvertMagicnessOfFragment() that first separates collections from other
+  elements and only invokes the former on those other elements.
 
 1.028	30-Nov-2016
 - ENH: Also support optional a:flagsMatchCount in
