@@ -2,12 +2,13 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2016 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.003	16-Dec-2016	Add ingo#escape#OnlyUnescaped().
 "   1.017.002	20-Feb-2014	Add ingo#escape#UnescapeExpr().
 "   1.009.001	15-Jun-2013	file creation
 
