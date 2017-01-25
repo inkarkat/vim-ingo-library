@@ -2,12 +2,19 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2014-2016 Ingo Karkat
+" Copyright: (C) 2014-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.030.005	26-Jan-2017	Add escaping of additional values to
+"				ingo#option#Join() and split into
+"				ingo#option#Append() and ingo#option#Prepend().
+"				Offer simpler ingo#option#JoinEscaped() and
+"				ingo#option#JoinUnescaped() for actual joining
+"				of values split via ingo#option#Split() /
+"				ingo#option#SplitAndUnescape().
 "   1.028.004	31-Oct-2016	Add ingo#option#Join().
 "   1.024.003	06-Mar-2015	Add ingo#option#SplitAndUnescape().
 "   1.021.002	12-Jun-2014	Add ingo#option#Contains() and
@@ -34,9 +41,53 @@ function! ingo#option#ContainsOneOf( optionValue, list )
     return 0
 endfunction
 
-function! ingo#option#Join( val1, ... )
+function! ingo#option#JoinEscaped( ... )
+    return join(a:000, ',')
+endfunction
+function! ingo#option#JoinUnescaped( ... )
+    return join(map(copy(a:000), 'escape(v:val, ",")'), ',')
+endfunction
+
+function! ingo#option#Append( val1, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Add a:val2, a:val3, ... to the original a:val1 option value. Commas in the
+"   additional values will be escaped, empty values will be skipped.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:val1  Original option value.
+"* RETURN VALUES:
+"   Concatenation of a:val1, a:val2, ...
+"******************************************************************************
     let l:result = a:val1
-    for l:val in a:000
+    for l:val in map(copy(a:000), 'escape(v:val, ",")')
+	if empty(l:result)
+	    let l:result = l:val
+	elseif ! empty(l:val)
+	    let l:result .= ',' . l:val
+	endif
+    endfor
+    return l:result
+endfunction
+function! ingo#option#Prepend( val1, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Prepend a:val2, a:val3, ... to the original a:val1 option value. Commas in
+"   the additional values will be escaped, empty values will be skipped.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:val1  Original option value.
+"* RETURN VALUES:
+"   Concatenation of a:val2, ..., a:val1
+"******************************************************************************
+    let l:result = []
+    for l:val in map(copy(a:000), 'escape(v:val, ",")') + [a:val1]
 	if empty(l:result)
 	    let l:result = l:val
 	elseif ! empty(l:val)
