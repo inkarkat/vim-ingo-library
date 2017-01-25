@@ -40,6 +40,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	027	26-Jan-2017	Factor our s:ResolveDirspec().
 "	026	02-Apr-2015	Emulate lower priority of filespecs matching
 "				'suffixes' via custom s:SuffixesSort() function,
 "				and use that when multiple glob() results have
@@ -153,9 +154,12 @@ function! s:RemoveDirspec( filespec, dirspecs )
     endfor
     return a:filespec
 endfunction
+function! s:ResolveDirspec( dirspec )
+	return (type(a:dirspec) == type(function('tr')) ? call(a:dirspec, []) : a:dirspec)
+endfunction
 function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, argLead )
     try
-	let l:dirspec = (type(a:dirspec) == 2 ? call(a:dirspec, []) : a:dirspec)
+	let l:dirspec = s:ResolveDirspec(a:dirspec)
     catch /^Vim\%((\a\+)\)\=:E/
 	throw ingo#msg#MsgFromVimException()   " Don't swallow Vimscript errors.
     catch /^Vim\%((\a\+)\)\=:/
@@ -267,7 +271,7 @@ endfunction
 function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspec, filename )
     try
 "****Dechomsg '****' a:isBang string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspec) string(a:filename)
-	let l:dirspec = (type(a:dirspec) == 2 ? call(a:dirspec, []) : a:dirspec)
+	let l:dirspec = s:ResolveDirspec(a:dirspec)
 
 	" Detach any file options or commands for assembling the filespec.
 	let [l:fileOptionsAndCommands, l:filename] = ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands(a:filename)
