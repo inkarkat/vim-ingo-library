@@ -40,6 +40,18 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	026	02-Apr-2015	Emulate lower priority of filespecs matching
+"				'suffixes' via custom s:SuffixesSort() function,
+"				and use that when multiple glob() results have
+"				to be combined and sorted.
+"	025	01-Apr-2015	Sorting of completed filenames in
+"				s:CompleteFiles() removes the reduced priority
+"				of 'suffixes' option which is considered by
+"				glob(). Check whether sorting is actually
+"				necessary (when multiple glob() results have to
+"				be combined, which is only the case when there
+"				are multiple browsefilters) via l:sourceCnt, and
+"				skip filtering if not.
 "	024	13-Feb-2015	ENH: Support List of a:parameters.browsefilter.
 "	023	08-Jan-2015	ENH: Support multiple and fnamemodify()'ed
 "				placement of the filespec in a:parameters.action
@@ -210,7 +222,8 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 	endif
 
 	if l:sourceCnt > 1
-	    return ingo#compat#uniq(sort(l:filespecs), 's:SuffixesSort') " Maintain lower priority of 'suffixes' while sorting.
+	    call s:BuildSuffixesExpr()
+	    return ingo#compat#uniq(sort(l:filespecs, 's:SuffixesSort')) " Maintain lower priority of 'suffixes' while sorting.
 	else
 	    return l:filespecs
 	endif
@@ -218,9 +231,37 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
 	let &wildignore = l:save_wildignore
     endtry
 endfunction
+function! s:BuildSuffixesExpr()
+    let s:suffixesExpr =
+    \   '\V\%(' .
+    \   join(
+    \       map(
+    \           split(&suffixes,  '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\%(, *\|\ze\.\)'),
+    \           'ingo#escape#Unescape(v:val, ".,")'
+    \       ),
+    \       '\|'
+    \   ) .
+    \   '\)\$'
+endfunction
+function! s:IsSuffix( caseSigil, filespec )
+    execute 'return (a:filespec =~' . a:caseSigil . ' s:suffixesExpr)'
+endfunction
 function! s:SuffixesSort( f1, f2 )
-    " TODO
-    return 0
+    let l:caseSigil = (ingo#os#IsWinOrDos() ? '?' : '#')    " On Windows, the entire globbing is (usually) case-insensitive.
+
+    execute 'let l:isEqual = a:f1 ==' . l:caseSigil . ' a:f2'
+    if l:isEqual
+	return 0
+    endif
+
+    let l:isSuffix1 = s:IsSuffix(l:caseSigil, a:f1)
+    let l:isSuffix2 = s:IsSuffix(l:caseSigil, a:f2)
+
+    if l:isSuffix1 == l:isSuffix2
+	execute 'return (a:f1 >' . l:caseSigil . ' a:f2 ? 1 : -1)'
+    else
+	return (l:isSuffix1 ? 1 : -1)
+    endif
 endfunction
 
 function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspec, filename )
