@@ -4,12 +4,14 @@
 "   - ingo/option.vim autoload script
 "   - IndentCommentPrefix.vim plugin (optional integration)
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.030.004	27-Jan-2017	Add
+"				ingo#regexp#comments#GetFlexibleWhitespaceAndCommentPrefixPattern().
 "   1.020.003	03-Jun-2014	Use ingo#option#Split().
 "   1.013.002	12-Sep-2013	Avoid using \ze in
 "				ingo#regexp#comments#CommentToExpression(). It
@@ -49,6 +51,25 @@ function! ingo#regexp#comments#FromSetting()
     let l:commentExpressions += map(copy(ingo#plugin#setting#GetBufferLocal('IndentCommentPrefix_Whitelist', [])), 'escape(v:val, ''\\'')')
 
     return l:commentExpressions
+endfunction
+
+function! ingo#regexp#comments#GetFlexibleWhitespaceAndCommentPrefixPattern( isAllowEmpty )
+"******************************************************************************
+"* PURPOSE:
+"   Obtain a regular expression that matches any amount of whitespace (with
+"   a:isAllowEmpty also none at all) and optionally any of the currently valid
+"   comment prefixes in between.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:isAllowEmpty  Flag whether to allow a zero-length match of nothing at all.
+"* RETURN VALUES:
+"   Regular expression.
+"******************************************************************************
+    let l:commentPattern = '\%(' . join(ingo#regexp#comments#FromSetting(), '\|') . '\)'
+    return '\_s' . (a:isAllowEmpty ? '*' : '\+') . l:commentPattern . '\?\_s*'
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
