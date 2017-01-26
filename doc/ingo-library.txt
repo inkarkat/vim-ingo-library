@@ -83,6 +83,14 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.030	RELEASEME
+- Add escaping of additional values to ingo#option#Join() and split into
+  ingo#option#Append() and ingo#option#Prepend().
+- Offer simpler ingo#option#JoinEscaped() and ingo#option#JoinUnescaped() for
+  actual joining of values split via ingo#option#Split() /
+  ingo#option#SplitAndUnescape().
+- Add ingo#str#EndsWith() variant of ingo#fs#path#split#Contains().
+
 1.029	24-Jan-2017
 - CHG: ingo#comments#RemoveCommentPrefix() isn't useful as it omits any indent
   before the comment prefix. Change its implementation to just erase the
