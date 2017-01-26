@@ -1,14 +1,16 @@
 " ingo/regexp/comments.vim: Functions that converts 'comments' to regular expressions.
 "
 " DEPENDENCIES:
+"   - ingo/option.vim autoload script
 "   - IndentCommentPrefix.vim plugin (optional integration)
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.020.003	03-Jun-2014	Use ingo#option#Split().
 "   1.013.002	12-Sep-2013	Avoid using \ze in
 "				ingo#regexp#comments#CommentToExpression(). It
 "				may be used in a larger expression that still
@@ -40,7 +42,7 @@ function! ingo#regexp#comments#FromSetting()
     else
 	" Convert each comment marker of the 'comments' setting into a regular
 	" expression.
-	let l:commentExpressions = map(split(&l:comments, '\\\@<!,'), 'ingo#regexp#comments#CommentToExpression(v:val)')
+	let l:commentExpressions = map(ingo#option#Split(&l:comments), 'ingo#regexp#comments#CommentToExpression(v:val)')
     endif
 
     " Integration with IndentCommentPrefix.vim plugin.
