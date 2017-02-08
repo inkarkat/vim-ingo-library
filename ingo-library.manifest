@@ -94,6 +94,7 @@ autoload/ingo/query/confirm.vim
 autoload/ingo/query/file.vim
 autoload/ingo/query/fromlist.vim
 autoload/ingo/query/get.vim
+autoload/ingo/query/recall.vim
 autoload/ingo/query/substitute.vim
 autoload/ingo/range.vim
 autoload/ingo/range/borders.vim
