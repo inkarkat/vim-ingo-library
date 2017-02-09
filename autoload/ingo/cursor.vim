@@ -2,12 +2,14 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.030.003	10-Feb-2017	Add ingo#cursor#StartInsert() and
+"				ingo#cursor#StartAppend().
 "   1.018.002	10-Apr-2014	Add ingo#cursor#IsAtEndOfLine().
 "   1.016.001	11-Dec-2013	file creation
 
@@ -56,6 +58,38 @@ function! ingo#cursor#IsAtEndOfLine( ... )
     " This won't work with :set virtualedit=all, when the cursor is after the
     " physical end of the line.
     "return (search('\%#.$', 'cn', line('.')) > 0)
+endfunction
+
+
+function! ingo#cursor#StartInsert( isAtEndOfLine )
+    if a:isAtEndOfLine
+	startinsert!
+    else
+	startinsert
+    endif
+endfunction
+
+function! ingo#cursor#StartAppend( ... )
+"******************************************************************************
+"* PURPOSE:
+"   Start appending just after executing this command. Works like typing "a" in
+"   normal mode.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Starts insert mode.
+"* INPUTS:
+"   a:isAtEndOfLine Optional flag whether the cursor is at the end of the line.
+"* RETURN VALUES:
+"   None.
+"******************************************************************************
+    let l:isAtEndOfLine = (a:0 ? a:1 : ingo#cursor#IsAtEndOfLine())
+    if l:isAtEndOfLine
+	startinsert!
+    else
+	normal! l
+	startinsert
+    endif
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
