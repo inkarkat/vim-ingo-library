@@ -40,7 +40,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"	027	26-Jan-2017	Factor our s:ResolveDirspec().
+"	027	26-Jan-2017	Factor out s:ResolveDirspecs().
+"				ENH: Handle List of dirspecs, all of which will
+"				be used for completion, and the subpath passed
+"				to the command will be searched in each and the
+"				first found filespec returned.
 "	026	02-Apr-2015	Emulate lower priority of filespecs matching
 "				'suffixes' via custom s:SuffixesSort() function,
 "				and use that when multiple glob() results have
@@ -154,12 +158,25 @@ function! s:RemoveDirspec( filespec, dirspecs )
     endfor
     return a:filespec
 endfunction
-function! s:ResolveDirspec( dirspec )
-	return (type(a:dirspec) == type(function('tr')) ? call(a:dirspec, []) : a:dirspec)
+function! s:ResolveDirspecs( dirspecs, ... )
+    let l:dirspecs = (type(a:dirspecs) == type(function('tr')) ? call(a:dirspecs, []) : a:dirspecs)
+    if a:0 && type(l:dirspecs) == type([])
+	if len(l:dirspecs) > 1
+	    " Iterate over all dirspecs to find the first containing a:filespec.
+	    for l:dirspec in l:dirspecs
+		if ! empty(ingo#compat#glob(ingo#fs#path#Combine(l:dirspec, a:1), 0, 1))
+		    return l:dirspec
+		endif
+	    endfor
+	endif
+	return l:dirspecs[0]    " This is also the fallback if a:filespec wasn't found in any of a:dirspecs.
+    else
+	return l:dirspecs
+    endif
 endfunction
-function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, argLead )
+function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs, argLead )
     try
-	let l:dirspec = s:ResolveDirspec(a:dirspec)
+	let l:dirspecs = ingo#list#Make(s:ResolveDirspecs(a:dirspecs))
     catch /^Vim\%((\a\+)\)\=:E/
 	throw ingo#msg#MsgFromVimException()   " Don't swallow Vimscript errors.
     catch /^Vim\%((\a\+)\)\=:/
@@ -177,27 +194,30 @@ function! s:CompleteFiles( dirspec, browsefilter, wildignore, isIncludeSubdirs, 
     endif
     try
 	let l:filespecs = []
+	let l:resolvedDirspecs = []
 	let l:sourceCnt = 0
 
-	if a:isIncludeSubdirs
-	    " If the l:dirspec itself contains wildcards, there may be multiple
-	    " matches.
-	    let l:resolvedDirspecs = ingo#compat#glob(l:dirspec, 0, 1)
+	for l:dirspec in l:dirspecs
+	    if a:isIncludeSubdirs
+		" If the l:dirspec itself contains wildcards, there may be multiple
+		" matches.
+		let l:resolvedDirspecs += ingo#compat#glob(l:dirspec, 0, 1)
 
-	    " If there is a browsefilter, we need to add all directories
-	    " separately, as most of them probably have been filtered away by
-	    " the (file-based) a:browsefilter.
-	    if ! empty(a:browsefilter)
-		let l:dirspecWildcard = l:dirspec . a:argLead . '*' . ingo#fs#path#Separator()
-		let l:filespecs += ingo#compat#glob(l:dirspecWildcard, 0, 1)
-		let l:sourceCnt += 1
+		" If there is a browsefilter, we need to add all directories
+		" separately, as most of them probably have been filtered away by
+		" the (file-based) a:browsefilter.
+		if ! empty(a:browsefilter)
+		    let l:dirspecWildcard = l:dirspec . a:argLead . '*' . ingo#fs#path#Separator()
+		    let l:filespecs += ingo#compat#glob(l:dirspecWildcard, 0, 1)
+		    let l:sourceCnt += 1
+		endif
 	    endif
-	endif
 
-	for l:filter in l:browsefilter
-	    let l:filespecWildcard = l:dirspec . a:argLead . l:filter
-	    let l:filespecs += ingo#compat#glob(l:filespecWildcard, 0, 1)
-	    let l:sourceCnt += 1
+	    for l:filter in l:browsefilter
+		let l:filespecWildcard = l:dirspec . a:argLead . l:filter
+		let l:filespecs += ingo#compat#glob(l:filespecWildcard, 0, 1)
+		let l:sourceCnt += 1
+	    endfor
 	endfor
 
 	if a:isIncludeSubdirs
@@ -268,10 +288,9 @@ function! s:SuffixesSort( f1, f2 )
     endif
 endfunction
 
-function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspec, filename )
+function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspecs, filename )
     try
-"****Dechomsg '****' a:isBang string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspec) string(a:filename)
-	let l:dirspec = s:ResolveDirspec(a:dirspec)
+"****Dechomsg '****' a:isBang string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspecs) string(a:filename)
 
 	" Detach any file options or commands for assembling the filespec.
 	let [l:fileOptionsAndCommands, l:filename] = ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands(a:filename)
@@ -286,7 +305,7 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 
 	if empty(l:filename)
 	    if type(a:DefaultFilename) == 2
-		let l:unescapedFilename = call(a:DefaultFilename, [l:dirspec])
+		let l:unescapedFilename = call(a:DefaultFilename, [s:ResolveDirspecs(a:dirspecs)])
 	    elseif a:DefaultFilename ==# '%'
 		let l:unescapedFilename = expand('%:t')
 	    else
@@ -294,6 +313,7 @@ function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProces
 	    endif
 	    let l:filename = ingo#compat#fnameescape(l:unescapedFilename)
 	endif
+	let l:dirspec = s:ResolveDirspecs(a:dirspecs, l:filename)
 
 	if ! empty(a:FilenameProcessingFunction)
 	    let l:processedFilename = call(a:FilenameProcessingFunction, [l:filename, l:fileOptionsAndCommands])
@@ -361,28 +381,28 @@ function! s:Expand( expr, fileOptionsAndCommands, escapedFilespec, unescapedFile
 endfunction
 
 let s:count = 0
-function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
+function! CommandCompleteDirForAction#setup( command, dirspecs, parameters )
 "*******************************************************************************
 "* PURPOSE:
 "   Define a custom a:command that takes an (potentially optional) single file
 "   argument and executes the a:parameters.action command or Funcref with it.
 "   The command will have a custom completion that completes files from
-"   a:dirspec, with a:parameters.browsefilter applied and
+"   a:dirspecs, with a:parameters.browsefilter applied and
 "   a:parameters.wildignore extensions filtered out. The custom completion will
 "   return the list of file (/ directory / subdir path) names found. Those
-"   should be interpreted relative to (and thus do not include) a:dirspec.
+"   should be interpreted relative to (and thus do not include) a:dirspecs.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
 "   Defines custom a:command that takes one filename argument, which will have
-"   filename completion from a:dirspec. Unless a:parameters.defaultFilename is
+"   filename completion from a:dirspecs. Unless a:parameters.defaultFilename is
 "   provided, the filename argument is mandatory.
 "* INPUTS:
 "   a:command   Name of the custom command to be defined.
-"   a:dirspec	Directory (including trailing path separator!) from which
+"   a:dirspecs	Directory/ies (including trailing path separator!) from which
 "		files will be completed.
 "		Or Funcref to a function that takes no arguments and returns the
-"		dirspec.
+"		dirspec(s).
 "
 "   a:parameters.commandAttributes
 "	    Optional :command {attr}, e.g. <buffer>, -bang, -range.
@@ -402,7 +422,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "	    post actions itself. Throw an error message if needed.
 "   a:parameters.browsefilter
 "	    File wildcard (e.g. '*.txt') used for filtering the files in
-"	    a:dirspec. Multiple can be specified as a List. Default is empty
+"	    a:dirspecs. Multiple can be specified as a List. Default is empty
 "	    string to include all (non-hidden) files. Does not apply to
 "	    subdirectory names (but applies to the files inside the
 "	    subdirectories).
@@ -414,14 +434,14 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
 "	    'wildignore' setting.
 "   a:parameters.isIncludeSubdirs
 "	    Flag whether subdirectories will be included in the completion
-"	    matches. By default, only files in a:dirspec itself will be offered.
+"	    matches. By default, only files in a:dirspecs itself will be offered.
 "   a:parameters.defaultFilename
 "	    If specified, the command will not require the filename argument,
 "	    and default to this filename if none is specified.
 "	    The special value "%" will be replaced with the current buffer's
 "	    filename.
-"	    Or Funcref to a function that takes the dirspec and returns the
-"	    filename. Throw an error message if needed.
+"	    Or Funcref to a function that takes the [List of] dirspec[s] and
+"	    returns the filename. Throw an error message if needed.
 "	    This can resolve to an empty string; however, then your
 "	    a:parameters.action has to cope with that (e.g. by putting up a
 "	    browse dialog).
@@ -462,7 +482,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     execute
     \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:generatedCompleteFunctionName) .
     \	printf("    return s:CompleteFiles(%s, %s, %s, %d, a:ArgLead)\n",
-    \	    string(a:dirspec), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
+    \	    string(a:dirspecs), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
     \	) .    "endfunction"
 
     execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, %s, %s, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
@@ -478,7 +498,7 @@ function! CommandCompleteDirForAction#setup( command, dirspec, parameters )
     \   string(l:DefaultFilename),
     \	string(l:FilenameProcessingFunction),
     \	string(l:FilespecProcessingFunction),
-    \   string(a:dirspec),
+    \   string(a:dirspecs),
     \)
 
     return l:generatedCompleteFunctionName
