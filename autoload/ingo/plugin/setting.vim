@@ -2,12 +2,13 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2009-2014 Ingo Karkat
+" Copyright: (C) 2009-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.023.007	27-Jan-2015	Add ingo#plugin#setting#GetScope().
 "   1.023.006	06-Dec-2014	Add ingo#plugin#setting#GetTabLocal().
 "   1.019.005	16-Apr-2014	Add ingo#plugin#setting#BooleanToStringValue().
 "   1.010.004	08-Jul-2013	Add prefix to exception thrown from
@@ -18,6 +19,31 @@
 "				get().
 "	001	04-Sep-2009	file creation
 
+function! ingo#plugin#setting#GetScope( variableName, scopeList )
+"******************************************************************************
+"* PURPOSE:
+"   Get the scope of a configuration variable that can be defined in multiple
+"   scopes.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:variableName  Name of the variable.
+"   a:scopeList     List of variable scope prefixes. These are tried in
+"		    sequential order.
+"* RETURN VALUES:
+"   Scope prefix from a:scopeList where a:variableName is defined, or empty if
+"   it's defined nowhere.
+"******************************************************************************
+    for l:scope in a:scopeList
+	let l:variable = l:scope . ':' . a:variableName
+	if exists(l:variable)
+	    return l:scope
+	endif
+    endfor
+    return ''
+endfunction
 function! ingo#plugin#setting#GetFromScope( variableName, scopeList, ... )
 "******************************************************************************
 "* PURPOSE:
@@ -39,7 +65,7 @@ function! ingo#plugin#setting#GetFromScope( variableName, scopeList, ... )
 "******************************************************************************
     for l:scope in a:scopeList
 	let l:variable = l:scope . ':' . a:variableName
-	if exists( l:variable )
+	if exists(l:variable)
 	    execute 'return' l:variable
 	endif
     endfor
