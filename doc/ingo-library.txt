@@ -92,6 +92,7 @@ HISTORY							*ingo-library-history*
 - Add ingo#str#EndsWith() variant of ingo#fs#path#split#Contains().
 - Add ingo#regexp#comments#GetFlexibleWhitespaceAndCommentPrefixPattern().
 - Add ingo/hlgroup.vim module.
+- Add ingo#cursor#StartInsert() and ingo#cursor#StartAppend().
 
 1.029	24-Jan-2017
 - CHG: ingo#comments#RemoveCommentPrefix() isn't useful as it omits any indent
