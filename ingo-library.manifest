@@ -64,6 +64,7 @@ autoload/ingo/ftplugin/onbufwinenter.vim
 autoload/ingo/ftplugin/windowsettings.vim
 autoload/ingo/funcref.vim
 autoload/ingo/gui/position.vim
+autoload/ingo/hlgroup.vim
 autoload/ingo/indent.vim
 autoload/ingo/join.vim
 autoload/ingo/line/replace.vim
