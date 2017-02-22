@@ -2,12 +2,13 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2009-2015 Ingo Karkat
+" Copyright: (C) 2009-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.030.008	20-Feb-2017	Add ingo#plugin#setting#Default().
 "   1.023.007	27-Jan-2015	Add ingo#plugin#setting#GetScope().
 "   1.023.006	06-Dec-2014	Add ingo#plugin#setting#GetTabLocal().
 "   1.019.005	16-Apr-2014	Add ingo#plugin#setting#BooleanToStringValue().
@@ -93,6 +94,10 @@ function! ingo#plugin#setting#BooleanToStringValue( settingName, ... )
 	execute 'let l:settingValue = &' . a:settingName
     endif
     return l:settingValue ? a:settingName : 'no' . a:settingName
+endfunction
+
+function! ingo#plugin#setting#Default( value, defaultValue )
+    return (a:value ==# '' ? a:defaultValue : a:value)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
