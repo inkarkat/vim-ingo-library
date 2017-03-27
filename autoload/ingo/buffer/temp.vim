@@ -8,6 +8,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.028.006	16-Nov-2016	FIX: Correct delegation in
+"				ingo#buffer#temp#Execute(); wrong recursive call
+"				was used (after 1.027).
+"				ENH: Add optional a:isSilent argument to
+"				ingo#buffer#temp#Execute().
 "   1.027.005	20-Aug-2016	Add ingo#buffer#temp#ExecuteWithText() and
 "				ingo#buffer#temp#CallWithText() variants that
 "				pre-initialize the buffer (a common use case).
@@ -46,11 +51,13 @@ function! ingo#buffer#temp#Execute( ... )
 "			contents and just execute a:command for its side
 "			effects.
 "   a:isReturnAsList	Flag whether to return the contents as a List of lines.
+"   a:isSilent          Flag whether a:command is executed silently (default:
+"			true).
 "* RETURN VALUES:
 "   Contents of the buffer, by default as one newline-delimited string, with
 "   a:isReturnAsList as a List, like getline() does.
 "******************************************************************************
-    return call('ingo#buffer#temp#Execute', [''] + a:000)
+    return call('ingo#buffer#temp#ExecuteWithText', [''] + a:000)
 endfunction
 function! ingo#buffer#temp#ExecuteWithText( text, command, ... )
 "******************************************************************************
@@ -70,10 +77,13 @@ function! ingo#buffer#temp#ExecuteWithText( text, command, ... )
 "			contents and just execute a:command for its side
 "			effects.
 "   a:isReturnAsList	Flag whether to return the contents as a List of lines.
+"   a:isSilent          Flag whether a:command is executed silently (default:
+"			true).
 "* RETURN VALUES:
 "   Contents of the buffer, by default as one newline-delimited string, with
 "   a:isReturnAsList as a List, like getline() does.
 "******************************************************************************
+    let l:isSilent = (a:0 >= 3 ? a:3 : 1)
     " It's hard to create a temp buffer in a safe way without side effects.
     " Switching the buffer can change the window view, may have a noticable
     " delay even with autocmds suppressed (maybe due to 'autochdir', or just a
@@ -96,7 +106,7 @@ function! ingo#buffer#temp#ExecuteWithText( text, command, ... )
 	endif
     try
 	call s:SetBuffer(a:text)
-	silent execute a:command
+	execute (l:isSilent ? 'silent' : '') a:command
 	if ! a:0 || ! a:1
 	    let l:lines = getline(1, line('$'))
 	    return (a:0 >= 2 && a:2 ? l:lines : join(l:lines, "\n"))
