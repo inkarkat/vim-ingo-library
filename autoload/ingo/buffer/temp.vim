@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2016 Ingo Karkat
+" Copyright: (C) 2011-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -66,8 +66,10 @@ function! ingo#buffer#temp#ExecuteWithText( text, command, ... )
 "   return the contents of the buffer after the execution.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   - a:command should have no side effects to the buffer (other than changing
-"     its contents), as it will be reused on subsequent invocations. If you
-"     change any buffer-local option, also undo the change!
+"     its contents) that "survive" a buffer deletion, as the buffer will be
+"     reused on subsequent invocations. Setting 'filetype', buffer-local
+"     mappings and custom commands seem to be fine, but beware of buffer-local
+"     autocmds!
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
@@ -98,8 +100,8 @@ function! ingo#buffer#temp#ExecuteWithText( text, command, ... )
 	    finally
 		let &switchbuf = l:save_switchbuf
 	    endtry
-	    " The :bdelete got rid of the buffer contents; no need to clean the
-	    " revived buffer.
+	    " The :bdelete got rid of the buffer contents and any buffer-local
+	    " options; no need to clean the revived buffer.
 	else
 	    noautocmd silent keepalt leftabove 1new IngoLibraryTempBuffer
 	    let s:tempBufNr = bufnr('')
