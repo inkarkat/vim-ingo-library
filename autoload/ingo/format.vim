@@ -2,12 +2,19 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.002	23-Jan-2017	FIX: ingo#format#Format(): An invalid %0$
+"				references the last passed argument instead of
+"				yielding the empty string (as [argument-index$]
+"				is 1-based). Add bounds check to avoid that
+"				get() references index of -1.
+"  				FIX: ingo#format#Format(): Also support escaping
+"  				via "%%", as in printf().
 "   1.015.001	18-Nov-2013	file creation
 
 function! ingo#format#Format( fmt, ... )
@@ -15,8 +22,8 @@ function! ingo#format#Format( fmt, ... )
 "* PURPOSE:
 "   Return a String with a:fmt, where "%" items are replaced by the formatted
 "   form of their respective arguments. Like |printf()|, but like Java's
-"   String.format(), additionally supports explicit positioning with
-"   %[argument-index$].
+"   String.format(), additionally supports explicit positioning with (1-based)
+"   %[argument-index$], e.g. "The %2$s is %1$d".
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -33,7 +40,7 @@ function! ingo#format#Format( fmt, ... )
 "******************************************************************************
     let l:args = []
     let s:consumedOriginalArgIdx = -1
-    let l:printfFormat = substitute(a:fmt, '%\%(\(\d\+\)\$\|.\)', '\=s:ProcessFormat(a:000, l:args, submatch(1))', 'g')
+    let l:printfFormat = substitute(a:fmt, '%\@<!%\%(\(\d\+\)\$\|[^%]\)', '\=s:ProcessFormat(a:000, l:args, submatch(1))', 'g')
     return call('printf', [l:printfFormat] + l:args)
 endfunction
 function! s:ProcessFormat( originalArgs, args, argCnt )
@@ -46,7 +53,8 @@ function! s:ProcessFormat( originalArgs, args, argCnt )
 	return submatch(0)
     else
 	" Copy the indexed argument.
-	call add(a:args, get(a:originalArgs, (a:argCnt - 1), ''))
+	let l:indexedArg = (a:argCnt > 0 ? get(a:originalArgs, (a:argCnt - 1), '') : '')
+	call add(a:args, l:indexedArg)
 	return '%'
     endif
 endfunction
