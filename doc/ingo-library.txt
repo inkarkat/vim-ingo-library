@@ -95,6 +95,11 @@ HISTORY							*ingo-library-history*
 - Add ingo#cursor#StartInsert() and ingo#cursor#StartAppend().
 - Add ingo/compat/command.vim module.
 - Add ingo#plugin#setting#Default().
+- BUG: ingo#mbyte#virtcol#GetVirtColOfCurrentCharacter() yields wrong values
+  with single-width multibyte characters, and at the beginning of the line
+  (column 1). Need to start with offset 1 (not 0), and account for that
+  (subtract 1) in the final return. Need to check that the virtcol argument
+  will be larger than 0.
 
 1.029	24-Jan-2017
 - CHG: ingo#comments#RemoveCommentPrefix() isn't useful as it omits any indent
