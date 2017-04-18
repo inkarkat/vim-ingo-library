@@ -5,12 +5,13 @@
 "   - ingo/options.vim autoload script
 "   - ingo/strdisplaywidth.vim autoload script
 "
-" Copyright: (C) 2013-2016 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.019	10-Jan-2017	Add ingo#compat#systemlist().
 "   1.028.018	25-Nov-2016	Add ingo#compat#getcurpos().
 "   1.026.017	11-Aug-2016	Add ingo#compat#strgetchar() and
 "				ingo#compat#strcharpart(), introduced in Vim
@@ -148,6 +149,15 @@ else
     endfunction
 endif
 
+if exists('*systemlist')
+    function! ingo#compat#systemlist( ... )
+	return call('systemlist', a:000)
+    endfunction
+else
+    function! ingo#compat#systemlist( ... )
+	return split(call('system', a:000), '\n')
+    endfunction
+endif
 
 function! ingo#compat#fnameescape( filespec )
 "*******************************************************************************
