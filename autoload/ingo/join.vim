@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/folds.vim autoload script
 "
-" Copyright: (C) 2014-2016 Ingo Karkat
+" Copyright: (C) 2014-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -111,7 +111,7 @@ function! ingo#join#FoldedLines( isKeepSpace, startLnum, endLnum, separator )
 "   a:separator     String to be put in between the lines (also when one of them
 "		    is completely empty).
 "* RETURN VALUES:
-"   [ number of ranges, number of joined lines ]
+"   [ number of folds, number of joined lines ]
 "******************************************************************************
     let l:folds = ingo#folds#GetClosedFolds(a:startLnum, a:endLnum)
     return ingo#join#Ranges(a:isKeepSpace, a:startLnum, a:endLnum, a:separator, l:folds)
