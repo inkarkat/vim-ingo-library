@@ -10,6 +10,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.028.015	10-Oct-2016	Add
+"				ingo#collections#SeparateItemsAndSeparators(), a
+"				variant of
+"				ingo#collections#SplitKeepSeparators().
 "   1.025.014	24-Jul-2016	Add ingo#collections#Reduce().
 "   1.025.013	01-May-2015	Add ingo#collections#Partition().
 "   1.023.012	22-Oct-2014	Add ingo#collections#mapsort().
@@ -219,6 +223,60 @@ function! ingo#collections#SplitKeepSeparators( expr, pattern, ... )
     endwhile
 
     return l:items
+endfunction
+function! ingo#collections#SeparateItemsAndSeparators( expr, pattern, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Like the built-in |split()|, but return both items and the separators
+"   matched by a:pattern as two separate Lists.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   If a:keepempty, len(items) == len(separators) + 1
+"* INPUTS:
+"   a:expr	Text to be split.
+"   a:pattern	Regular expression that specifies the separator text that
+"		delimits the items.
+"   a:keepempty	When the first or last item is empty it is omitted, unless the
+"		{keepempty} argument is given and it's non-zero.
+"		Other empty items are kept when {pattern} matches at least one
+"		character or when {keepempty} is non-zero.
+"* RETURN VALUES:
+"   List of [items, separators].
+"******************************************************************************
+    let l:keepempty = (a:0 ? a:1 : 0)
+    let l:prevIndex = 0
+    let l:index = 0
+    let l:separator = ''
+    let l:items = []
+    let l:separators = []
+
+    while ! empty(a:expr)
+	let l:index = match(a:expr, a:pattern, l:prevIndex)
+	if l:index == -1
+	    call s:add(l:items, strpart(a:expr, l:prevIndex), l:keepempty)
+	    break
+	endif
+	let l:item = strpart(a:expr, l:prevIndex, (l:index - l:prevIndex))
+	call s:add(l:items, l:item, (l:keepempty || ! empty(l:separator)))
+
+	let l:prevIndex = matchend(a:expr, a:pattern, l:prevIndex)
+	let l:separator = strpart(a:expr, l:index, (l:prevIndex - l:index))
+
+	if empty(l:item) && empty(l:separator)
+	    " We have a zero-width separator; consume at least one character to
+	    " avoid the endless loop.
+	    let l:prevIndex = matchend(a:expr, '\_.', l:index)
+	    if l:prevIndex == -1
+		break
+	    endif
+	    call add(l:items, strpart(a:expr, l:index, (l:prevIndex - l:index)))
+	else
+	    call s:add(l:separators, l:separator, l:keepempty)
+	endif
+    endwhile
+
+    return [l:items, l:separators]
 endfunction
 
 function! ingo#collections#isort( i1, i2 )
