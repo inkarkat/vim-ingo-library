@@ -2,12 +2,13 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.030.005	21-Apr-2017	Add ingo#os#IsWindowsShell().
 "   1.014.004	26-Sep-2013	Add ingo#os#IsCygwin().
 "   1.014.003	13-Sep-2013	Add ingo#os#PathSeparator().
 "   1.013.002	13-Sep-2013	FIX: Correct case of ingo#os#IsWin*() function
@@ -28,6 +29,10 @@ endfunction
 
 function! ingo#os#PathSeparator()
     return (ingo#os#IsWinOrDos() ? ';' : ':')
+endfunction
+
+function! ingo#os#IsWindowsShell()
+    return (&shell =~? 'cmd\.exe$')
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
