@@ -8,6 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.014.004	26-Sep-2013	Add ingo#os#IsCygwin().
 "   1.014.003	13-Sep-2013	Add ingo#os#PathSeparator().
 "   1.013.002	13-Sep-2013	FIX: Correct case of ingo#os#IsWin*() function
 "				names.
@@ -19,6 +20,10 @@ endfunction
 
 function! ingo#os#IsWinOrDos()
     return has('dos16') || has('dos32') || ingo#os#IsWindows()
+endfunction
+
+function! ingo#os#IsCygwin()
+    return has('win32unix')
 endfunction
 
 function! ingo#os#PathSeparator()
