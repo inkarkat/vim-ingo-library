@@ -104,6 +104,8 @@ HISTORY							*ingo-library-history*
   identifier placeholders and a Dict containing them.
 - ENH: ingo#format#Format(): Also handle a:fmt without any "%" items without
   error.
+- Add ingo#compat#DictKey(), as Vim 7.4.1707 now allows using an empty
+  dictionary key.
 
 1.029	24-Jan-2017
 - CHG: ingo#comments#RemoveCommentPrefix() isn't useful as it omits any indent
