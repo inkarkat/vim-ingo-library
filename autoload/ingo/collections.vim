@@ -4,7 +4,7 @@
 "   - ingo/dict.vim autoload script
 "   - ingo/list.vim autoload script
 "
-" Copyright: (C) 2011-2016 Ingo Karkat
+" Copyright: (C) 2011-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -57,7 +57,8 @@ function! ingo#collections#ToDict( list, ... )
 "* INPUTS:
 "   a:list  List of keys.
 "   a:emptyValue    Optional value for items in a:list that yield an empty
-"		    string, which cannot be uses as a Dictionary key.
+"		    string, which (in Vim versions prior to 7.4.1707) cannot be
+"		    used as a Dictionary key.
 "		    If omitted, empty values are not included in the Dictionary.
 "* RETURN VALUES:
 "   A new Dictionary with keys taken from a:list.
