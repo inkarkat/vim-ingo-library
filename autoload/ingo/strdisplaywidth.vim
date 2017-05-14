@@ -3,12 +3,15 @@
 " DEPENDENCIES:
 "   - ingo/str.vim autoload script
 "
-" Copyright: (C) 2008-2016 Ingo Karkat
+" Copyright: (C) 2008-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.030.006	15-May-2017	Add ingo#strdisplaywidth#CutLeft() variant of
+"				ingo#strdisplaywidth#strleft() that returns both
+"				parts. Same for ingo#strdisplaywidth#strright().
 "   1.026.005	11-Aug-2016	ENH: ingo#strdisplaywidth#TruncateTo() has a
 "				configurable ellipsis string
 "				g:IngoLibrary_TruncateEllipsis, now defaulting
@@ -22,8 +25,6 @@
 "				ingo#strdisplaywidth#strleft().
 "				Factor out ingo#str#Reverse().
 "   1.008.001	07-Jun-2013	file creation from EchoWithoutScrolling.vim.
-
-scriptencoding utf-8
 
 function! ingo#strdisplaywidth#HasMoreThan( expr, virtCol )
     return (match(a:expr, '^.*\%>' . (a:virtCol + 1) . 'v') != -1)
@@ -41,9 +42,13 @@ function! ingo#strdisplaywidth#strleft( expr, virtCol )
     " character), and include that before-column in the match, too.
     return matchstr(a:expr, '^.*\%<' . (a:virtCol + 1) . 'v.')
 endfunction
+function! ingo#strdisplaywidth#CutLeft( expr, virtCol )
+    let l:left = ingo#strdisplaywidth#strleft(a:expr, a:virtCol)
+    return [l:left, strpart(a:expr, len(l:left))]
+endfunction
 
 if ! exists('g:IngoLibrary_TruncateEllipsis')
-    let g:IngoLibrary_TruncateEllipsis = (&encoding ==# 'utf-8' ? '…' : '...')
+    let g:IngoLibrary_TruncateEllipsis = (&encoding ==# 'utf-8' ? "\u2026" : '...')
 endif
 function! ingo#strdisplaywidth#TruncateTo( text, virtCol, ... )
 "******************************************************************************
@@ -91,6 +96,10 @@ function! ingo#strdisplaywidth#strright( expr, virtCol )
     " the column counting from the end, the string is reversed during the
     " matching.
     return ingo#str#Reverse(ingo#strdisplaywidth#strleft(ingo#str#Reverse(a:expr), a:virtCol))
+endfunction
+function! ingo#strdisplaywidth#CutRight( expr, virtCol )
+    let l:right = ingo#strdisplaywidth#strright(a:expr, a:virtCol)
+    return [l:right, strpart(a:expr, 0, len(a:expr) - len(l:right))]
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
