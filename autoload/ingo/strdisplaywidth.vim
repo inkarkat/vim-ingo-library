@@ -3,12 +3,18 @@
 " DEPENDENCIES:
 "   - ingo/str.vim autoload script
 "
-" Copyright: (C) 2008-2014 Ingo Karkat
+" Copyright: (C) 2008-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.026.005	11-Aug-2016	ENH: ingo#strdisplaywidth#TruncateTo() has a
+"				configurable ellipsis string
+"				g:IngoLibrary_TruncateEllipsis, now defaulting
+"				to a single-char UTF-8 variant if we're in such
+"				encoding. It also handles pathologically small
+"				lengths that only show / cut into the ellipsis.
 "   1.023.004	29-Dec-2014	Add ingo#strdisplaywidth#TruncateTo().
 "   1.019.003	17-Apr-2014	Add ingo#strdisplaywidth#GetMinMax().
 "   1.011.002	26-Jul-2013	FIX: Off-by-one in
@@ -16,6 +22,8 @@
 "				ingo#strdisplaywidth#strleft().
 "				Factor out ingo#str#Reverse().
 "   1.008.001	07-Jun-2013	file creation from EchoWithoutScrolling.vim.
+
+scriptencoding utf-8
 
 function! ingo#strdisplaywidth#HasMoreThan( expr, virtCol )
     return (match(a:expr, '^.*\%>' . (a:virtCol + 1) . 'v') != -1)
@@ -33,6 +41,10 @@ function! ingo#strdisplaywidth#strleft( expr, virtCol )
     " character), and include that before-column in the match, too.
     return matchstr(a:expr, '^.*\%<' . (a:virtCol + 1) . 'v.')
 endfunction
+
+if ! exists('g:IngoLibrary_TruncateEllipsis')
+    let g:IngoLibrary_TruncateEllipsis = (&encoding ==# 'utf-8' ? '…' : '...')
+endif
 function! ingo#strdisplaywidth#TruncateTo( text, virtCol, ... )
 "******************************************************************************
 "* PURPOSE:
@@ -43,7 +55,7 @@ function! ingo#strdisplaywidth#TruncateTo( text, virtCol, ... )
 "     the middle of a:text, not at the end, but it is meant for :echoing, as
 "     it accounts for buffer-local tabstop values.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   None.
+"   The default ellipsis can be configured by g:IngoLibrary_TruncateEllipsis.
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
@@ -51,12 +63,22 @@ function! ingo#strdisplaywidth#TruncateTo( text, virtCol, ... )
 "   a:virtCol   Maximum virtual columns for a:text.
 "   a:truncationIndicator   Optional text to be appended when truncation
 "			    appears. a:text is further reduced to account for
-"			    its width. Default is "...".
+"			    its width. Default is "..." or the single-char UTF-8
+"			    variant if the encoding also is UTF-8.
 "* RETURN VALUES:
 "   Truncated a:text.
 "******************************************************************************
-    let l:truncationIndicator = (a:0 ? a:1 : '...')
+    let l:truncationIndicator = (a:0 ? a:1 : g:IngoLibrary_TruncateEllipsis)
     if ingo#strdisplaywidth#HasMoreThan(a:text, a:virtCol)
+	let l:ellipsisLength = ingo#compat#strchars(g:IngoLibrary_TruncateEllipsis)
+
+	" Handle pathological cases.
+	if a:virtCol == l:ellipsisLength
+	    return g:IngoLibrary_TruncateEllipsis
+	elseif a:virtCol < l:ellipsisLength
+	    return ingo#compat#strcharpart(g:IngoLibrary_TruncateEllipsis, 0, a:virtCol)
+	endif
+
 	let l:truncatedText = ingo#strdisplaywidth#strleft(a:text, max([0, a:virtCol - ingo#compat#strdisplaywidth(l:truncationIndicator)]))
 	return l:truncatedText . l:truncationIndicator
     else
