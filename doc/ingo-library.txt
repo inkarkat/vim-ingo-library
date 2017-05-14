@@ -107,6 +107,8 @@ HISTORY							*ingo-library-history*
 - Add ingo#compat#DictKey(), as Vim 7.4.1707 now allows using an empty
   dictionary key.
 - Add ingo#os#IsWindowsShell().
+- Generalize functions ingo ingo/nary.vim and delegate ingo#binary#...()
+  functions to those. Add ingo/nary.vim module.
 
 1.029	24-Jan-2017
 - CHG: ingo#comments#RemoveCommentPrefix() isn't useful as it omits any indent
