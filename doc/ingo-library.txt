@@ -109,6 +109,14 @@ HISTORY							*ingo-library-history*
 - Add ingo#os#IsWindowsShell().
 - Generalize functions ingo ingo/nary.vim and delegate ingo#binary#...()
   functions to those. Add ingo/nary.vim module.
+- ENH: ingo#regexp#collection#LiteralToRegexp(): Support inverted collection
+  via optional a:isInvert flag.
+- Add ingo#strdisplaywidth#CutLeft() variant of ingo#strdisplaywidth#strleft()
+  that returns both parts. Same for ingo#strdisplaywidth#strright().
+- CHG: Rename ill-named ingo#strdisplaywidth#pad#Middle() to
+  ingo#strdisplaywidth#pad#Center().
+- Add "real" ingo#strdisplaywidth#pad#Middle() that inserts the padding in the
+  middle of the string / between the two passed string parts.
 
 1.029	24-Jan-2017
 - CHG: ingo#comments#RemoveCommentPrefix() isn't useful as it omits any indent
