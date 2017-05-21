@@ -10,10 +10,38 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.030.004	22-May-2017	Add ingo#fs#path#split#PathAndName().
 "   1.030.003	26-Jan-2017	Add ingo#str#EndsWith() variant of
 "				ingo#fs#path#split#Contains().
 "   1.025.002	30-Apr-2015	Add ingo#fs#path#split#Contains().
 "   1.019.001	22-May-2014	file creation
+
+function! ingo#fs#path#split#PathAndName( filespec, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Split a:filespec into the (absolute, relative, or ".') path and the file
+"   name itself.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:filespec                      Absolute / relative filespec.
+"   a:isPathWithTrailingSeparator   Optional flag whether the returned file path
+"				    ends with a trailing path separator. Default
+"				    true.
+"* RETURN VALUES:
+"   [filepath, filename]
+"******************************************************************************
+    let l:isPathWithTrailingSeparator = (a:0 ? a:1 : 1)
+    let [l:dirspec, l:filename] = [fnamemodify(a:filespec, ':h'), fnamemodify(a:filespec, ':t')]
+
+    if l:isPathWithTrailingSeparator
+	let l:dirspec = ingo#fs#path#Combine(l:dirspec, '')
+    endif
+
+    return [l:dirspec, l:filename]
+endfunction
 
 function! ingo#fs#path#split#AtBasePath( filespec, basePath )
 "******************************************************************************
