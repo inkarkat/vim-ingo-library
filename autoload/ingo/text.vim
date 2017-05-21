@@ -3,12 +3,14 @@
 " DEPENDENCIES:
 "   - ingo/pos.vim autoload script
 "
-" Copyright: (C) 2012-2015 Ingo Karkat
+" Copyright: (C) 2012-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.010	23-Mar-2016	Add ingo#text#GetCharBefore() variant of
+"				ingo#text#GetChar().
 "   1.024.009	22-Apr-2015	ingo#text#Insert(): Also allow insertion one
 "				beyond the last line (in column 1), just like
 "				setline() allows.
@@ -95,6 +97,28 @@ function! ingo#text#GetChar( startPos, ... )
     let [l:count, l:isUpTo] = (a:0 ? (a:1 > 0 ? [a:1, 0] : [-1 * a:1, 1]) : [0, 0])
 
     return matchstr(getline(l:line), '\%' . l:column . 'c' . '.' . (l:count ? '\{' . (l:isUpTo ? ',' : '') . l:count . '}' : ''))
+endfunction
+function! ingo#text#GetCharBefore( startPos, ... )
+"*******************************************************************************
+"* PURPOSE:
+"   Extract one / a:count character(s) before a:startPos from the current buffer.
+"   Only considers the current line.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:startPos	    [line, col]
+"   a:count         Optional number of characters to extract; default 1.
+"		    If this is a negative number, tries to extract as many as
+"		    possible instead of not matching.
+"* RETURN VALUES:
+"   string text, or empty string if no(t enough) character(s).
+"*******************************************************************************
+    let [l:line, l:column] = a:startPos
+    let [l:count, l:isUpTo] = (a:0 ? (a:1 > 0 ? [a:1, 0] : [-1 * a:1, 1]) : [0, 0])
+
+    return matchstr(getline(l:line), '.' . (l:count ? '\{' . (l:isUpTo ? ',' : '') . l:count . '}' : '') . '\%' . l:column . 'c')
 endfunction
 
 function! ingo#text#Insert( pos, text )
