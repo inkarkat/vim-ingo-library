@@ -3,12 +3,15 @@
 " DEPENDENCIES:
 "   - ingo/pos.vim autoload script
 "
-" Copyright: (C) 2012-2016 Ingo Karkat
+" Copyright: (C) 2012-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.030.011	22-May-2017	Add ingo#text#ReplaceChar(), a combination of
+"				ingo#text#GetChar(), ingo#text#Remove(), and
+"				ingo#text#Insert().
 "   1.025.010	23-Mar-2016	Add ingo#text#GetCharBefore() variant of
 "				ingo#text#GetChar().
 "   1.024.009	22-Apr-2015	ingo#text#Insert(): Also allow insertion one
@@ -47,8 +50,8 @@ function! ingo#text#Get( startPos, endPos, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:startPos	    [line, col]
-"   a:endPos	    [line, col]
+"   a:startPos	    [line, col]; col is the 1-based byte-index.
+"   a:endPos	    [line, col]; col is the 1-based byte-index.
 "   a:isExclusive   Flag whether a:endPos is exclusive; by default, the
 "		    character at that position is included; pass 1 to exclude
 "		    it.
@@ -86,7 +89,7 @@ function! ingo#text#GetChar( startPos, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:startPos	    [line, col]
+"   a:startPos	    [line, col]; col is the 1-based byte-index.
 "   a:count         Optional number of characters to extract; default 1.
 "		    If this is a negative number, tries to extract as many as
 "		    possible instead of not matching.
@@ -108,7 +111,7 @@ function! ingo#text#GetCharBefore( startPos, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:startPos	    [line, col]
+"   a:startPos	    [line, col]; col is the 1-based byte-index.
 "   a:count         Optional number of characters to extract; default 1.
 "		    If this is a negative number, tries to extract as many as
 "		    possible instead of not matching.
@@ -181,6 +184,38 @@ function! ingo#text#Remove( pos, len )
 	throw 'Remove: Column must be at least 1'
     endif
     return (setline(l:lnum, strpart(l:line, 0, l:col - 1) . strpart(l:line, l:col - 1 + a:len)) == 0)
+endfunction
+function! ingo#text#ReplaceChar( startPos, replacement, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Replace one / a:count character(s) from a:startPos with a:replacement.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   Buffer is modifiable.
+"* EFFECTS / POSTCONDITIONS:
+"   Changes the buffer.
+"* INPUTS:
+"   a:startPos	    [line, col]; col is the 1-based byte-index.
+"   a:replacement   String to be put into the buffer.
+"   a:count         Optional number of characters to replace; default 1.
+"		    If this is a negative number, tries to extract as many as
+"		    possible instead of not matching.
+"* RETURN VALUES:
+"   Original string text that got replaced, or empty string if the position does
+"   not exist and no replacement was done.
+"******************************************************************************
+    let l:originalText = call('ingo#text#GetChar', [a:startPos] + a:000)
+    if empty(l:originalText)
+	return ''
+    endif
+
+    let [l:lnum, l:col] = a:startPos
+    let l:line = getline(l:lnum)
+    let l:len = len(l:originalText)
+    if setline(l:lnum, strpart(l:line, 0, l:col - 1) . a:replacement . strpart(l:line, l:col - 1 + l:len)) == 0
+	return l:originalText
+    else
+	return ''
+    endif
 endfunction
 function! ingo#text#RemoveVirtCol( pos, width, isAllowSmaller )
 "******************************************************************************
