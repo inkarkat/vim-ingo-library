@@ -8,6 +8,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.029.005	17-Dec-2016	Add ingo#err#SetAndBeep().
 "   1.028.004	18-Nov-2016	ENH: Add optional {context} to all ingo#err#...
 "				functions, in case other custom commands can be
 "				called between error setting and checking, to
@@ -80,6 +81,10 @@ function! ingo#err#SetVimException( ... )
 endfunction
 function! ingo#err#SetCustomException( customPrefixPattern, ... )
     call call('ingo#err#Set', [substitute(v:exception, printf('^\C\%%(%s\):\s*', a:customPrefixPattern), '', '')] + a:000)
+endfunction
+function! ingo#err#SetAndBeep( text )
+    call ingo#err#Set(a:text)
+    execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
