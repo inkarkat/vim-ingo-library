@@ -1,13 +1,16 @@
 " ingo/binary.vim: Functions for working with binary numbers.
 "
 " DEPENDENCIES:
+"   - nary.vim autoload script
 "
-" Copyright: (C) 2016 Ingo Karkat
+" Copyright: (C) 2016-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.030.002	14-May-2017	Generalize functions into ingo/nary.vim and
+"				delegate ingo#binary#...() functions to those.
 "   1.029.001	28-Dec-2016	file creation
 
 function! ingo#binary#FromNumber( number, ... )
@@ -27,27 +30,7 @@ function! ingo#binary#FromNumber( number, ... )
 "* RETURN VALUES:
 "   List of [b0, b1, b2, ...] boolean values; lowest bits come first.
 "******************************************************************************
-    let l:number = a:number
-    let l:result = []
-    let l:bitCnt = 0
-    let l:bitMax = (a:0 ? ingo#compat#abs(a:1) : 0)
-
-    while 1
-	" Encode this little-endian.
-	call add(l:result, l:number % 2)
-	let l:number = l:number / 2
-	let l:bitCnt += 1
-
-	if l:bitMax && l:bitCnt == l:bitMax
-	    if a:1 > 0 && l:number != 0
-		throw printf('FromNumber: Cannot represent %d in %d bits', a:number, l:bitMax)
-	    endif
-	    break
-	elseif ! a:0 && l:number == 0
-	    break
-	endif
-    endwhile
-    return l:result
+    return call('ingo#nary#FromNumber', [2, a:number] + a:000)
 endfunction
 function! ingo#binary#ToNumber( bits )
 "******************************************************************************
@@ -62,13 +45,7 @@ function! ingo#binary#ToNumber( bits )
 "* RETURN VALUES:
 "   Positive integer represented by a:bits.
 "******************************************************************************
-    let l:number = 0
-    let l:factor = 1
-    while ! empty(a:bits)
-	let l:number += l:factor * remove(a:bits, 0)
-	let l:factor = l:factor * 2
-    endwhile
-    return l:number
+    return call('ingo#nary#ToNumber', [2, a:bits] + a:000)
 endfunction
 
 function! ingo#binary#BitsRequired( number )
@@ -80,17 +57,11 @@ function! ingo#binary#BitsRequired( number )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:number   Positive integer.
+"   a:number    Positive integer.
 "* RETURN VALUES:
 "   Number of bits required to represent numbers between 0 and a:number.
 "******************************************************************************
-    let l:bitCnt = 1
-    let l:max = 2
-    while a:number >= l:max
-	let l:bitCnt += 1
-	let l:max = l:max * 2
-    endwhile
-    return l:bitCnt
+    return ingo#nary#ElementsRequired(2, a:number)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
