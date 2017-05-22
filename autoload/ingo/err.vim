@@ -2,12 +2,14 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2016 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.030.006	23-May-2017	Add ingo#err#Command() for an alternative way of
+"				passing back [error] commands to be executed.
 "   1.029.005	17-Dec-2016	Add ingo#err#SetAndBeep().
 "   1.028.004	18-Nov-2016	ENH: Add optional {context} to all ingo#err#...
 "				functions, in case other custom commands can be
@@ -85,6 +87,26 @@ endfunction
 function! ingo#err#SetAndBeep( text )
     call ingo#err#Set(a:text)
     execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
+endfunction
+
+
+"******************************************************************************
+"* PURPOSE:
+"   Sometimes you cannot return the status, but need to directly return the set
+"   of commands to execute, or alternatively the error command. This function
+"   allows you to assemble such.
+"* USAGE:
+"	command! Foo execute Foo#Bar()
+"	function! Foo#Bar()
+"	    if (error)
+"		return ingo#err#Command('This did not work')
+"	    else
+"		return 'echomsg "yay, okay"'
+"	    endif
+"	endfunction
+"******************************************************************************
+function! ingo#err#Command( errmsg )
+    return 'echoerr ' . string(a:errmsg)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
