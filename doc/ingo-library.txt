@@ -117,6 +117,7 @@ HISTORY							*ingo-library-history*
   ingo#strdisplaywidth#pad#Center().
 - Add "real" ingo#strdisplaywidth#pad#Middle() that inserts the padding in the
   middle of the string / between the two passed string parts.
+- Add ingo#fs#path#split#PathAndName().
 
 1.029	24-Jan-2017
 - CHG: ingo#comments#RemoveCommentPrefix() isn't useful as it omits any indent
