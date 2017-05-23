@@ -237,7 +237,8 @@ function! ingo#collections#SeparateItemsAndSeparators( expr, pattern, ... )
 "* INPUTS:
 "   a:expr	Text to be split.
 "   a:pattern	Regular expression that specifies the separator text that
-"		delimits the items.
+"		delimits the items. Will match at least one character, even if
+"		the pattern match is zero-width.
 "   a:keepempty	When the first or last item is empty it is omitted, unless the
 "		{keepempty} argument is given and it's non-zero.
 "		Other empty items are kept when {pattern} matches at least one
