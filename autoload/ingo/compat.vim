@@ -11,6 +11,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.030.020	19-Apr-2017	Add ingo#compat#DictKey(), as Vim 7.4.1707 now
+"				allows using an empty dictionary key.
 "   1.029.019	10-Jan-2017	Add ingo#compat#systemlist().
 "   1.028.018	25-Nov-2016	Add ingo#compat#getcurpos().
 "   1.026.017	11-Aug-2016	Add ingo#compat#strgetchar() and
@@ -406,6 +408,17 @@ elseif executable('sha256sum')
 else
     function! ingo#compat#sha256( string )
 	throw 'ingo#compat#sha256: Not implemented here'
+    endfunction
+endif
+
+" Patch 7.4.1707: Allow using an empty dictionary key
+if v:version == 704 && has('patch1707') || v:version > 704
+    function ingo#compat#DictKey( key )
+	return a:key
+    endfunction
+else
+    function ingo#compat#DictKey( key )
+	return (empty(a:key) ? "\<Nul>" : a:key)
     endfunction
 endif
 
