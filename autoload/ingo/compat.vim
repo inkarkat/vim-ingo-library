@@ -11,6 +11,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.030.021	24-May-2017	Add ingo#compat#synstack().
 "   1.030.020	19-Apr-2017	Add ingo#compat#DictKey(), as Vim 7.4.1707 now
 "				allows using an empty dictionary key.
 "   1.029.019	10-Jan-2017	Add ingo#compat#systemlist().
@@ -408,6 +409,19 @@ elseif executable('sha256sum')
 else
     function! ingo#compat#sha256( string )
 	throw 'ingo#compat#sha256: Not implemented here'
+    endfunction
+endif
+
+if exists('*synstack')
+    function! ingo#compat#synstack( lnum, col )
+	return synstack(a:lnum, a:col)
+    endfunction
+else
+    " As the synstack() function is not available, we can only try to get the
+    " actual syntax ID and the one of the syntax item that determines the
+    " effective color.
+    function! ingo#compat#synstack( lnum, col )
+	return return [synID(a:a:lnum, a:a:col, 1), synID(a:a:lnum, a:a:col, 0)]
     endfunction
 endif
 
