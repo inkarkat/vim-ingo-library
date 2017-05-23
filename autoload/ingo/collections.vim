@@ -65,6 +65,8 @@ function! ingo#collections#ToDict( list, ... )
 "* SEE ALSO:
 "   ingo#dict#FromKeys() allows to specify a default value (here hard-coded to
 "   1), but doesn't handle empty keys.
+"   ingo#dict#count#Items() also creates a Dict from a List, and additionally
+"   counts the unique values.
 "******************************************************************************
     let l:dict = {}
     for l:item in a:list
