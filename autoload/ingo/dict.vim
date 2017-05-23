@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -67,6 +67,8 @@ function! ingo#dict#FromKeys( keys, defaultValue )
 "* SEE ALSO:
 "   ingo#collections#ToDict() handles empty key values, but uses a hard-coded
 "   default value.
+"   ingo#dict#count#Items() also creates a Dict from a List, and additionally
+"   counts the unique values.
 "******************************************************************************
     let l:dict = {}
     for l:key in a:keys
