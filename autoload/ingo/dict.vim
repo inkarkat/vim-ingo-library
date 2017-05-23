@@ -8,13 +8,19 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.023.003	21-Nov-2014	ENH: Also allow passing an items List to
+"				ingo#dict#Mirror() and ingo#dict#AddMirrored()
+"				(useful to influence which key from equal values
+"				is used).
+"				ENH: Also support optional a:isEnsureUniqueness
+"				flag for ingo#dict#FromItems().
 "   1.016.002	16-Jan-2014	Add ingo#dict#AddMirrored(), and also add
 "				optional a:isEnsureUniqueness flag to
 "				ingo#dict#Mirror().
 "   1.016.002	23-Dec-2013	Add ingo#dict#Mirror().
 "   1.009.001	21-Jun-2013	file creation
 
-function! ingo#dict#FromItems( items )
+function! ingo#dict#FromItems( items, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Create a Dictionary object from a list of [key, value] items, as returned by
@@ -25,11 +31,21 @@ function! ingo#dict#FromItems( items )
 "   None.
 "* INPUTS:
 "   a:items List of [key, value] items.
+"   a:isEnsureUniqueness    Optional flag whether a KeyNotUnique should be
+"			    thrown if an equal key was already found. By
+"			    default, the last key (in the arbitrary item()
+"			    order) overrides previous ones.
 "* RETURN VALUES:
 "   A new Dictionary.
 "******************************************************************************
+    let l:isEnsureUniqueness = (a:0 && a:1)
     let l:dict = {}
     for [l:key, l:val] in a:items
+	if l:isEnsureUniqueness
+	    if has_key(l:dict, l:key)
+		throw 'Mirror: KeyNotUnique: ' . l:key
+	    endif
+	endif
 	let l:dict[l:key] = l:val
     endfor
     return l:dict
@@ -71,6 +87,8 @@ function! ingo#dict#Mirror( dict, ... )
 "   a:dict  Dictionary. It is assumed that all values are non-empty and of
 "	    String or Number type (so that they can be coerced into the String
 "	    type of the Dictionary key).
+"	    Alternatively, a list of [key, value] items can be passed (to
+"	    influence which key from equal values is used).
 "   a:isEnsureUniqueness    Optional flag whether a ValueNotUnique should be
 "			    thrown if an equal value was already found. By
 "			    default, the last value (in the arbitrary item()
@@ -80,7 +98,7 @@ function! ingo#dict#Mirror( dict, ... )
 "******************************************************************************
     let l:isEnsureUniqueness = (a:0 && a:1)
     let l:dict = {}
-    for [l:key, l:value] in items(a:dict)
+    for [l:key, l:value] in (type(a:dict) == type({}) ? items(a:dict) : a:dict)
 	if l:isEnsureUniqueness
 	    if has_key(l:dict, l:value)
 		throw 'Mirror: ValueNotUnique: ' . l:value
@@ -102,6 +120,8 @@ function! ingo#dict#AddMirrored( dict, ... )
 "   a:dict  Dictionary. It is assumed that all values are non-empty and of
 "	    String or Number type (so that they can be coerced into the String
 "	    type of the Dictionary key).
+"	    Alternatively, a list of [key, value] items can be passed (to
+"	    influence which key from equal values is used).
 "   a:isEnsureUniqueness    Optional flag whether a ValueNotUnique should be
 "			    thrown if an equal value was already found. By
 "			    default, the last value (in the arbitrary item()
@@ -110,7 +130,7 @@ function! ingo#dict#AddMirrored( dict, ... )
 "   Returns the original a:dict with added reversed entries.
 "******************************************************************************
     let l:isEnsureUniqueness = (a:0 && a:1)
-    for [l:key, l:value] in items(a:dict)
+    for [l:key, l:value] in (type(a:dict) == type({}) ? items(a:dict) : a:dict)
 	if l:isEnsureUniqueness
 	    if has_key(l:dict, l:value)
 		throw 'AddMirrored: ValueNotUnique: ' . l:value
