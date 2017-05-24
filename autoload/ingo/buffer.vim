@@ -2,12 +2,13 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2016 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.030.006	25-May-2017	Add ingo#buffer#VisibleList().
 "   1.025.005	29-Jul-2016	Add ingo#buffer#ExistOtherLoadedBuffers().
 "   1.015.004	18-Nov-2013	Make buffer argument of ingo#buffer#IsBlank()
 "				optional, defaulting to the current buffer.
@@ -51,6 +52,28 @@ endfunction
 function! ingo#buffer#IsEmptyVim()
     let l:currentBufNr = bufnr('')
     return ingo#buffer#IsBlank(l:currentBufNr) && ! ingo#buffer#ExistOtherBuffers(l:currentBufNr)
+endfunction
+
+function! ingo#buffer#VisibleList()
+"******************************************************************************
+"* PURPOSE:
+"   The result is a List, where each item is the number of the buffer associated
+"   with each window in all tab pages. Like |tabpagebuflist()|, but for all tab
+"   pages.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   None.
+"* RETURN VALUES:
+"   List of buffer numbers; may contain duplicates.
+"******************************************************************************
+    let l:buflist = []
+    for l:i in range(tabpagenr('$'))
+	call extend(l:buflist, tabpagebuflist(l:i + 1))
+    endfor
+    return l:buflist
 endfunction
 
 let &cpo = s:save_cpo
