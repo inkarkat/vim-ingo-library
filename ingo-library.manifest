@@ -82,6 +82,7 @@ autoload/ingo/motion/boundary.vim
 autoload/ingo/motion/helper.vim
 autoload/ingo/motion/omap.vim
 autoload/ingo/msg.vim
+autoload/ingo/nary.vim
 autoload/ingo/number.vim
 autoload/ingo/option.vim
 autoload/ingo/os.vim
