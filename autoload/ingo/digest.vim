@@ -57,9 +57,12 @@ function! ingo#digest#Get( items, itemSplitPattern, ... )
 "****D echomsg '****' string(l:counts) '->' string(l:accepted)
     let l:evaluation = map(l:separation, 's:Evaluate(v:val[0], v:val[1], l:accepted)')
 
-    let l:longestItems = s:FilterLongestItems(l:evaluation)
-"****D echomsg '****' string(l:longestItems)
-    let l:unjoinedResult = s:GetUnjoinedResult(l:longestItems)
+    " When a percentage is given, select the longest parts, to consider that not
+    " every item contains all parts. Without a percentage, all parts should be
+    " contained, so the shortest parts is chosen.
+    let l:filteredItems = s:FilterItems((a:0 ? 'max' : 'min'), l:evaluation)
+"****D echomsg '****' string(l:filteredItems)
+    let l:unjoinedResult = s:GetUnjoinedResult(l:filteredItems)
 "****D echomsg '****' string(l:unjoinedResult)
     return s:UnjoinResult(l:unjoinedResult)
 endfunction
@@ -81,23 +84,23 @@ function! s:Evaluate( parts, separators, accepted )
     endfor
     return l:result
 endfunction
-function! s:FilterLongestItems( evaluation )
-    let l:partsMax = max(map(copy(a:evaluation), 'v:val[0]'))
+function! s:FilterItems( Comparer, evaluation )
+    let l:partsNum = call(a:Comparer, [map(copy(a:evaluation), 'v:val[0]')])
     return
     \   map(
     \       filter(
     \           copy(a:evaluation),
-    \           'v:val[0] == l:partsMax'
+    \           'v:val[0] == l:partsNum'
     \       ),
     \       'v:val[1:]'
     \   )
 endfunction
-function! s:GetUnjoinedResult( longestItems )
-    let l:unjoinedResult = a:longestItems[0]
+function! s:GetUnjoinedResult( filteredItems )
+    let l:unjoinedResult = a:filteredItems[0]
     for l:i in range(len(l:unjoinedResult))
 	let l:j = 0
 	while l:j < len(l:unjoinedResult[l:i])
-	    for l:otherResult in a:longestItems[1:]
+	    for l:otherResult in a:filteredItems[1:]
 		if type(l:unjoinedResult[l:i][l:j]) != type([]) &&
 		\   get(l:otherResult[l:i], l:j, '') !=# l:unjoinedResult[l:i][l:j]
 		    let l:unjoinedResult[l:i][l:j] = [] " Discontinuation marker: split here later.
@@ -124,6 +127,38 @@ function! s:UnjoinResult( unjoinedResult )
     endfor
 
     return filter(l:result, '! empty(v:val)')
+endfunction
+
+function! ingo#digest#BufferList( bufferList, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Determine common elements from the passed a:bufferList.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:bufferList	List of buffer numbers (or names).
+"   a:percentage        Optional value between 1 and 100 that specifies the
+"			percentage of the items in which a part has to occur in
+"			order to be kept in the digest. Default 100, i.e. a part
+"			has to occur in all items.
+"* RETURN VALUES:
+"   List of non-consecutive parts that occur in all / a:percentage of buffer
+"   names. Consecutive parts are re-joined.
+"******************************************************************************
+    " Commonality in path and file name (without extensions)?
+    let l:digest = call('ingo#digest#Get', [map(copy(a:bufferList), 'fnamemodify(bufname(v:val), ":p:r")'), '\A\+'] + a:000)
+    if empty(l:digest)
+	" Commonality in file extensions?
+	let l:digest = call('ingo#digest#Get', [map(copy(a:bufferList), 'fnamemodify(bufname(v:val), ":e")'), '\A\+'] + a:000)
+    endif
+    if empty(l:digest)
+	" Commonality in CamelParts?
+	let l:digest = call('ingo#digest#Get', [map(copy(a:bufferList), 'fnamemodify(bufname(v:val), ":p")'), '\l\zs\ze\u'] + a:000)
+    endif
+
+    return l:digest
 endfunction
 
 let &cpo = s:save_cpo
