@@ -2,12 +2,13 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.025.005	29-Jul-2016	Add ingo#buffer#ExistOtherLoadedBuffers().
 "   1.015.004	18-Nov-2013	Make buffer argument of ingo#buffer#IsBlank()
 "				optional, defaulting to the current buffer.
 "				Allow use of ingo#buffer#IsEmpty() with other
@@ -42,6 +43,9 @@ endfunction
 
 function! ingo#buffer#ExistOtherBuffers( targetBufNr )
     return ! empty(filter(range(1, bufnr('$')), 'buflisted(v:val) && v:val != a:targetBufNr'))
+endfunction
+function! ingo#buffer#ExistOtherLoadedBuffers( targetBufNr )
+    return ! empty(filter(range(1, bufnr('$')), 'buflisted(v:val) && bufloaded(v:val) && v:val != a:targetBufNr'))
 endfunction
 
 function! ingo#buffer#IsEmptyVim()
