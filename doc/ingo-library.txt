@@ -122,6 +122,11 @@ HISTORY							*ingo-library-history*
   ingo#text#Remove(), and ingo#text#Insert().
 - Add ingo#err#Command() for an alternative way of passing back [error]
   commands to be executed.
+- ingo#syntaxitem#IsOnSyntax(): Factor out synstack() emulation into
+  ingo#compat#synstack() and unify similar function variants.
+- ENH: ingo#syntaxitem#IsOnSyntax(): Allow optional a:stopItemPattern to avoid
+  considering syntax items at the bottom of the stack.
+- Add ingo#compat#synstack().
 
 1.029	24-Jan-2017
 - CHG: ingo#comments#RemoveCommentPrefix() isn't useful as it omits any indent
