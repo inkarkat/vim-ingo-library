@@ -127,6 +127,9 @@ HISTORY							*ingo-library-history*
 - ENH: ingo#syntaxitem#IsOnSyntax(): Allow optional a:stopItemPattern to avoid
   considering syntax items at the bottom of the stack.
 - Add ingo#compat#synstack().
+- Add ingo/dict/count.vim module.
+- Add ingo/digest.vim module.
+- Add ingo#buffer#VisibleList().
 
 1.029	24-Jan-2017
 - CHG: ingo#comments#RemoveCommentPrefix() isn't useful as it omits any indent
