@@ -83,7 +83,7 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.030	RELEASEME
+1.030	26-May-2017
 - Add escaping of additional values to ingo#option#Join() and split into
   ingo#option#Append() and ingo#option#Prepend().
 - Offer simpler ingo#option#JoinEscaped() and ingo#option#JoinUnescaped() for
