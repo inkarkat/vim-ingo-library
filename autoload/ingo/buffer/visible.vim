@@ -2,13 +2,13 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2016 Ingo Karkat
+" Copyright: (C) 2011-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.025.004	29-Jul-20167	FIX: Temporarily reset 'switchbuf' in
+"   1.025.004	29-Jul-2016	FIX: Temporarily reset 'switchbuf' in
 "				ingo#buffer#visible#Execute(), to avoid that
 "				"usetab" switched to another tab page.
 "   1.024.003	17-Mar-2015	ingo#buffer#visible#Execute(): Restore the

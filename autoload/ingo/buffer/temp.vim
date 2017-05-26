@@ -16,7 +16,7 @@
 "   1.027.005	20-Aug-2016	Add ingo#buffer#temp#ExecuteWithText() and
 "				ingo#buffer#temp#CallWithText() variants that
 "				pre-initialize the buffer (a common use case).
-"   1.025.004	29-Jul-20167	FIX: Temporarily reset 'switchbuf' in
+"   1.025.004	29-Jul-2016	FIX: Temporarily reset 'switchbuf' in
 "				ingo#buffer#temp#Execute(), to avoid that
 "				"usetab" switched to another tab page.
 "   1.023.003	07-Nov-2014	ENH: Add optional a:isReturnAsList flag to
