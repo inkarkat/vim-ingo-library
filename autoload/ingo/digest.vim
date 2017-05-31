@@ -10,6 +10,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.031.002	31-May-2017	FIX: Potentially invalid indexing of
+"				l:otherResult[l:i] in s:GetUnjoinedResult(). Use
+"				get() for inner List access, too.
 "   1.030.001	24-May-2017	file creation
 let s:save_cpo = &cpo
 set cpo&vim
@@ -102,7 +105,7 @@ function! s:GetUnjoinedResult( filteredItems )
 	while l:j < len(l:unjoinedResult[l:i])
 	    for l:otherResult in a:filteredItems[1:]
 		if type(l:unjoinedResult[l:i][l:j]) != type([]) &&
-		\   get(l:otherResult[l:i], l:j, '') !=# l:unjoinedResult[l:i][l:j]
+		\   get(get(l:otherResult, l:i, []), l:j, '') !=# l:unjoinedResult[l:i][l:j]
 		    let l:unjoinedResult[l:i][l:j] = [] " Discontinuation marker: split here later.
 		endif
 	    endfor
