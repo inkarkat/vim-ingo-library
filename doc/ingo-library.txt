@@ -83,6 +83,12 @@ IDEAS							  *ingo-library-ideas*
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.031	RELEASEME
+- FIX: Potentially invalid indexing of l:otherResult[l:i] in
+  s:GetUnjoinedResult(). Use get() for inner List access, too.
+- Add special ingo#compat#synstack to work around missing patch 7.2.014:
+  synstack() doesn't work in an empty line.
+
 1.030	26-May-2017
 - Add escaping of additional values to ingo#option#Join() and split into
   ingo#option#Append() and ingo#option#Prepend().
