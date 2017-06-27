@@ -88,6 +88,9 @@ HISTORY							*ingo-library-history*
   s:GetUnjoinedResult(). Use get() for inner List access, too.
 - Add special ingo#compat#synstack to work around missing patch 7.2.014:
   synstack() doesn't work in an empty line.
+- BUG: ingo#comments#SplitIndentAndText() and
+  ingo#comments#RemoveCommentPrefix() fail with nestable comment prefixes with
+  "E688: More targets than List items".
 
 1.030	26-May-2017
 - Add escaping of additional values to ingo#option#Join() and split into
