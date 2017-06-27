@@ -51,10 +51,16 @@ ingo#err#SetCustomException()).
 INSTALLATION
 ------------------------------------------------------------------------------
 
-This script is packaged as a vimball. If you have the "gunzip" decompressor
-in your PATH, simply edit the \*.vmb.gz package in Vim; otherwise, decompress
-the archive first, e.g. using WinZip. Inside Vim, install by sourcing the
-vimball or via the :UseVimball command.
+The code is hosted in a Git repo at
+    https://github.com/inkarkat/vim-ingo-library
+You can use your favorite plugin manager, or "git clone" into a directory used
+for Vim packages. Stable releases are on the "master" branch, the latest
+unstable snapshot on "develop".
+
+This script is also packaged as a vimball. If you have the "gunzip"
+decompressor in your PATH, simply edit the \*.vmb.gz package in Vim; otherwise,
+decompress the archive first, e.g. using WinZip. Inside Vim, install by
+sourcing the vimball or via the :UseVimball command.
 
     vim ingo-library*.vmb.gz
     :so %
@@ -65,10 +71,16 @@ To uninstall, use the :RmVimball command.
 
 - Requires Vim 7.0 or higher.
 
+CONTRIBUTING
+------------------------------------------------------------------------------
+
+Report any bugs, send patches, or suggest features via the issue tracker at
+https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
+
 HISTORY
 ------------------------------------------------------------------------------
 
-##### 1.031   RELEASEME
+##### 1.031   27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in
   s:GetUnjoinedResult(). Use get() for inner List access, too.
 - Add special ingo#compat#synstack to work around missing patch 7.2.014:
