@@ -9,6 +9,14 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.031.008	27-Jun-2017	BUG: ingo#comments#SplitIndentAndText() and
+"				ingo#comments#RemoveCommentPrefix() fail with
+"				nestable comment prefixes with "E688: More
+"				targets than List items". Implementation in
+"				s:SplitIndentAndText() was based on unnestable
+"				prefixes. Instead of adding 1 to the actual
+"				nesting level to obtain the pattern multiplier,
+"				ensure it is at least 1.
 "   1.029.007	09-Jan-2017	Add ingo#comments#SplitAll(), a more powerful
 "				variant of ingo#comments#SplitIndentAndText().
 "   1.029.006	02-Dec-2016	CHG: ingo#comments#RemoveCommentPrefix() isn't
@@ -236,7 +244,7 @@ function! s:SplitIndentAndText( line, checkComment )
 
     return matchlist(
     \   a:line,
-    \   '\V\C\^\(\s\*\%(' . escape(l:commentprefix, '\') . (l:isBlankRequired ? '\s\+' : '\s\*'). '\)\{' . (l:nestingLevel + 1) . '}\)' .
+    \   '\V\C\^\(\s\*\%(' . escape(l:commentprefix, '\') . (l:isBlankRequired ? '\s\+' : '\s\*'). '\)\{' . max([1, l:nestingLevel]) . '}\)' .
     \       '\(\.\*\)\$'
     \)[1:2]
 endfunction
