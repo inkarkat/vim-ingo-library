@@ -54,8 +54,8 @@ INSTALLATION
 The code is hosted in a Git repo at
     https://github.com/inkarkat/vim-ingo-library
 You can use your favorite plugin manager, or "git clone" into a directory used
-for Vim packages. Stable releases are on the "master" branch, the latest
-unstable snapshot on "develop".
+for Vim packages. Releases are on the "stable" branch, the latest unstable
+development snapshot on "master".
 
 This script is also packaged as a vimball. If you have the "gunzip"
 decompressor in your PATH, simply edit the \*.vmb.gz package in Vim; otherwise,
