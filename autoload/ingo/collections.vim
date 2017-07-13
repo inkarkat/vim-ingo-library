@@ -235,12 +235,12 @@ function! ingo#collections#SeparateItemsAndSeparators( expr, pattern, ... )
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
-"   If a:keepempty, len(items) == len(separators) + 1
+"   If a:keepempty (and {pattern} matches at least one character),
+"   len(items) == len(separators) + 1
 "* INPUTS:
 "   a:expr	Text to be split.
 "   a:pattern	Regular expression that specifies the separator text that
-"		delimits the items. Will match at least one character, even if
-"		the pattern match is zero-width.
+"		delimits the items.
 "   a:keepempty	When the first or last item is empty it is omitted, unless the
 "		{keepempty} argument is given and it's non-zero.
 "		Other empty items are kept when {pattern} matches at least one
