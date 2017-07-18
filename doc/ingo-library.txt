@@ -94,6 +94,10 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.032	RELEASEME
+- ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
+  when executed e.g. from within a |:map-expr|.
+
 1.031	27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in
   s:GetUnjoinedResult(). Use get() for inner List access, too.

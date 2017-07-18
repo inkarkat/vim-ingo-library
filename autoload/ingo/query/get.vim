@@ -2,31 +2,10 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2016 Ingo Karkat
+" Copyright: (C) 2012-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.029.007	17-Dec-2016	FIX: ingo#query#get#Char() does not beep when
-"				validExpr is given and invalid character pressed.
-"				Add ingo#query#get#ValidChar() variant that
-"				loops until a valid character has been pressed.
-"   1.017.006	04-Mar-2014	Make ingo#query#get#Char() only abort on <Esc>
-"				when that character is not in the validExpr (to
-"				allow to explicitly query it).
-"   1.007.005	31-May-2013	Move into ingo-library.
-"	004	21-Mar-2013	Handle non-8-bit characters in
-"				ingouserquery#GetChar(). Necessary to query
-"				<BS>.
-"	003	22-Feb-2013	FIX: Missed some marks (among them ") in
-"				ingouserquery#GetMark(). Turns out the set of
-"				read-only marks is more complex; allow to pass 1
-"				as a:invalidMarkExpr as a shortcut.
-"	002	14-Feb-2013	Add ingouserquery#GetChar() and
-"				ingouserquery#GetMark().
-"	001	21-Aug-2012	file creation; function extracted from
-"				autoload/mark.vim.
 let s:save_cpo = &cpo
 set cpo&vim
 
@@ -172,8 +151,12 @@ function! ingo#query#get#Register( errorRegister, ... )
 "* RETURN VALUES:
 "   Either the register, or an a:errorRegister when aborted or invalid register.
 "******************************************************************************
-    let l:register = ingo#query#get#Char({'validExpr': '[-a-zA-Z0-9":.%#=*+~/]' , 'invalidExpr': (a:0 ? a:1 : '')})
-    return (empty(l:register) ? a:errorRegister : l:register)
+    try
+	let l:register = ingo#query#get#Char({'validExpr': '[-a-zA-Z0-9":.%#=*+~/]' , 'invalidExpr': (a:0 ? a:1 : '')})
+	return (empty(l:register) ? a:errorRegister : l:register)
+    catch /^Vim\%((\a\+)\)\=:E523:/ " E523: Not allowed here
+	return a:errorRegister
+    endtry
 endfunction
 
 function! ingo#query#get#Mark( ... )
@@ -191,10 +174,14 @@ function! ingo#query#get#Mark( ... )
 "* RETURN VALUES:
 "   Either the mark, or empty string when aborted or invalid register.
 "******************************************************************************
-    return ingo#query#get#Char({
-    \   'validExpr': '[a-zA-Z0-9''`"[\]<>^.(){}]',
-    \   'invalidExpr': (a:0 ? (a:1 is# 1 ? '[0-9^.(){}]' : a:1) : '')
-    \})
+    try
+	return ingo#query#get#Char({
+	\   'validExpr': '[a-zA-Z0-9''`"[\]<>^.(){}]',
+	\   'invalidExpr': (a:0 ? (a:1 is# 1 ? '[0-9^.(){}]' : a:1) : '')
+	\})
+    catch /^Vim\%((\a\+)\)\=:E523:/ " E523: Not allowed here
+	return ''
+    endtry
 endfunction
 
 let &cpo = s:save_cpo
