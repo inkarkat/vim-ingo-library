@@ -137,6 +137,7 @@ autoload/ingo/strdisplaywidth/pad.vim
 autoload/ingo/subst.vim
 autoload/ingo/subst/expr/emulation.vim
 autoload/ingo/subst/pairs.vim
+autoload/ingo/subst/replacement.vim
 autoload/ingo/swap.vim
 autoload/ingo/syntaxitem.vim
 autoload/ingo/system.vim

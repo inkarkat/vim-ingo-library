@@ -80,6 +80,12 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.032   RELEASEME
+- ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
+  when executed e.g. from within a :map-expr.
+- Add ingo/subst/replacement.vim module with functions originally in
+  PatternsOnText.vim ([vimscript #4602](http://www.vim.org/scripts/script.php?script_id=4602)).
+
 ##### 1.031   27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in
   s:GetUnjoinedResult(). Use get() for inner List access, too.
