@@ -85,6 +85,7 @@ HISTORY
   when executed e.g. from within a :map-expr.
 - Add ingo/subst/replacement.vim module with functions originally in
   PatternsOnText.vim ([vimscript #4602](http://www.vim.org/scripts/script.php?script_id=4602)).
+- Add ingo/lines/empty.vim module.
 
 ##### 1.031   27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in
