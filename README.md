@@ -86,6 +86,8 @@ HISTORY
 - Add ingo/subst/replacement.vim module with functions originally in
   PatternsOnText.vim ([vimscript #4602](http://www.vim.org/scripts/script.php?script_id=4602)).
 - Add ingo/lines/empty.vim module.
+- CHG: Rename ingo#str#split#First() to ingo#str#split#MatchFirst() and add
+  ingo#str#split#StrFirst() variant that uses a fixed string, not a pattern.
 
 ##### 1.031   27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in
