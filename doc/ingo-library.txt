@@ -102,6 +102,7 @@ HISTORY							*ingo-library-history*
 - Add ingo/lines/empty.vim module.
 - CHG: Rename ingo#str#split#First() to ingo#str#split#MatchFirst() and add
   ingo#str#split#StrFirst() variant that uses a fixed string, not a pattern.
+- Add ingo/list/lcs.vim module.
 
 1.031	27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in

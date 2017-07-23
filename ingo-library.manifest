@@ -76,6 +76,7 @@ autoload/ingo/lines/empty.vim
 autoload/ingo/lines/replace.vim
 autoload/ingo/list.vim
 autoload/ingo/list/find.vim
+autoload/ingo/list/lcs.vim
 autoload/ingo/list/split.vim
 autoload/ingo/mapmaker.vim
 autoload/ingo/matches.vim
