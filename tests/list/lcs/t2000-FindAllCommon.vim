@@ -1,7 +1,7 @@
-" Test final all common substrings.
+" Test find all common substrings.
 
 call vimtest#StartTap()
-call vimtap#Plan(9)
+call vimtap#Plan(6)
 
 call vimtap#Is(ingo#list#lcs#FindAllCommon(
 \   ['foobar', 'fooxy', 'foobitch']),
@@ -33,24 +33,6 @@ call vimtap#Is(ingo#list#lcs#FindAllCommon(
 \   ['basbygetfoofor', 'basilgivefooto', 'basingotfooin']),
 \   [[[], ['by', 'il', 'in'], ['et', 'ive', 'ot'], ['for', 'to', 'in']], ['bas', 'g', 'foo']],
 \   'same length common prefers first'
-\)
-
-
-call vimtap#Is(ingo#list#lcs#FindAllCommon(
-\   ['myfoobar', 'thefooxy', 'theyfoobitch'], 3),
-\   [[['my', 'the', 'they'], ['bar', 'xy', 'bitch']], ['foo']],
-\   'minimumLength reached'
-\)
-call vimtap#Is(ingo#list#lcs#FindAllCommon(
-\   ['myfoobar', 'thefooxy', 'theyfoobitch'], 4),
-\   [[['myfoobar', 'thefooxy', 'theyfoobitch']], []],
-\   'minimumLength missed'
-\)
-
-call vimtap#Is(ingo#list#lcs#FindAllCommon(
-\   ['metfooforbarby', 'havefootobasil', 'gotfooinbasin'], 3),
-\   [[['met', 'have', 'got'], ['forbarby', 'tobasil', 'inbasin']], ['foo']],
-\   'minimumLength filters out shorter'
 \)
 
 call vimtest#Quit()

@@ -1,7 +1,7 @@
 " Test find longest common substrings.
 
 call vimtest#StartTap()
-call vimtap#Plan(8)
+call vimtap#Plan(6)
 
 call vimtap#Is(ingo#list#lcs#FindLongestCommon(
 \   ['foobar', 'fooxy', 'foobitch']),
@@ -33,18 +33,6 @@ call vimtap#Is(ingo#list#lcs#FindLongestCommon(
 \   ['basbigetfoofor', 'basilgivefooto', 'basingotfooin']),
 \   'bas',
 \   'same length common prefers first'
-\)
-
-
-call vimtap#Is(ingo#list#lcs#FindLongestCommon(
-\   ['myfoobar', 'thefooxy', 'theyfoobitch'], 3),
-\   'foo',
-\   'minimumLength reached'
-\)
-call vimtap#Is(ingo#list#lcs#FindLongestCommon(
-\   ['myfoobar', 'thefooxy', 'theyfoobitch'], 4),
-\   '',
-\   'minimumLength missed'
 \)
 
 call vimtest#Quit()
