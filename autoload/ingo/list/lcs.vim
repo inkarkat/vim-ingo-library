@@ -2,6 +2,7 @@
 "
 " DEPENDENCIES:
 "   - ingo/compat.vim autoload script
+"   - ingo/list.vim autoload script
 "   - ingo/str/split.vim autoload script
 "
 " Copyright: (C) 2017 Ingo Karkat
@@ -61,34 +62,72 @@ function! ingo#list#lcs#FindAllCommon( strings, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:strings   List of strings.
-"   a:minimumLength Minimum substring length; default 1.
+"   a:strings                   List of strings.
+"   a:minimumCommonLength       Minimum substring length; default 1.
+"   a:minimumDifferingLength    Minimum length; default 0.
 "* RETURN VALUES:
+"   [distinctLists, commons], as in:
 "   [
 "	[prefix1, prefix2, ...], [middle1, middle2, ...], ..., [suffix1, suffix2, ...],
 "	[commonBetweenPrefixAndMiddle, ..., commonBetweenMiddleAndSuffix]
 "   ]
-"   The second List always contains one element less than the first; its
+"   The commons List always contains one element less than distinctLists; its
 "   elements are meant to go between those of the first List.
 "   If all strings start or end with a common substring, [prefix1, prefix2, ...]
 "   / [suffix1, suffix2, ...] is the empty List [].
 "******************************************************************************
-    let l:minimumLength = (a:0 ? a:1 : 1)
+    let l:minimumCommonLength = (a:0 ? a:1 : 1)
+    let l:minimumDifferingLength = (a:0 >= 2 ? a:2 : 0)
 
-    let l:common = ingo#list#lcs#FindLongestCommon(a:strings, l:minimumLength)
+    let l:common = ingo#list#lcs#FindLongestCommon(a:strings, l:minimumCommonLength)
     if empty(l:common)
 	return [[a:strings], []]
     endif
 
-    let [l:prefixes, l:suffixes] = s:Split(a:strings, l:common)
+    let [l:differingCnt, l:prefixes, l:suffixes] = s:Split(a:strings, l:common)
 
-    let [l:prefixDiffering, l:prefixCommon] = ingo#list#lcs#FindAllCommon(l:prefixes, l:minimumLength)
-    let [l:suffixDiffering, l:suffixCommon] = ingo#list#lcs#FindAllCommon(l:suffixes, l:minimumLength)
+    let l:isPrefixTooShort = s:IsTooShort(l:prefixes, l:minimumDifferingLength)
+    let l:isSuffixTooShort = s:IsTooShort(l:suffixes, l:minimumDifferingLength)
+    if l:isPrefixTooShort
+	if l:isSuffixTooShort
+	    " No more recursion. Join back prefixes, common, and suffixes. Oh
+	    " wait, we can just return the original List.
+	    return [[a:strings], []]
+
+	    "let [l:prefixDiffering, l:prefixCommon] = [[map(range(l:differingCnt), 'get(l:prefixes, v:val, "") . l:common . get(l:suffixes, v:val, "")')], []]
+	    "let l:common = ''
+	    "let [l:suffixDiffering, l:suffixCommon] = [[], []]
+	else
+	    " Recurse into the suffixes, then join its first distincts with the
+	    " prefixes and common.
+	    let [l:suffixDiffering, l:suffixCommon] = ingo#list#lcs#FindAllCommon(l:suffixes, l:minimumCommonLength, l:minimumDifferingLength)
+
+	    let [l:prefixDiffering, l:prefixCommon] = [[map(range(l:differingCnt), 'get(l:prefixes, v:val, "") . l:common . get(get(l:suffixDiffering, 0, []), v:val, "")')], []]
+	    let l:common = ''
+	    call remove(l:suffixDiffering, 0)
+	endif
+    elseif l:isSuffixTooShort
+	" Recurse into the prefixes, then join its last distincts with common
+	" and the suffixes.
+	let [l:prefixDiffering, l:prefixCommon] = ingo#list#lcs#FindAllCommon(l:prefixes, l:minimumCommonLength, l:minimumDifferingLength)
+	let [l:suffixDiffering, l:suffixCommon] = [[map(range(l:differingCnt), 'get(l:prefixDiffering[-1], v:val, "") . l:common . get(l:suffixes, v:val, "")')], []]
+	let l:common = ''
+	call remove(l:prefixDiffering, -1)
+    else
+	" Recurse into both prefixes and suffixes.
+	let [l:prefixDiffering, l:prefixCommon] = ingo#list#lcs#FindAllCommon(l:prefixes, l:minimumCommonLength, l:minimumDifferingLength)
+	let [l:suffixDiffering, l:suffixCommon] = ingo#list#lcs#FindAllCommon(l:suffixes, l:minimumCommonLength, l:minimumDifferingLength)
+    endif
 
     return [
     \   l:prefixDiffering + l:suffixDiffering,
-    \   filter(l:prefixCommon + [l:common ] + l:suffixCommon, '! empty(v:val)')
+    \   filter(l:prefixCommon + [l:common] + l:suffixCommon, '! empty(v:val)')
     \]
+endfunction
+function! s:IsTooShort( list, minimumLength )
+    return a:minimumLength > 0 &&
+    \   min(map(copy(a:list), 'ingo#compat#strchars(v:val)')) < a:minimumLength &&
+    \   ! ingo#list#IsEmpty(a:list)
 endfunction
 function! s:Split( strings, common )
     let l:prefixes = []
@@ -100,10 +139,10 @@ function! s:Split( strings, common )
 	call add(l:suffixes, l:suffix)
     endfor
 
-    return [s:Shorten(l:prefixes), s:Shorten(l:suffixes)]
+    return [len(l:prefixes), s:Shorten(l:prefixes), s:Shorten(l:suffixes)]
 endfunction
 function! s:Shorten( list )
-    return (empty(filter(copy(a:list), '! empty(v:val)')) ?
+    return (ingo#list#IsEmpty(a:list) ?
     \   [] :
     \   a:list
     \)
