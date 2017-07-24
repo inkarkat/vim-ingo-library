@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2016 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -136,6 +136,23 @@ function! ingo#list#Join( ... )
 	let l:i += 1
     endwhile
     return l:result
+endfunction
+
+function! ingo#list#IsEmpty( list )
+"******************************************************************************
+"* PURPOSE:
+"   Test whether the list itself contains no elements or only empty ones.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:list  A list.
+"* RETURN VALUES:
+"   0 if a:list is not empty and at least one of its elements make empty()
+"   return 1; else 1.
+"******************************************************************************
+    return empty(filter(copy(a:list), '! empty(v:val)'))
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
