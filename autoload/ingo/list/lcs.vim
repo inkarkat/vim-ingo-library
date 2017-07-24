@@ -77,7 +77,13 @@ function! ingo#list#lcs#FindAllCommon( strings, ... )
 "   / [suffix1, suffix2, ...] is the empty List [].
 "******************************************************************************
     let l:minimumCommonLength = (a:0 ? a:1 : 1)
-    let l:minimumDifferingLength = (a:0 >= 2 ? a:2 : 0)
+    let [l:minimumPrefixDifferingLength, l:minimumSuffixDifferingLength] = (a:0 >= 2 ?
+    \   (type(a:2) == type([]) ?
+    \       a:2 :
+    \       [a:2, a:2]
+    \   ) :
+    \   [0, 0]
+    \)
 
     let l:common = ingo#list#lcs#FindLongestCommon(a:strings, l:minimumCommonLength)
     if empty(l:common)
@@ -86,8 +92,8 @@ function! ingo#list#lcs#FindAllCommon( strings, ... )
 
     let [l:differingCnt, l:prefixes, l:suffixes] = s:Split(a:strings, l:common)
 
-    let l:isPrefixTooShort = s:IsTooShort(l:prefixes, l:minimumDifferingLength)
-    let l:isSuffixTooShort = s:IsTooShort(l:suffixes, l:minimumDifferingLength)
+    let l:isPrefixTooShort = s:IsTooShort(l:prefixes, l:minimumPrefixDifferingLength)
+    let l:isSuffixTooShort = s:IsTooShort(l:suffixes, l:minimumSuffixDifferingLength)
     if l:isPrefixTooShort
 	if l:isSuffixTooShort
 	    " No more recursion. Join back prefixes, common, and suffixes. Oh
@@ -100,7 +106,7 @@ function! ingo#list#lcs#FindAllCommon( strings, ... )
 	else
 	    " Recurse into the suffixes, then join its first distincts with the
 	    " prefixes and common.
-	    let [l:suffixDiffering, l:suffixCommon] = ingo#list#lcs#FindAllCommon(l:suffixes, l:minimumCommonLength, l:minimumDifferingLength)
+	    let [l:suffixDiffering, l:suffixCommon] = ingo#list#lcs#FindAllCommon(l:suffixes, l:minimumCommonLength, [0, l:minimumSuffixDifferingLength]) " Minimum prefix length doesn't apply here, as we're joining it.
 
 	    let [l:prefixDiffering, l:prefixCommon] = [[map(range(l:differingCnt), 'get(l:prefixes, v:val, "") . l:common . get(get(l:suffixDiffering, 0, []), v:val, "")')], []]
 	    let l:common = ''
@@ -109,14 +115,14 @@ function! ingo#list#lcs#FindAllCommon( strings, ... )
     elseif l:isSuffixTooShort
 	" Recurse into the prefixes, then join its last distincts with common
 	" and the suffixes.
-	let [l:prefixDiffering, l:prefixCommon] = ingo#list#lcs#FindAllCommon(l:prefixes, l:minimumCommonLength, l:minimumDifferingLength)
+	let [l:prefixDiffering, l:prefixCommon] = ingo#list#lcs#FindAllCommon(l:prefixes, l:minimumCommonLength, [l:minimumPrefixDifferingLength, 0]) " Minimum suffix length doesn't apply here, as we're joining it.
 	let [l:suffixDiffering, l:suffixCommon] = [[map(range(l:differingCnt), 'get(l:prefixDiffering[-1], v:val, "") . l:common . get(l:suffixes, v:val, "")')], []]
 	let l:common = ''
 	call remove(l:prefixDiffering, -1)
     else
 	" Recurse into both prefixes and suffixes.
-	let [l:prefixDiffering, l:prefixCommon] = ingo#list#lcs#FindAllCommon(l:prefixes, l:minimumCommonLength, l:minimumDifferingLength)
-	let [l:suffixDiffering, l:suffixCommon] = ingo#list#lcs#FindAllCommon(l:suffixes, l:minimumCommonLength, l:minimumDifferingLength)
+	let [l:prefixDiffering, l:prefixCommon] = ingo#list#lcs#FindAllCommon(l:prefixes, l:minimumCommonLength, [l:minimumPrefixDifferingLength, l:minimumSuffixDifferingLength])
+	let [l:suffixDiffering, l:suffixCommon] = ingo#list#lcs#FindAllCommon(l:suffixes, l:minimumCommonLength, [l:minimumPrefixDifferingLength, l:minimumSuffixDifferingLength])
     endif
 
     return [
