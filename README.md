@@ -90,6 +90,7 @@ HISTORY
   ingo#str#split#StrFirst() variant that uses a fixed string, not a pattern.
 - Add ingo/list/lcs.vim module.
 - Add ingo#list#IsEmpty().
+- Add ingo/collection/find.vim module.
 
 ##### 1.031   27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in
