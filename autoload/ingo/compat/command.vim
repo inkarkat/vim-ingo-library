@@ -19,8 +19,8 @@ function! ingo#compat#command#Mods( mods )
 "   from the fact that the modifiers do not contain special characters, and do
 "   the quoting ourselves: '<mods>'. Now we only need to remove the identifer in
 "   case it hasn't been understood, and this is what this function is about.
-"	command! Sedit call SpecialEdit(<q-mods>)
-"	command! Sedit call SpecialEdit(ingo#compat#command#Mods('<args>'))
+"	-command! Sedit call SpecialEdit(<q-mods>)
+"	+command! Sedit call SpecialEdit(ingo#compat#command#Mods('<mods>'))
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
