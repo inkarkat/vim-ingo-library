@@ -1,6 +1,10 @@
 " subs/BraceCreation.vim: Condense multiple strings into a Brace Expression like in Bash.
 "
 " DEPENDENCIES:
+"   - ingo/compat.vim autoload script
+"   - ingo/list.vim autoload script
+"   - ingo/list/lcs.vim autoload script
+"   - ingo/list/sequence.vim autoload script
 "
 " Copyright: (C) 2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -59,11 +63,8 @@ function! s:Translate( distinctList )
 	return ''
     endif
 
-    let [l:sequenceLen, l:stride] = (ingo#list#Matches(a:distinctList, '^\d\+$') ?
-    \   ingo#list#sequence#FindNumerical(a:distinctList) :
-    \   [0, 0]
-    \)
-    if l:sequenceLen <= 2
+    let [l:sequenceLen, l:stride] = ingo#list#sequence#FindNumerical(a:distinctList)
+    if l:sequenceLen <= 2 || ! ingo#list#Matches(a:distinctList[0 : l:sequenceLen - 1], '^\d\+$')
 	let [l:sequenceLen, l:stride] = ingo#list#sequence#FindCharacter(a:distinctList)
     endif
     if l:sequenceLen > 2
