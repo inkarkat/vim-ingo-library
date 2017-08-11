@@ -12,6 +12,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	003	02-Dec-2016	Refactoring: Factor out s:MakeToken().
 "	002	01-Dec-2016	ENH: Keep original separators between words.
 "				ENH: Also handle numeric and character
 "				sequences.
@@ -20,11 +21,14 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+function! s:MakeToken( symbol, level )
+    return "\001" . a:level . a:symbol . "\001"
+endfunction
 function! s:ProcessListInBraces( bracesText, iterationCnt )
     let l:text = a:bracesText
-    let l:text = substitute(l:text, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!,', "\001" . a:iterationCnt . ";\001", "g")
+    let l:text = substitute(l:text, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!,', s:MakeToken(a:iterationCnt, ';'), 'g')
     if l:text ==# a:bracesText
-	let l:text = substitute(l:text, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\.\.', "\001" . a:iterationCnt . "#\001", "g")
+	let l:text = substitute(l:text, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\.\.', s:MakeToken(a:iterationCnt, '#'), 'g')
     endif
     return ingo#escape#Unescape(l:text, ',')
 endfunction
@@ -45,7 +49,7 @@ function! s:ProcessBraces( text )
 	let l:text = substitute(
 	\   l:text,
 	\   '\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!{\(\%([^{}]\|\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\[{}]\)*\%(,\|\.\.\)\%([^{}]\|\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\[{}]\)*\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!}',
-	\   '\=submatch(1) . "\001" . l:iterationCnt . "<\001" . s:ProcessListInBraces(submatch(2), l:iterationCnt) . "\001" . l:iterationCnt . ">\001"',
+	\   '\=submatch(1) . s:MakeToken(l:iterationCnt, "<") . s:ProcessListInBraces(submatch(2), l:iterationCnt) . s:MakeToken(l:iterationCnt, ">")',
 	\   'g'
 	\)
 	let l:iterationCnt += 1
@@ -54,7 +58,7 @@ function! s:ProcessBraces( text )
     return [l:iterationCnt - 2, l:text]
 endfunction
 function! s:ExpandOneLevel( text, level )
-    let l:parse = matchlist(a:text, printf('^\(.\{-}\)%s\(.\{-}\)%s\(.*\)$', "\001" . a:level . "<\001", "\001" . a:level . ">\001"))
+    let l:parse = matchlist(a:text, printf('^\(.\{-}\)%s\(.\{-}\)%s\(.*\)$', s:MakeToken(a:level, '<'), s:MakeToken(a:level, '>')))
     if empty(l:parse)
 	return (a:level > 1 ?
 	\   s:ExpandOneLevel(a:text, a:level - 1) :
@@ -63,13 +67,13 @@ function! s:ExpandOneLevel( text, level )
     endif
 
     let [l:pre, l:braceList, l:post] = l:parse[1:3]
-    if l:braceList =~# "\001" . a:level . "#\001"
+    if l:braceList =~# s:MakeToken(a:level, '#')
 	" Sequence.
-	let l:sequenceElements = split(l:braceList, "\001" . a:level . "#\001", 1)
+	let l:sequenceElements = split(l:braceList, s:MakeToken(a:level, '#'), 1)
 	let l:nonEmptySequenceElementNum = len(filter(copy(l:sequenceElements), '! empty(v:val)'))
 	if l:nonEmptySequenceElementNum < 2 || l:nonEmptySequenceElementNum > 3
 	    " Undo the brace translation.
-	    return [substitute(a:text, "\001\\d\\+\\([#<>]\\)\001", '\={"#": "..", "<": "{", ">": "}"}[submatch(1)]', 'g')]
+	    return [substitute(a:text, s:MakeToken('\d\+', '\([#<>]\)'), '\={"#": "..", "<": "{", ">": "}"}[submatch(1)]', 'g')]
 	endif
 	let l:isNumericSequence = (len(filter(copy(l:sequenceElements), 'v:val !~# "^[+-]\\?\\d\\+$"')) == 0)
 	if l:isNumericSequence
@@ -95,7 +99,7 @@ function! s:ExpandOneLevel( text, level )
 	endif
     else
 	" List (possibly nested).
-	let l:braceElements = split(l:braceList, "\001" . a:level . ";\001", 1)
+	let l:braceElements = split(l:braceList, s:MakeToken(a:level, ';'), 1)
 
 	if a:level > 1
 	    let l:braceElements = ingo#collections#Flatten1(map(l:braceElements, 's:ExpandOneLevel(v:val, a:level - 1)'))
