@@ -92,6 +92,7 @@ HISTORY
 - Add ingo#list#IsEmpty().
 - Add ingo/collection/find.vim module.
 - Add ingo/window.vim and ingo/window/adjacent modules.
+- Add ingo#list#Matches().
 
 ##### 1.031   27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in

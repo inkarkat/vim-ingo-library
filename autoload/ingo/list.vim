@@ -155,4 +155,21 @@ function! ingo#list#IsEmpty( list )
     return empty(filter(copy(a:list), '! empty(v:val)'))
 endfunction
 
+function! ingo#list#Matches( list, expr )
+"******************************************************************************
+"* PURPOSE:
+"   Test whether each element of the list matches the regular expression.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:list  A list.
+"   a:expr  Regular expression.
+"* RETURN VALUES:
+"   1 if all elements of a:list match a:expr; else 0.
+"******************************************************************************
+    return empty(filter(copy(a:list), 'v:val !~# a:expr'))
+endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
