@@ -55,6 +55,13 @@
 "   error functions) are invoked between your error setting and checking (also
 "   maybe triggered by autocmds), you can pass an optional {context} (e.g. your
 "   plugin / command name) to any of the commands.
+"   Note: With this approach, further typed commands will be aborted in a macro
+"   / mapping. However, further commands in a command sequence or function (even
+"   with :function-abort) will still be executed, unlike built-in commands (e.g.
+"   :substitute/doesNotExist//). To prevent execution of further commands, you
+"   have to wrap everything in try...catch (which is recommended anyhow, because
+"   a function abort will still print a ugly multi-line exception, not a short
+"   user-friendly message).
 "******************************************************************************
 let s:err = {}
 let s:errmsg = ''
