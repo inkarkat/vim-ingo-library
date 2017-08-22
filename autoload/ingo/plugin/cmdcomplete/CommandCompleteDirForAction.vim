@@ -40,6 +40,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	029	23-Aug-2017	ENH: Add a:options.isAllowOtherDirs to configure
+"				handling of absolute argleads. The completion so
+"				far just kept a leading "/", which isn't so
+"				helpful.
 "	028	20-Feb-2017	ENH: Get <mods> information into s:Command() and
 "				pass this on to a:Action, and make this
 "				accessible to a:Action Funcrefs via a context
@@ -178,7 +182,7 @@ function! s:ResolveDirspecs( dirspecs, ... )
 	return l:dirspecs
     endif
 endfunction
-function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs, argLead )
+function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs, isAllowOtherDirs, argLead )
     try
 	let l:dirspecs = ingo#list#Make(s:ResolveDirspecs(a:dirspecs))
     catch /^Vim\%((\a\+)\)\=:E/
@@ -200,6 +204,18 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
 	let l:filespecs = []
 	let l:resolvedDirspecs = []
 	let l:sourceCnt = 0
+
+	if ! empty(a:argLead) && ingo#fs#path#IsAbsolute(a:argLead) " Let's ignore relative upwards addressing with ../.. for now.
+	    if a:isAllowOtherDirs
+		" As we have an absolute arglead, we do not need (in fact: must
+		" not use) the provided a:dirspecs. If we replace those with a
+		" single empty one, the logic below will do exactly what we
+		" need, as it concatenates dirspec and arglead.
+		let l:dirspecs = ['']
+	    else
+		return []
+	    endif
+	endif
 
 	for l:dirspec in l:dirspecs
 	    if a:isIncludeSubdirs
@@ -439,6 +455,9 @@ function! CommandCompleteDirForAction#setup( command, dirspecs, parameters )
 "   a:parameters.isIncludeSubdirs
 "	    Flag whether subdirectories will be included in the completion
 "	    matches. By default, only files in a:dirspecs itself will be offered.
+"   a:parameters.isAllowOtherDirs
+"	    Flag whether directories outside of a:dirspecs will be considered
+"	    for completion, too. By default not.
 "   a:parameters.defaultFilename
 "	    If specified, the command will not require the filename argument,
 "	    and default to this filename if none is specified.
@@ -476,6 +495,7 @@ function! CommandCompleteDirForAction#setup( command, dirspecs, parameters )
     let l:browsefilter = get(a:parameters, 'browsefilter', '')
     let l:wildignore = get(a:parameters, 'wildignore', 0)
     let l:isIncludeSubdirs = get(a:parameters, 'isIncludeSubdirs', 0)
+    let l:isAllowOtherDirs = get(a:parameters, 'isAllowOtherDirs', 0)
     let l:DefaultFilename = get(a:parameters, 'defaultFilename', '')
     let l:FilenameProcessingFunction = get(a:parameters, 'FilenameProcessingFunction', '')
     let l:FilespecProcessingFunction = get(a:parameters, 'FilespecProcessingFunction', '')
@@ -485,8 +505,8 @@ function! CommandCompleteDirForAction#setup( command, dirspecs, parameters )
     let l:completeFunctionName = get(a:parameters, 'overrideCompleteFunction', l:generatedCompleteFunctionName)
     execute
     \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:generatedCompleteFunctionName) .
-    \	printf("    return s:CompleteFiles(%s, %s, %s, %d, a:ArgLead)\n",
-    \	    string(a:dirspecs), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
+    \	printf("    return s:CompleteFiles(%s, %s, %s, %d, %d, a:ArgLead)\n",
+    \	    string(a:dirspecs), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs, l:isAllowOtherDirs
     \	) .    "endfunction"
 
     execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, ingo#compat#command#Mods(''<mods>''), %s, %s, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
