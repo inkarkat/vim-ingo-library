@@ -40,6 +40,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	028	20-Feb-2017	ENH: Get <mods> information into s:Command() and
+"				pass this on to a:Action, and make this
+"				accessible to a:Action Funcrefs via a context
+"				object g:CommandCompleteDirForAction_Context.
 "	027	26-Jan-2017	Factor out s:ResolveDirspecs().
 "				ENH: Handle List of dirspecs, all of which will
 "				be used for completion, and the subpath passed
@@ -288,16 +292,16 @@ function! s:SuffixesSort( f1, f2 )
     endif
 endfunction
 
-function! s:Command( isBang, Action, PostAction, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspecs, filename )
+function! s:Command( isBang, mods, Action, PostAction, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspecs, filename )
     try
-"****Dechomsg '****' a:isBang string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspecs) string(a:filename)
+"****Dechomsg '****' a:isBang a:mods string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspecs) string(a:filename)
 
 	" Detach any file options or commands for assembling the filespec.
 	let [l:fileOptionsAndCommands, l:filename] = ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands(a:filename)
 "****D echomsg '****' string(l:filename) string(l:fileOptionsAndCommands)
 	" Set up a context object so that Funcrefs can have access to the
 	" information whether <bang> was given.
-	let g:CommandCompleteDirForAction_Context = { 'bang': a:isBang }
+	let g:CommandCompleteDirForAction_Context = { 'bang': a:isBang, 'mods': a:mods }
 
 	" l:filename comes from the custom command, and must be taken as is (the
 	" custom completion will have already escaped the completion).
@@ -485,7 +489,7 @@ function! CommandCompleteDirForAction#setup( command, dirspecs, parameters )
     \	    string(a:dirspecs), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs
     \	) .    "endfunction"
 
-    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, %s, %s, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
+    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, ingo#compat#command#Mods(''<mods>''), %s, %s, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
     \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'),
     \   l:completeFunctionName,
     \   l:commandAttributes,
