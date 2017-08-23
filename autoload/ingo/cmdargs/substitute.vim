@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/list.vim autoload script
 "
-" Copyright: (C) 2012-2016 Ingo Karkat
+" Copyright: (C) 2012-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -100,8 +100,8 @@ function! ingo#cmdargs#substitute#Parse( arguments, ... )
 "				    previous replacement in a :substitute.
 "   a:options.emptyFlags            Flags to use when a:options.flagsExpr is not
 "				    empty, but no arguments at all are given.
-"				    Defaults to "&" to use the previous flags of
-"				    a :substitute. Provide a List if
+"				    Defaults to ["&", ""] to use the previous
+"				    flags of a :substitute. Provide a List if
 "				    a:options.flagsMatchCount is larger than 1.
 "   a:options.isAllowLoneFlags      Allow to omit /pat/repl/, and parse a
 "				    stand-alone a:options.flagsExpr (assuming
