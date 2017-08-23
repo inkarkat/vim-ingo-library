@@ -94,6 +94,7 @@ HISTORY
 - Add ingo/window.vim and ingo/window/adjacent modules.
 - Add ingo#list#Matches().
 - Add ingo/list/sequence.vim module.
+- Add ingo#fs#path#IsAbsolute() and ingo#fs#path#IsUpwards().
 
 ##### 1.031   27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in
@@ -545,7 +546,7 @@ HISTORY
 - Make buffer argument of ingo#buffer#IsBlank() optional, defaulting to the
   current buffer.
 - Allow use of ingo#buffer#IsEmpty() with other buffers.
-- CHG: Pass \_all\_ additional arguments of ingo#actions#ValueOrFunc(),
+- CHG: Pass _all_ additional arguments of ingo#actions#ValueOrFunc(),
   ingo#actions#NormalOrFunc(), ingo#actions#ExecuteOrFunc(),
   ingo#actions#EvaluateOrFunc() instead of only the first (interpreted as a
   List of arguments) when passed a Funcref as a:Action.

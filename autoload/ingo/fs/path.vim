@@ -2,10 +2,11 @@
 "
 " DEPENDENCIES:
 "   - ingo/compat.vim autoload script
-"   - ingo/os.vim autoload script
 "   - ingo/escape/file.vim autoload script
+"   - ingo/os.vim autoload script
+"   - ingo/fs/path/split.vim autoload script
 "
-" Copyright: (C) 2012-2014 Ingo Karkat
+" Copyright: (C) 2012-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -119,6 +120,18 @@ function! ingo#fs#path#IsUncPathRoot( filespec )
     return (a:filespec =~# l:uncPathPattern)
 endfunction
 function! ingo#fs#path#GetRootDir( filespec )
+"******************************************************************************
+"* PURPOSE:
+"   Determine the root directory of a:filespec.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:filespec  Full path (use |::p| modifier if necessary).
+"* RETURN VALUES:
+"   Root drive / UNC path / "/".
+"******************************************************************************
     if ! ingo#os#IsWinOrDos()
 	return '/'
     endif
@@ -133,6 +146,42 @@ function! ingo#fs#path#GetRootDir( filespec )
     endif
 
     return l:dir
+endfunction
+
+function! ingo#fs#path#IsAbsolute( filespec )
+"******************************************************************************
+"* PURPOSE:
+"   Test whether a:filespec is an absolute filespec; i.e. starts with a root
+"   drive / UNC path / "/".
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:filespec  Relative / absolute filespec. Does not need to exist.
+"* RETURN VALUES:
+"   1 if it is absolute, else 0.
+"******************************************************************************
+    let l:rootDir = ingo#fs#path#GetRootDir(fnamemodify(a:filespec, ':p'))
+    return (type(ingo#fs#path#split#AtBasePath(a:filespec, l:rootDir)) != type([]))
+endfunction
+
+function! ingo#fs#path#IsUpwards( filespec )
+"******************************************************************************
+"* PURPOSE:
+"   Test whether a:filespec navigates to a parent directory through ".." path
+"   elements.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:filespec  Relative / absolute filespec. Does not need to exist.
+"* RETURN VALUES:
+"   1 if it navigates to a parent. 0 if it is absolute, or relative within the
+"   current context.
+"******************************************************************************
+    return (ingo#fs#path#Normalize(simplify(a:filespec), '/') =~# '^\.\./')
 endfunction
 
 function! ingo#fs#path#IsCaseInsensitive( ... )
