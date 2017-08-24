@@ -26,13 +26,15 @@ function! ingo#area#frompattern#GetHere( pattern, ... )
 "		    used.
 "   a:lastLine      End line number to search for the start of the pattern.
 "		    Optional; defaults to the current line.
+"   a:returnValueOnNoSelection  Optional return value if there's no match. If
+"				omitted, [[0, 0], [0, 0]] will be returned.
 "* RETURN VALUES:
-"   [[startLnum, startCol], [endLnum, endCol]], or [].
+"   [[startLnum, startCol], [endLnum, endCol]], or a:returnValueOnNoSelection.
 "******************************************************************************
     let l:startPos = getpos('.')[1:2]
     let l:endPos = searchpos(a:pattern, 'cenW', (a:0 ? a:1 : line('.')))
     if l:endPos == [0, 0]
-	return []
+	return (a:0 >= 2 ? a:2 : [[0, 0], [0, 0]])
     endif
     return [l:startPos, l:endPos]
 endfunction
@@ -56,16 +58,18 @@ function! ingo#area#frompattern#GetAroundHere( pattern, ... )
 "		    Optional; defaults to the current line.
 "   a:firstLine     First line number to search for the start of the pattern.
 "		    Optional; defaults to the current line.
+"   a:returnValueOnNoSelection  Optional return value if there's no match. If
+"				omitted, [[0, 0], [0, 0]] will be returned.
 "* RETURN VALUES:
-"   [[startLnum, startCol], [endLnum, endCol]], or [].
+"   [[startLnum, startCol], [endLnum, endCol]], or a:returnValueOnNoSelection.
 "******************************************************************************
     let l:startPos = searchpos(a:pattern, 'bcnW', (a:0 >= 2 ? a:2 : line('.')))
     if l:startPos == [0, 0]
-	return []
+	return (a:0 >= 3 ? a:3 : [[0, 0], [0, 0]])
     endif
     let l:endPos = searchpos(a:pattern, 'cenW', (a:0 ? a:1 : line('.')))
     if l:endPos == [0, 0]
-	return []
+	return (a:0 >= 3 ? a:3 : [[0, 0], [0, 0]])
     endif
     return [l:startPos, l:endPos]
 endfunction
