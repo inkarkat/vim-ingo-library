@@ -1,6 +1,7 @@
 autoload/ingo/actions.vim
 autoload/ingo/actions/iterations.vim
 autoload/ingo/actions/special.vim
+autoload/ingo/area.vim
 autoload/ingo/area/frompattern.vim
 autoload/ingo/avoidprompt.vim
 autoload/ingo/binary.vim
