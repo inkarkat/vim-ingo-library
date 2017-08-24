@@ -3,39 +3,16 @@
 " DEPENDENCIES:
 "   - ingo/msg.vim autoload script
 "
-" Copyright: (C) 2012-2014 Ingo Karkat
+" Copyright: (C) 2012-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.020.007	31-May-2014	Also set the change marks to the replaced area.
-"				Make col argument 1-based for consistency.
-"   1.020.006	30-May-2014	Factor out and expose ingo#text#Replace#Area().
-"				Allow a:Text Funcref in
-"				ingo#text#replace#PatternWithText().
-"				CHG: When replacing at the cursor position, also
-"				jump to the beginning of the replacement. This
-"				is more consistent with Vim's default behavior.
-"   1.011.005	23-Jul-2013	Move into ingo-library.
-"	004	11-Apr-2013	ENH: ingoreplacer#ReplaceText() returns
-"				structure with the original and replaced text.
-"				Use ingo#msg#WarningMsg() from ingo-library.
-"				Extract user output into separate
-"				ingoreplacer#ReplaceTextWithMessage() function.
-"	003	07-May-2012	As an optimization, use l:maxCount for "last"
-"				location when already determined by "current" location.
-"	002	06-May-2012	ENH: Change default strategy to current match,
-"				then next match (instead of last match), and
-"				allow passing of different strategy of choosing
-"				the match locations.
-"	001	06-May-2012	file creation from plugin/InsertDate.vim
 
 function! s:ReplaceRange( source, startIdx, endIdx, string )
     return strpart(a:source, 0, a:startIdx) . a:string . strpart(a:source, a:endIdx + 1)
 endfunction
 
-function! ingo#text#replace#Area( startPos, endPos, Text )
+function! ingo#text#replace#Between( startPos, endPos, Text )
 "******************************************************************************
 "* PURPOSE:
 "   Replace the text between a:startPos and a:endPos from the current buffer
@@ -81,8 +58,28 @@ function! ingo#text#replace#Area( startPos, endPos, Text )
 	return [l:currentText, l:text, 0]
     endif
 endfunction
+function! ingo#text#replace#Area( area, Text )
+"******************************************************************************
+"* PURPOSE:
+"   Replace the text in the area of [startPos, endPos] from the current buffer
+"   with a:Text.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Modifies current buffer.
+"   Sets the change marks '[,'] to the modified area.
+"* INPUTS:
+"   a:area      [[startLnum, startCol], [endLnum, endCol]]; col is the 1-based
+"		byte-index.
+"   a:Text      Replacement text, or Funcref that gets passed the text to
+"		replace, and returns the replacement text.
+"* RETURN VALUES:
+"   List of [originalText, replacementText, didReplacement].
+"******************************************************************************
+    return call('ingo#text#replace#Between', a:area + [a:Text])
+endfunction
 function! s:ReplaceTextInRange( startIdx, endIdx, Text, where )
-    let [l:originalText, l:replacementText, l:didReplacement] = ingo#text#replace#Area([line('.'), a:startIdx + 1], [line('.'), a:endIdx + 1], a:Text)
+    let [l:originalText, l:replacementText, l:didReplacement] = ingo#text#replace#Between([line('.'), a:startIdx + 1], [line('.'), a:endIdx + 1], a:Text)
     if l:didReplacement
 	call cursor(line('.'), a:startIdx + 1)
 	return {'startIdx': a:startIdx, 'endIdx': a:endIdx, 'original': l:originalText, 'replacement': l:replacementText, 'where': a:where}
