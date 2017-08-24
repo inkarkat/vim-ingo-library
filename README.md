@@ -96,6 +96,8 @@ HISTORY
 - Add ingo/list/sequence.vim module.
 - Add ingo#fs#path#IsAbsolute() and ingo#fs#path#IsUpwards().
 - Add ingo/area/frompattern.vim module.
+- CHG: Rename ingo#selection#position#Get() to ingo#selection#area#Get().
+  Extend the function's API with options.
 
 ##### 1.031   27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in
