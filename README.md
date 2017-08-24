@@ -95,6 +95,7 @@ HISTORY
 - Add ingo#list#Matches().
 - Add ingo/list/sequence.vim module.
 - Add ingo#fs#path#IsAbsolute() and ingo#fs#path#IsUpwards().
+- Add ingo/area/frompattern.vim module.
 
 ##### 1.031   27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in
