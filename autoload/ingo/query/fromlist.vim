@@ -9,20 +9,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.027.005	27-Sep-2016	ENH: ingo#query#fromlist#Query(): Support
-"				headless (testing) mode via
-"				g:IngoLibrary_QueryChoices, like
-"				ingo#query#Confirm() already does.
-"				Expose ingo#query#fromlist#RenderList().
-"   1.025.004	27-Jan-2016	Refactoring: Factor out ingo#query#Question().
-"   1.023.003	19-Jan-2015	Break listing of query choices into multiple
-"				lines when the overall question doesn't fit in a
-"				single line.
-"   1.023.002	18-Jan-2015	Support ingo#query#fromlist#Query() querying of
-"				more than 10 elements by number.
-"   1.020.001	03-Jun-2014	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 
@@ -116,6 +102,36 @@ function! ingo#query#fromlist#Query( what, list, ... )
 	return -1
     endif
     return l:count - 1
+endfunction
+
+function! ingo#query#fromlist#QueryAsText( what, list, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Query for one entry from a:list; elements can be selected by accelerator key
+"   or the number of the element. Supports "headless mode", i.e. bypassing the
+"   actual dialog so that no user intervention is necessary (in automated
+"   tests).
+"* SEE ALSO:
+"   ingo#query#recall#Query() provides an alternative means to query one
+"   (longer) entry from a list.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   The headless mode is activated by defining a List of choices (either
+"   numerical return values of confirm(), or the choice text without the
+"   shortcut key "&") in g:IngoLibrary_QueryChoices. Each invocation of this
+"   function removes the first element from that List and returns it.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:what  Description of what is queried.
+"   a:list  List of elements. Accelerators can be preset by prefixing with "&".
+"   a:defaultIndex  Default element (which will be chosen via <Enter>); -1 for
+"		    no default.
+"* RETURN VALUES:
+"   Choice text without the shortcut key '&'. Empty string if the dialog was
+"   aborted.
+"******************************************************************************
+    let l:index = call('ingo#query#fromlist#Query', [a:what, a:list] + a:000)
+    return (l:index == -1 ? '' : a:list[l:index])
 endfunction
 
 let &cpo = s:save_cpo

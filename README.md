@@ -102,6 +102,8 @@ HISTORY
 - CHG: Rename ingo#text#replace#Area() to ingo#text#replace#Between() and add
   ingo#text#replace#Area() that actually takes a (single) a:area argument.
 - Add ingo/area.vim module.
+- Add ingo#query#fromlist#QueryAsText() variant of
+  ingo#query#fromlist#Query().
 
 ##### 1.031   27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in
