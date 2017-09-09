@@ -104,6 +104,8 @@ HISTORY
 - Add ingo/area.vim module.
 - Add ingo#query#fromlist#QueryAsText() variant of
   ingo#query#fromlist#Query().
+- ENH: ingo#buffer#scratch#Create(): Allow to set the scratch buffer contents
+  directly by passing a List as a:scratchCommand.
 
 ##### 1.031   27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in

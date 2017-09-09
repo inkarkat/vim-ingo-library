@@ -5,93 +5,10 @@
 "   - ingo/escape/file.vim autoload script
 "   - ingo/fs/path.vim autoload script
 "
-" Copyright: (C) 2009-2015 Ingo Karkat
+" Copyright: (C) 2009-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.024.022	15-Apr-2015	BUG: ingo#buffer#scratch#Create() with existing
-"				scratch buffer yields "E95: Buffer with this
-"				name already exists" instead of reusing the
-"				buffer. Use new a:isFile flag to
-"				ingo#escape#file#bufnameescape() and set
-"				a:isFullMatch to 1 instead of emulating the
-"				full-match for non-existing scratch buffers.
-"				Keep current cursor position when
-"				ingo#buffer#scratch#Create() removes the first
-"				empty line in the scratch buffer.
-"   1.012.021	08-Aug-2013	Move escapings.vim into ingo-library.
-"   1.010.020	08-Jul-2013	Move into ingo-library.
-"	019	11-Jun-2013	Move ingobuffer#ExecuteIn...() and
-"				ingobuffer#CallIn...() to ingo/buffer/temp.vim
-"				and ingo/buffer/visible.vim.
-"	018	01-Jun-2013	Move ingofile.vim into ingo-library.
-"	017	19-Feb-2013	Factor out ingobuffer#SetScratchBuffer().
-"	016	18-Feb-2013	Add ingobuffer#GetUnusedBracketedFilename().
-"	015	18-May-2012	Move ingobuffer#CombineToFilespec() and
-"				ingobuffer#MakeTempfile() to ingofile.vim
-"				autoload script.
-"	014	26-Mar-2012	Add ingobuffer#IsEmptyBuffer(), copied from
-"				ingotemplates.vim.
-"	013	26-Oct-2011	Also switch algorithm for
-"				ingobuffer#ExecuteInVisibleBuffer(), because
-"				:hide may destroy the current buffer when
-"				'bufhidden' is set. (This happened in the blame
-"				buffer of vcscommand.vim).
-"	012	03-Oct-2011	Switch algorithm for
-"				ingobuffer#ExecuteInTempBuffer() from switching
-"				buffers to new split buffer, since the former
-"				had a noticable delay when in a long Vimscript
-"				file, due to re-sync of syntax highlighting.
-"	011	01-Oct-2011	Factor out more generic
-"				ingobuffer#NextBracketedFilename().
-"	010	27-Sep-2011	Add ingobuffer#ExecuteInTempBuffer(), and
-"				ingobuffer#CallInTempBuffer().
-"				Also implement ingobuffer#CallInVisibleBuffer()
-"				in the same style.
-"	009	09-Jul-2011	Have somehow written ingobuffer#MakeTempfile()
-"				without knowledge of the built-in tempname().
-"				Now use that as the primary source of a temp
-"				directory, and only use the other locations as
-"				(probably unnecessary) fallbacks.
-"	008	12-Apr-2011	Add ingobuffer#ExecuteInVisibleBuffer() for
-"				:AutoSave command.
-"	007	31-Mar-2011	ingobuffer#MakeScratchBuffer() only deletes the
-"				first line in the scratch buffer if it is
-"				actually empty.
-"				FIX: Need to check the buftype also when a
-"				window is visible that shows a buffer with the
-"				scratch filename. Otherwise, a buffer containing
-"				a normal file may be re-used as a scratch
-"				buffer.
-"				Also allow scratch buffer names like
-"				"[Messages]", not just "Messages [Scratch]" in
-"				ingobuffer#NextScratchFilename().
-"				Minor: 'buftype' can only contain one particular
-"				word, change regexp-match to exact match.
-"	006	17-Jan-2011	Added $TMPDIR to ingobuffer#MakeTempfile().
-"	005	02-Mar-2010	ENH: ingobuffer#CombineToFilespec() allows
-"				multiple filenames and passing in a single list
-"				of filespec fragments. Improved detection of
-"				desired path separator and falling back to
-"				system default based on 'shellslash' setting.
-"	004	15-Oct-2009	ENH: ingobuffer#MakeScratchBuffer() now allows
-"				to omit (via empty string) the a:scratchCommand
-"				Ex command, and will then keep the scratch
-"				buffer writable.
-"	003	04-Sep-2009	ENH: If a:scratchIsFile is false and
-"				a:scratchDirspec is empty, there will be only
-"				one scratch buffer with the same
-"				a:scratchFilename, regardless of the scratch
-"				buffer's directory path. This also fixes Vim
-"				errors on the :file command when s:Bufnr() has
-"				determined that there is no existing buffer,
-"				when in fact there is.
-"				Replaced ':normal ...dd' with :delete, and not
-"				clobbering the unnamed register any more.
-"	002	01-Sep-2009	Added ingobuffer#MakeTempfile().
-"	001	05-Jan-2009	file creation
 
 function! ingo#buffer#scratch#NextBracketedFilename( filespec, template )
 "******************************************************************************
@@ -222,6 +139,8 @@ function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIs
 "			will be no trailing empty line.
 "			Pass empty string if you want to populate the scratch
 "			buffer yourself.
+"			Pass a List of lines to set the scratch buffer contents
+"			directly to the lines.
 "   a:windowOpenCommand	Ex command to open the scratch window, e.g. :vnew or
 "			:topleft new.
 "* RETURN VALUES:
@@ -233,7 +152,7 @@ function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIs
 "   4	Created scratch buffer in new window.
 "   Note: To handle errors caused by a:scratchCommand, you need to put this
 "   method call into a try..catch block and :close the scratch buffer when an
-"   exception is thrown
+"   exception is thrown.
 "*******************************************************************************
     let l:currentWinNr = winnr()
     let l:status = 0
@@ -281,13 +200,20 @@ function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIs
     " Note: ':silent' to suppress the "--No lines in buffer--" message.
 
     if ! empty(a:scratchCommand)
-	execute a:scratchCommand
-	" ^ Keeps the existing line at the top of the buffer, if :1{cmd} is used.
-	" v Deletes it.
-	if empty(getline(1))
-	    let l:save_cursor = getpos('.')
-		silent 1delete _    " Note: ':silent' to suppress deletion message if ':set report=0'.
-	    call cursor(l:save_cursor[1] - 1, l:save_cursor[2])
+	if type(a:scratchCommand) == type([])
+	    call setline(1, a:scratchCommand)
+	    call cursor(1, 1)
+	    call setpos("'[", [0, 1, 1, 0])
+	    call setpos("']", [0, line('$'), 1, 0])
+	else
+	    execute a:scratchCommand
+	    " ^ Keeps the existing line at the top of the buffer, if :1{cmd} is used.
+	    " v Deletes it.
+	    if empty(getline(1))
+		let l:save_cursor = getpos('.')
+		    silent 1delete _    " Note: ':silent' to suppress deletion message if ':set report=0'.
+		call cursor(l:save_cursor[1] - 1, l:save_cursor[2])
+	    endif
 	endif
 
 	setlocal readonly
