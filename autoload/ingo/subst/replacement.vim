@@ -1,4 +1,4 @@
-" autoload/ingo/subst/replacement.vim: Functions for replacing the match of a substitution.
+" ingo/subst/replacement.vim: Functions for replacing the match of a substitution.
 "
 " DEPENDENCIES:
 "   - ingo/collections.vim autoload script

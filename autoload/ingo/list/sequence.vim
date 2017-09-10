@@ -1,4 +1,4 @@
-" autoload/ingo/list/sequence.vim: Functions for sequences of numbers etc.
+" ingo/list/sequence.vim: Functions for sequences of numbers etc.
 "
 " DEPENDENCIES:
 "

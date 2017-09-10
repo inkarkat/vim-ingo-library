@@ -1,4 +1,4 @@
-" autoload/ingo/window.vim: Functions for dealing with windows.
+" ingo/window.vim: Functions for dealing with windows.
 "
 " DEPENDENCIES:
 "

@@ -1,4 +1,4 @@
-" autoload/ingo/window/adjacent.vim: Functions around windows that are next to each other.
+" ingo/window/adjacent.vim: Functions around windows that are next to each other.
 "
 " DEPENDENCIES:
 "   - ingo/window.vim autoload script

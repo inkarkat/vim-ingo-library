@@ -1,4 +1,4 @@
-" autoload/ingo/area/frompattern.vim: Functions to determine an area in the current buffer.
+" ingo/area/frompattern.vim: Functions to determine an area in the current buffer.
 "
 " DEPENDENCIES:
 "   - ingo/text.vim autoload script

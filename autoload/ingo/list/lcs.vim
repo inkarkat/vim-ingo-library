@@ -1,4 +1,4 @@
-" autoload/ingo/list/lcs.vim: Functions to find longest common substring(s).
+" ingo/list/lcs.vim: Functions to find longest common substring(s).
 "
 " DEPENDENCIES:
 "   - ingo/compat.vim autoload script

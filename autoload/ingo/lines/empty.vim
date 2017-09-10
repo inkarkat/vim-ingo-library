@@ -1,4 +1,4 @@
-" autoload/ingo/lines/empty.vim: Functions to search for empty lines.
+" ingo/lines/empty.vim: Functions to search for empty lines.
 "
 " DEPENDENCIES:
 "

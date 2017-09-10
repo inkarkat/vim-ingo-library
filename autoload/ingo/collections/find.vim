@@ -1,4 +1,4 @@
-" autoload/ingo/collections/find.vim: Functions for finding values in collections.
+" ingo/collections/find.vim: Functions for finding values in collections.
 "
 " DEPENDENCIES:
 "

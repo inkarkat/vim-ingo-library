@@ -1,4 +1,4 @@
-" autoload/ingo/area.vim: Functions to deal with areas.
+" ingo/area.vim: Functions to deal with areas.
 "
 " DEPENDENCIES:
 "
