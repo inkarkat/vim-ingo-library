@@ -59,6 +59,9 @@ function! ingo#ftplugin#converter#external#ToText( externalCommandDefinitionsVar
 	call setline(1, l:text)
 	call setpos("'[", [0, 1, 1, 0])
 	call setpos("']", [0, line('$'), 1, 0])
+
+	let &l:filetype = get(l:commandDefinition, 'filetype', 'text')
+
 	setlocal nomodifiable nomodified
 	return 1
     catch /^external:/
