@@ -107,6 +107,8 @@ HISTORY
 - ENH: ingo#buffer#scratch#Create(): Allow to set the scratch buffer contents
   directly by passing a List as a:scratchCommand.
 - Extract generic ingo#buffer#generate#Create() from ingo/buffer/scratch.vim.
+- Add ingo#plugin#cmdcomplete#MakeListExprCompleteFunc() variant of
+  ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc().
 
 ##### 1.031   27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in
