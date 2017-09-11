@@ -64,13 +64,16 @@ function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIs
 "*******************************************************************************
     let l:status = ingo#buffer#generate#Create(a:scratchDirspec, a:scratchFilename, a:scratchIsFile, a:scratchCommand, a:windowOpenCommand)
     if l:status != 0
-	call ingo#buffer#scratch#SetLocal(a:scratchIsFile)
+	call ingo#buffer#scratch#SetLocal(a:scratchIsFile, ! empty(a:scratchCommand))
     endif
     return l:status
 endfunction
-function! ingo#buffer#scratch#SetLocal( isFile )
+function! ingo#buffer#scratch#SetLocal( isFile, isInitialized )
     execute 'setlocal buftype=' . ingo#buffer#generate#BufType(a:isFile)
-    setlocal bufhidden=wipe nobuflisted noswapfile readonly
+    setlocal bufhidden=wipe nobuflisted noswapfile
+    if a:isInitialized
+	setlocal readonly
+    endif
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
