@@ -50,6 +50,31 @@ function! s:ObtainText( commandDefinition, filespec )
 endfunction
 
 function! ingo#ftplugin#converter#external#ToText( externalCommandDefinitionsVariable, arguments, filespec )
+"******************************************************************************
+"* PURPOSE:
+"   Build a command that converts the current buffer via an external command to
+"   just text.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Takes over the current buffer, replaces its contents, changes its filetype
+"   and locks further editing.
+"* INPUTS:
+"   a:externalCommandDefinitionsVariable    Name of a List of Definitions
+"					    objects:
+"	command:    External command to execute.
+"	commandline:printf() (or ingo#format#Format()) template for inserting
+"		    command and a:filespec to build the command-line to execute.
+"	filetype:   Optional value to :setlocal filetype to (default: "text")
+"	extension:  Optional file extension (for
+"		    ingo#ftplugin#converter#external#ExtractText())
+"* USAGE:
+"   command! -bar -nargs=? FooToText call setline(1, getline(1)) |
+"   \   if ! ingo#ftplugin#converter#external#ToText('g:foo_converters',
+"   \   <q-args>, bufname('')) | echoerr ingo#err#Get() | endif
+"* RETURN VALUES:
+"   1 if successful, 0 if ingo#err#Set().
+"******************************************************************************
     try
 	let l:commandDefinition = s:GetExternalCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
 	let l:text = s:ObtainText(l:commandDefinition, a:filespec)
@@ -70,6 +95,26 @@ function! ingo#ftplugin#converter#external#ToText( externalCommandDefinitionsVar
     endtry
 endfunction
 function! ingo#ftplugin#converter#external#ExtractText( externalCommandDefinitionsVariable, mods, arguments, filespec )
+"******************************************************************************
+"* PURPOSE:
+"   Build a command that converts the current buffer via an external command to
+"   another scratch buffer that contains just text.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Creates a new scratch buffer.
+"* INPUTS:
+"   a:externalCommandDefinitionsVariable    Name of a List of Definitions
+"					    objects (cp.
+"					    ingo#ftplugin#converter#external#ToText())
+"* USAGE:
+"   command! -bar -nargs=? FooExtractText
+"   \   if ! ingo#ftplugin#converter#external#ExtractText('g:foo_converters',
+"   \   ingo#compat#command#Mods('<mods>'), <q-args>, bufname('')) |
+"   \   echoerr ingo#err#Get() | endif
+"* RETURN VALUES:
+"   1 if successful, 0 if ingo#err#Set().
+"******************************************************************************
     try
 	let l:commandDefinition = s:GetExternalCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
 	let l:text = s:ObtainText(l:commandDefinition, a:filespec)

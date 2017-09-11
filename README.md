@@ -109,6 +109,7 @@ HISTORY
 - Extract generic ingo#buffer#generate#Create() from ingo/buffer/scratch.vim.
 - Add ingo#plugin#cmdcomplete#MakeListExprCompleteFunc() variant of
   ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc().
+- Add ingo/ftplugin/converter/external.vim module.
 
 ##### 1.031   27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in
