@@ -48,7 +48,10 @@ function! s:Join( distinctLists, commons )
     while ! empty(a:distinctLists) || ! empty(a:commons)
 	if ! empty(a:distinctLists)
 	    let l:distinctList = remove(a:distinctLists, 0)
-	    call add(l:result, s:Translate(l:distinctList))
+	    let l:creation = s:Create(l:distinctList)[0]
+	    if ! empty(l:creation)
+		call add(l:result, '{' . l:creation . '}')
+	    endif
 	endif
 
 	if ! empty(a:commons)
@@ -58,9 +61,9 @@ function! s:Join( distinctLists, commons )
 
     return join(l:result, '')
 endfunction
-function! s:Translate( distinctList )
+function! s:Create( distinctList )
     if empty(a:distinctList)
-	return ''
+	return ['', 0]
     endif
 
     let [l:sequenceLen, l:stride] = ingo#list#sequence#FindNumerical(a:distinctList)
@@ -72,13 +75,20 @@ function! s:Translate( distinctList )
 	\   (ingo#compat#abs(l:stride) == 1 ? '' : '..' . l:stride)
 
 	if l:sequenceLen < len(a:distinctList)
-	    let l:result = '{' . l:result . '},' . join(a:distinctList[l:sequenceLen :], ',')
+	    " Search for further sequences in the surplus elements. If this is a
+	    " sequence, we have to enclose it in {...}. A normal brace list can
+	    " just be appended.
+	    let [l:surplusResult, l:isSurplusSequence] = s:Create(a:distinctList[l:sequenceLen :])
+	    let l:result = '{' . l:result . '},' . (l:isSurplusSequence ?
+	    \   '{' . l:surplusResult . '}' :
+	    \   l:surplusResult
+	    \)
 	endif
-    else
-	let l:result = join(a:distinctList, ',')
-    endif
 
-    return '{' . l:result . '}'
+	return [l:result, 1]
+    else
+	return [join(a:distinctList, ','), 0]
+    endif
 endfunction
 
 function! subs#BraceCreation#Queried( text )
