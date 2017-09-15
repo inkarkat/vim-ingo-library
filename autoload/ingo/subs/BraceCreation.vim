@@ -12,6 +12,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	002	16-Sep-2017	FIX: Need to escape commas in brace items, and
+"				literal {..} to avoid that these are interpreted
+"				as (separators of a) brace expression.
 "	001	12-Aug-2017	file creation
 let s:save_cpo = &cpo
 set cpo&vim
@@ -87,7 +90,14 @@ function! s:Create( distinctList )
 
 	return [l:result, 1]
     else
-	return [join(a:distinctList, ','), 0]
+	return [join(map(a:distinctList, 's:Escape(v:val)'), ','), 0]
+    endif
+endfunction
+function! s:Escape( braceItem )
+    if a:braceItem =~# '{.*}'
+	return escape(a:braceItem, '{},')
+    else
+	return escape(a:braceItem, ',')
     endif
 endfunction
 
