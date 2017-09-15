@@ -16,6 +16,8 @@
 "				literal {..} to avoid that these are interpreted
 "				as (separators of a) brace expression.
 "				Factor out subs#BraceCreation#FromList().
+"				Move wrapping in {...} inside s:Create(), now
+"				with an additional a:isWrap argument.
 "	001	12-Aug-2017	file creation
 let s:save_cpo = &cpo
 set cpo&vim
@@ -54,10 +56,7 @@ function! s:Join( distinctLists, commons )
     while ! empty(a:distinctLists) || ! empty(a:commons)
 	if ! empty(a:distinctLists)
 	    let l:distinctList = remove(a:distinctLists, 0)
-	    let l:creation = s:Create(l:distinctList)[0]
-	    if ! empty(l:creation)
-		call add(l:result, '{' . l:creation . '}')
-	    endif
+	    call add(l:result, s:Create(l:distinctList, 1)[0])
 	endif
 
 	if ! empty(a:commons)
@@ -67,7 +66,7 @@ function! s:Join( distinctLists, commons )
 
     return join(l:result, '')
 endfunction
-function! s:Create( distinctList )
+function! s:Create( distinctList, isWrap )
     if empty(a:distinctList)
 	return ['', 0]
     endif
@@ -84,24 +83,28 @@ function! s:Create( distinctList )
 	    " Search for further sequences in the surplus elements. If this is a
 	    " sequence, we have to enclose it in {...}. A normal brace list can
 	    " just be appended.
-	    let [l:surplusResult, l:isSurplusSequence] = s:Create(a:distinctList[l:sequenceLen :])
-	    let l:result = '{' . l:result . '},' . (l:isSurplusSequence ?
-	    \   '{' . l:surplusResult . '}' :
-	    \   l:surplusResult
-	    \)
+	    let [l:surplusResult, l:isSurplusSequence] = s:Create(a:distinctList[l:sequenceLen :], 0)
+	    let l:result = s:Brace(l:result) . ',' . s:Brace(l:surplusResult, l:isSurplusSequence)
 	endif
 
-	return [l:result, 1]
+	return [s:Brace(l:result), a:isWrap]
     else
-	return [join(map(a:distinctList, 's:Escape(v:val)'), ','), 0]
+	let l:nonEmptyList = filter(copy(a:distinctList), '! empty(v:val)')
+	" if len(l:nonEmptyList) == 1
+	"     return [s:Wrap('[]', l:nonEmptyList[0]), 0]
+	" endif
+
+	return [s:Brace(join(map(a:distinctList, 's:Escape(v:val)'), ','), a:isWrap), 0]
     endif
 endfunction
+function! s:Wrap( wrap, string, ... )
+    return (! a:0 || a:0 && a:1 ? a:wrap[0] . a:string . a:wrap[1] : a:string)
+endfunction
+function! s:Brace( string, ... )
+    return call('s:Wrap', ['{}', a:string] + a:000)
+endfunction
 function! s:Escape( braceItem )
-    if a:braceItem =~# '{.*}'
-	return escape(a:braceItem, '{},')
-    else
-	return escape(a:braceItem, ',')
-    endif
+    return escape(a:braceItem, '{},')
 endfunction
 
 function! subs#BraceCreation#Queried( text )
