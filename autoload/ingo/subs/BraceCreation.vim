@@ -15,11 +15,12 @@
 "	002	16-Sep-2017	FIX: Need to escape commas in brace items, and
 "				literal {..} to avoid that these are interpreted
 "				as (separators of a) brace expression.
+"				Factor out subs#BraceCreation#FromList().
 "	001	12-Aug-2017	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! subs#BraceCreation#Do( text, ... )
+function! subs#BraceCreation#FromSplitString( text, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Split a:text into WORDs (or on a:separatorPattern), extract common
@@ -41,8 +42,10 @@ function! subs#BraceCreation#Do( text, ... )
     if len(l:strings) <= 1
 	throw 'Only one string'
     endif
-
-    let [l:distinctLists, l:commons] = ingo#list#lcs#FindAllCommon(l:strings)
+    return subs#BraceCreation#FromList(l:strings)
+endfunction
+function! subs#BraceCreation#FromList( list )
+    let [l:distinctLists, l:commons] = ingo#list#lcs#FindAllCommon(a:list)
 
     return s:Join(l:distinctLists, l:commons)
 endfunction
@@ -105,7 +108,7 @@ function! subs#BraceCreation#Queried( text )
     if ! g:TextTransformContext.isRepeat
 	let s:separatorPattern = input('Enter separator pattern: ')
     endif
-    return subs#BraceCreation#Do(a:text, s:separatorPattern)
+    return subs#BraceCreation#FromSplitString(a:text, s:separatorPattern)
 endfunction
 
 let &cpo = s:save_cpo
