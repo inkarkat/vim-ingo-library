@@ -34,29 +34,52 @@ function! subs#BraceCreation#FromSplitString( text, ... )
 "* INPUTS:
 "   a:text  Source text with multiple strings.
 "   a:separatorPattern  Regular expression to separate the source text into
-"			strings. Defaults to whitespace.
+"			strings. Defaults to whitespace (also when empty string
+"			is passed).
+"   a:options           Additional options; see subs#BraceCreation#FromList().
 "* RETURN VALUES:
 "   Brace Expression.
 "******************************************************************************
-    let l:separatorPattern = (a:0 ? a:1 : '\_s\+')
+    let l:separatorPattern = (a:0 && ! empty(a:1) ? a:1 : '\_s\+')
 
     let l:strings = split(a:text, l:separatorPattern)
     if len(l:strings) <= 1
 	throw 'Only one string'
     endif
-    return subs#BraceCreation#FromList(l:strings)
+    return subs#BraceCreation#FromList(l:strings, (a:0 >= 2 ? a:2 : {}))
 endfunction
-function! subs#BraceCreation#FromList( list )
+function! subs#BraceCreation#FromList( list, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Extract common substrings in a:list, and turn these into a (shorter) Brace
+"   Expression, like in Bash.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:list      List of strings.
+"   a:options.optionalElementInSquareBraces
+"		Flag whether a single optional element is denoted as [elem]
+"		instead of {elem,} (or {,elem}, or even {,,elem,}; i.e. the
+"		bidirectional equivalence is lost, but the notation is more
+"		readable.
+"   a:options.uniqueElements
+"		Flag whether duplicate elements are removed, so that only unique
+"		strings are contained in there.
+"* RETURN VALUES:
+"   Brace Expression.
+"******************************************************************************
     let [l:distinctLists, l:commons] = ingo#list#lcs#FindAllCommon(a:list)
 
-    return s:Join(l:distinctLists, l:commons)
+    return s:Join(l:distinctLists, l:commons, (a:0 ? a:1 : {}))
 endfunction
-function! s:Join( distinctLists, commons )
+function! s:Join( distinctLists, commons, options )
     let l:result = []
     while ! empty(a:distinctLists) || ! empty(a:commons)
 	if ! empty(a:distinctLists)
 	    let l:distinctList = remove(a:distinctLists, 0)
-	    call add(l:result, s:Create(l:distinctList, 1)[0])
+	    call add(l:result, s:Create(a:options, l:distinctList, 1)[0])
 	endif
 
 	if ! empty(a:commons)
@@ -66,7 +89,7 @@ function! s:Join( distinctLists, commons )
 
     return join(l:result, '')
 endfunction
-function! s:Create( distinctList, isWrap )
+function! s:Create( options, distinctList, isWrap )
     if empty(a:distinctList)
 	return ['', 0]
     endif
@@ -83,16 +106,18 @@ function! s:Create( distinctList, isWrap )
 	    " Search for further sequences in the surplus elements. If this is a
 	    " sequence, we have to enclose it in {...}. A normal brace list can
 	    " just be appended.
-	    let [l:surplusResult, l:isSurplusSequence] = s:Create(a:distinctList[l:sequenceLen :], 0)
+	    let [l:surplusResult, l:isSurplusSequence] = s:Create(a:options, a:distinctList[l:sequenceLen :], 0)
 	    let l:result = s:Brace(l:result) . ',' . s:Brace(l:surplusResult, l:isSurplusSequence)
 	endif
 
 	return [s:Brace(l:result), a:isWrap]
     else
-	let l:nonEmptyList = filter(copy(a:distinctList), '! empty(v:val)')
-	" if len(l:nonEmptyList) == 1
-	"     return [s:Wrap('[]', l:nonEmptyList[0]), 0]
-	" endif
+	if get(a:options, 'optionalElementInSquareBraces', 0)
+	    let l:nonEmptyList = filter(copy(a:distinctList), '! empty(v:val)')
+	    if len(l:nonEmptyList) == 1
+		return [s:Wrap('[]', l:nonEmptyList[0]), 0]
+	    endif
+	endif
 
 	return [s:Brace(join(map(a:distinctList, 's:Escape(v:val)'), ','), a:isWrap), 0]
     endif
