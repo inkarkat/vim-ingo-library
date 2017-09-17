@@ -38,7 +38,8 @@ function! subs#BraceCreation#FromSplitString( text, ... )
 "			is passed).
 "   a:options           Additional options; see subs#BraceCreation#FromList().
 "* RETURN VALUES:
-"   Brace Expression.
+"   Brace Expression. Returns braced and comma-separated original items if no
+"   common substrings could be extracted.
 "******************************************************************************
     let l:separatorPattern = (a:0 && ! empty(a:1) ? a:1 : '\_s\+')
 
@@ -59,6 +60,13 @@ function! subs#BraceCreation#FromList( list, ... )
 "   None.
 "* INPUTS:
 "   a:list      List of strings.
+"   a:options.returnValueOnFailure
+"		Return value if there are no common substrings (or in strict
+"		mode the common substrings are not a prefix or suffix).
+"   a:options.strict
+"		Flag whether it must be possible to mechanically expand the
+"		result back into the original strings. This means that
+"		opportunities to extract multiple substrings are not taken.
 "   a:options.optionalElementInSquareBraces
 "		Flag whether a single optional element is denoted as [elem]
 "		instead of {elem,} (or {,elem}, or even {,,elem,}; i.e. the
@@ -68,11 +76,48 @@ function! subs#BraceCreation#FromList( list, ... )
 "		Flag whether duplicate elements are removed, so that only unique
 "		strings are contained in there.
 "* RETURN VALUES:
-"   Brace Expression.
+"   Brace Expression. Returns braced and comma-separated original items if no
+"   common substrings could be extracted (or a:options.returnValueOnFailure).
 "******************************************************************************
+    let l:options = (a:0 ? a:1 : {})
     let [l:distinctLists, l:commons] = ingo#list#lcs#FindAllCommon(a:list)
+    let l:isFailure = empty(l:commons)
+
+    if ! l:isFailure && get(l:options, 'strict', 0)
+	let [l:isFailure, l:distinctLists, l:commons] = s:ToStrict(a:list, l:distinctLists, l:commons)
+    endif
+
+    if l:isFailure && has_key(l:options, 'returnValueOnFailure')
+	return a:options.returnValueOnFailure
+    endif
 
     return s:Join(l:distinctLists, l:commons, (a:0 ? a:1 : {}))
+endfunction
+function! s:ToStrict( list, distinctLists, commons )
+    if ! empty(a:distinctLists[0]) && ! empty(a:distinctLists[-1])
+	" Join the original strings.
+	return [1, [a:list], []]
+    elseif len(a:commons) > (empty(a:distinctLists[0]) && empty(a:distinctLists[-1]) ? 2 : 1)
+	if empty(a:distinctLists[0]) && empty(a:distinctLists[-1])
+	    " Use first and last common, combine inner.
+	    return [0, [[]] + s:Recombine(a:distinctLists[1:-2], a:commons[1:-2]) + [[]], [a:commons[0], a:commons[-1]]]
+	elseif empty(a:distinctLists[0])
+	    " Use first common, combine rest.
+	    return [0, [[]] + s:Recombine(a:distinctLists[1:], a:commons[1:]), [a:commons[0]]]
+	elseif empty(a:distinctLists[-1])
+	    " Use last common, combine rest.
+	    return [0, s:Recombine(a:distinctLists[0: -2], a:commons[0: -2]) + [[]], [a:commons[-1]]]
+	endif
+    endif
+    return [0, a:distinctLists, a:commons]
+endfunction
+function! s:Recombine( distinctLists, commons )
+    let l:realDistincts = filter(copy(a:distinctLists), '! empty(v:val)')
+    let l:distinctNum = len(l:realDistincts[0])
+    let l:distinctAndCommonsIntermingled = ingo#list#Join(l:realDistincts, map(copy(a:commons), 'repeat([v:val], l:distinctNum)'))
+    let l:indexedElementsTogether = call('ingo#list#Zip', l:distinctAndCommonsIntermingled)
+    let l:joinedIndividualElements = map(l:indexedElementsTogether, 'join(v:val, "")')
+    return [l:joinedIndividualElements]
 endfunction
 function! s:Join( distinctLists, commons, options )
     let l:result = []
