@@ -94,17 +94,20 @@ function! subs#BraceCreation#FromList( list, ... )
     return s:Join(l:distinctLists, l:commons, (a:0 ? a:1 : {}))
 endfunction
 function! s:ToStrict( list, distinctLists, commons )
-    if ! empty(a:distinctLists[0]) && ! empty(a:distinctLists[-1])
+    let l:isCommonPrefix = empty(a:distinctLists[0])
+    let l:isCommonSuffix = empty(a:distinctLists[-1])
+
+    if ! l:isCommonPrefix && ! l:isCommonSuffix
 	" Join the original strings.
 	return [1, [a:list], []]
-    elseif len(a:commons) > (empty(a:distinctLists[0]) && empty(a:distinctLists[-1]) ? 2 : 1)
-	if empty(a:distinctLists[0]) && empty(a:distinctLists[-1])
+    elseif len(a:commons) > (l:isCommonPrefix && l:isCommonSuffix ? 2 : 1)
+	if l:isCommonPrefix && l:isCommonSuffix
 	    " Use first and last common, combine inner.
 	    return [0, [[]] + s:Recombine(a:distinctLists[1:-2], a:commons[1:-2]) + [[]], [a:commons[0], a:commons[-1]]]
-	elseif empty(a:distinctLists[0])
+	elseif l:isCommonPrefix
 	    " Use first common, combine rest.
 	    return [0, [[]] + s:Recombine(a:distinctLists[1:], a:commons[1:]), [a:commons[0]]]
-	elseif empty(a:distinctLists[-1])
+	elseif l:isCommonSuffix
 	    " Use last common, combine rest.
 	    return [0, s:Recombine(a:distinctLists[0: -2], a:commons[0: -2]) + [[]], [a:commons[-1]]]
 	endif
