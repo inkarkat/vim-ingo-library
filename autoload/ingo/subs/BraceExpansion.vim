@@ -6,7 +6,7 @@
 "   - ingo/compat.vim autoload script
 "   - ingo/escape.vim autoload script
 "
-" Copyright: (C) 2016 Ingo Karkat
+" Copyright: (C) 2016-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -117,8 +117,7 @@ endfunction
 function! subs#BraceExpansion#Do( text, ... )
 "******************************************************************************
 "* PURPOSE:
-"	Expand "foo{x,y}" inside a:text to "foox fooy", like Bash's brace
-"	expansion.
+"   Expand "foo{x,y}" inside a:text to "foox fooy", like Bash's Brace Expansion.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
