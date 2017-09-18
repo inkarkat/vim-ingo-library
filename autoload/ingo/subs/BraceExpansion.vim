@@ -128,17 +128,7 @@ endfunction
 function! subs#BraceExpansion#ExpandMinimal( word, joiner )
     let [l:nestingLevel, l:processedText] = s:ProcessBraces(a:word)
     let l:collections = s:ExpandOneLevel(function('s:Collect'), l:processedText, l:nestingLevel)
-
-    let l:cardinalities = ingo#compat#uniq(sort(
-    \   map(
-    \       filter(copy(l:collections), 'type(v:val) == type([])'),
-    \       'len(v:val)'
-    \   )))
-
-    let l:expansionNum = s:CalculateExpansionNumber(l:cardinalities)
-    call map(l:collections, 's:Multiply(ingo#list#Make(v:val), l:expansionNum)')
-
-    let l:expansions = s:CollectionsToExpansions(l:collections, l:expansionNum)
+    let l:expansions = s:CollectionsToExpansions(l:collections)
     return join(l:expansions, a:joiner)
 endfunction
 function! s:CalculateExpansionNumber( cardinalities )
@@ -151,11 +141,20 @@ endfunction
 function! s:Multiply( elements, cardinalityNum )
     return repeat(a:elements, a:cardinalityNum / len(a:elements))
 endfunction
-function! s:CollectionsToExpansions( collections, expansionNum )
-    let l:expansions = repeat([''], a:expansionNum)
+function! s:CollectionsToExpansions( collections )
+    let l:cardinalities = ingo#compat#uniq(sort(
+    \   map(
+    \       filter(copy(a:collections), 'type(v:val) == type([])'),
+    \       'len(v:val)'
+    \   )))
+
+    let l:expansionNum = s:CalculateExpansionNumber(l:cardinalities)
+    call map(a:collections, 's:Multiply(ingo#list#Make(v:val), l:expansionNum)')
+
+    let l:expansions = repeat([''], l:expansionNum)
     while len(a:collections) > 0
 	let l:collection = remove(a:collections, 0)
-	for l:i in range(a:expansionNum)
+	for l:i in range(l:expansionNum)
 	    let l:expansions[l:i] .= l:collection[l:i]
 	endfor
     endwhile
