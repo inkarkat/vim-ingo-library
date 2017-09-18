@@ -102,7 +102,7 @@ function! s:ExpandOneLevel( TailCall, text, level )
 	let l:braceElements = split(l:braceList, s:MakeToken(a:level, ';'), 1)
 
 	if a:level > 1
-	    let l:braceElements = ingo#collections#Flatten1(map(l:braceElements, 's:ExpandOneLevel(a:TailCall, v:val, a:level - 1)'))
+	    let l:braceElements = ingo#collections#Flatten1(map(l:braceElements, 's:ExpandOneLevel("s:FlattenRecurse", v:val, a:level - 1)'))
 	endif
     endif
 
@@ -119,11 +119,7 @@ function! subs#BraceExpansion#ExpandStrict( word, joiner )
 endfunction
 
 function! s:Collect( TailCall, pre, braceElements, post, level )
-    if a:level > 1
-	return s:FlattenRecurse(a:TailCall, a:pre, a:braceElements, a:post, a:level)
-    else
-	return [a:pre, a:braceElements] + s:ExpandOneLevel(a:TailCall, a:post, a:level)
-    endif
+    return [a:pre, a:braceElements] + s:ExpandOneLevel(a:TailCall, a:post, a:level)
 endfunction
 function! subs#BraceExpansion#ExpandMinimal( word, joiner )
     let [l:nestingLevel, l:processedText] = s:ProcessBraces(a:word)
