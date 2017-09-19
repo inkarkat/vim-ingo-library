@@ -12,6 +12,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	004	20-Sep-2017	ENH: Implement minimal expansion that matches
+"				the default implementation in
+"				subs/BraceCreation.vim. Also introduce option
+"				flags that control the processing, and support
+"				the [opt] instead of {opt,}, here, too.
 "	003	02-Dec-2016	Refactoring: Factor out s:MakeToken().
 "	002	01-Dec-2016	ENH: Keep original separators between words.
 "				ENH: Also handle numeric and character
@@ -159,6 +164,9 @@ function! s:CollectionsToExpansions( collections )
     return l:expansions
 endfunction
 
+function! s:ConvertOptionalElementInSquareBraces( expression )
+    return substitute(a:expression, '\[\([^\]]\+\)\]', '{\1,}', 'g')
+endfunction
 function! subs#BraceExpansion#ExpandToList( expression, options )
 "******************************************************************************
 "* PURPOSE:
@@ -177,6 +185,9 @@ function! subs#BraceExpansion#ExpandToList( expression, options )
 "			    {foo,bar}To{Me,You} ~
 "			    true:  fooToMe fooToYou barToMe barToYou
 "			    false: fooToMe barToYou
+"   a:options.optionalElementInSquareBraces
+"		Flag whether to also handle a single optional element denoted as
+"		[elem] instead of {elem,}.
 "* RETURN VALUES:
 "   All expanded values of the brace expression as a List of Strings.
 "******************************************************************************
@@ -185,7 +196,10 @@ function! subs#BraceExpansion#ExpandToList( expression, options )
     \       'subs#BraceExpansion#ExpandStrict' :
     \       'subs#BraceExpansion#ExpandMinimal'
     \   ),
-    \   [a:expression]
+    \   [get(a:options, 'optionalElementInSquareBraces', 0) ?
+    \       s:ConvertOptionalElementInSquareBraces(a:expression) :
+    \       a:expression
+    \   ]
     \)
 endfunction
 function! subs#BraceExpansion#ExpandToString( expression, joiner, options )
