@@ -13,6 +13,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	003	20-Sep-2017	ENH: Implement strict mode in addition to my
+"				laxer implementation. Add option flags for a
+"				single optional element to be written as [opt]
+"				instead of {opt,}, and to deduplicate identical
+"				elements.
 "	002	16-Sep-2017	FIX: Need to escape commas in brace items, and
 "				literal {..} to avoid that these are interpreted
 "				as (separators of a) brace expression.
