@@ -108,14 +108,17 @@ function! s:ExpandOneLevel( TailCall, text, level )
 
     return call(a:TailCall, [a:TailCall, l:pre, l:braceElements, l:post, a:level])
 endfunction
+function! s:JoinExpansions( expansions, joiner )
+    call map(a:expansions, 'ingo#escape#Unescape(v:val, "\\{}")')
+    return join(a:expansions, a:joiner)
+endfunction
 function! s:FlattenRecurse( TailCall, pre, braceElements, post, level )
     return ingo#collections#Flatten1(map(a:braceElements, 's:ExpandOneLevel(a:TailCall, a:pre . v:val . a:post, a:level)'))
 endfunction
 function! subs#BraceExpansion#ExpandStrict( word, joiner )
     let [l:nestingLevel, l:processedText] = s:ProcessBraces(a:word)
     let l:expansions = s:ExpandOneLevel(function('s:FlattenRecurse'), l:processedText, l:nestingLevel)
-    call map(l:expansions, 'ingo#escape#Unescape(v:val, "\\{}")')
-    return join(l:expansions, a:joiner)
+    return s:JoinExpansions(l:expansions, a:joiner)
 endfunction
 
 function! s:Collect( TailCall, pre, braceElements, post, level )
@@ -125,7 +128,7 @@ function! subs#BraceExpansion#ExpandMinimal( word, joiner )
     let [l:nestingLevel, l:processedText] = s:ProcessBraces(a:word)
     let l:collections = s:ExpandOneLevel(function('s:Collect'), l:processedText, l:nestingLevel)
     let l:expansions = s:CollectionsToExpansions(l:collections)
-    return join(l:expansions, a:joiner)
+    return s:JoinExpansions(l:expansions, a:joiner)
 endfunction
 function! s:CalculateExpansionNumber( cardinalities )
     let l:num = 1
