@@ -1,6 +1,7 @@
 " subs/BraceCreation.vim: Condense multiple strings into a Brace Expression like in Bash.
 "
 " DEPENDENCIES:
+"   - ingo/collections.vim autoload script
 "   - ingo/compat.vim autoload script
 "   - ingo/list.vim autoload script
 "   - ingo/list/lcs.vim autoload script
@@ -67,6 +68,9 @@ function! subs#BraceCreation#FromList( list, ... )
 "		Flag whether it must be possible to mechanically expand the
 "		result back into the original strings. This means that
 "		opportunities to extract multiple substrings are not taken.
+"   a:options.short
+"		Flag to enable all optimizations, i.e.
+"		optionalElementInSquareBraces and uniqueElements.
 "   a:options.optionalElementInSquareBraces
 "		Flag whether a single optional element is denoted as [elem]
 "		instead of {elem,} (or {,elem}, or even {,,elem,}; i.e. the
@@ -80,6 +84,11 @@ function! subs#BraceCreation#FromList( list, ... )
 "   common substrings could be extracted (or a:options.returnValueOnFailure).
 "******************************************************************************
     let l:options = (a:0 ? a:1 : {})
+    if has_key(l:options, 'short')
+	let l:options.optionalElementInSquareBraces = 1
+	let l:options.uniqueElements = 1
+    endif
+
     let [l:distinctLists, l:commons] = ingo#list#lcs#FindAllCommon(a:list)
     let l:isFailure = empty(l:commons)
 
@@ -127,6 +136,11 @@ function! s:Join( distinctLists, commons, options )
     while ! empty(a:distinctLists) || ! empty(a:commons)
 	if ! empty(a:distinctLists)
 	    let l:distinctList = remove(a:distinctLists, 0)
+
+	    if get(a:options, 'uniqueElements', 0)
+		let l:distinctList = ingo#collections#UniqueStable(l:distinctList)
+	    endif
+
 	    call add(l:result, s:Create(a:options, l:distinctList, 1)[0])
 	endif
 
