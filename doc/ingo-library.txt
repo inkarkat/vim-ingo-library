@@ -94,6 +94,9 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.033	RELEASEME
+- Add ingo/subs/BraceCreation.vim and ingo/subs/BraceExpansion.vim modules.
+
 1.032	20-Sep-2017
 - ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
   when executed e.g. from within a |:map-expr|.

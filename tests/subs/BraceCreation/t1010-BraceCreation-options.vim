@@ -4,7 +4,7 @@ call vimtest#StartTap()
 call vimtap#Plan(7)
 
 function! s:Call( text, options )
-    return subs#BraceCreation#FromSplitString(a:text, '', a:options)
+    return ingo#subs#BraceCreation#FromSplitString(a:text, '', a:options)
 endfunction
 
 call vimtap#Is(s:Call('abc def zyz', {}), '{abc,def,zyz}', 'no common substrings')

@@ -4,7 +4,7 @@ call vimtest#StartTap()
 call vimtap#Plan(21)
 
 function! s:Call( text )
-    return subs#BraceCreation#FromSplitString(a:text)
+    return ingo#subs#BraceCreation#FromSplitString(a:text)
 endfunction
 
 call vimtap#Is(s:Call('fo! foX foo'), 'fo{!,X,o}', 'same prefix, different suffixes')
@@ -31,7 +31,7 @@ call vimtap#Is(s:Call('foobar foo} foo{ fooxy'), 'foo{bar,\},\{,xy}', 'embedded 
 call vimtap#Is(s:Call('abc def zyz'), '{abc,def,zyz}', 'no common substrings')
 call vimtap#Is(s:Call('abc abc abc'), 'abc', 'all common')
 
-call vimtap#Is(subs#BraceCreation#FromList(split('FooHasBoo FooIsBoo FooCanBoo', ' ')), 'Foo{Has,Is,Can}Boo', 'from list: two commons in outside')
-call vimtap#Is(subs#BraceCreation#FromList(split('abc def zyz', ' ')), '{abc,def,zyz}', 'from list: no common substrings')
+call vimtap#Is(ingo#subs#BraceCreation#FromList(split('FooHasBoo FooIsBoo FooCanBoo', ' ')), 'Foo{Has,Is,Can}Boo', 'from list: two commons in outside')
+call vimtap#Is(ingo#subs#BraceCreation#FromList(split('abc def zyz', ' ')), '{abc,def,zyz}', 'from list: no common substrings')
 
 call vimtest#Quit()

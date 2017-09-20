@@ -1,4 +1,4 @@
-" subs/BraceExpansion.vim: Generate arbitrary strings like in Bash.
+" ingo/subs/BraceExpansion.vim: Generate arbitrary strings like in Bash.
 "
 " DEPENDENCIES:
 "   - ingo/collections.vim autoload script
@@ -10,19 +10,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"	004	20-Sep-2017	ENH: Implement minimal expansion that matches
-"				the default implementation in
-"				subs/BraceCreation.vim. Also introduce option
-"				flags that control the processing, and support
-"				the [opt] instead of {opt,}, here, too.
-"	003	02-Dec-2016	Refactoring: Factor out s:MakeToken().
-"	002	01-Dec-2016	ENH: Keep original separators between words.
-"				ENH: Also handle numeric and character
-"				sequences.
-"				Add subs#BraceExpansion#Queried().
-"	001	30-Nov-2016	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 
@@ -119,7 +106,7 @@ endfunction
 function! s:FlattenRecurse( TailCall, pre, braceElements, post, level )
     return ingo#collections#Flatten1(map(a:braceElements, 's:ExpandOneLevel(a:TailCall, a:pre . v:val . a:post, a:level)'))
 endfunction
-function! subs#BraceExpansion#ExpandStrict( expression )
+function! ingo#subs#BraceExpansion#ExpandStrict( expression )
     let [l:nestingLevel, l:processedText] = s:ProcessBraces(a:expression)
     let l:expansions = s:ExpandOneLevel(function('s:FlattenRecurse'), l:processedText, l:nestingLevel)
     return s:UnescapeExpansions(l:expansions)
@@ -128,7 +115,7 @@ endfunction
 function! s:Collect( TailCall, pre, braceElements, post, level )
     return [a:pre, a:braceElements] + s:ExpandOneLevel(a:TailCall, a:post, a:level)
 endfunction
-function! subs#BraceExpansion#ExpandMinimal( expression )
+function! ingo#subs#BraceExpansion#ExpandMinimal( expression )
     let [l:nestingLevel, l:processedText] = s:ProcessBraces(a:expression)
     let l:collections = s:ExpandOneLevel(function('s:Collect'), l:processedText, l:nestingLevel)
     let l:expansions = s:CollectionsToExpansions(l:collections)
@@ -167,7 +154,7 @@ endfunction
 function! s:ConvertOptionalElementInSquareBraces( expression )
     return substitute(a:expression, '\[\([^\]]\+\)\]', '{\1,}', 'g')
 endfunction
-function! subs#BraceExpansion#ExpandToList( expression, options )
+function! ingo#subs#BraceExpansion#ExpandToList( expression, options )
 "******************************************************************************
 "* PURPOSE:
 "   Expand a brace expression into a List of expansions.
@@ -193,8 +180,8 @@ function! subs#BraceExpansion#ExpandToList( expression, options )
 "******************************************************************************
     return call(
     \   function(get(a:options, 'strict', 1) ?
-    \       'subs#BraceExpansion#ExpandStrict' :
-    \       'subs#BraceExpansion#ExpandMinimal'
+    \       'ingo#subs#BraceExpansion#ExpandStrict' :
+    \       'ingo#subs#BraceExpansion#ExpandMinimal'
     \   ),
     \   [get(a:options, 'optionalElementInSquareBraces', 0) ?
     \       s:ConvertOptionalElementInSquareBraces(a:expression) :
@@ -202,7 +189,7 @@ function! subs#BraceExpansion#ExpandToList( expression, options )
     \   ]
     \)
 endfunction
-function! subs#BraceExpansion#ExpandToString( expression, joiner, options )
+function! ingo#subs#BraceExpansion#ExpandToString( expression, joiner, options )
 "******************************************************************************
 "* PURPOSE:
 "   Expand a brace expression and join the expansions with a:joiner.
@@ -215,15 +202,15 @@ function! subs#BraceExpansion#ExpandToString( expression, joiner, options )
 "   a:joiner    Literal text to be used to join the expanded expressions;
 "		defaults to a <Space> character.
 "   a:options               Additional options; see
-"			    subs#BraceExpansion#ExpandToList().
+"			    ingo#subs#BraceExpansion#ExpandToList().
 "* RETURN VALUES:
 "   All expanded values of the brace expression, joined by a:joiner, in a single
 "   string.
 "******************************************************************************
-    return join(subs#BraceExpansion#ExpandToList(a:expression, a:options), a:joiner)
+    return join(ingo#subs#BraceExpansion#ExpandToList(a:expression, a:options), a:joiner)
 endfunction
 
-function! subs#BraceExpansion#Do( text, ... )
+function! ingo#subs#BraceExpansion#InsideText( text, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Expand "foo{x,y}" inside a:text to "foox fooy", like Bash's Brace Expansion.
@@ -239,7 +226,7 @@ function! subs#BraceExpansion#Do( text, ... )
 "			    braces are expanded; defaults to a:joiner or
 "			    any whitespace (also when empty string is passed).
 "   a:options               Additional options; see
-"			    subs#BraceExpansion#ExpandToList().
+"			    ingo#subs#BraceExpansion#ExpandToList().
 "* RETURN VALUES:
 "   a:text, separated by a:braceSeparatorPattern, each part had brace
 "   expressions expanded, then joined by a:joiner, and all put together again.
@@ -251,19 +238,12 @@ function! subs#BraceExpansion#Do( text, ... )
     let l:result = ingo#collections#fromsplit#MapItems(
     \   a:text,
     \   '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!' . l:braceSeparatorPattern,
-    \   printf('subs#BraceExpansion#ExpandToString(ingo#escape#UnescapeExpr(v:val, %s), %s, %s)',
+    \   printf('ingo#subs#BraceExpansion#ExpandToString(ingo#escape#UnescapeExpr(v:val, %s), %s, %s)',
     \       string(l:braceSeparatorPattern), string(l:joiner), string(l:options)
     \   )
     \)
 
     return join(l:result, '')
-endfunction
-
-function! subs#BraceExpansion#Queried( text )
-    if ! g:TextTransformContext.isRepeat
-	let s:joiner = input('Enter separator string: ')
-    endif
-    return subs#BraceExpansion#Do(a:text, s:joiner)
 endfunction
 
 let &cpo = s:save_cpo

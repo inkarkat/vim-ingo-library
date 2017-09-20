@@ -1,4 +1,4 @@
-" subs/BraceCreation.vim: Condense multiple strings into a Brace Expression like in Bash.
+" ingo/subs/BraceCreation.vim: Condense multiple strings into a Brace Expression like in Bash.
 "
 " DEPENDENCIES:
 "   - ingo/collections.vim autoload script
@@ -11,24 +11,10 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"	003	20-Sep-2017	ENH: Implement strict mode in addition to my
-"				laxer implementation. Add option flags for a
-"				single optional element to be written as [opt]
-"				instead of {opt,}, and to deduplicate identical
-"				elements.
-"	002	16-Sep-2017	FIX: Need to escape commas in brace items, and
-"				literal {..} to avoid that these are interpreted
-"				as (separators of a) brace expression.
-"				Factor out subs#BraceCreation#FromList().
-"				Move wrapping in {...} inside s:Create(), now
-"				with an additional a:isWrap argument.
-"	001	12-Aug-2017	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! subs#BraceCreation#FromSplitString( text, ... )
+function! ingo#subs#BraceCreation#FromSplitString( text, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Split a:text into WORDs (or on a:separatorPattern), extract common
@@ -42,7 +28,8 @@ function! subs#BraceCreation#FromSplitString( text, ... )
 "   a:separatorPattern  Regular expression to separate the source text into
 "			strings. Defaults to whitespace (also when empty string
 "			is passed).
-"   a:options           Additional options; see subs#BraceCreation#FromList().
+"   a:options           Additional options; see
+"			ingo#subs#BraceCreation#FromList().
 "* RETURN VALUES:
 "   Brace Expression. Returns braced and comma-separated original items if no
 "   common substrings could be extracted.
@@ -53,9 +40,9 @@ function! subs#BraceCreation#FromSplitString( text, ... )
     if len(l:strings) <= 1
 	throw 'Only one string'
     endif
-    return subs#BraceCreation#FromList(l:strings, (a:0 >= 2 ? a:2 : {}))
+    return ingo#subs#BraceCreation#FromList(l:strings, (a:0 >= 2 ? a:2 : {}))
 endfunction
-function! subs#BraceCreation#FromList( list, ... )
+function! ingo#subs#BraceCreation#FromList( list, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Extract common substrings in a:list, and turn these into a (shorter) Brace
@@ -197,13 +184,6 @@ function! s:Brace( string, ... )
 endfunction
 function! s:Escape( braceItem )
     return escape(a:braceItem, '{},')
-endfunction
-
-function! subs#BraceCreation#Queried( text )
-    if ! g:TextTransformContext.isRepeat
-	let s:separatorPattern = input('Enter separator pattern: ')
-    endif
-    return subs#BraceCreation#FromSplitString(a:text, s:separatorPattern)
 endfunction
 
 let &cpo = s:save_cpo

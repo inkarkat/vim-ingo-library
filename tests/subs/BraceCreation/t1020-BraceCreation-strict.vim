@@ -1,7 +1,7 @@
 " Test brace creation.
 
 function! s:Call( text )
-    return subs#BraceCreation#FromSplitString(a:text, '', {'strict': 1})
+    return ingo#subs#BraceCreation#FromSplitString(a:text, '', {'strict': 1})
 endfunction
 
 call vimtest#StartTap()

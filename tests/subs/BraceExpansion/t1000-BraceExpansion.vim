@@ -1,7 +1,7 @@
 " Test brace expansion.
 
 function! s:Call( text )
-    return join(subs#BraceExpansion#ExpandStrict(a:text), ' ')
+    return join(ingo#subs#BraceExpansion#ExpandStrict(a:text), ' ')
 endfunction
 
 call vimtest#StartTap()

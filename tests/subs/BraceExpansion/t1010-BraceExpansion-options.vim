@@ -4,7 +4,7 @@ call vimtest#StartTap()
 call vimtap#Plan(2)
 
 function! s:Call( text, options )
-    return subs#BraceExpansion#ExpandToString(a:text, ' ', a:options)
+    return ingo#subs#BraceExpansion#ExpandToString(a:text, ' ', a:options)
 endfunction
 
 call vimtap#Is(s:Call('Foo{Has,}Bo{o,o,x}', {}), 'FooHasBoo FooHasBoo FooHasBox FooBoo FooBoo FooBox', 'optional inner in default curly braces')

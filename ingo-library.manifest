@@ -142,6 +142,8 @@ autoload/ingo/str/restricted.vim
 autoload/ingo/str/split.vim
 autoload/ingo/strdisplaywidth.vim
 autoload/ingo/strdisplaywidth/pad.vim
+autoload/ingo/subs/BraceCreation.vim
+autoload/ingo/subs/BraceExpansion.vim
 autoload/ingo/subst.vim
 autoload/ingo/subst/expr/emulation.vim
 autoload/ingo/subst/pairs.vim

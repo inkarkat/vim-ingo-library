@@ -1,7 +1,7 @@
 " Test brace expansion with minimal amount of expansions.
 
 function! s:Call( text )
-    return join(subs#BraceExpansion#ExpandMinimal(a:text), ' ')
+    return join(ingo#subs#BraceExpansion#ExpandMinimal(a:text), ' ')
 endfunction
 
 call vimtest#StartTap()
