@@ -41,12 +41,12 @@ USAGE
 
 ### EXCEPTION HANDLING
 
-For exceptional conditions (e.g. cannot locate window that should be there)
-and programming errors (e.g. passing a wrong variable type to a library
-function), error strings are |:throw|n. These are prefixed with (something
-resembling) the short function name, so that it's possible to :catch these
-and e.g. convert them into a proper error (e.g. via
-ingo#err#SetCustomException()).
+    For exceptional conditions (e.g. cannot locate window that should be there)
+    and programming errors (e.g. passing a wrong variable type to a library
+    function), error strings are |:throw|n. These are prefixed with (something
+    resembling) the short function name, so that it's possible to :catch these
+    and e.g. convert them into a proper error (e.g. via
+    ingo#err#SetCustomException()).
 
 INSTALLATION
 ------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
-##### 1.032   RELEASEME
+##### 1.032   20-Sep-2017
 - ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
   when executed e.g. from within a :map-expr.
 - Add ingo/subst/replacement.vim module with functions originally in
