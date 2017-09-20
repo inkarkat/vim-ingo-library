@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2015 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -21,6 +21,8 @@ function! ingo#text#frompattern#GetHere( pattern, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Extract the match of a:pattern starting from the current cursor position.
+"* SEE ALSO:
+"   - ingo#area#frompattern#GetHere() returns the positions, not the match.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -47,6 +49,8 @@ function! ingo#text#frompattern#GetAroundHere( pattern, ... )
 "   Extract the match of a:pattern starting the match from the current cursor
 "   position, but (unlike ingo#text#frompattern#GetHere()), also include matched
 "   characters _before_ the current position.
+"* SEE ALSO:
+"   - ingo#area#frompattern#GetAroundHere() returns the positions, not the match.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -88,6 +92,7 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, replacement, 
 "* SEE ALSO:
 "   - ingo#str#frompattern#Get() extracts matches from a string / List of lines
 "     instead of the current buffer.
+"   - ingo#area#frompattern#Get() returns the positions, not the matches.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:

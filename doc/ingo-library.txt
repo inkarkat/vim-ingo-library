@@ -62,8 +62,8 @@ INSTALLATION					   *ingo-library-installation*
 The code is hosted in a Git repo at
     https://github.com/inkarkat/vim-ingo-library
 You can use your favorite plugin manager, or "git clone" into a directory used
-for Vim |packages|. Stable releases are on the "master" branch, the latest
-unstable snapshot on "develop".
+for Vim |packages|. Releases are on the "stable" branch, the latest unstable
+development snapshot on "master".
 
 This script is also packaged as a |vimball|. If you have the "gunzip"
 decompressor in your PATH, simply edit the *.vmb.gz package in Vim; otherwise,
@@ -93,6 +93,37 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 
 ==============================================================================
 HISTORY							*ingo-library-history*
+
+1.032	20-Sep-2017
+- ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
+  when executed e.g. from within a |:map-expr|.
+- Add ingo/subst/replacement.vim module with functions originally in
+  PatternsOnText.vim (vimscript #4602).
+- Add ingo/lines/empty.vim module.
+- CHG: Rename ingo#str#split#First() to ingo#str#split#MatchFirst() and add
+  ingo#str#split#StrFirst() variant that uses a fixed string, not a pattern.
+- Add ingo/list/lcs.vim module.
+- Add ingo#list#IsEmpty().
+- Add ingo/collection/find.vim module.
+- Add ingo/window.vim and ingo/window/adjacent modules.
+- Add ingo#list#Matches().
+- Add ingo/list/sequence.vim module.
+- Add ingo#fs#path#IsAbsolute() and ingo#fs#path#IsUpwards().
+- Add ingo/area/frompattern.vim module.
+- CHG: Rename ingo#selection#position#Get() to ingo#selection#area#Get().
+  Extend the function's API with options.
+- Add ingo#text#GetFromArea().
+- CHG: Rename ingo#text#replace#Area() to ingo#text#replace#Between() and add
+  ingo#text#replace#Area() that actually takes a (single) a:area argument.
+- Add ingo/area.vim module.
+- Add ingo#query#fromlist#QueryAsText() variant of
+  ingo#query#fromlist#Query().
+- ENH: ingo#buffer#scratch#Create(): Allow to set the scratch buffer contents
+  directly by passing a List as a:scratchCommand.
+- Extract generic ingo#buffer#generate#Create() from ingo/buffer/scratch.vim.
+- Add ingo#plugin#cmdcomplete#MakeListExprCompleteFunc() variant of
+  ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc().
+- Add ingo/ftplugin/converter/external.vim module.
 
 1.031	27-Jun-2017
 - FIX: Potentially invalid indexing of l:otherResult[l:i] in

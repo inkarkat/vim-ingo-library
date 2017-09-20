@@ -2,15 +2,35 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.009.001	27-Jun-2013	file creation
 
-function! ingo#str#split#First( expr, pattern )
+function! ingo#str#split#StrFirst( expr, str )
+"******************************************************************************
+"* PURPOSE:
+"   Split a:expr into the text before and after the first occurrence of a:str.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:expr  Text to be split.
+"   a:str   The literal text to split on.
+"* RETURN VALUES:
+"   Tuple of [beforeStr, afterStr].
+"   When there's no occurrence of a:str, the returned tuple is [a:expr, ''].
+"******************************************************************************
+    let l:startIdx = stridx(a:expr, a:str)
+    if l:startIdx == -1
+	return [a:expr, '']
+    endif
+
+    let l:endIdx = l:startIdx + len(a:str)
+    return [strpart(a:expr, 0, l:startIdx), strpart(a:expr, l:endIdx)]
+endfunction
+function! ingo#str#split#MatchFirst( expr, pattern )
 "******************************************************************************
 "* PURPOSE:
 "   Split a:expr into the text before and after the first match of a:pattern.

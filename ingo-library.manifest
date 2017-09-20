@@ -1,9 +1,12 @@
 autoload/ingo/actions.vim
 autoload/ingo/actions/iterations.vim
 autoload/ingo/actions/special.vim
+autoload/ingo/area.vim
+autoload/ingo/area/frompattern.vim
 autoload/ingo/avoidprompt.vim
 autoload/ingo/binary.vim
 autoload/ingo/buffer.vim
+autoload/ingo/buffer/generate.vim
 autoload/ingo/buffer/locate.vim
 autoload/ingo/buffer/scratch.vim
 autoload/ingo/buffer/temp.vim
@@ -23,6 +26,7 @@ autoload/ingo/cmdrangeconverter.vim
 autoload/ingo/codec/URL.vim
 autoload/ingo/collections.vim
 autoload/ingo/collections/differences.vim
+autoload/ingo/collections/find.vim
 autoload/ingo/collections/fromsplit.vim
 autoload/ingo/collections/memoized.vim
 autoload/ingo/collections/permute.vim
@@ -63,6 +67,7 @@ autoload/ingo/fs/path/asfilename.vim
 autoload/ingo/fs/path/split.vim
 autoload/ingo/fs/tempfile.vim
 autoload/ingo/fs/traversal.vim
+autoload/ingo/ftplugin/converter/external.vim
 autoload/ingo/ftplugin/onbufwinenter.vim
 autoload/ingo/ftplugin/windowsettings.vim
 autoload/ingo/funcref.vim
@@ -72,9 +77,12 @@ autoload/ingo/indent.vim
 autoload/ingo/join.vim
 autoload/ingo/line/replace.vim
 autoload/ingo/lines.vim
+autoload/ingo/lines/empty.vim
 autoload/ingo/lines/replace.vim
 autoload/ingo/list.vim
 autoload/ingo/list/find.vim
+autoload/ingo/list/lcs.vim
+autoload/ingo/list/sequence.vim
 autoload/ingo/list/split.vim
 autoload/ingo/mapmaker.vim
 autoload/ingo/matches.vim
@@ -121,9 +129,9 @@ autoload/ingo/search/buffer.vim
 autoload/ingo/search/pattern.vim
 autoload/ingo/search/timelimited.vim
 autoload/ingo/selection.vim
+autoload/ingo/selection/area.vim
 autoload/ingo/selection/frompattern.vim
 autoload/ingo/selection/patternmatch.vim
-autoload/ingo/selection/position.vim
 autoload/ingo/smartcase.vim
 autoload/ingo/str.vim
 autoload/ingo/str/find.vim
@@ -137,6 +145,7 @@ autoload/ingo/strdisplaywidth/pad.vim
 autoload/ingo/subst.vim
 autoload/ingo/subst/expr/emulation.vim
 autoload/ingo/subst/pairs.vim
+autoload/ingo/subst/replacement.vim
 autoload/ingo/swap.vim
 autoload/ingo/syntaxitem.vim
 autoload/ingo/system.vim
@@ -146,6 +155,8 @@ autoload/ingo/text/frompattern.vim
 autoload/ingo/text/replace.vim
 autoload/ingo/undo.vim
 autoload/ingo/units.vim
+autoload/ingo/window.vim
+autoload/ingo/window/adjacent.vim
 autoload/ingo/window/cmdwin.vim
 autoload/ingo/window/dimensions.vim
 autoload/ingo/window/locate.vim
