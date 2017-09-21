@@ -58,7 +58,7 @@ function! ingo#list#sequence#FindCharacter( list )
     endtry
 endfunction
 function! s:NotAChar()
-    throw NotAChar
+    throw 'NotAChar'
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
