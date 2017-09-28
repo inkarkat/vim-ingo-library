@@ -71,6 +71,8 @@ function! ingo#subs#BraceCreation#FromList( list, ... )
 "   a:options.uniqueElements
 "		Flag whether duplicate elements are removed, so that only unique
 "		strings are contained in there.
+"   a:options.minimumCommonLength       Minimum substring length; default 1.
+"   a:options.minimumDifferingLength    Minimum length; default 0.
 "* RETURN VALUES:
 "   Brace Expression. Returns braced and comma-separated original items if no
 "   common substrings could be extracted (or a:options.returnValueOnFailure).
@@ -81,7 +83,7 @@ function! ingo#subs#BraceCreation#FromList( list, ... )
 	let l:options.uniqueElements = 1
     endif
 
-    let [l:distinctLists, l:commons] = ingo#list#lcs#FindAllCommon(a:list)
+    let [l:distinctLists, l:commons] = ingo#list#lcs#FindAllCommon(a:list, get(l:options, 'minimumCommonLength', 1), get(l:options, 'minimumDifferingLength', 0))
     let l:isFailure = empty(l:commons)
 
     if ! l:isFailure && get(l:options, 'strict', 0)
