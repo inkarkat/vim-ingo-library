@@ -82,6 +82,7 @@ HISTORY
 
 ##### 1.033   RELEASEME
 - Add ingo/subs/BraceCreation.vim and ingo/subs/BraceExpansion.vim modules.
+- Add ingo#query#get#WritableRegister() variant of ingo#query#get#Register().
 
 ##### 1.032   20-Sep-2017
 - ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
