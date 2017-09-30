@@ -69,19 +69,21 @@ function! s:ExpandOneLevel( TailCall, text, level )
 	endif
 	let l:isNumericSequence = (len(filter(copy(l:sequenceElements), 'v:val !~# "^[+-]\\?\\d\\+$"')) == 0)
 	if l:isNumericSequence
-	    let l:step = ingo#compat#abs(get(l:sequenceElements, 2, 1))
+	    let l:numberElements = map(copy(l:sequenceElements), 'str2nr(v:val)')
+	    let l:step = ingo#compat#abs(get(l:numberElements, 2, 1))
 	    if l:step == 0 | let l:step = 1 | endif
 	    let l:isZeroPadding = (l:sequenceElements[0] =~# '^0\d' || l:sequenceElements[1] =~# '^0\d')
-	    if l:sequenceElements[0] > l:sequenceElements[1]
+	    if l:numberElements[0] > l:numberElements[1]
 		let l:step = l:step * -1
 	    endif
-	    let l:braceElements = range(l:sequenceElements[0], l:sequenceElements[1], l:step)
+	    let l:braceElements = range(l:numberElements[0], l:numberElements[1], l:step)
 
 	    if l:isZeroPadding
-		call map(l:braceElements, 'printf("%0" . strlen(max(l:braceElements)) . "d", v:val)')
+		let l:digitNum = max(map(l:sequenceElements[0:1], 'len(v:val)'))
+		call map(l:braceElements, 'printf("%0" . l:digitNum . "d", v:val)')
 	    endif
 	else
-	    let l:step = ingo#compat#abs(get(l:sequenceElements, 2, 1))
+	    let l:step = ingo#compat#abs(str2nr(get(l:sequenceElements, 2, 1)))
 	    if l:step == 0 | let l:step = 1 | endif
 	    let [l:nrParameter0, l:nrParameter1] = [char2nr(l:sequenceElements[0]), char2nr(l:sequenceElements[1])]
 	    if l:nrParameter0 > l:nrParameter1
