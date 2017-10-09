@@ -9,7 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
 function! ingo#buffer#scratch#NextFilename( filespec )
-    return ingo#buffer#scratch#NextBracketedFilename(a:filespec, 'Scratch')
+    return ingo#buffer#generate#NextBracketedFilename(a:filespec, 'Scratch')
 endfunction
 function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIsFile, scratchCommand, windowOpenCommand )
 "*******************************************************************************
@@ -62,7 +62,7 @@ function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIs
 "   method call into a try..catch block and :close the scratch buffer when an
 "   exception is thrown.
 "*******************************************************************************
-    let l:status = ingo#buffer#generate#Create(a:scratchDirspec, a:scratchFilename, a:scratchIsFile, a:scratchCommand, a:windowOpenCommand)
+    let l:status = ingo#buffer#generate#Create(a:scratchDirspec, a:scratchFilename, a:scratchIsFile, a:scratchCommand, a:windowOpenCommand, function('ingo#buffer#scratch#NextFilename'))
     if l:status != 0
 	call ingo#buffer#scratch#SetLocal(a:scratchIsFile, ! empty(a:scratchCommand))
     endif

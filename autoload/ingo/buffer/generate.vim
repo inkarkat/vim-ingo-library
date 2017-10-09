@@ -100,7 +100,7 @@ endfunction
 function! ingo#buffer#generate#BufType( isFile )
     return (a:isFile ? 'nowrite' : 'nofile')
 endfunction
-function! ingo#buffer#generate#Create( dirspec, filename, isFile, contentsCommand, windowOpenCommand )
+function! ingo#buffer#generate#Create( dirspec, filename, isFile, contentsCommand, windowOpenCommand, NextFilenameFuncref )
 "*******************************************************************************
 "* PURPOSE:
 "   Create (or re-use an existing) buffer (i.e. doesn't correspond to a file on
@@ -139,6 +139,10 @@ function! ingo#buffer#generate#Create( dirspec, filename, isFile, contentsComman
 "			to the lines.
 "   a:windowOpenCommand	Ex command to open the window, e.g. ":vnew" or
 "			":topleft new".
+"   a:NextFilenameFuncref   Funcref that is invoked (with a:filename) to
+"			    generate file names for the generated buffer should
+"			    the desired one (a:filename) already exist but not
+"			    be a generated buffer.
 "* RETURN VALUES:
 "   Indicator whether the buffer has been opened:
 "   0	Failed to open buffer.
@@ -170,16 +174,16 @@ function! ingo#buffer#generate#Create( dirspec, filename, isFile, contentsComman
 	    let l:status = 3
 	else
 	    " A buffer with the filespec is already loaded, but it contains an
-	    " existing file, not a file. As we don't want to jump to this
-	    " existing file, try again with the next filename.
-	    return ingo#buffer#generate#Create(a:dirspec, ingo#buffer#generate#NextFilename(a:filename), a:isFile, a:contentsCommand, a:windowOpenCommand)
+	    " existing file, not a generated file. As we don't want to jump to
+	    " this existing file, try again with the next filename.
+	    return ingo#buffer#generate#Create(a:dirspec, call(a:NextFilenameFuncref, [a:filename]), a:isFile, a:contentsCommand, a:windowOpenCommand, a:NextFilenameFuncref)
 	endif
     else
 	if getbufvar(l:bufnr, '&buftype') !=# ingo#buffer#generate#BufType(a:isFile)
 	    " A window with the filespec is already visible, but its buffer
-	    " contains an existing file, not a file. As we don't want to jump to
-	    " this existing file, try again with the next filename.
-	    return ingo#buffer#generate#Create(a:dirspec, ingo#buffer#generate#NextFilename(a:filename), a:isFile, a:contentsCommand, a:windowOpenCommand)
+	    " contains an existing file, not a generated file. As we don't want
+	    " to jump to this existing file, try again with the next filename.
+	    return ingo#buffer#generate#Create(a:dirspec, call(a:NextFilenameFuncref, [a:filename]), a:isFile, a:contentsCommand, a:windowOpenCommand, a:NextFilenameFuncref)
 	elseif l:winnr == l:currentWinNr
 	    let l:status = 1
 	else
