@@ -88,6 +88,7 @@ HISTORY
 - Add ingo#mbyte#virtcol#GetColOfVirtCol().
 - Expose ingo#plugin#marks#FindUnused(), and have it optionally take the
   considered marks.
+- Add ingo#plugin#marks#Reuse().
 
 ##### 1.032   20-Sep-2017
 - ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input

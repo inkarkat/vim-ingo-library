@@ -7,6 +7,51 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
+function! ingo#plugin#marks#Reuse( pos, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Locate (for reuse) an existing mark at a:pos.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:pos               Position, either [lnum, col] or the full [bufnum, lnum,
+"			col, off].
+"   a:consideredMarks   Optional String or List of marks that are considered.
+"			Defaults to lowercase and uppercase marks a-zA-Z.
+"* RETURN VALUES:
+"   Mark name, or empty String.
+"******************************************************************************
+    let l:consideredMarks = (a:0 ? a:1 : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    let l:pos = (len(a:pos) < 4 ? [0] + a:pos[0:1] + [0] : a:pos[0:3])
+
+    for l:mark in (type(l:consideredMarks) == type([]) ? l:consideredMarks : split(l:consideredMarks, '\zs'))
+	let l:targetPos = l:pos
+	if l:mark =~# '\u'
+	    if l:pos[0] == 0
+		" Uppercase marks have the buffer number as the first element.
+		let l:targetPos = [bufnr('')] + l:pos[1:]
+	    endif
+	else
+	    if l:pos[0] != 0 && l:pos[0] != bufnr('')
+		" The searched-for position is in another buffer, so local marks
+		" must not be considered.
+		continue
+	    else
+		" Lowercase marks have 0 as the first element.
+		let l:targetPos[0] = 0
+	    endif
+	endif
+
+	if getpos("'" . l:mark) == l:targetPos
+	    return l:mark
+	endif
+    endfor
+
+    return ''
+endfunction
+
 function! ingo#plugin#marks#FindUnused( ... )
 "******************************************************************************
 "* PURPOSE:
