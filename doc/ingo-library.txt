@@ -100,6 +100,8 @@ HISTORY							*ingo-library-history*
 - Add ingo#str#find#StartIndex().
 - Fix recursive invocations of ingo#buffer#generate#Create().
 - Add ingo#mbyte#virtcol#GetColOfVirtCol().
+- Expose ingo#plugin#marks#FindUnused(), and have it optionally take the
+  considered marks.
 
 1.032	20-Sep-2017
 - ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
