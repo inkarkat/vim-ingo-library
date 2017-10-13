@@ -7,15 +7,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.030.002	24-May-2017	ingo#syntaxitem#IsOnSyntax(): Factor out
-"				synstack() emulation into ingo#compat#synstack()
-"				and unify similar function variants.
-"				ENH: ingo#syntaxitem#IsOnSyntax(): Allow
-"				optional a:stopItemPattern to avoid considering
-"				syntax items at the bottom of the stack.
-"   1.005.001	02-May-2013	file creation
 
 function! ingo#syntaxitem#IsOnSyntax( pos, syntaxItemPattern, ... )
 "******************************************************************************
@@ -53,7 +44,7 @@ function! ingo#syntaxitem#IsOnSyntax( pos, syntaxItemPattern, ... )
 	let l:actualSyntaxItemName = synIDattr(l:id, 'name')
 	let l:effectiveSyntaxItemName = synIDattr(synIDtrans(l:id), 'name')
 "****D echomsg '****' l:actualSyntaxItemName . '->' . l:effectiveSyntaxItemName
-	if a:0 && (l:actualSyntaxItemName =~# a:1 || l:effectiveSyntaxItemName =~# a:1)
+	if a:0 && ! empty(a:1) && (l:actualSyntaxItemName =~# a:1 || l:effectiveSyntaxItemName =~# a:1)
 	    return 0
 	endif
 	if l:actualSyntaxItemName =~# a:syntaxItemPattern || l:effectiveSyntaxItemName =~# a:syntaxItemPattern
