@@ -92,6 +92,7 @@ HISTORY
 - BUG: ingo#syntaxitem#IsOnSyntax() considers empty a:stopItemPattern as
   unconditional stop.
 - Add ingo#regexp#build#UnderCursor().
+- Add ingo#escape#command#mapeval().
 
 ##### 1.032   20-Sep-2017
 - ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
