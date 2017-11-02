@@ -16,8 +16,13 @@ function! ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc( argumentList, ... )
 "   Define a complete function for :command -complete=customlist that completes
 "   from a static list of possible arguments.
 "* USAGE:
-"   :execute 'command! -complete=customlist,' .
-"	ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc(['foo', 'fox', 'bar']) ...
+"   call ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc(
+"   \   ['foo', 'fox', 'bar'], 'FooCompleteFunc')
+"   command! -complete=customlist,FooCompleteFunc Foo ...
+"	or alternatively
+"   execute 'command! -complete=customlist,' .
+"	ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc(
+"	\   ['foo', 'fox', 'bar']) . 'Foo ...'
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -50,7 +55,11 @@ function! ingo#plugin#cmdcomplete#MakeListExprCompleteFunc( argumentExpr, ... )
 "   Define a complete function for :command -complete=customlist that completes
 "   from a (dynamically invoked) expression.
 "* USAGE:
-"   :execute 'command! -complete=customlist,' .
+"   call ingo#plugin#cmdcomplete#MakeListExprCompleteFunc(
+"   \   'map(copy(g:values), "v:val[0:3]")', 'FooCompleteFunc')
+"   command! -complete=customlist,FooCompleteFunc Foo ...
+"	or alternatively
+"   execute 'command! -complete=customlist,' .
 "	ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc(
 "	\   'map(copy(g:values), "v:val[0:3]")') ...
 "* ASSUMPTIONS / PRECONDITIONS:
