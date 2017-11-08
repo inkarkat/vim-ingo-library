@@ -93,6 +93,8 @@ HISTORY
   unconditional stop.
 - Add ingo#regexp#build#UnderCursor().
 - Add ingo#escape#command#mapeval().
+- Add ingo#range#IsEntireBuffer().
+- Add ingo/compat/commands.vim module.
 
 ##### 1.032   20-Sep-2017
 - ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
