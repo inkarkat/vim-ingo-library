@@ -7,14 +7,13 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.029.004	13-Jan-2017	Add ingo#register#GetAsList().
-"   1.015.003	18-Nov-2013	FIX: Actually return the result of a Funcref
-"				passed to
-"				ingo#register#KeepRegisterExecuteOrFunc().
-"   1.014.002	27-Oct-2013	Add ingo#register#KeepRegisterExecuteOrFunc().
-"   1.011.001	09-Jul-2013	file creation
+
+function! ingo#register#All()
+    return '[-a-zA-Z0-9":.%#=*+~/]'
+endfunction
+function! ingo#register#Writable()
+    return '[-a-zA-Z0-9"*+_/]'
+endfunction
 
 function! ingo#register#Default()
     let l:values = split(&clipboard, ',')

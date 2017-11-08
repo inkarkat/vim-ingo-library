@@ -152,7 +152,7 @@ function! ingo#query#get#Register( errorRegister, ... )
 "   Either the register, or an a:errorRegister when aborted or invalid register.
 "******************************************************************************
     try
-	let l:register = ingo#query#get#Char({'validExpr': '[-a-zA-Z0-9":.%#=*+~/]' , 'invalidExpr': (a:0 ? a:1 : '')})
+	let l:register = ingo#query#get#Char({'validExpr': ingo#register#All(), 'invalidExpr': (a:0 ? a:1 : '')})
 	return (empty(l:register) ? a:errorRegister : l:register)
     catch /^Vim\%((\a\+)\)\=:E523:/ " E523: Not allowed here
 	return a:errorRegister
@@ -177,7 +177,7 @@ function! ingo#query#get#WritableRegister( errorRegister, ... )
 "   register.
 "******************************************************************************
     try
-	let l:register = ingo#query#get#Char({'validExpr': '[a-zA-Z0-9"*+]' , 'invalidExpr': (a:0 ? a:1 : '')})
+	let l:register = ingo#query#get#Char({'validExpr': ingo#register#Writable(), 'invalidExpr': (a:0 ? a:1 : '')})
 	return (empty(l:register) ? a:errorRegister : l:register)
     catch /^Vim\%((\a\+)\)\=:E523:/ " E523: Not allowed here
 	return a:errorRegister
