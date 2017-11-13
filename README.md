@@ -101,6 +101,7 @@ HISTORY
   registers (-\_\* are writable, too).
 - Add ingo/register/accumulate.vim module.
 - Add ingo/tabpage.vim module.
+- Add ingo#list#NonEmpty() and ingo#list#JoinNonEmpty().
 
 ##### 1.032   20-Sep-2017
 - ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
