@@ -153,6 +153,7 @@ autoload/ingo/subst/replacement.vim
 autoload/ingo/swap.vim
 autoload/ingo/syntaxitem.vim
 autoload/ingo/system.vim
+autoload/ingo/tabpage.vim
 autoload/ingo/tabstops.vim
 autoload/ingo/text.vim
 autoload/ingo/text/frompattern.vim

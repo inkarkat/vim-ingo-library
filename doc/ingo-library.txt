@@ -114,6 +114,7 @@ HISTORY							*ingo-library-history*
 - FIX: ingo#query#get#WritableRegister() doesn't consider all writable
   registers (-_* are writable, too).
 - Add ingo/register/accumulate.vim module.
+- Add ingo/tabpage.vim module.
 
 1.032	20-Sep-2017
 - ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
