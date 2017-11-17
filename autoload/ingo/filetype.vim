@@ -18,8 +18,8 @@ function! ingo#filetype#Is( filetypes )
     return 0
 endfunction
 
-function! ingo#filetype#GetPrimary()
-    return get(split(&filetype, '\.'), 0, '')
+function! ingo#filetype#GetPrimary( ... )
+    return get(split((a:0 ? a:1 : &filetype), '\.'), 0, '')
 endfunction
 function! ingo#filetype#IsPrimary( filetypes )
     return (index(ingo#list#Make(a:filetypes), ingo#filetype#GetPrimary()) != -1)
