@@ -100,13 +100,22 @@ function! ingo#cmdargs#command#Parse( commandLine, ... )
 "	strpart(a:commandLine, 0, len(a:commandLine) - len(l:parse[0]))
 "   <
 "******************************************************************************
-    return matchlist(a:commandLine,
-    \	'\C\(^\s*\|\\\@<!|\s*\)' .
+    let l:commandPattern =
     \	'\(' . ingo#cmdargs#commandcommands#GetExpr() . '\)\?' .
     \	'\(' . ingo#cmdargs#range#RangeExpr() . '\)\s*' .
     \	'\(\h\w*\)\(!\?\)\(' . ingo#cmdargs#command#DelimiterExpr() . (a:0 > 1 ? a:2 : '.*') . '\)\?' .
     \   '\(' . (a:0 && ! empty(a:1) ? '$\|\s\+' . a:1 : '$') . '\)'
-    \)[0:7]
+
+    for l:anchor in ['\s*\\\@<!|\s*', '^\s*']
+	let l:parse = matchlist(a:commandLine,
+	\   printf('\C\(%s\)', l:anchor) . l:commandPattern
+	\)
+	if ! empty(l:parse)
+	    break
+	endif
+    endfor
+
+    return l:parse[0:7]
 endfunction
 
 let &cpo = s:save_cpo
