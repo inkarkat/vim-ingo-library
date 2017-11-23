@@ -110,4 +110,28 @@ function! ingo#fs#path#split#EndsWith( filespec, fragment )
     return ingo#str#EndsWith(l:filespec, l:fragment, ingo#fs#path#IsCaseInsensitive(l:filespec))
 endfunction
 
+function! ingo#fs#path#split#ChangeBasePath( filespec, basePath, newBasePath )
+"******************************************************************************
+"* PURPOSE:
+"   Replace a:basePath in a:filespec with a:newBasePath. This will be done on
+"   normalized paths.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:filespec  Filespec.
+"   a:basePath  Filespec to the base directory that contains a:filespec.
+"   a:newBasePath Filespec to the new base directory.
+"* RETURN VALUES:
+"   Changed a:filespec, or empty List if a:filespec did not start with
+"   a:basePath.
+"******************************************************************************
+    let l:remainder = ingo#fs#path#split#AtBasePath(a:filespec, a:basePath)
+    if type(l:remainder) == type([])
+	return []
+    endif
+    return ingo#fs#path#Combine(ingo#fs#path#Normalize(a:newBasePath, '/'), l:remainder)
+endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

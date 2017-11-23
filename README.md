@@ -103,6 +103,7 @@ HISTORY
 - Add ingo/tabpage.vim module.
 - Add ingo#list#NonEmpty() and ingo#list#JoinNonEmpty().
 - Factor out ingo#filetype#GetPrimary() from ingo#filetype#IsPrimary().
+- Add ingo#fs#path#split#ChangeBasePath().
 
 ##### 1.032   20-Sep-2017
 - ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
