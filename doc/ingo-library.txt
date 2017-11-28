@@ -118,6 +118,9 @@ HISTORY							*ingo-library-history*
 - Add ingo#list#NonEmpty() and ingo#list#JoinNonEmpty().
 - Factor out ingo#filetype#GetPrimary() from ingo#filetype#IsPrimary().
 - Add ingo#fs#path#split#ChangeBasePath().
+- ENH: ingo#funcref#ToString() returns non-Funcref argument as is (instead of
+  empty String). This allows to transparently handle function names (as
+  String), too.
 
 1.032	20-Sep-2017
 - ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
