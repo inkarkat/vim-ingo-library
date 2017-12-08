@@ -109,6 +109,8 @@ HISTORY
   String), too.
 - ingo#event#Trigger(): Temporarily disable modeline processing in
   compatibility implementation.
+- Add ingo#event#TriggerEverywhere() and ingo#event#TriggerEverywhereCustom()
+  compatibility wrappers for :doautoall <nomodeline>.
 
 ##### 1.032   20-Sep-2017
 - ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
