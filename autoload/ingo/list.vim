@@ -138,10 +138,26 @@ function! ingo#list#Join( ... )
     return l:result
 endfunction
 
+function! ingo#list#NonEmpty( list )
+"******************************************************************************
+"* PURPOSE:
+"   Remove empty items from a:list.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Modifies a:list; use copy() to avoid that.
+"* INPUTS:
+"   a:list  A list.
+"* RETURN VALUES:
+"   Modified a:list where all items where empty() is 1 have been removed.
+"******************************************************************************
+    return filter(a:list, '! empty(v:val)')
+endfunction
+
 function! ingo#list#IsEmpty( list )
 "******************************************************************************
 "* PURPOSE:
-"   Test whether the list itself contains no elements or only empty ones.
+"   Test whether the list itself contains no items or only empty ones.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -149,10 +165,27 @@ function! ingo#list#IsEmpty( list )
 "* INPUTS:
 "   a:list  A list.
 "* RETURN VALUES:
-"   0 if a:list is not empty and at least one of its elements make empty()
+"   0 if a:list is not empty and at least one of its items make empty()
 "   return 1; else 1.
 "******************************************************************************
-    return empty(filter(copy(a:list), '! empty(v:val)'))
+    return empty(ingo#list#NonEmpty(copy(a:list)))
+endfunction
+
+function! ingo#list#JoinNonEmpty( list, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Join the non-empty items in a:list together into one String.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Modifies a:list; use copy() to avoid that.
+"* INPUTS:
+"   a:list  A list.
+"   a:sep   Optional separator to be put in between the items.
+"* RETURN VALUES:
+"   String.
+"******************************************************************************
+    return call('join', [ingo#list#NonEmpty(a:list)] + a:000)
 endfunction
 
 function! ingo#list#Matches( list, expr )
@@ -167,7 +200,7 @@ function! ingo#list#Matches( list, expr )
 "   a:list  A list.
 "   a:expr  Regular expression.
 "* RETURN VALUES:
-"   1 if all elements of a:list match a:expr; else 0.
+"   1 if all items of a:list match a:expr; else 0.
 "******************************************************************************
     return empty(filter(copy(a:list), 'v:val !~# a:expr'))
 endfunction

@@ -7,6 +7,12 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
+function! s:NotRightType()
+    throw 'NotRightType'
+endfunction
+function! s:ToNumber( val )
+    return (type(a:val) == type(0) ? a:val : (a:val =~# '^\d\+$' ? str2nr(a:val) : s:NotRightType()))
+endfunction
 function! ingo#list#sequence#FindNumerical( list )
 "******************************************************************************
 "* PURPOSE:
@@ -25,13 +31,17 @@ function! ingo#list#sequence#FindNumerical( list )
 	return [0, 0]
     endif
 
-    let l:stride = a:list[1] - a:list[0]
+    let [l:idx, l:stride] = [0, 0]
+    try
+	let l:stride = s:ToNumber(a:list[1]) - s:ToNumber(a:list[0])
 
-    let l:idx = 2
-    while (l:idx < len(a:list) && a:list[l:idx] - a:list[l:idx - 1] == l:stride)
-	let l:idx += 1
-    endwhile
-
+	let l:idx = 2
+	while (l:idx < len(a:list) && s:ToNumber(a:list[l:idx]) - s:ToNumber(a:list[l:idx - 1]) == l:stride)
+	    let l:idx += 1
+	endwhile
+    catch /NotRightType/
+	" Using exception for flow control here.
+    endtry
     return [l:idx, l:stride]
 endfunction
 
@@ -51,14 +61,11 @@ function! ingo#list#sequence#FindCharacter( list )
 "   elements are single characters).
 "******************************************************************************
     try
-	let l:characterList = map(copy(a:list), 'v:val =~# "^.$" ? char2nr(v:val) : s:NotAChar()')
+	let l:characterList = map(copy(a:list), 'v:val =~# "^.$" ? char2nr(v:val) : s:NotRightType()')
 	return ingo#list#sequence#FindNumerical(l:characterList)
-    catch /NotAChar/
+    catch /NotRightType/
 	return [0, 0]
     endtry
-endfunction
-function! s:NotAChar()
-    throw NotAChar
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

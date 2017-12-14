@@ -145,14 +145,39 @@ function! ingo#query#get#Register( errorRegister, ... )
 "* INPUTS:
 "   a:errorRegister     Register name to be returned when aborted or invalid
 "			register. Defaults to the empty string. Use '\' to yield
-"			an empty string when passing the function's results
-"			directly to getreg().
+"			an empty string (from getreg()) when passing the
+"			function's results directly to getreg().
 "   a:invalidRegisterExpr   Optional pattern for invalid registers.
 "* RETURN VALUES:
 "   Either the register, or an a:errorRegister when aborted or invalid register.
 "******************************************************************************
     try
-	let l:register = ingo#query#get#Char({'validExpr': '[-a-zA-Z0-9":.%#=*+~/]' , 'invalidExpr': (a:0 ? a:1 : '')})
+	let l:register = ingo#query#get#Char({'validExpr': ingo#register#All(), 'invalidExpr': (a:0 ? a:1 : '')})
+	return (empty(l:register) ? a:errorRegister : l:register)
+    catch /^Vim\%((\a\+)\)\=:E523:/ " E523: Not allowed here
+	return a:errorRegister
+    endtry
+endfunction
+function! ingo#query#get#WritableRegister( errorRegister, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Query a register that can be written to from the user.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:errorRegister     Register name to be returned when aborted or invalid
+"			register. Defaults to the empty string. Use '\' to yield
+"			an empty string (from getreg()) when passing the
+"			function's results directly to getreg().
+"   a:invalidRegisterExpr   Optional pattern for invalid registers.
+"* RETURN VALUES:
+"   Either the writable register, or an a:errorRegister when aborted or invalid
+"   register.
+"******************************************************************************
+    try
+	let l:register = ingo#query#get#Char({'validExpr': ingo#register#Writable(), 'invalidExpr': (a:0 ? a:1 : '')})
 	return (empty(l:register) ? a:errorRegister : l:register)
     catch /^Vim\%((\a\+)\)\=:E523:/ " E523: Not allowed here
 	return a:errorRegister

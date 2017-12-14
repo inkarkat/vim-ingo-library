@@ -2,4 +2,6 @@ digest/
 list/
 list/lcs/
 list/sequence/
+subs/BraceCreation/
+subs/BraceExpansion/
 subst/expr/

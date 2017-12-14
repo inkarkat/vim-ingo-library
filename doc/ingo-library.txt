@@ -94,6 +94,38 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.033	14-Dec-2017
+- Add ingo/subs/BraceCreation.vim and ingo/subs/BraceExpansion.vim modules.
+- Add ingo#query#get#WritableRegister() variant of ingo#query#get#Register().
+- Add ingo#str#find#StartIndex().
+- Fix recursive invocations of ingo#buffer#generate#Create().
+- Add ingo#mbyte#virtcol#GetColOfVirtCol().
+- Expose ingo#plugin#marks#FindUnused(), and have it optionally take the
+  considered marks.
+- Add ingo#plugin#marks#Reuse().
+- BUG: ingo#syntaxitem#IsOnSyntax() considers empty a:stopItemPattern as
+  unconditional stop.
+- Add ingo#regexp#build#UnderCursor().
+- Add ingo#escape#command#mapeval().
+- Add ingo#range#IsEntireBuffer().
+- Add ingo/compat/commands.vim module.
+- Add ingo#register#All() and ingo#register#Writable() (so that this
+  information doesn't have to be duplicated any longer).
+- FIX: ingo#query#get#WritableRegister() doesn't consider all writable
+  registers (-_* are writable, too).
+- Add ingo/register/accumulate.vim module.
+- Add ingo/tabpage.vim module.
+- Add ingo#list#NonEmpty() and ingo#list#JoinNonEmpty().
+- Factor out ingo#filetype#GetPrimary() from ingo#filetype#IsPrimary().
+- Add ingo#fs#path#split#ChangeBasePath().
+- ENH: ingo#funcref#ToString() returns non-Funcref argument as is (instead of
+  empty String). This allows to transparently handle function names (as
+  String), too.
+- ingo#event#Trigger(): Temporarily disable modeline processing in
+  compatibility implementation.
+- Add ingo#event#TriggerEverywhere() and ingo#event#TriggerEverywhereCustom()
+  compatibility wrappers for :doautoall <nomodeline>.
+
 1.032	20-Sep-2017
 - ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
   when executed e.g. from within a |:map-expr|.

@@ -1,4 +1,4 @@
-" MultibyteVirtcol.vim: Multibyte-aware translation functions from col() to virtcol().
+" ingo/mbyte/virtcol.vim: Multibyte-aware translation functions between byte index and virtcol.
 "
 " DEPENDENCIES:
 
@@ -6,18 +6,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.030.003	06-Apr-2017	BUG:
-"				ingo#mbyte#virtcol#GetVirtColOfCurrentCharacter()
-"				yields wrong values with single-width multibyte
-"				characters, and at the beginning of the line
-"				(column 1). Need to start with offset 1 (not 0),
-"				and account for that (subtract 1) in the final
-"				return. Need to check that the virtcol argument
-"				will be larger than 0.
-"   1.004.002	08-Apr-2013	Move into ingo-library.
-"	001	02-Jul-2009	file creation from EchoLine.vim.
 
 function! ingo#mbyte#virtcol#GetVirtStartColOfCurrentCharacter( lineNum, column )
     let l:currentVirtCol = ingo#mbyte#virtcol#GetVirtColOfCurrentCharacter(a:lineNum, a:column)
@@ -48,6 +36,11 @@ function! ingo#mbyte#virtcol#GetVirtColOfNextCharacter( lineNum, column )
 	let l:offset += 1
     endwhile
     return virtcol([a:lineNum, a:column + l:offset])
+endfunction
+
+function! ingo#mbyte#virtcol#GetColOfVirtCol( lineNum, virtCol )
+    let l:col = searchpos(printf('\%%%dl.\%%>%dv', a:lineNum, a:virtCol), 'cnw')[1]
+    return (l:col > 0 ? l:col : len(getline(a:lineNum)) + 1)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

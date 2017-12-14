@@ -1,26 +1,12 @@
 " ingo/lines.vim: Functions for line manipulation.
 "
 " DEPENDENCIES:
+"   - ingo/range.vim autoload script
 "
-" Copyright: (C) 2012-2015 Ingo Karkat
+" Copyright: (C) 2012-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.024.005	12-Feb-2015	FIX: Also correctly set change marks when
-"				replacing entire buffer with
-"				ingo#lines#Replace(). (The :delete clobbered
-"				them.)
-"   1.019.004	19-May-2014	ENH: Make ingo#lines#Replace() handle
-"				replacement with nothing (empty List) and
-"				replacing the entire buffer (without leaving an
-"				additional empty line).
-"   1.004.003	04-Apr-2013	Drop the :silent in ingolines#PutWrapper().
-"				Move into ingo-library.
-"	002	02-Sep-2012	ENH: Avoid clobbering the expression register.
-"	001	16-Aug-2012	file creation from LineJuggler.vim autoload
-"				script.
 
 function! ingo#lines#PutWrapper( lnum, putCommand, lines )
 "******************************************************************************
@@ -88,7 +74,7 @@ function! ingo#lines#Replace( startLnum, endLnum, lines, ... )
 "* RETURN VALUES:
 "   None.
 "******************************************************************************
-    let l:isEntireBuffer = (a:startLnum <= 1 && a:endLnum == line('$'))
+    let l:isEntireBuffer = ingo#range#IsEntireBuffer(a:startLnum, a:endLnum)
     silent execute printf('%s,%sdelete %s', a:startLnum, a:endLnum, (a:0 ? a:1 : '_'))
     if ! empty(a:lines)
 	silent call ingo#lines#PutBefore(a:startLnum, a:lines)

@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/cmdargs/range.vim autoload script
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -93,14 +93,29 @@ function! ingo#cmdargs#command#Parse( commandLine, ... )
 "			    a:argumentExpr is not given or when
 "			    commandDirectArgs is not empty.
 "   Or: [] if no match.
+"
+"   To reassemble, you can concatenate [1:7] together; originally, that's the
+"   same as [0].
+"   To get the cut-off previous command(s), you can use >
+"	strpart(a:commandLine, 0, len(a:commandLine) - len(l:parse[0]))
+"   <
 "******************************************************************************
-    return matchlist(a:commandLine,
-    \	'\C\(^\s*\|\\\@<!|\s*\)' .
+    let l:commandPattern =
     \	'\(' . ingo#cmdargs#commandcommands#GetExpr() . '\)\?' .
     \	'\(' . ingo#cmdargs#range#RangeExpr() . '\)\s*' .
     \	'\(\h\w*\)\(!\?\)\(' . ingo#cmdargs#command#DelimiterExpr() . (a:0 > 1 ? a:2 : '.*') . '\)\?' .
     \   '\(' . (a:0 && ! empty(a:1) ? '$\|\s\+' . a:1 : '$') . '\)'
-    \)[0:7]
+
+    for l:anchor in ['\s*\\\@<!|\s*', '^\s*']
+	let l:parse = matchlist(a:commandLine,
+	\   printf('\C\(%s\)', l:anchor) . l:commandPattern
+	\)
+	if ! empty(l:parse)
+	    break
+	endif
+    endfor
+
+    return l:parse[0:7]
 endfunction
 
 let &cpo = s:save_cpo
