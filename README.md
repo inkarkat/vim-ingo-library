@@ -80,6 +80,9 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.034   RELEASEME
+- Add ingo/regexp/split.vim module.
+
 ##### 1.033   14-Dec-2017
 - Add ingo/subs/BraceCreation.vim and ingo/subs/BraceExpansion.vim modules.
 - Add ingo#query#get#WritableRegister() variant of ingo#query#get#Register().

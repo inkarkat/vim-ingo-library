@@ -124,6 +124,7 @@ autoload/ingo/regexp/fromwildcard.vim
 autoload/ingo/regexp/magic.vim
 autoload/ingo/regexp/pairs.vim
 autoload/ingo/regexp/previoussubstitution.vim
+autoload/ingo/regexp/split.vim
 autoload/ingo/regexp/virtcols.vim
 autoload/ingo/register.vim
 autoload/ingo/register/accumulate.vim
