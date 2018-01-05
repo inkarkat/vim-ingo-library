@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2008-2013 Ingo Karkat
+" Copyright: (C) 2008-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -77,6 +77,96 @@ function! ingo#folds#NextVisibleLine( lnum, direction )
     endwhile
 
     return -1
+endfunction
+function! ingo#folds#LastVisibleLine( lnum, direction )
+"******************************************************************************
+"* PURPOSE:
+"   Determine the line number of the last visible (i.e. not folded) line.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:lnum  Line number to base the calculation on.
+"   a:direction -1 for upward, 1 for downward relative movement
+"* RETURN VALUES:
+"   line number, of -1 if there is no more visible line in that direction of the
+"   buffer.
+"******************************************************************************
+    let l:lnum = ingo#folds#NextVisibleLine(a:lnum, a:direction)
+    if l:lnum == -1
+	return l:lnum
+    endif
+
+    while l:lnum > 0 && l:lnum <= line('$')
+	if foldclosed(l:lnum) != -1
+	    break
+	endif
+
+	let l:lnum += a:direction
+    endwhile
+
+    return l:lnum - a:direction
+endfunction
+function! ingo#folds#NextClosedLine( lnum, direction )
+"******************************************************************************
+"* PURPOSE:
+"   Determine the line number of the next closed (i.e. folded) line.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:lnum  Line number to base the calculation on. When this one is folded, it
+"           is returned.
+"   a:direction -1 for upward, 1 for downward relative movement
+"* RETURN VALUES:
+"   line number, of -1 if there is no more folded line in that direction of the
+"   buffer.
+"******************************************************************************
+    let l:lnum = a:lnum
+
+    while l:lnum > 0 && l:lnum <= line('$')
+	if foldclosed(l:lnum) != -1
+	    return l:lnum
+	endif
+
+	let l:lnum += a:direction
+    endwhile
+
+    return -1
+endfunction
+function! ingo#folds#LastClosedLine( lnum, direction )
+"******************************************************************************
+"* PURPOSE:
+"   Determine the line number of the last closed (i.e. folded) line. Unlike
+"   foldclosedend(), considers multiple adjacent closed folds as one unit.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:lnum  Line number to base the calculation on.
+"   a:direction -1 for upward, 1 for downward relative movement
+"* RETURN VALUES:
+"   line number, of -1 if there is no more folded line in that direction of the
+"   buffer.
+"******************************************************************************
+    let l:lnum = ingo#folds#NextClosedLine(a:lnum, a:direction)
+    if l:lnum == -1
+	return l:lnum
+    endif
+
+    while l:lnum > 0 && l:lnum <= line('$')
+	let l:borderLnum = (a:direction < 0 ? foldclosed(l:lnum) : foldclosedend(l:lnum))
+	if l:borderLnum == -1
+	    break
+	endif
+
+	let l:lnum = l:borderLnum + a:direction
+    endwhile
+
+    return l:lnum - a:direction
 endfunction
 
 

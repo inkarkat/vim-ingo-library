@@ -82,6 +82,9 @@ HISTORY
 
 ##### 1.034   RELEASEME
 - Add ingo/regexp/split.vim module.
+- Add ingo#folds#LastVisibleLine(), ingo#folds#NextClosedLine(),
+  ingo#folds#LastClosedLine() variants of existing
+  ingo#folds#NextVisibleLine().
 
 ##### 1.033   14-Dec-2017
 - Add ingo/subs/BraceCreation.vim and ingo/subs/BraceExpansion.vim modules.
@@ -798,7 +801,7 @@ HISTORY
 - Started development of shared autoload functionality.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2009-2017 Ingo Karkat -
+Copyright: (C) 2009-2018 Ingo Karkat -
 Contains URL encoding / decoding algorithms written by Tim Pope. -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
