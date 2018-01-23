@@ -100,6 +100,9 @@ autoload/ingo/os.vim
 autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/compiler.vim
 autoload/ingo/plugin/marks.vim
+autoload/ingo/plugin/rendered.vim
+autoload/ingo/plugin/rendered/Confirmeach.vim
+autoload/ingo/plugin/rendered/Subset.vim
 autoload/ingo/plugin/setting.vim
 autoload/ingo/pos.vim
 autoload/ingo/print.vim

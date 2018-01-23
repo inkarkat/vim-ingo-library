@@ -85,6 +85,7 @@ HISTORY
 - Add ingo#folds#LastVisibleLine(), ingo#folds#NextClosedLine(),
   ingo#folds#LastClosedLine() variants of existing
   ingo#folds#NextVisibleLine().
+- Add ingo/plugin/rendered.vim module.
 
 ##### 1.033   14-Dec-2017
 - Add ingo/subs/BraceCreation.vim and ingo/subs/BraceExpansion.vim modules.
