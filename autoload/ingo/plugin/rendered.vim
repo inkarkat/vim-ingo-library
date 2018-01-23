@@ -71,7 +71,7 @@ function! ingo#plugin#rendered#List( what, renderer, additionalOptions, items )
 		let l:ProcessingFuncref = function('ingo#plugin#rendered#' . substitute(l:ordering, '\s', '', 'g') . '#Filter')
 		let l:items = call(l:ProcessingFuncref, [l:items])
 	    elseif index(l:renderChoices, l:ordering) != -1
-		call call(a:renderer.handleOption, [l:ordering])
+		call a:renderer.handleOption(l:ordering)
 	    elseif index(l:additionalChoices, l:ordering) != -1
 		return [l:ordering, l:items]
 	    else
