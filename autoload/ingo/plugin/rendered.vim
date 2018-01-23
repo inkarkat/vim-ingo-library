@@ -165,6 +165,74 @@ function! g:ingo#plugin#rendered#BraceExpressionRenderer.handleOption( command )
     endif
 endfunction
 
+
+
+function! ingo#plugin#rendered#ListJoinedOrBraceExpression( what, braceOptions, additionalOptions, items )
+"******************************************************************************
+"* PURPOSE:
+"   Allow interactive reordering, filtering, and eventual rendering of List
+"   a:items (and potentially more a:additionalOptions) either as a joined String
+"   or as a Bash-like Brace Expression. The separator (and optional prefix /
+"   suffix) is queried first, and can be changed during the interaction. Also,
+"   there's the option to yank the result to a register.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:what  Text describing what each element in a:items represents (e.g.
+"           "matches").
+"   a:braceOptions  Dictionary of parameters for the Brace Expression creation;
+"                   cp. ingo#subs#BraceCreation#FromList().
+"   a:additionalOptions List of additional options presented to the user. Can
+"                       include "&" accelerators; these will be dropped in the
+"                       command passed to a:renderer.handleOption().
+"   a:items     List of items to be renderer.
+"* RETURN VALUES:
+"   List of [command, renderedItems]. The command contains "Quit" if the user
+"   chose to cancel, and "Yank" if the result was yanked to a register. If an
+"   additional option was chosen, command contains the option (without "&"
+"   accelerators), and renderedItems the (so far unrendered, but potentially
+"   filtered) List of a:items. If an ordering was chosen, command is empty and
+"   renderedItems contains the result.
+"******************************************************************************
+    echohl Question
+	let l:separator = input('Enter separator string (or prefix^Mseparator^Msuffix); empty for creation of Brace Expression: ')
+    echohl None
+    if empty(l:separator)
+	let l:renderer = copy(g:ingo#plugin#rendered#BraceExpressionRenderer)
+	let l:renderer.braceOptions = a:braceOptions
+    else
+	let l:renderer = copy(g:ingo#plugin#rendered#JoinRenderer)
+	let l:renderer.separator = l:separator
+	if l:renderer.separator =~# '^\%(\r\@!.\)*\r\%(\r\@!.\)*\r\%(\r\@!.\)*$'
+	    let [l:renderer.prefix, l:renderer.separator, l:renderer.suffix] = split(l:renderer.separator, '\r', 1)
+	endif
+    endif
+
+
+    let [l:command, l:result] = ingo#plugin#rendered#List(a:what, l:renderer, ['Change se&parator', '&Yank'] + a:additionalOptions, a:items)
+    if l:command ==# 'Quit'
+	return [l:command, '']
+    elseif l:command ==# 'Yank'
+	call ingo#msg#HighlightMsg('Register ([a-zA-Z0-9"*+] <Enter> for default): ', 'Question')
+	let l:register = ingo#query#get#Char({'validExpr': '[a-zA-Z0-9"*+\r]'})
+	if empty(l:register) | continue | endif
+	let l:register = (l:register ==# "\<C-m>" ? '' : l:register)
+	let [l:command, l:result] = ingo#plugin#rendered#List('yanked ' . a:what, l:renderer, [], l:result)
+	if empty(l:command)
+	    call setreg(l:register, l:result)
+	endif
+	return ['Yank', l:result]
+    elseif l:command ==# 'Change separator'
+	return ingo#plugin#rendered#ListJoinedOrBraceExpression(a:what, a:braceOptions, a:additionalOptions, a:items)
+    elseif empty(l:command)
+	return ['', l:result]
+    else
+	throw 'ASSERT: Invalid command: ' . string(l:command)
+    endif
+endfunction
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
