@@ -140,7 +140,7 @@ endfunction
 "   None.
 "******************************************************************************
 let g:ingo#plugin#rendered#BraceExpressionRenderer = {
-\   'options': ['longer co&mmon', 'shor&ter common', 'longer disti&nct', 'sho&rter distinct'],
+\   'options': ['Longer co&mmon', 'Shor&ter common', 'Longer disti&nct', 'Sho&rter distinct'],
 \   'commonLengthOffset': 0,
 \   'differingLengthOffset': 0,
 \   'braceOptions': {}
@@ -152,13 +152,13 @@ function! g:ingo#plugin#rendered#BraceExpressionRenderer.render( items ) dict
     return ingo#subs#BraceCreation#FromList(a:items, self.braceOptions)
 endfunction
 function! g:ingo#plugin#rendered#BraceExpressionRenderer.handleOption( command ) dict
-    if a:command ==# 'longer common'
+    if a:command ==# 'Longer common'
 	let self.commonLengthOffset += 1
-    elseif a:command ==# 'shorter common'
+    elseif a:command ==# 'Shorter common'
 	let self.commonLengthOffset -= 1
-    elseif a:command ==# 'longer distinct'
+    elseif a:command ==# 'Longer distinct'
 	let self.differingLengthOffset += 1
-    elseif a:command ==# 'shorter distinct'
+    elseif a:command ==# 'Shorter distinct'
 	let self.differingLengthOffset -= 1
     else
 	throw 'ASSERT: Invalid render command: ' . string(a:command)
