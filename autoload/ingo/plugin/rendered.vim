@@ -27,8 +27,8 @@ function! ingo#plugin#rendered#List( what, renderer, additionalOptions, items )
 "           "matches").
 "   a:renderer  Object that implements the rendering of the a:items.
 "		Can supply additional rendering options presented to the user,
-"		in a:renderer.options List. If such an option is chosen,
-"		a:renderer.handleOption(command) is invoked. Finally,
+"		via a List returned from a:renderer.options(). If such an option
+"		is chosen, a:renderer.handleOption(command) is invoked. Finally,
 "		a:renderer.render(items) is used to render the List.
 "		This library ships with some default renderers that can be
 "		copy()ed and passed; see below.
@@ -45,7 +45,6 @@ function! ingo#plugin#rendered#List( what, renderer, additionalOptions, items )
 "******************************************************************************
     let l:items = a:items
     let l:processOptions = a:additionalOptions + ['&Confirm each', '&Subset', '&Quit']
-    let l:renderChoices = map(copy(a:renderer.options), 'ingo#query#StripAccellerator(v:val)')
     let l:additionalChoices = map(copy(a:additionalOptions), 'ingo#query#StripAccellerator(v:val)')
 
     let l:save_guioptions = &guioptions
@@ -63,7 +62,9 @@ function! ingo#plugin#rendered#List( what, renderer, additionalOptions, items )
 
 	    let l:orderingMessage = printf('Choose ordering for %d %s: ', len(l:items), a:what)
 
-	    let l:ordering = ingo#query#ConfirmAsText(l:orderingMessage, l:orderingOptions + a:renderer.options + l:processOptions, 1)
+	    let l:rendererOptions = a:renderer.options()
+	    let l:renderChoices = map(copy(l:rendererOptions), 'ingo#query#StripAccellerator(v:val)')
+	    let l:ordering = ingo#query#ConfirmAsText(l:orderingMessage, l:orderingOptions + l:rendererOptions + l:processOptions, 1)
 	    if empty(l:ordering) || l:ordering ==# 'Quit'
 		return ['Quit', '']
 	    elseif l:ordering ==# 'Confirm each' || l:ordering == 'Subset'
@@ -117,11 +118,13 @@ endfunction
 "   None.
 "******************************************************************************
 let g:ingo#plugin#rendered#JoinRenderer = {
-\   'options': [],
 \   'prefix': '',
 \   'separator': '',
 \   'suffix': '',
 \}
+function! g:ingo#plugin#rendered#JoinRenderer.options() dict
+    return []
+endfunction
 function! g:ingo#plugin#rendered#JoinRenderer.render( items ) dict
     return self.prefix . join(a:items, self.separator) . self.suffix
 endfunction
@@ -140,19 +143,31 @@ endfunction
 "   None.
 "******************************************************************************
 let g:ingo#plugin#rendered#BraceExpressionRenderer = {
-\   'options': ['Longer co&mmon', 'Shor&ter common', 'Longer disti&nct', 'Sho&rter distinct'],
 \   'commonLengthOffset': 0,
 \   'differingLengthOffset': 0,
 \   'braceOptions': {}
 \}
+function! g:ingo#plugin#rendered#BraceExpressionRenderer.options() dict
+    let l:options = ['Longer co&mmon', 'Shor&ter common', 'Longer disti&nct', 'Sho&rter distinct']
+    if ! get(self.braceOptions, 'strict', 0) | call add(l:options, '&Strict') | endif
+    if ! get(self.braceOptions, 'short', 0)  | call add(l:options, 'S&hort')  | endif
+    return l:options
+endfunction
 function! g:ingo#plugin#rendered#BraceExpressionRenderer.render( items ) dict
-    let self.braceOptions.minimumCommonLength = max([1, get(self.options, 'minimumCommonLength', 1) + self.commonLengthOffset])
-    let self.braceOptions.minimumDifferingLength = max([0, get(self.options, 'minimumDifferingLength', 0) + self.differingLengthOffset])
+    let l:braceOptions = copy(self.braceOptions)
+    let l:braceOptions.minimumCommonLength    = max([1, get(self.braceOptions, 'minimumCommonLength', 1) + self.commonLengthOffset])
+    let l:braceOptions.minimumDifferingLength = max([0, get(self.braceOptions, 'minimumDifferingLength', 0) + self.differingLengthOffset])
 
-    return ingo#subs#BraceCreation#FromList(a:items, self.braceOptions)
+    return ingo#subs#BraceCreation#FromList(a:items, l:braceOptions)
 endfunction
 function! g:ingo#plugin#rendered#BraceExpressionRenderer.handleOption( command ) dict
-    if a:command ==# 'Longer common'
+    if a:command ==# 'Strict'
+	let self.braceOptions.strict = 1
+	let self.braceOptions.short = 0
+    elseif a:command ==# 'Short'
+	let self.braceOptions.short = 1
+	let self.braceOptions.strict = 0
+    elseif a:command ==# 'Longer common'
 	let self.commonLengthOffset += 1
     elseif a:command ==# 'Shorter common'
 	let self.commonLengthOffset -= 1
