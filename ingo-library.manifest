@@ -12,6 +12,7 @@ autoload/ingo/buffer/scratch.vim
 autoload/ingo/buffer/temp.vim
 autoload/ingo/buffer/temprange.vim
 autoload/ingo/buffer/visible.vim
+autoload/ingo/change.vim
 autoload/ingo/cmdargs.vim
 autoload/ingo/cmdargs/command.vim
 autoload/ingo/cmdargs/commandcommands.vim
