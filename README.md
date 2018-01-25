@@ -88,6 +88,7 @@ HISTORY
 - Add ingo/plugin/rendered.vim module.
 - Add ingo/change.vim module.
 - Add ingo#undo#IsEnabled().
+- Add ingo#str#split#AtPrefix() and ingo#str#split#AtSuffix().
 
 ##### 1.033   14-Dec-2017
 - Add ingo/subs/BraceCreation.vim and ingo/subs/BraceExpansion.vim modules.
