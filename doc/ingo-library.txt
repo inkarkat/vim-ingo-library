@@ -101,6 +101,7 @@ HISTORY							*ingo-library-history*
   ingo#folds#NextVisibleLine().
 - Add ingo/plugin/rendered.vim module.
 - Add ingo/change.vim module.
+- Add ingo#undo#IsEnabled().
 
 1.033	14-Dec-2017
 - Add ingo/subs/BraceCreation.vim and ingo/subs/BraceExpansion.vim modules.

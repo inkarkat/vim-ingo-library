@@ -2,24 +2,10 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2014 Ingo Karkat
+" Copyright: (C) 2014-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.021.002	17-Jun-2014	Use built-in changenr() in
-"				ingo#undo#GetChangeNumber(); actually, the
-"				entire function could be replaced by the
-"				built-in, if it would not just return one less
-"				than the number of the undone change after undo.
-"				We want the result to represent the current
-"				change, regardless of what undo / redo was done
-"				earlier. Change the implementation to test for
-"				whether the current change is the last in the
-"				buffer, and if not, make a no-op change to get
-"				to an explicit change state.
-"   1.019.001	25-Apr-2014	file creation
 
 function! ingo#undo#GetChangeNumber()
 "******************************************************************************
@@ -35,8 +21,12 @@ function! ingo#undo#GetChangeNumber()
 "* INPUTS:
 "   None.
 "* RETURN VALUES:
-"   Change number, for use with :undo {N}.
+"   Change number, for use with :undo {N}. -1 if undo is not supported.
 "******************************************************************************
+    if ! ingo#undo#IsEnabled()
+	return -1
+    endif
+
     if exists('*undotree')
 	let l:undotree = undotree()
 	let l:isLastChange = (l:undotree.seq_cur == l:undotree.seq_last)
@@ -56,6 +46,27 @@ function! ingo#undo#GetChangeNumber()
     endif
 
     return changenr()
+endfunction
+
+function! ingo#undo#IsEnabled( ... )
+"******************************************************************************
+"* PURPOSE:
+"   Check whether (at least N levels of) undo is enabled.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:N Number of undo levels that must be supported.
+"* RETURN VALUES:
+"   1 if (N / one) level of undo is supported, else 0.
+"******************************************************************************
+    if a:0
+	let l:undolevels = (&undolevels == 0 ? 1 : &undolevels)
+	return (l:undolevels >= a:1)
+    else
+	return (&undolevels >= 0)
+    endif
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
