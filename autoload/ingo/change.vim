@@ -37,4 +37,45 @@ function! ingo#change#Get()
     return l:lastChangedText
 endfunction
 
+function! ingo#change#GetOverwrittenText()
+"******************************************************************************
+"* PURPOSE:
+"   Get the text that was overwritten by the last change.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   None.
+"* RETURN VALUES:
+"   Overwritten text, or empty string.
+"******************************************************************************
+    let [l:startPos, l:endPos] = [getpos("'[")[1:2], getpos("']")[1:2]]
+    let [l:startLnum, l:endLnum] = [l:startPos[0], l:endPos[0]]
+    let l:lastLnum = line('$')
+
+    let l:textBeforeChange = ingo#text#Get([l:startLnum, 1], l:startPos, 1)
+    let l:textAfterChange = ingo#text#Get(l:endPos, [l:endLnum, len(getline(l:endLnum))], 0)
+
+    let l:isInsertion = (ingo#text#Get(l:startPos, l:endPos, 1) ==# @.)
+    if ! l:isInsertion | let l:textAfterChange = matchstr(l:textAfterChange, '^.\zs.*') | endif
+"****D echomsg string(l:textBeforeChange) string(l:textAfterChange)
+
+    let l:undoChangeNumber = ingo#undo#GetChangeNumber()
+    if l:undoChangeNumber < 0 | return '' | endif " Without undo, the overwritten text cannot be determined.
+    try
+	silent undo
+
+	let l:changeOffset = l:lastLnum - line('$')
+	let l:changedArea = join(getline(l:startLnum, l:endLnum - l:changeOffset), "\n")
+
+	let l:startOfOverwritten = ingo#str#split#AtPrefix(l:changedArea, l:textBeforeChange)
+	let l:overwritten = ingo#str#split#AtSuffix(l:startOfOverwritten, l:textAfterChange)
+
+	return l:overwritten
+    finally
+	silent execute 'undo' l:undoChangeNumber
+    endtry
+endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
