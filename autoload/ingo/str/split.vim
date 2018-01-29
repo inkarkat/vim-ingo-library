@@ -68,15 +68,17 @@ function! ingo#str#split#AtPrefix( expr, prefix, ... )
 "* INPUTS:
 "   a:expr                  Text to be split.
 "   a:prefix                The literal prefix text to remove.
+"   a:isIgnoreCase          Optional flag whether to ignore case differences
+"                           (default: false).
 "   a:onPrefixNotExisting   Optional value to be returned when a:expr does not
 "                           start with a:prefix.
 "* RETURN VALUES:
 "   Remainder of a:expr without a:prefix. Returns a:onPrefixNotExisting or
 "   a:expr if the prefix doesn't exist.
 "******************************************************************************
-    return (ingo#str#StartsWith(a:expr, a:prefix) ?
+    return (ingo#str#StartsWith(a:expr, a:prefix, (a:0 ? a:1 : 0)) ?
     \   strpart(a:expr, len(a:prefix)) :
-    \   (a:0 ? a:1 : a:expr)
+    \   (a:0 >= 2 ? a:2 : a:expr)
     \)
 endfunction
 
