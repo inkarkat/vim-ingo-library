@@ -3,12 +3,13 @@
 " DEPENDENCIES:
 "   - ingo/fs/path.vim autoload script
 "   - ingo/str.vim autoload script
-"   - ingo/str/split.vim autoload script
 "
 " Copyright: (C) 2014-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! ingo#fs#path#split#PathAndName( filespec, ... )
 "******************************************************************************
@@ -57,7 +58,10 @@ function! ingo#fs#path#split#AtBasePath( filespec, basePath, ... )
 "******************************************************************************
     let l:filespec = ingo#fs#path#Combine(ingo#fs#path#Normalize(a:filespec, '/'), '')
     let l:basePath = ingo#fs#path#Combine(ingo#fs#path#Normalize(a:basePath, '/'), '')
-    return ingo#str#split#AtPrefix(l:filespec, l:basePath, (a:0 ? a:1 : []))
+    return (ingo#str#StartsWith(l:filespec, l:basePath, ingo#fs#path#IsCaseInsensitive(l:filespec)) ?
+    \   strpart(a:filespec, len(l:basePath)) :
+    \   (a:0 ? a:1 : [])
+    \)
 endfunction
 
 function! ingo#fs#path#split#Contains( filespec, fragment )
@@ -127,4 +131,6 @@ function! ingo#fs#path#split#ChangeBasePath( filespec, basePath, newBasePath )
     return ingo#fs#path#Combine(ingo#fs#path#Normalize(a:newBasePath, '/'), l:remainder)
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
