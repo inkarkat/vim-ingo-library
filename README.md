@@ -90,6 +90,7 @@ HISTORY
 - Add ingo#undo#IsEnabled().
 - Add ingo#str#split#AtPrefix() and ingo#str#split#AtSuffix().
 - Add ingo/lnum.vim module.
+- Add ingo#text#GetCharVirtCol().
 
 ##### 1.033   14-Dec-2017
 - Add ingo/subs/BraceCreation.vim and ingo/subs/BraceExpansion.vim modules.
