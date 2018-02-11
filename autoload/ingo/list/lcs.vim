@@ -5,7 +5,7 @@
 "   - ingo/list.vim autoload script
 "   - ingo/str/split.vim autoload script
 "
-" Copyright: (C) 2017 Ingo Karkat
+" Copyright: (C) 2017-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -33,7 +33,7 @@ function! ingo#list#lcs#FindLongestCommon( strings, ... )
     let l:maxMatch = ''
 
     while 1
-	let [l:match, l:startPos, l:endPos] = matchstrpos(
+	let [l:match, l:startPos, l:endPos] = ingo#compat#matchstrpos(
 	\   join(a:strings + [''], "\n"),
 	\   printf('^[^\n]\{-}\zs\([^\n]\{%d,}\)\ze[^\n]\{-}\n\%([^\n]\{-}\1[^\n]*\n\)\{%d}$', l:minimumLength, len(a:strings) - 1),
 	\   l:pos
