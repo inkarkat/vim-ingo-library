@@ -89,6 +89,7 @@ HISTORY
 - Add ingo/change.vim module.
 - Add ingo#undo#IsEnabled().
 - Add ingo#str#split#AtPrefix() and ingo#str#split#AtSuffix().
+- Add ingo/lnum.vim module.
 
 ##### 1.033   14-Dec-2017
 - Add ingo/subs/BraceCreation.vim and ingo/subs/BraceExpansion.vim modules.

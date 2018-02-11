@@ -86,6 +86,7 @@ autoload/ingo/list/find.vim
 autoload/ingo/list/lcs.vim
 autoload/ingo/list/sequence.vim
 autoload/ingo/list/split.vim
+autoload/ingo/lnum.vim
 autoload/ingo/mapmaker.vim
 autoload/ingo/matches.vim
 autoload/ingo/math.vim
