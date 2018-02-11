@@ -5,7 +5,7 @@
 "   - ingo/options.vim autoload script
 "   - ingo/strdisplaywidth.vim autoload script
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -446,6 +446,34 @@ if v:version == 704 && has('patch1707') || v:version > 704
 else
     function! ingo#compat#DictKey( key )
 	return (empty(a:key) ? "\<Nul>" : a:key)
+    endfunction
+endif
+
+if exists('*matchstrpos')
+    function! ingo#compat#matchstrpos( ... )
+	return call('matchstrpos', a:000)
+    endfunction
+else
+    function! ingo#compat#matchstrpos( ... )
+	let l:start = call('match', a:000)
+
+	if type(a:1) == type([])
+	    let l:index = l:start
+	    if l:index < 0
+		return ['', -1, -1, -1]
+	    endif
+
+	    let l:matchArgs = [a:1[l:index], a:2] " {start} and {count} address the List, not the element; omit it here.
+	    let l:str = call('matchstr', l:matchArgs)
+	    let l:start = call('match', l:matchArgs)
+	    let l:end = call('matchend', l:matchArgs)
+
+	    return [l:str, l:index, l:start, l:end]
+	else
+	    let l:str = call('matchstr', a:000)
+	    let l:end = call('matchend', a:000)
+	    return [l:str, l:start, l:end]
+	endif
     endfunction
 endif
 
