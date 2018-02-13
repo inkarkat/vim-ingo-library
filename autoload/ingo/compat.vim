@@ -5,58 +5,10 @@
 "   - ingo/options.vim autoload script
 "   - ingo/strdisplaywidth.vim autoload script
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.031.023	02-Jun-2017	Add special ingo#compat#synstack to work around
-"				missing patch 7.2.014: synstack() doesn't work
-"				in an empty line.
-"   1.031.022	31-May-2017	Minor: Add forgotten ! to function definition of
-"				ingo#compat#DictKey().
-"   1.030.021	24-May-2017	Add ingo#compat#synstack().
-"   1.030.020	19-Apr-2017	Add ingo#compat#DictKey(), as Vim 7.4.1707 now
-"				allows using an empty dictionary key.
-"   1.029.019	10-Jan-2017	Add ingo#compat#systemlist().
-"   1.028.018	25-Nov-2016	Add ingo#compat#getcurpos().
-"   1.026.017	11-Aug-2016	Add ingo#compat#strgetchar() and
-"				ingo#compat#strcharpart(), introduced in Vim
-"				7.4.1730.
-"				Support ingo#compat#strchars() optional {skipcc}
-"				argument, introduced in Vim 7.4.755.
-"   1.025.016	15-Jul-2016	Add ingo#compat#sha256(), with a fallback to an
-"				external sha256sum command.
-"   1.024.015	23-Apr-2015	Add ingo#compat#shiftwidth(), taken from :h
-"				shiftwidth().
-"   1.022.014	25-Sep-2014	FIX: Non-list argument to glob() for old Vim
-"				versions.
-"   1.022.013	23-Sep-2014	FIX: globpath() with {list} argument is only
-"				available with Vim 7.4.279.
-"   1.022.012	22-Sep-2014	Add ingo#compat#glob() and
-"				ingo#compat#globpath().
-"   1.021.011	12-Jun-2014	Make test for 'virtualedit' option values also
-"				account for unrelated values.
-"   1.021.010	11-Jun-2014	Add ingo#compat#uniq().
-"   1.020.009	30-May-2014	Add ingo#compat#abs().
-"   1.018.008	12-Apr-2014	FIX: Off-by-one in emulated
-"				ingo#compat#strdisplaywidth() reported one too
-"				few.
-"   1.017.007	19-Feb-2014	Add workarounds for fnameescape() bugs on
-"				Windows for ! and [] characters.
-"   1.015.006	20-Nov-2013	Add ingo#compat#setpos().
-"   1.012.005	02-Sep-2013	FIX: Contrary to the old maparg(), <SID> doesn't
-"				get automatically translated into <SNR>NNN_
-"				when using the new ,{dict} overload. Perform
-"				this substitution ourselves to maintain
-"				compatibility.
-"   1.012.004	09-Aug-2013	Add ingo#compat#maparg().
-"   1.012.003	08-Aug-2013	Add ingo#compat#fnameescape() and
-"				ingo#compat#shellescape() from escapings.vim.
-"   1.008.002	07-Jun-2013	Move EchoWithoutScrolling#DetermineVirtColNum()
-"				implementaion in here.
-"   1.004.001	04-Apr-2013	file creation
 
 if exists('*shiftwidth')
     function! ingo#compat#shiftwidth()
@@ -446,6 +398,34 @@ if v:version == 704 && has('patch1707') || v:version > 704
 else
     function! ingo#compat#DictKey( key )
 	return (empty(a:key) ? "\<Nul>" : a:key)
+    endfunction
+endif
+
+if exists('*matchstrpos')
+    function! ingo#compat#matchstrpos( ... )
+	return call('matchstrpos', a:000)
+    endfunction
+else
+    function! ingo#compat#matchstrpos( ... )
+	let l:start = call('match', a:000)
+
+	if type(a:1) == type([])
+	    let l:index = l:start
+	    if l:index < 0
+		return ['', -1, -1, -1]
+	    endif
+
+	    let l:matchArgs = [a:1[l:index], a:2] " {start} and {count} address the List, not the element; omit it here.
+	    let l:str = call('matchstr', l:matchArgs)
+	    let l:start = call('match', l:matchArgs)
+	    let l:end = call('matchend', l:matchArgs)
+
+	    return [l:str, l:index, l:start, l:end]
+	else
+	    let l:str = call('matchstr', a:000)
+	    let l:end = call('matchend', a:000)
+	    return [l:str, l:start, l:end]
+	endif
     endfunction
 endif
 

@@ -80,6 +80,19 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.034   13-Feb-2018
+- Add ingo/regexp/split.vim module.
+- Add ingo#folds#LastVisibleLine(), ingo#folds#NextClosedLine(),
+  ingo#folds#LastClosedLine() variants of existing
+  ingo#folds#NextVisibleLine().
+- Add ingo/plugin/rendered.vim module.
+- Add ingo/change.vim module.
+- Add ingo#undo#IsEnabled().
+- Add ingo#str#split#AtPrefix() and ingo#str#split#AtSuffix().
+- Add ingo/lnum.vim module.
+- Add ingo#text#GetCharVirtCol().
+- Add ingo#compat#matchstrpos().
+
 ##### 1.033   14-Dec-2017
 - Add ingo/subs/BraceCreation.vim and ingo/subs/BraceExpansion.vim modules.
 - Add ingo#query#get#WritableRegister() variant of ingo#query#get#Register().
@@ -795,7 +808,7 @@ HISTORY
 - Started development of shared autoload functionality.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2009-2017 Ingo Karkat -
+Copyright: (C) 2009-2018 Ingo Karkat -
 Contains URL encoding / decoding algorithms written by Tim Pope. -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 

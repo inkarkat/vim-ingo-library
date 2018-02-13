@@ -1,11 +1,14 @@
 " ingo/str/split.vim: Functions for splitting strings.
 "
 " DEPENDENCIES:
+"   - ingo/str.vim autoload script
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! ingo#str#split#StrFirst( expr, str )
 "******************************************************************************
@@ -54,4 +57,54 @@ function! ingo#str#split#MatchFirst( expr, pattern )
     return [strpart(a:expr, 0, l:startIdx), strpart(a:expr, l:startIdx, l:endIdx - l:startIdx), strpart(a:expr, l:endIdx)]
 endfunction
 
+function! ingo#str#split#AtPrefix( expr, prefix, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Split off a:prefix from the beginning of a:expr.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:expr                  Text to be split.
+"   a:prefix                The literal prefix text to remove.
+"   a:isIgnoreCase          Optional flag whether to ignore case differences
+"                           (default: false).
+"   a:onPrefixNotExisting   Optional value to be returned when a:expr does not
+"                           start with a:prefix.
+"* RETURN VALUES:
+"   Remainder of a:expr without a:prefix. Returns a:onPrefixNotExisting or
+"   a:expr if the prefix doesn't exist.
+"******************************************************************************
+    return (ingo#str#StartsWith(a:expr, a:prefix, (a:0 ? a:1 : 0)) ?
+    \   strpart(a:expr, len(a:prefix)) :
+    \   (a:0 >= 2 ? a:2 : a:expr)
+    \)
+endfunction
+
+function! ingo#str#split#AtSuffix( expr, suffix, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Split off a:suffix from the end of a:expr.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:expr                  Text to be split.
+"   a:suffix                The literal suffix text to remove.
+"   a:onSuffixNotExisting   Optional value to be returned when a:expr does not
+"                           end with a:suffix.
+"* RETURN VALUES:
+"   Remainder of a:expr without a:suffix. Returns a:onSuffixNotExisting or
+"   a:expr if the suffix doesn't exist.
+"******************************************************************************
+    return (ingo#str#EndsWith(a:expr, a:suffix) ?
+    \   strpart(a:expr, 0, len(a:expr) - len(a:suffix)) :
+    \   (a:0 ? a:1 : a:expr)
+    \)
+endfunction
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

@@ -4,17 +4,12 @@
 "   - ingo/fs/path.vim autoload script
 "   - ingo/str.vim autoload script
 "
-" Copyright: (C) 2014-2017 Ingo Karkat
+" Copyright: (C) 2014-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.030.004	22-May-2017	Add ingo#fs#path#split#PathAndName().
-"   1.030.003	26-Jan-2017	Add ingo#str#EndsWith() variant of
-"				ingo#fs#path#split#Contains().
-"   1.025.002	30-Apr-2015	Add ingo#fs#path#split#Contains().
-"   1.019.001	22-May-2014	file creation
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! ingo#fs#path#split#PathAndName( filespec, ... )
 "******************************************************************************
@@ -43,7 +38,7 @@ function! ingo#fs#path#split#PathAndName( filespec, ... )
     return [l:dirspec, l:filename]
 endfunction
 
-function! ingo#fs#path#split#AtBasePath( filespec, basePath )
+function! ingo#fs#path#split#AtBasePath( filespec, basePath, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Split off a:basePath from a:filespec. The check will be done on normalized
@@ -55,16 +50,18 @@ function! ingo#fs#path#split#AtBasePath( filespec, basePath )
 "* INPUTS:
 "   a:filespec  Filespec.
 "   a:basePath  Filespec to the base directory that contains a:filespec.
+"   a:onBasePathNotExisting Optional value to be returned when a:filespec does
+"                           not start with a:basePath; default empty List.
 "* RETURN VALUES:
 "   Remainder of a:filespec, after removing a:basePath, or empty List if
 "   a:filespec did not start with a:basePath.
 "******************************************************************************
     let l:filespec = ingo#fs#path#Combine(ingo#fs#path#Normalize(a:filespec, '/'), '')
     let l:basePath = ingo#fs#path#Combine(ingo#fs#path#Normalize(a:basePath, '/'), '')
-    if ingo#str#StartsWith(l:filespec, l:basePath, ingo#fs#path#IsCaseInsensitive(l:filespec))
-	return strpart(a:filespec, len(l:basePath))
-    endif
-    return []
+    return (ingo#str#StartsWith(l:filespec, l:basePath, ingo#fs#path#IsCaseInsensitive(l:filespec)) ?
+    \   strpart(a:filespec, len(l:basePath)) :
+    \   (a:0 ? a:1 : [])
+    \)
 endfunction
 
 function! ingo#fs#path#split#Contains( filespec, fragment )
@@ -134,4 +131,6 @@ function! ingo#fs#path#split#ChangeBasePath( filespec, basePath, newBasePath )
     return ingo#fs#path#Combine(ingo#fs#path#Normalize(a:newBasePath, '/'), l:remainder)
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

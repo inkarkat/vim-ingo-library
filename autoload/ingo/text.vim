@@ -1,9 +1,11 @@
 " ingo/text.vim: Function for getting and setting text in the current buffer.
 "
 " DEPENDENCIES:
+"   - ingo/mbyte/virtcol.vim autoload script
 "   - ingo/pos.vim autoload script
+"   - ingo/regexp/virtcols.vim autoload script
 "
-" Copyright: (C) 2012-2017 Ingo Karkat
+" Copyright: (C) 2012-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -113,6 +115,26 @@ function! ingo#text#GetCharBefore( startPos, ... )
     let [l:count, l:isUpTo] = (a:0 ? (a:1 > 0 ? [a:1, 0] : [-1 * a:1, 1]) : [0, 0])
 
     return matchstr(getline(l:line), '.' . (l:count ? '\{' . (l:isUpTo ? ',' : '') . l:count . '}' : '') . '\%' . l:column . 'c')
+endfunction
+function! ingo#text#GetCharVirtCol( startPos, ... )
+"*******************************************************************************
+"* PURPOSE:
+"   Extract one / a:count character(s) from a:startPos from the current buffer.
+"   Only considers the current line.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:startPos	    [line, virtcol]; virtcol is the 1-based screen column.
+"   a:count         Optional number of characters to extract; default 1.
+"		    If this is a negative number, tries to extract as many as
+"		    possible instead of not matching.
+"* RETURN VALUES:
+"   string text, or empty string if no(t enough) character(s).
+"*******************************************************************************
+    let l:startBytePos = [a:startPos[0], ingo#mbyte#virtcol#GetColOfVirtCol(a:startPos[0], a:startPos[1])]
+    return ingo#text#GetChar(l:startBytePos, (a:0 ? a:1 : 1))
 endfunction
 
 function! ingo#text#Insert( pos, text )

@@ -12,6 +12,7 @@ autoload/ingo/buffer/scratch.vim
 autoload/ingo/buffer/temp.vim
 autoload/ingo/buffer/temprange.vim
 autoload/ingo/buffer/visible.vim
+autoload/ingo/change.vim
 autoload/ingo/cmdargs.vim
 autoload/ingo/cmdargs/command.vim
 autoload/ingo/cmdargs/commandcommands.vim
@@ -85,6 +86,7 @@ autoload/ingo/list/find.vim
 autoload/ingo/list/lcs.vim
 autoload/ingo/list/sequence.vim
 autoload/ingo/list/split.vim
+autoload/ingo/lnum.vim
 autoload/ingo/mapmaker.vim
 autoload/ingo/matches.vim
 autoload/ingo/math.vim
@@ -100,6 +102,9 @@ autoload/ingo/os.vim
 autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/compiler.vim
 autoload/ingo/plugin/marks.vim
+autoload/ingo/plugin/rendered.vim
+autoload/ingo/plugin/rendered/Confirmeach.vim
+autoload/ingo/plugin/rendered/Subset.vim
 autoload/ingo/plugin/setting.vim
 autoload/ingo/pos.vim
 autoload/ingo/print.vim
@@ -124,6 +129,7 @@ autoload/ingo/regexp/fromwildcard.vim
 autoload/ingo/regexp/magic.vim
 autoload/ingo/regexp/pairs.vim
 autoload/ingo/regexp/previoussubstitution.vim
+autoload/ingo/regexp/split.vim
 autoload/ingo/regexp/virtcols.vim
 autoload/ingo/register.vim
 autoload/ingo/register/accumulate.vim
