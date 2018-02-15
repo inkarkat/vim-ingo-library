@@ -1,6 +1,7 @@
 " Test matchstrpos() compatibility.
 
 source helpers/CompatChecker.vim
+let g:IngoLibrary_CompatFor = 'matchstrpos'
 
 call vimtest#StartTap()
 call vimtap#Plan(12)
