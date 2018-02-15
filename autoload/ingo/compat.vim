@@ -2,7 +2,8 @@
 "
 " DEPENDENCIES:
 "   - ingo/collections.vim autoload script
-"   - ingo/options.vim autoload script
+"   - ingo/option.vim autoload script
+"   - ingo/os.vim autoload script
 "   - ingo/strdisplaywidth.vim autoload script
 "
 " Copyright: (C) 2013-2018 Ingo Karkat
@@ -10,7 +11,9 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
-if exists('*shiftwidth')
+let s:compatFor = (exists('g:IngoLibrary_CompatFor') ? ingo#collections#ToDict(split(g:IngoLibrary_CompatFor, ',')) : {})
+
+if exists('*shiftwidth') && ! has_key(s:compatFor, 'shiftwidth')
     function! ingo#compat#shiftwidth()
 	return shiftwidth()
     endfunction
@@ -20,7 +23,7 @@ else
     endfunction
 endif
 
-if exists('*strdisplaywidth')
+if exists('*strdisplaywidth') && ! has_key(s:compatFor, 'strdisplaywidth')
     function! ingo#compat#strdisplaywidth( expr, ... )
 	return call('strdisplaywidth', [a:expr] + a:000)
     endfunction
@@ -37,7 +40,7 @@ else
     endfunction
 endif
 
-if exists('*strchars')
+if exists('*strchars') && ! has_key(s:compatFor, 'strchars')
     if v:version == 704 && has('patch755') || v:version > 704
 	function! ingo#compat#strchars( ... )
 	    return call('strchars', a:000)
@@ -53,7 +56,7 @@ else
     endfunction
 endif
 
-if exists('*strgetchar')
+if exists('*strgetchar') && ! has_key(s:compatFor, 'strgetchar')
     function! ingo#compat#strgetchar( expr, index )
 	return strgetchar(a:expr, a:index)
     endfunction
@@ -63,7 +66,7 @@ else
     endfunction
 endif
 
-if exists('*strcharpart')
+if exists('*strcharpart') && ! has_key(s:compatFor, 'strcharpart')
     function! ingo#compat#strcharpart( ... )
 	return call('strcharpart', a:000)
     endfunction
@@ -79,7 +82,7 @@ else
     endfunction
 endif
 
-if exists('*abs')
+if exists('*abs') && ! has_key(s:compatFor, 'abs')
     function! ingo#compat#abs( expr )
 	return abs(a:expr)
     endfunction
@@ -89,7 +92,7 @@ else
     endfunction
 endif
 
-if exists('*uniq')
+if exists('*uniq') && ! has_key(s:compatFor, 'uniq')
     function! ingo#compat#uniq( list )
 	return uniq(a:list)
     endfunction
@@ -99,7 +102,7 @@ else
     endfunction
 endif
 
-if exists('*getcurpos')
+if exists('*getcurpos') && ! has_key(s:compatFor, 'getcurpos')
     function! ingo#compat#getcurpos()
 	return getcurpos()
     endfunction
@@ -109,7 +112,7 @@ else
     endfunction
 endif
 
-if exists('*systemlist')
+if exists('*systemlist') && ! has_key(s:compatFor, 'systemlist')
     function! ingo#compat#systemlist( ... )
 	return call('systemlist', a:000)
     endfunction
@@ -132,7 +135,7 @@ function! ingo#compat#fnameescape( filespec )
 "* RETURN VALUES:
 "   Escaped filespec to be passed as a {file} argument to an Ex command.
 "*******************************************************************************
-    if exists('*fnameescape')
+    if exists('*fnameescape') && ! has_key(s:compatFor, 'fnameescape')
 	if ingo#os#IsWindows()
 	    let l:filespec = a:filespec
 
@@ -184,7 +187,7 @@ function! ingo#compat#shellescape( filespec, ... )
 "*******************************************************************************
     let l:isSpecial = (a:0 ? a:1 : 0)
     let l:specialShellescapeCharacters = "\n%#'!"
-    if exists('*shellescape')
+    if exists('*shellescape') && ! has_key(s:compatFor, 'shellescape')
 	if a:0
 	    if v:version < 702
 		" The shellescape({string}) function exists since Vim 7.0.111,
@@ -277,7 +280,7 @@ else
     endfunction
 endif
 
-if v:version == 703 && has('patch32') || v:version > 703
+if (v:version == 703 && has('patch32') || v:version > 703) && ! has_key(s:compatFor, 'maparg')
     function! ingo#compat#maparg( name, ... )
 	let l:args = [a:name, '', 0, 1]
 	if a:0 > 0
@@ -300,7 +303,7 @@ else
     endfunction
 endif
 
-if v:version == 703 && has('patch590') || v:version > 703
+if (v:version == 703 && has('patch590') || v:version > 703) && ! has_key(s:compatFor, 'setpos')
     function! ingo#compat#setpos( expr, list )
 	return setpos(a:expr, a:list)
     endfunction
@@ -354,7 +357,7 @@ else
     endfunction
 endif
 
-if exists('*sha256')
+if exists('*sha256') && ! has_key(s:compatFor, 'sha256')
     function! ingo#compat#sha256( string )
 	return sha256(a:string)
     endfunction
@@ -369,7 +372,7 @@ else
     endfunction
 endif
 
-if exists('*synstack')
+if exists('*synstack') && ! has_key(s:compatFor, 'synstack')
     if v:version < 702 || v:version == 702 && ! has('patch14')
 	" 7.2.014: synstack() doesn't work in an empty line
 	function! ingo#compat#synstack( lnum, col )
@@ -401,7 +404,7 @@ else
     endfunction
 endif
 
-if exists('*matchstrpos')
+if exists('*matchstrpos') && ! has_key(s:compatFor, 'matchstrpos')
     function! ingo#compat#matchstrpos( ... )
 	return call('matchstrpos', a:000)
     endfunction
