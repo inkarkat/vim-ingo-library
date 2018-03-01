@@ -80,6 +80,9 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.035   RELEASEME
+- Add #ingo#compat#commands#NormalWithCount().
+
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
 - Add ingo#folds#LastVisibleLine(), ingo#folds#NextClosedLine(),
