@@ -81,7 +81,9 @@ HISTORY
 ------------------------------------------------------------------------------
 
 ##### 1.035   RELEASEME
-- Add #ingo#compat#commands#NormalWithCount().
+- Add ingo#compat#commands#NormalWithCount().
+- Add ingo#compat#haslocaldir().
+- Add ingo/workingdir.vim module.
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.

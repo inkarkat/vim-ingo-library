@@ -122,6 +122,16 @@ else
     endfunction
 endif
 
+if exists('*haslocaldir') && ! has_key(s:compatFor, 'haslocaldir')
+    function! ingo#compat#haslocaldir()
+	return haslocaldir()
+    endfunction
+else
+    function! ingo#compat#haslocaldir()
+	return 0
+    endfunction
+endif
+
 function! ingo#compat#fnameescape( filespec )
 "*******************************************************************************
 "* PURPOSE:

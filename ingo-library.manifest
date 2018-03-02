@@ -175,4 +175,5 @@ autoload/ingo/window/preview.vim
 autoload/ingo/window/quickfix.vim
 autoload/ingo/window/special.vim
 autoload/ingo/window/switches.vim
+autoload/ingo/workingdir.vim
 doc/ingo-library.txt
