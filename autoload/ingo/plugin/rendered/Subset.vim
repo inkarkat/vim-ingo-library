@@ -15,13 +15,16 @@ function! ingo#plugin#rendered#Subset#Filter( items )
     let l:subsets = input('Enter subsets in Vim List notation, e.g. "0 3:5 -1", or matching /pattern/ (non-matching with !/.../): ')
     echohl None
 
-    if ingo#cmdargs#pattern#IsDelimited(l:subsets)
-	return s:FilterByPattern(a:items, l:subsets[1:-2], 0)
-    elseif l:subsets[0] == '!' && ingo#cmdargs#pattern#IsDelimited(l:subsets[1:])
-	return s:FilterByPattern(a:items, l:subsets[2:-2], 1)
-    else
-	return s:Slice(a:items, split(l:subsets))
+    let l:subsetsPattern = ingo#cmdargs#pattern#ParseUnescaped(l:subsets)
+    if l:subsetsPattern !=# l:subsets
+	return s:FilterByPattern(a:items, l:subsetsPattern, 0)
+    elseif l:subsets[0] ==# '!'
+	let l:subsetsPattern = ingo#cmdargs#pattern#ParseUnescaped(l:subsets[1:])
+	if l:subsetsPattern !=# l:subsets
+	    return s:FilterByPattern(a:items, l:subsetsPattern, 1)
+	endif
     endif
+    return s:Slice(a:items, split(l:subsets))
 endfunction
 
 function! s:FilterByPattern( items, pattern, isKeepNonMatching )
