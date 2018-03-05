@@ -8,6 +8,8 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
+let s:compatFor = (exists('g:IngoLibrary_CompatFor') ? ingo#collections#ToDict(split(g:IngoLibrary_CompatFor, ',')) : {})
+
 if exists('*haslocaldir') && ! has_key(s:compatFor, 'haslocaldir')
     function! ingo#workingdir#ChdirCommand()
 	return (haslocaldir() ? 'lchdir!' : 'chdir!')
