@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/escape.vim autoload script
 "
-" Copyright: (C) 2013-2016 Ingo Karkat
+" Copyright: (C) 2013-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -139,6 +139,15 @@ function! ingo#cmdargs#pattern#ParseUnescaped( arguments, ... )
 "* PURPOSE:
 "   Parse a:arguments as a pattern delimited by optional /.../ (or similar)
 "   characters, and with optional following flags match.
+"   You can use this function to check for delimiting /.../ characters, and then
+"   either react on the (unescaped) pattern, or take the literal original
+"   string:
+"	let l:pattern = ingo#cmdargs#pattern#ParseUnescaped(a:argument)
+"	if l:pattern !=# a:argument
+"	    " Pattern-based processing with l:pattern.
+"	else
+"	    " Literal processing with a:argument
+"	endif
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
