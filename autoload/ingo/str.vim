@@ -3,8 +3,9 @@
 " DEPENDENCIES:
 "   - ingo/regexp/collection.vim autoload script
 "   - ingo/regexp/virtcols.vim autoload script
+"   - ingo/str/list.vim autoload script
 "
-" Copyright: (C) 2013-2016 Ingo Karkat
+" Copyright: (C) 2013-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -41,7 +42,7 @@ function! ingo#str#Trim( string )
 endfunction
 
 function! ingo#str#Reverse( string )
-    return join(reverse(split(a:string, '\zs')), '')
+    return join(reverse(ingo#str#list#OfCharacters(a:string)), '')
 endfunction
 
 function! ingo#str#StartsWith( string, substring, ... )

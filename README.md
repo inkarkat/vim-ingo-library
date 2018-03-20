@@ -85,6 +85,7 @@ HISTORY
 - Add ingo#compat#haslocaldir().
 - Add ingo/workingdir.vim module.
 - Add ingo/selection/virtcols.vim module.
+- Add ingo/str/list.vim module.
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
