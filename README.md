@@ -86,6 +86,7 @@ HISTORY
 - Add ingo/workingdir.vim module.
 - Add ingo/selection/virtcols.vim module.
 - Add ingo/str/list.vim module.
+- Add ingo#funcref#AsString().
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
