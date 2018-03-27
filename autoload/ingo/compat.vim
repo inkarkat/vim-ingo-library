@@ -2,6 +2,7 @@
 "
 " DEPENDENCIES:
 "   - ingo/collections.vim autoload script
+"   - ingo/list.vim autoload script
 "   - ingo/option.vim autoload script
 "   - ingo/os.vim autoload script
 "   - ingo/strdisplaywidth.vim autoload script
@@ -129,6 +130,29 @@ if exists('*haslocaldir') && ! has_key(s:compatFor, 'haslocaldir')
 else
     function! ingo#compat#haslocaldir()
 	return 0
+    endfunction
+endif
+
+if exists('*execute') && ! has_key(s:compatFor, 'execute')
+    function! ingo#compat#execute( ... )
+	return call('execute', a:000)
+    endfunction
+else
+    function! ingo#compat#execute( command, ... )
+	let l:prefix = (a:0 ? a:1 : 'silent')
+	let l:output = ''
+	try
+	    redir => l:output
+		for l:command in ingo#list#Make(a:command)
+		    execute l:prefix l:command
+		endfor
+	    redir END
+	    redraw	" This is necessary because of the :redir done earlier.
+	finally
+	    redir END
+	endtry
+
+	return l:output
     endfunction
 endif
 
