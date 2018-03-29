@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2014-2017 Ingo Karkat
+" Copyright: (C) 2014-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -95,6 +95,11 @@ function! ingo#option#Prepend( val1, ... )
 	endif
     endfor
     return l:result
+endfunction
+
+function! ingo#option#GetBinaryOptionValue( optionName )
+    execute 'let l:originalOptionValue = &' . a:optionName
+    return (l:originalOptionValue ? '' : 'no') . a:optionName
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

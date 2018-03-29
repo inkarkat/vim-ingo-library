@@ -88,6 +88,7 @@ HISTORY
 - Add ingo/str/list.vim module.
 - Add ingo#funcref#AsString().
 - Add ingo#compat#execute().
+- Add ingo#option#GetBinaryOptionValue().
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
