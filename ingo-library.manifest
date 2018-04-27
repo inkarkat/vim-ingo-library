@@ -61,6 +61,7 @@ autoload/ingo/event.vim
 autoload/ingo/external.vim
 autoload/ingo/filetype.vim
 autoload/ingo/folds.vim
+autoload/ingo/folds/containment.vim
 autoload/ingo/folds/persistence.vim
 autoload/ingo/foldtext.vim
 autoload/ingo/format.vim
