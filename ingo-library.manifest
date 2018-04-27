@@ -6,6 +6,7 @@ autoload/ingo/area/frompattern.vim
 autoload/ingo/avoidprompt.vim
 autoload/ingo/binary.vim
 autoload/ingo/buffer.vim
+autoload/ingo/buffer/ephemeral.vim
 autoload/ingo/buffer/generate.vim
 autoload/ingo/buffer/locate.vim
 autoload/ingo/buffer/scratch.vim
