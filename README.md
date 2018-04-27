@@ -90,6 +90,7 @@ HISTORY
 - Add ingo#compat#execute().
 - Add ingo#option#GetBinaryOptionValue().
 - Add ingo/buffer/ephemeral.vim module.
+- Add ingo/lists/find.vim module.
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
