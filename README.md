@@ -92,6 +92,7 @@ HISTORY
 - Add ingo/buffer/ephemeral.vim module.
 - Add ingo/lists/find.vim module.
 - Add ingo/folds/containment.vim module.
+- Add ingo/ftplugin/setting.vim module.
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
