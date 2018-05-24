@@ -85,6 +85,27 @@ function! ingo#fs#path#split#Contains( filespec, fragment )
     let l:fragment = ingo#fs#path#Normalize(a:fragment, '/')
     return ingo#str#Contains(l:filespec, l:fragment, ingo#fs#path#IsCaseInsensitive(l:filespec))
 endfunction
+
+function! ingo#fs#path#split#StartsWith( filespec, basePath )
+"******************************************************************************
+"* PURPOSE:
+"   Test whether a:filespec starts with a:basePath, matching entire path
+"   fragments. You can always use forward slashes, as these will be internally
+"   normalized.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:filespec  Filespec to be examined.
+"   a:basePath  Filespec to the base directory that is checked against.
+"* RETURN VALUES:
+"   1 if it starts with it, 0 if not.
+"******************************************************************************
+    let l:basePath = ingo#fs#path#split#AtBasePath(a:filespec, a:basePath)
+    return (type(l:basePath) != type([]))
+endfunction
+
 function! ingo#fs#path#split#EndsWith( filespec, fragment )
 "******************************************************************************
 "* PURPOSE:

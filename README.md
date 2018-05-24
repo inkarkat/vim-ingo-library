@@ -94,6 +94,8 @@ HISTORY
 - Add ingo/folds/containment.vim module.
 - Add ingo/ftplugin/setting.vim module.
 - Extract generic ingo#plugin#cmdcomplete#MakeCompleteFunc().
+- Add ingo#fs#path#split#StartsWith() (we already had
+  ingo#fs#path#split#EndsWith()).
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
