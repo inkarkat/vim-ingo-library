@@ -10,28 +10,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.022.010	22-Sep-2014	Use new ingo#compat#glob().
-"   1.019.009	23-May-2014	Add ingo#fs#path#Exists().
-"   1.019.008	21-May-2014	Add ingo#fs#path#IsCaseInsensitive().
-"   1.019.007	07-May-2014	ingo#fs#path#Normalize(): Don't normalize to
-"				Cygwin /cygdrive/x/... when the chosen path
-"				separator is "\". This would result in a mixed
-"				separator style that is not actually handled.
-"				Add special normalization to "C:/" on Cygwin via
-"				":/" path separator argument.
-"   1.014.006	26-Sep-2013	ingo#fs#path#Normalize(): Also convert between
-"				the different D:\ and /cygdrive/d/ notations on
-"				Windows and Cygwin.
-"   1.013.005	13-Sep-2013	Use operating system detection functions from
-"				ingo/os.vim.
-"   1.011.004	01-Aug-2013	Extract ingo#fs#path#IsUncPathRoot().
-"   1.010.003	08-Jul-2013	Add prefix to exception thrown from
-"				ingo#fs#path#GetRootDir().
-"   1.009.002	26-Jun-2013	Add ingo#fs#path#Equals().
-"				Minor: Remove duplication.
-"   1.007.001	01-Jun-2013	file creation from ingofile.vim
 
 function! ingo#fs#path#Separator()
     return (exists('+shellslash') && ! &shellslash ? '\' : '/')
