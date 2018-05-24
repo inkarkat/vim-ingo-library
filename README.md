@@ -96,6 +96,7 @@ HISTORY
 - Extract generic ingo#plugin#cmdcomplete#MakeCompleteFunc().
 - Add ingo#fs#path#split#StartsWith() (we already had
   ingo#fs#path#split#EndsWith()).
+- Add ingo#fs#path#Canonicalize().
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
