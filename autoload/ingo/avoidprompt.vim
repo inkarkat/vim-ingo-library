@@ -25,24 +25,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.028.003	18-Nov-2016	ENH: Add optional a:reservedColumns also to
-"				ingo#avoidprompt#TruncateTo(), and pass this
-"				from ingo#avoidprompt#Truncate().
-"				ingo#avoidprompt#TruncateTo(): The strright()
-"				cannot precisely account for the rendering of
-"				tab widths. Check the result, and if necessary,
-"				remove further characters until we go below the
-"				limit.
-"   1.026.002	11-Aug-2016	ENH: ingo#avoidprompt#TruncateTo() has a
-"				configurable ellipsis string
-"				g:IngoLibrary_TruncateEllipsis, now defaulting
-"				to a single-char UTF-8 variant if we're in such
-"				encoding. Thanks to Daniel Hahler for sending a
-"				patch! It also handles pathologically small
-"				lengths that only show / cut into the ellipsis.
-"   1.008.001	07-Jun-2013	file creation from EchoWithoutScrolling.vim
 
 function! ingo#avoidprompt#MaxLength()
     let l:maxLength = &columns
