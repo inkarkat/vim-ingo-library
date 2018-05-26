@@ -21,7 +21,7 @@
 " TODO:
 "   - Consider 'cmdheight', add argument isSingleLine.
 "
-" Copyright: (C) 2008-2016 Ingo Karkat
+" Copyright: (C) 2008-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -223,8 +223,36 @@ endfunction
 function! ingo#avoidprompt#Echo( text )
     echo ingo#avoidprompt#Truncate(a:text)
 endfunction
+function! ingo#avoidprompt#EchoMsg( text )
+"******************************************************************************
+"* PURPOSE:
+"   Echo as much as can be viewed in the command-line area of a:text, while
+"   saving the full message in the message history. This way, there's no
+"   hit-enter prompt, but the user can still recall the message history to see
+"   the full message (in case important bits were truncated).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Echos a:text and saves it in the message history. May redraw the window.
+"* INPUTS:
+"   a:text	Text which may be truncated to fit.
+"* RETURN VALUES:
+"   None.
+"******************************************************************************
+    let l:truncatedText = ingo#avoidprompt#Truncate(a:text)
+    echomsg a:text
+    if l:truncatedText !=# a:text
+	" Need to overwrite the overly long message (it's still in full in the
+	" message history).
+	redraw  " This avoids the hit-enter prompt.
+	echo l:truncatedText    " Use :echo because the full text already is in the message history.
+    endif
+endfunction
 function! ingo#avoidprompt#EchoAsSingleLine( text )
     echo ingo#avoidprompt#Truncate(ingo#avoidprompt#TranslateLineBreaks(a:text))
+endfunction
+function! ingo#avoidprompt#EchoMsgAsSingleLine( text )
+    call ingo#avoidprompt#EchoMsg(ingo#avoidprompt#TranslateLineBreaks(a:text))
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

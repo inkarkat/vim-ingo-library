@@ -97,6 +97,7 @@ HISTORY
 - Add ingo#fs#path#split#StartsWith() (we already had
   ingo#fs#path#split#EndsWith()).
 - Add ingo#fs#path#Canonicalize().
+- Add ingo#avoidprompt#EchoMsg() and ingo#avoidprompt#EchoMsgAsSingleLine().
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
