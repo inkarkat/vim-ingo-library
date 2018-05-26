@@ -98,6 +98,9 @@ HISTORY
   ingo#fs#path#split#EndsWith()).
 - Add ingo#fs#path#Canonicalize().
 - Add ingo#avoidprompt#EchoMsg() and ingo#avoidprompt#EchoMsgAsSingleLine().
+- Tweak ingo#avoidprompt#MaxLength() algorithm; empirical testing showed that
+  1 more needs to be subtracted if :set noshowcmd ruler. Thanks to an9wer for
+  making me aware of this.
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.

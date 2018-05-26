@@ -39,7 +39,7 @@ function! ingo#avoidprompt#MaxLength()
 	if &showcmd == 1
 	    let l:maxLength -= 12
 	else
-	    let l:maxLength -= 1
+	    let l:maxLength -= 2 " Ruler does not occupy the last cell, and there has to be one empty cell between ruler and message.
 	endif
 	if &ruler == 1 && has('statusline') && ((&laststatus == 0) || (&laststatus == 1 && winnr('$') == 1))
 	    if &rulerformat == ''
@@ -55,7 +55,7 @@ function! ingo#avoidprompt#MaxLength()
 	    endif
 	endif
     else
-	let l:maxLength -= 1
+	let l:maxLength -= 1 " Cannot occupy the last cell in the line.
     endif
     return l:maxLength
 endfunction
