@@ -16,12 +16,14 @@ function! ingo#plugin#rendered#Confirmeach#Filter( items )
 
 	echo l:match . "\t"
 	echohl Question
-	    echon ' Use (y/n/a/q/l)?'
+	    echon ' Use (y/n/a/q/l; <Esc> to abort)?'
 	echohl None
 
 	let l:choice = ingo#query#get#Char({'isBeepOnInvalid': 0, 'validExpr': "[ynl\<Esc>aq]"})
-	if l:choice ==# "\<Esc>" || l:choice ==# 'q'
-	    return []
+	if l:choice ==# "\<Esc>"
+	    return a:items
+	elseif l:choice ==# 'q'
+	    break
 	elseif l:choice ==# 'y'
 	    call add(l:confirmedItems, l:match)
 	elseif l:choice ==# 'l'
