@@ -103,6 +103,7 @@ HISTORY
   making me aware of this.
 - CHG: Move ingo#list#Matches() to ingo#list#pattern#AllItemsMatch(). The
   previous name wasn't very clear.
+- Add ingo#list#pattern#{First,All}Match\[Index]() functions.
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
