@@ -115,6 +115,8 @@ HISTORY							*ingo-library-history*
 - Tweak ingo#avoidprompt#MaxLength() algorithm; empirical testing showed that
   1 more needs to be subtracted if :set noshowcmd ruler. Thanks to an9wer for
   making me aware of this.
+- CHG: Move ingo#list#Matches() to ingo#list#pattern#AllItemsMatch(). The
+  previous name wasn't very clear.
 
 1.034	13-Feb-2018
 - Add ingo/regexp/split.vim module.

@@ -7,7 +7,7 @@
 "   - ingo/list/lcs.vim autoload script
 "   - ingo/list/sequence.vim autoload script
 "
-" Copyright: (C) 2017 Ingo Karkat
+" Copyright: (C) 2017-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -151,7 +151,7 @@ function! s:Create( options, distinctList, isWrap )
     endif
 
     let [l:sequenceLen, l:stride] = ingo#list#sequence#FindNumerical(a:distinctList)
-    if l:sequenceLen <= 2 || ! ingo#list#Matches(a:distinctList[0 : l:sequenceLen - 1], '^\d\+$')
+    if l:sequenceLen <= 2 || ! ingo#list#pattern#AllItemsMatch(a:distinctList[0 : l:sequenceLen - 1], '^\d\+$')
 	let [l:sequenceLen, l:stride] = ingo#list#sequence#FindCharacter(a:distinctList)
     endif
     if l:sequenceLen > 2
