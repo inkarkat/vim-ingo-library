@@ -4,7 +4,7 @@
 "   - ingo/dict.vim autoload script
 "   - ingo/list.vim autoload script
 "
-" Copyright: (C) 2011-2017 Ingo Karkat
+" Copyright: (C) 2011-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -192,7 +192,7 @@ function! ingo#collections#SplitKeepSeparators( expr, pattern, ... )
 "		Other empty items are kept when {pattern} matches at least one
 "		character or when {keepempty} is non-zero.
 "* RETURN VALUES:
-"   List of items.
+"   List of items: [item1, sep1, item2, sep2, item3, ...]
 "******************************************************************************
     let l:keepempty = (a:0 ? a:1 : 0)
     let l:prevIndex = 0
@@ -246,7 +246,7 @@ function! ingo#collections#SeparateItemsAndSeparators( expr, pattern, ... )
 "		Other empty items are kept when {pattern} matches at least one
 "		character or when {keepempty} is non-zero.
 "* RETURN VALUES:
-"   List of [items, separators].
+"   List of [items, separators]: [[item1, item2, item3, ...], [sep1, sep2, ...]]
 "******************************************************************************
     let l:keepempty = (a:0 ? a:1 : 0)
     let l:prevIndex = 0
