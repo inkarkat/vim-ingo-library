@@ -118,6 +118,9 @@ HISTORY							*ingo-library-history*
 - CHG: Move ingo#list#Matches() to ingo#list#pattern#AllItemsMatch(). The
   previous name wasn't very clear.
 - Add ingo#list#pattern#{First,All}Match[Index]() functions.
+- ingo#query#{get#Number,fromlist#Query}(): ENH: Also support number entry with leading zeros
+- ingo#query#fromlist#Query(): BUG: Cannot conclude multi-digit entry with <Enter>
+- ingo#query#fromlist#Query(): BUG: Typing non-accellerator non-number characters are treated as literal "0"
 
 1.034	13-Feb-2018
 - Add ingo/regexp/split.vim module.
