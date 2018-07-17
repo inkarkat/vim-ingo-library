@@ -84,13 +84,13 @@ function! ingo#query#fromlist#Query( what, list, ... )
     let l:count = (empty(l:choice) ? -1 : index(l:accelerators, l:choice, 0, 1)) + 1
     if l:count == 0 && l:choice =~# '^\d$'
 	let l:count = str2nr(l:choice)
-	if len(a:list) > 10 * l:count
+	let l:maxNum = len(a:list)
+	if l:maxNum > 10 * l:count
 	    " Need to query more numbers to be able to address all choices.
 	    echon ' ' . l:count
 
 	    let l:leadingZeroCnt = (l:choice ==# '0')
-	    let l:maxNum = len(a:list)
-	    while len(a:list) > 10 * l:count
+	    while l:maxNum > 10 * l:count
 		let l:char = nr2char(getchar())
 		if l:char ==# "\<CR>"
 		    break
@@ -115,7 +115,7 @@ function! ingo#query#fromlist#Query( what, list, ... )
 	endif
     endif
 
-    if l:count < 1 || l:count > len(a:list)
+    if l:count < 1 || l:count > l:maxNum
 	redraw | echo ''
 	return -1
     endif
