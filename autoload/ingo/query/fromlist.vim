@@ -88,6 +88,8 @@ function! ingo#query#fromlist#Query( what, list, ... )
 	    " Need to query more numbers to be able to address all choices.
 	    echon ' ' . l:count
 
+	    let l:leadingZeroCnt = (l:choice ==# '0')
+	    let l:maxNum = len(a:list)
 	    while len(a:list) > 10 * l:count
 		let l:char = nr2char(getchar())
 		if l:char ==# "\<CR>"
@@ -98,7 +100,17 @@ function! ingo#query#fromlist#Query( what, list, ... )
 		endif
 
 		echon l:char
-		let l:count = 10 * l:count + str2nr(l:char)
+		if l:char ==# '0' && l:count == 0
+		    let l:leadingZeroCnt += 1
+		    if l:leadingZeroCnt >= len(l:maxNum)
+			return -1
+		    endif
+		else
+		    let l:count = 10 * l:count + str2nr(l:char)
+		    if l:leadingZeroCnt + len(l:count) >= len(l:maxNum)
+			break
+		    endif
+		endif
 	    endwhile
 	endif
     endif
