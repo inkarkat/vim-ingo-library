@@ -1,9 +1,11 @@
 " ingo/query/fromlist.vim: Functions for querying elements from a list.
 "
 " DEPENDENCIES:
+"   - ingo/compat.vim autoload script
 "   - ingo/query.vim autoload script
 "   - ingo/query/confirm.vim autoload script
 "   - ingo/query/get.vim autoload script
+"   - ingo/query/recall.vim autoload script
 "
 " Copyright: (C) 2014-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -87,12 +89,16 @@ function! ingo#query#fromlist#Query( what, list, ... )
 	    echon ' ' . l:count
 
 	    while len(a:list) > 10 * l:count
-		let l:digit = ingo#query#get#Number(9)
-		if l:digit == -1
+		let l:char = nr2char(getchar())
+		if l:char ==# "\<CR>"
+		    break
+		elseif l:char !~# '\d'
 		    redraw | echo ''
 		    return -1
 		endif
-		let l:count = 10 * l:count + l:digit
+
+		echon l:char
+		let l:count = 10 * l:count + str2nr(l:char)
 	    endwhile
 	endif
     endif
