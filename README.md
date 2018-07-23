@@ -11,6 +11,23 @@ duplicating the functionality, or installing potentially conflicting versions
 with each plugin, this one core dependency fosters a lean Vim runtime and
 easier plugin updates.
 
+Separating common functions is explicitly recommended by Vim; see
+write-library-script. The autoload mechanism was created to make this
+really easy and efficient. Only those scripts that contain functions that are
+actually used are loaded, the rest is ignored; it just "wastes" the space on
+disk. (Not using autoload functions, and duplicating utility functions in the
+plugin script itself, now that would be truly bad.)
+
+Still, if you only use one or few of my plugins, yes, this might look
+wasteful. However, I have published an awful lot of plugins (most of which now
+use ingo-library), and intend to continue to do so. Considering that, the
+decision to extract the common functionality (which caused a lot of effort for
+me) benefits both users (no duplication, no incompatibilities, faster updates)
+and me (less overall effort in maintaining, more time for features). Please
+keep that in mind before complaining about this dependency.
+
+Furthermore, several other authors have been following the same approach:
+
 ### RELATED WORKS
 
 Other authors have published separate support libraries, too:
