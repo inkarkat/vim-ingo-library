@@ -3,6 +3,7 @@ digest/
 list/lcs/
 list/pattern/
 list/sequence/
+lists/
 lnum/
 regexp/split/
 subs/BraceCreation/
