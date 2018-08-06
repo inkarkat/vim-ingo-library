@@ -11,7 +11,7 @@ function! ingo#lists#find#FirstDifferent( list1, list2 )
 "******************************************************************************
 "* PURPOSE:
 "   Compare elements in a:list1 and a:list2 and return the index of the first
-"   elements are are not equal.
+"   elements that are not equal.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
