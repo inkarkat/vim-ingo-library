@@ -139,6 +139,7 @@ HISTORY							*ingo-library-history*
 - ingo#query#fromlist#Query(): BUG: Cannot conclude multi-digit entry with <Enter>
 - ingo#query#fromlist#Query(): BUG: Typing non-accellerator non-number characters are treated as literal "0"
 - Add ingo/lists.vim module.
+- Add ingo/regexp/capture.vim module.
 
 1.034	13-Feb-2018
 - Add ingo/regexp/split.vim module.
