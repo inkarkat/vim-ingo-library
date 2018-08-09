@@ -127,6 +127,7 @@ HISTORY
 - Add ingo/lists.vim module.
 - Add ingo/regexp/capture.vim module.
 - Add ingo#cmdargs#substitute#GetFlags().
+- Add ingo#subst#Indexed().
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.

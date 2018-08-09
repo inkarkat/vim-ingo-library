@@ -8,4 +8,5 @@ lnum/
 regexp/split/
 subs/BraceCreation/
 subs/BraceExpansion/
+subst/
 subst/expr/

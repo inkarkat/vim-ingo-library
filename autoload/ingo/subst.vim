@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -128,6 +128,44 @@ function! ingo#subst#FirstParameter( expr, patternTemplate, replacement, flags, 
 	endif
     endfor
     return [-1, a:expr]
+endfunction
+
+function! ingo#subst#Indexed( expr, pattern, replacement, indices )
+"******************************************************************************
+"* PURPOSE:
+"   Substitute only the N+1'th matches for the N in a:indices. Other matches are
+"   kept as-is.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:expr  Text to be transformed.
+"   a:pattern   Regular expression.
+"   a:replacement       Replacement. |sub-replace-expression| is not supported.
+"   a:indices   List of 0-based indices whose corresponding matches are
+"               replaced. A String value of "g" replaces globally, just like
+"               substitute(..., 'g').
+"* RETURN VALUES:
+"   Replacement.
+"******************************************************************************
+    if type(a:indices) == type('') && a:indices ==# 'g'
+	return substitute(a:expr, a:pattern, a:replacement, 'g')
+    endif
+
+    let l:context = {
+    \   'matchCnt': 0,
+    \   'indices': a:indices,
+    \   'replacement': a:replacement
+    \}
+    return substitute(a:expr, a:pattern, '\=s:IndexReplacer(l:context)', 'g')
+endfunction
+function! s:IndexReplacer( context )
+    let a:context.matchCnt += 1
+    return (index(a:context.indices, a:context.matchCnt - 1) == -1 ?
+    \   submatch(0) :
+    \   a:context.replacement
+    \)
 endfunction
 
 let &cpo = s:save_cpo
