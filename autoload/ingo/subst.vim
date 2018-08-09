@@ -130,11 +130,11 @@ function! ingo#subst#FirstParameter( expr, patternTemplate, replacement, flags, 
     return [-1, a:expr]
 endfunction
 
-function! ingo#subst#Indexed( expr, pattern, replacement, indices )
+function! ingo#subst#Indexed( expr, pattern, replacement, indices, ... )
 "******************************************************************************
 "* PURPOSE:
-"   Substitute only the N+1'th matches for the N in a:indices. Other matches are
-"   kept as-is.
+"   Substitute only / not the N+1'th matches for the N in a:indices. Other
+"   matches are kept as-is.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -146,6 +146,9 @@ function! ingo#subst#Indexed( expr, pattern, replacement, indices )
 "   a:indices   List of 0-based indices whose corresponding matches are
 "               replaced. A String value of "g" replaces globally, just like
 "               substitute(..., 'g').
+"   a:isInvert  Flag whether only those matches whose indices are NOT in
+"               a:indices are replaced. Does not invert the "g" String value.
+"               Default is false.
 "* RETURN VALUES:
 "   Replacement.
 "******************************************************************************
@@ -156,16 +159,15 @@ function! ingo#subst#Indexed( expr, pattern, replacement, indices )
     let l:context = {
     \   'matchCnt': 0,
     \   'indices': a:indices,
+    \   'isInvert': (a:0 ? a:1 : 0),
     \   'replacement': a:replacement
     \}
     return substitute(a:expr, a:pattern, '\=s:IndexReplacer(l:context)', 'g')
 endfunction
 function! s:IndexReplacer( context )
     let a:context.matchCnt += 1
-    return (index(a:context.indices, a:context.matchCnt - 1) == -1 ?
-    \   submatch(0) :
-    \   a:context.replacement
-    \)
+    execute 'let l:isSelected = index(a:context.indices, a:context.matchCnt - 1)' (a:context.isInvert ? '==' : '!=') '-1'
+    return (l:isSelected ? a:context.replacement : submatch(0))
 endfunction
 
 let &cpo = s:save_cpo
