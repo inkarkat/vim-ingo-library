@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/list.vim autoload script
 "
-" Copyright: (C) 2012-2017 Ingo Karkat
+" Copyright: (C) 2012-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -62,6 +62,10 @@
 function! s:ApplyEmptyFlags( emptyFlags, parsedFlags)
     return (empty(filter(copy(a:parsedFlags), '! empty(v:val)')) ? a:emptyFlags : a:parsedFlags)
 endfunction
+function! ingo#cmdargs#substitute#GetFlags( ... )
+    return '&\?[cegiInp#lr' . (a:0 ? a:1 : '') . ']*'
+endfunction
+
 function! ingo#cmdargs#substitute#Parse( arguments, ... )
 "******************************************************************************
 "* PURPOSE:
@@ -120,7 +124,7 @@ function! ingo#cmdargs#substitute#Parse( arguments, ... )
 "******************************************************************************
     let l:options = (a:0 ? a:1 : {})
     let l:additionalFlags = get(l:options, 'additionalFlags', '')
-    let l:flagsExpr = get(l:options, 'flagsExpr', '\(&\?[cegiInp#lr' . l:additionalFlags . ']*\)\(\s*\d*\)')
+    let l:flagsExpr = get(l:options, 'flagsExpr', '\(' . ingo#cmdargs#substitute#GetFlags(l:additionalFlags) . '\)\(\s*\d*\)')
     let l:isParseFlags = (! empty(l:flagsExpr))
     let l:flagsMatchCount = get(l:options, 'flagsMatchCount', (has_key(l:options, 'flagsExpr') ? (l:isParseFlags ? 1 : 0) : 2))
     let l:defaultFlags = (l:isParseFlags ? repeat([''], l:flagsMatchCount) : [])
