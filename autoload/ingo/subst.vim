@@ -1,6 +1,8 @@
 " ingo/subst.vim: Functions for substitutions.
 "
 " DEPENDENCIES:
+"   - ingo/format.vim autoload script
+"   - ingo/subst/replacement.vim autoload script
 "
 " Copyright: (C) 2013-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -142,7 +144,8 @@ function! ingo#subst#Indexed( expr, pattern, replacement, indices, ... )
 "* INPUTS:
 "   a:expr  Text to be transformed.
 "   a:pattern   Regular expression.
-"   a:replacement       Replacement. |sub-replace-expression| is not supported.
+"   a:replacement       Replacement. Handles |sub-replace-expression|, & and \0,
+"                       \1 .. \9, and \r\n\t\b (but not \u, \U, etc.)
 "   a:indices   List of 0-based indices whose corresponding matches are
 "               replaced. A String value of "g" replaces globally, just like
 "               substitute(..., 'g').
@@ -167,7 +170,7 @@ endfunction
 function! s:IndexReplacer( context )
     let a:context.matchCnt += 1
     execute 'let l:isSelected = index(a:context.indices, a:context.matchCnt - 1)' (a:context.isInvert ? '==' : '!=') '-1'
-    return (l:isSelected ? a:context.replacement : submatch(0))
+    return ingo#subst#replacement#DefaultReplacementOnPredicate(l:isSelected, a:context)
 endfunction
 
 let &cpo = s:save_cpo
