@@ -128,6 +128,7 @@ HISTORY
 - Add ingo/regexp/capture.vim module.
 - Add ingo#cmdargs#substitute#GetFlags().
 - Add ingo#subst#Indexed().
+- Add ingo#regexp#split#PrefixGroupsSuffix().
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
