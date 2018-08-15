@@ -5,7 +5,7 @@
 "   - ingo/collections/fromsplit.vim autoload script
 "   - ingo/regexp/collection.vim autoload script
 "
-" Copyright: (C) 2011-2017 Ingo Karkat
+" Copyright: (C) 2011-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -65,7 +65,7 @@ let s:specialSearchCharacterExpressions = {
 \   'V': '\\',
 \}
 function! s:ConvertMagicnessOfFragment( fragment, sourceSpecialCharacterExpr, targetSpecialCharacterExpr )
-    let l:elements = ingo#collections#fromsplit#MapItemsAndSeparators(a:fragment, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\?' . ingo#regexp#collection#Expr(),
+    let l:elements = ingo#collections#fromsplit#MapItemsAndSeparators(a:fragment, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\?' . ingo#regexp#collection#Expr({'isBarePattern': 1}),
     \	printf('ingo#regexp#magic#ConvertMagicnessOfElement(v:val, %s, %s)', string(a:sourceSpecialCharacterExpr), string(a:targetSpecialCharacterExpr)),
     \	printf('ingo#regexp#magic#ConvertMagicnessOfCollection(v:val, %s, %s)', string(a:sourceSpecialCharacterExpr), string(a:targetSpecialCharacterExpr))
     \)
