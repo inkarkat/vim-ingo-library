@@ -27,6 +27,24 @@ function! ingo#regexp#deconstruct#RemovePositionAtoms( pattern )
     return substitute(a:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\%(\\\%([\^<>]\|_\^\|_\$\|%[\^$V#]\|%[<>]\?''.\|%[<>]\?\d\+[lcv]\)\|[\^$]\)', '', 'g')
 endfunction
 
+function! ingo#regexp#deconstruct#RemoveMultis( pattern )
+"******************************************************************************
+"* PURPOSE:
+"   Remove multi items (*, \+, etc.) that signify the multiplicity of the
+"   previous atom from a:pattern.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   Does not consider "very magic" (/\v)-style syntax. If you may have this,
+"   convert via ingo#regexp#magic#Normalize() first.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:pattern   regular expression
+"* RETURN VALUES:
+"   Modified a:pattern with multi items removed.
+"******************************************************************************
+    return substitute(a:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\%(\*\|\\[+=?]\|\\{-\?\d*,\?\d*}\|\\@\%(>\|=\|!\|<=\|<!\)\)', '', 'g')
+endfunction
+
 let s:specialLookup = {
 \   'e': "\e",
 \   't': "\t",
