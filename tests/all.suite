@@ -6,6 +6,7 @@ list/sequence/
 lists/
 lnum/
 regexp/capture/
+regexp/deconstruct/
 regexp/split/
 subs/BraceCreation/
 subs/BraceExpansion/
