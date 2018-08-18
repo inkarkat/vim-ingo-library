@@ -129,6 +129,7 @@ HISTORY
 - Add ingo#cmdargs#substitute#GetFlags().
 - Add ingo#subst#Indexed().
 - Add ingo#regexp#split#PrefixGroupsSuffix().
+- Add ingo#collections#SplitIntoMatches().
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.

@@ -1,8 +1,12 @@
 " ingo/collections.vim: Functions to operate on collections.
 "
 " DEPENDENCIES:
+"   - ingo/actions.vim autoload script
+"   - ingo/compat.vim autoload script
 "   - ingo/dict.vim autoload script
+"   - ingo/dict/count.vim autoload script
 "   - ingo/list.vim autoload script
+"   - ingocollections.vim autoload script
 "
 " Copyright: (C) 2011-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -281,6 +285,69 @@ function! ingo#collections#SeparateItemsAndSeparators( expr, pattern, ... )
     endwhile
 
     return [l:items, l:separators]
+endfunction
+function! ingo#collections#SplitIntoMatches( expr, pattern, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Like the built-in |split()|, but only return the separators matched by
+"   a:pattern, and discard the text in between (what is normally returned by
+"   split()). Optionally it checks that the discarded text only matches
+"   a:allowedDiscardPattern, and throws an exception if something else would be
+"   discarded.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:expr	Text to be split.
+"   a:pattern	Regular expression that specifies the separator text that
+"		delimits the items to be discarded.
+"   a:allowedDiscardPattern Optional regular expression that if given checks all
+"                           discarded text in between separators for match. If
+"                           one does not match, a "SplitIntoMatches: Cannot
+"                           discard TEXT" exception is thrown. To ensure that
+"                           everything matches as separators, and all items are
+"                           empty, pass "" or "^$".
+"* RETURN VALUES:
+"   List of separators matching a:pattern: [sep1, ...].
+"******************************************************************************
+    let l:allowedDiscardPattern = (a:0 ? (empty(a:1) ? '^$' : a:1) : '')
+    let l:prevIndex = 0
+    let l:index = 0
+    let l:separator = ''
+    let l:separators = []
+
+    while ! empty(a:expr)
+	let l:index = match(a:expr, a:pattern, l:prevIndex)
+	if l:index == -1
+	    let l:remainder = strpart(a:expr, l:prevIndex)
+	    if ! empty(l:allowedDiscardPattern) && matchstr(l:remainder, '\C' . l:allowedDiscardPattern) !=# l:remainder
+		throw 'SplitIntoMatches: Cannot discard ' . string(l:remainder)
+	    endif
+
+	    break
+	endif
+	let l:item = strpart(a:expr, l:prevIndex, (l:index - l:prevIndex))
+	if ! empty(l:allowedDiscardPattern) && matchstr(l:item, '\C' . l:allowedDiscardPattern) !=# l:item
+	    throw 'SplitIntoMatches: Cannot discard ' . string(l:item)
+	endif
+
+	let l:prevIndex = matchend(a:expr, a:pattern, l:prevIndex)
+	let l:separator = strpart(a:expr, l:index, (l:prevIndex - l:index))
+
+	if empty(l:item) && empty(l:separator)
+	    " We have a zero-width separator; consume at least one character to
+	    " avoid the endless loop.
+	    let l:prevIndex = matchend(a:expr, '\_.', l:index)
+	    if l:prevIndex == -1
+		break
+	    endif
+	else
+	    call s:add(l:separators, l:separator, 1)
+	endif
+    endwhile
+
+    return l:separators
 endfunction
 
 function! ingo#collections#isort( i1, i2 )
