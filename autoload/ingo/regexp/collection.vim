@@ -72,6 +72,47 @@ function! ingo#regexp#collection#LiteralToRegexp( text, ... )
     return '[' . (l:isInvert ? '^' : '') . ingo#regexp#collection#EscapeLiteralCharacters(a:text) . ']'
 endfunction
 
+function! ingo#regexp#collection#ToBranches( pattern )
+"******************************************************************************
+"* PURPOSE:
+"   Convert each collection in a:pattern into an equivalent group of alternative
+"   branches (where possible; i.e. for single characters). For example:
+"   /[abc[:digit:]]/ to /\%(a\|b\|c\|[[:digit:]]\)/. Does not support negative
+"   collections /[^...]/. Things that cannot be (easily) represented is kept as
+"   smaller collections in a branch, e.g. /[a-fxyz]/ to
+"   /\%([a-f]\|x\|y\|z\)/.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:pattern   regular expression, usually with collection(s) in them
+"* RETURN VALUES:
+"   Modified a:pattern
+"******************************************************************************
+    return substitute(a:pattern, ingo#regexp#collection#Expr(), '\=s:CollectionToBranches(submatch(0))', 'g')
+endfunction
+function! s:CollectionToBranches( collection )
+    if a:collection =~# '^\[\^'
+	return a:collection " Negative collections not yet supported.
+    endif
+
+    let l:branches = map(
+    \   ingo#collections#SplitIntoMatches(matchstr(a:collection, '^\[\zs.*\ze\]$'), '[^-]-[^-]\|\[:\a\+:\]\|\[=.\{-}]\]\|\[\..\.\]\|\\[etrbn]\|\\d\d\+\|\\[uU]\x\{4,8\}\|.'),
+    \   's:CollectionElementToPattern(v:val)'
+    \)
+    return '\%(' . join(l:branches, '\|') . '\)'
+endfunction
+function! s:CollectionElementToPattern( collectionElement )
+    if a:collectionElement =~# '^\%(\\[etrbn]\|.\)$'
+	" We can return (escaped) single characters as-is.
+	return a:collectionElement
+    else
+	" For the rest, enclose in a (smaller) collection on its own.
+	return '[' . a:collectionElement . ']'
+    endif
+endfunction
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
