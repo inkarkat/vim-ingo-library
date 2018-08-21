@@ -9,6 +9,7 @@ lnum/
 regexp/capture/
 regexp/collection/
 regexp/deconstruct/
+regexp/length/
 regexp/split/
 subs/BraceCreation/
 subs/BraceExpansion/
