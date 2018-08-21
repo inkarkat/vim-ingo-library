@@ -13,6 +13,16 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+function! s:AddWithLimit( accumulator, value )
+    return (a:accumulator == 0x7FFFFFFF || a:value == 0x7FFFFFFF ?
+    \   0x7FFFFFFF :
+    \   min([a:accumulator + a:value, 0x7FFFFFFF])
+    \)
+endfunction
+function! s:AddMinMax( accumulatorList, valueList )
+    let a:accumulatorList[0] = s:AddWithLimit(a:accumulatorList[0], a:valueList[0])
+    let a:accumulatorList[1] = s:AddWithLimit(a:accumulatorList[1], a:valueList[1])
+endfunction
 function! s:OverallMinMax( minMaxList )
     let l:minLengths = map(copy(a:minMaxList), 'v:val[0]')
     let l:maxLengths = map(copy(a:minMaxList), 'v:val[1]')
@@ -70,6 +80,24 @@ function! s:ProjectMultis( pattern, multi )
     return [l:minLength * l:minMultiplier, l:maxLength * l:maxMultiplier]
 endfunction
 function! s:ProjectPattern( pattern )
+    let l:splits = ingo#regexp#split#PrefixGroupsSuffix(a:pattern)
+    if len(l:splits) == 1
+	return s:ProjectUngroupedPattern(a:pattern)
+    endif
+
+    let l:minMaxes = [0, 0]
+    while len(l:splits) > 1
+	let l:prefix = remove(l:splits, 0)
+	call s:AddMinMax(l:minMaxes, s:ProjectUngroupedPattern(l:prefix))
+
+	let l:group = remove(l:splits, 0)
+	call s:AddMinMax(l:minMaxes, ingo#regexp#length#Project(l:group))
+    endwhile
+    call s:AddMinMax(l:minMaxes, s:ProjectUngroupedPattern(l:splits[0]))
+
+    return l:minMaxes
+endfunction
+function! s:ProjectUngroupedPattern( pattern )
     return [len(a:pattern), len(a:pattern)]
 endfunction
 function! s:ProjectMulti( multi )
