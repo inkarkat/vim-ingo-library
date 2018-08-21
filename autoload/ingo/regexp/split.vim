@@ -1,6 +1,7 @@
 " ingo/regexp/split.vim: Functions to split a regular expression.
 "
 " DEPENDENCIES:
+"   - ingo/regexp/length.vim autoload script
 "
 " Copyright: (C) 2017-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -105,6 +106,40 @@ function! ingo#regexp#split#PrefixGroupsSuffix( pattern )
     endif
 
     return l:result
+endfunction
+
+function! ingo#regexp#split#AddPatternByProjectedMatchLength( branches, pattern )
+"******************************************************************************
+"* PURPOSE:
+"   Add a:pattern to the List of regexp a:branches, in a position so that
+"   shorter earlier branches do not eclipse a following longer match.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:branches  List of regular expression branches (e.g. split via
+"               ingo#regexp#split#TopLevelBranches()).
+"   a:pattern   Regular expression to be added at the appropriate position in
+"               a:branches, depending on the projected length of the matches.
+"               Longer matches will come first, so that a shorter earlier match
+"               does not eclipse a following longer one.
+"* RETURN VALUES:
+"   Modified a:branches List.
+"******************************************************************************
+    let l:projectedPatternMinLength = ingo#regexp#length#Project(a:pattern)[0]
+
+    let l:i = 0
+    while l:i < len(a:branches)
+	let [l:min, l:max] = ingo#regexp#length#Project(a:branches[l:i])
+	let l:compare = (l:max < 0x7FFFFFFF ? l:max : l:min)
+	if l:compare < l:projectedPatternMinLength
+	    break
+	endif
+
+	let l:i += 1
+    endwhile
+    return insert(a:branches, a:pattern, l:i)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
