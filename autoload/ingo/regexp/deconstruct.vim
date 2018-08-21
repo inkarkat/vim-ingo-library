@@ -42,7 +42,7 @@ function! ingo#regexp#deconstruct#RemoveMultis( pattern )
 "* RETURN VALUES:
 "   Modified a:pattern with multi items removed.
 "******************************************************************************
-    return substitute(a:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\%(\*\|\\[+=?]\|\\{-\?\d*,\?\d*}\|\\@\%(>\|=\|!\|<=\|<!\)\)', '', 'g')
+    return substitute(a:pattern, ingo#regexp#multi#Expr(), '', 'g')
 endfunction
 
 let s:specialLookup = {

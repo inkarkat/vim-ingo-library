@@ -60,7 +60,7 @@ function! s:ProjectBranch( pattern )
     \   ingo#list#split#ChunksOf(
     \       ingo#collections#SplitKeepSeparators(
     \           a:pattern,
-    \           '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\%(\*\|\\[+=?]\|\\{-\?\d*,\?\d*}\|\\@\%(>\|=\|!\|<=\|<!\)\)',
+    \           ingo#regexp#multi#Expr(),
     \           1
     \       ),
     \       2, ''
