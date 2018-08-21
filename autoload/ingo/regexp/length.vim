@@ -7,6 +7,7 @@
 "   - ingo/regexp/collection.vim autoload script
 "   - ingo/regexp/deconstruct.vim autoload script
 "   - ingo/regexp/magic.vim autoload script
+"   - ingo/regexp/multi.vim autoload script
 "   - ingo/regexp/split.vim autoload script
 "
 " Copyright: (C) 2018 Ingo Karkat
@@ -25,6 +26,7 @@ endfunction
 function! s:AddMinMax( accumulatorList, valueList )
     let a:accumulatorList[0] = s:AddWithLimit(a:accumulatorList[0], a:valueList[0])
     let a:accumulatorList[1] = s:AddWithLimit(a:accumulatorList[1], a:valueList[1])
+    return a:accumulatorList
 endfunction
 function! s:OverallMinMax( minMaxList )
     let l:minLengths = map(copy(a:minMaxList), 'v:val[0]')
@@ -56,6 +58,38 @@ function! ingo#regexp#length#Project( pattern )
     return s:OverallMinMax(l:minMaxBranches)
 endfunction
 function! s:ProjectBranch( pattern )
+    let l:splits = ingo#regexp#split#PrefixGroupsSuffix(a:pattern)
+    if len(l:splits) == 1
+	return s:ProjectUngroupedPattern(a:pattern)
+    endif
+
+    call add(l:splits, '')  " Add one empty branch to be able to handle the last real one in a consistent way.
+    let l:minMaxes = [0, 0]
+    let l:previousMinMax = [0, 0]
+    while len(l:splits) > 1
+	let l:prefix = remove(l:splits, 0)
+	let [l:multi, l:rest] = matchlist(l:prefix, '^\(' . ingo#regexp#multi#Expr() . '\)\?\(.\{-}\)$')[1:2]
+	if empty(l:multi)
+	    call s:AddMinMax(l:minMaxes, l:previousMinMax)
+	else
+	    let l:prefix = l:rest
+	    call s:AddMinMax(l:minMaxes, s:Multiply(l:previousMinMax, l:multi))
+	endif
+	call s:AddMinMax(l:minMaxes, s:ProjectUngroupedPattern(l:prefix))
+
+	let l:group = remove(l:splits, 0)
+	let l:previousMinMax = ingo#regexp#length#Project(l:group)
+    endwhile
+
+    return l:minMaxes
+endfunction
+function! s:Multiply( minMax, multi )
+    let [l:minLength, l:maxLength] = a:minMax
+    let [l:minMultiplier, l:maxMultiplier] = s:ProjectMulti(a:multi)
+
+    return [l:minLength * l:minMultiplier, l:maxLength * l:maxMultiplier]
+endfunction
+function! s:ProjectUngroupedPattern( pattern )
     let l:patternMultis =
     \   ingo#list#split#ChunksOf(
     \       ingo#collections#SplitKeepSeparators(
@@ -74,33 +108,16 @@ function! s:ProjectBranch( pattern )
     \   's:ProjectMultis(v:val[0], v:val[1])'
     \)
 
-    return s:OverallMinMax(l:minMaxMultis)
+    return ingo#collections#Reduce(l:minMaxMultis, function('s:AddMinMax'), [0, 0])
 endfunction
 function! s:ProjectMultis( pattern, multi )
-    let [l:minLength, l:maxLength] = s:ProjectPattern(a:pattern)
-    let [l:minMultiplier, l:maxMultiplier] = s:ProjectMulti(a:multi)
-
-    return [l:minLength * l:minMultiplier, l:maxLength * l:maxMultiplier]
-endfunction
-function! s:ProjectPattern( pattern )
-    let l:splits = ingo#regexp#split#PrefixGroupsSuffix(a:pattern)
-    if len(l:splits) == 1
-	return s:ProjectUngroupedPattern(a:pattern)
-    endif
-
     let l:minMaxes = [0, 0]
-    while len(l:splits) > 1
-	let l:prefix = remove(l:splits, 0)
-	call s:AddMinMax(l:minMaxes, s:ProjectUngroupedPattern(l:prefix))
-
-	let l:group = remove(l:splits, 0)
-	call s:AddMinMax(l:minMaxes, ingo#regexp#length#Project(l:group))
-    endwhile
-    call s:AddMinMax(l:minMaxes, s:ProjectUngroupedPattern(l:splits[0]))
-
+    call s:AddMinMax(l:minMaxes, s:ProjectUngroupedSinglePattern(a:pattern))
+    call s:AddMinMax(l:minMaxes, [-1, -1])  " The tally for the atom before the multi is contained in the multi, so we need to subtract one. Simply cutting it off would be more difficult, because it could be an escaped special character or a collection.
+    call s:AddMinMax(l:minMaxes, s:ProjectMulti(a:multi))
     return l:minMaxes
 endfunction
-function! s:ProjectUngroupedPattern( pattern )
+function! s:ProjectUngroupedSinglePattern( pattern )
     let l:patternWithoutCollections = s:RemoveCollections(a:pattern)
     let l:literalText = ingo#regexp#deconstruct#ToQuasiLiteral(l:patternWithoutCollections)
     let l:literalTextLength = ingo#compat#strchars(l:literalText)
