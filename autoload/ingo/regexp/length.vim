@@ -4,6 +4,7 @@
 "   - ingo/collections.vim autoload script
 "   - ingo/compat.vim autoload script
 "   - ingo/list/split.vim autoload script
+"   - ingo/regexp/collection.vim autoload script
 "   - ingo/regexp/deconstruct.vim autoload script
 "   - ingo/regexp/magic.vim autoload script
 "   - ingo/regexp/split.vim autoload script
@@ -100,9 +101,13 @@ function! s:ProjectPattern( pattern )
     return l:minMaxes
 endfunction
 function! s:ProjectUngroupedPattern( pattern )
-    let l:literalText = ingo#regexp#deconstruct#ToQuasiLiteral(a:pattern)
+    let l:patternWithoutCollections = s:RemoveCollections(a:pattern)
+    let l:literalText = ingo#regexp#deconstruct#ToQuasiLiteral(l:patternWithoutCollections)
     let l:literalTextLength = ingo#compat#strchars(l:literalText)
     return [l:literalTextLength, l:literalTextLength]
+endfunction
+function! s:RemoveCollections( pattern )
+    return substitute(a:pattern, ingo#regexp#collection#Expr(), 'x', 'g')
 endfunction
 function! s:ProjectMulti( multi )
     if empty(a:multi)
