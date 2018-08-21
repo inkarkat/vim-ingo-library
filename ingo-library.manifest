@@ -132,8 +132,11 @@ autoload/ingo/regexp/build.vim
 autoload/ingo/regexp/capture.vim
 autoload/ingo/regexp/comments.vim
 autoload/ingo/regexp/collection.vim
+autoload/ingo/regexp/deconstruct.vim
 autoload/ingo/regexp/fromwildcard.vim
+autoload/ingo/regexp/length.vim
 autoload/ingo/regexp/magic.vim
+autoload/ingo/regexp/multi.vim
 autoload/ingo/regexp/pairs.vim
 autoload/ingo/regexp/previoussubstitution.vim
 autoload/ingo/regexp/split.vim

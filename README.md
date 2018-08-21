@@ -131,6 +131,7 @@ HISTORY
 - Add ingo#regexp#split#PrefixGroupsSuffix().
 - Add ingo#collections#SplitIntoMatches().
 - Add ingo#regexp#collection#ToBranches().
+- Add ingo/regexp/{deconstruct,length,multi} modules.
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
