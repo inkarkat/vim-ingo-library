@@ -74,6 +74,8 @@ function! ingo#regexp#split#PrefixGroupsSuffix( pattern )
 "* RETURN VALUES:
 "   List of [prefix, group1, [infix, group2, [...]] suffix], or [a:pattern] if
 "   there's no toplevel group at all.
+"   Throws 'PrefixGroupsSuffix: Unmatched \(' or
+"   'PrefixGroupsSuffix: Unmatched \)' if a:pattern is invalid.
 "******************************************************************************
     let l:pattern = a:pattern
     let l:result = []

@@ -49,6 +49,8 @@ function! ingo#regexp#length#Project( pattern )
 "* RETURN VALUES:
 "   List of [minLength, maxLength]. For complex expressions or unbounded multis
 "   like |/*| , assumes a minimum of 0 and a maximum of 0x7FFFFFFF.
+"   Throws 'PrefixGroupsSuffix: Unmatched \(' or
+"   'PrefixGroupsSuffix: Unmatched \)' if a:pattern is invalid.
 "******************************************************************************
     let l:branches = ingo#regexp#split#TopLevelBranches(a:pattern)
     let l:minMaxBranches = map(
