@@ -43,6 +43,7 @@ autoload/ingo/compat/regexp.vim
 autoload/ingo/compat/shellcommand.vim
 autoload/ingo/compat/window.vim
 autoload/ingo/cursor.vim
+autoload/ingo/cursor/keep.vim
 autoload/ingo/cursor/move.vim
 autoload/ingo/date.vim
 autoload/ingo/date/epoch.vim

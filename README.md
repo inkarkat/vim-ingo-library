@@ -132,6 +132,8 @@ HISTORY
 - Add ingo#collections#SplitIntoMatches().
 - Add ingo#regexp#collection#ToBranches().
 - Add ingo/regexp/{deconstruct,length,multi} modules.
+- Add ingo#range#Is{In,Out}side().
+- Add ingo/cursor/keep.vim module.
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.

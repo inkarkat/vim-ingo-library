@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2017 Ingo Karkat
+" Copyright: (C) 2012-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -47,6 +47,13 @@ endfunction
 
 function! ingo#range#IsEntireBuffer( startLnum, endLnum )
     return (a:startLnum <= 1 && a:endLnum == line('$'))
+endfunction
+
+function! ingo#range#IsOutside( lnum, startLnum, endLnum )
+    return (a:lnum < a:startLnum || a:lnum > a:endLnum)
+endfunction
+function! ingo#range#IsInside( lnum, startLnum, endLnum )
+    return ! ingo#range#IsOutside(a:lnum, a:startLnum, a:endLnum)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
