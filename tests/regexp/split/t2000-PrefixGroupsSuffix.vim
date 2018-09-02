@@ -1,7 +1,7 @@
 " Test splitting prefix, group(s), suffix.
 
 call vimtest#StartTap()
-call vimtap#Plan(11)
+call vimtap#Plan(9)
 
 call vimtap#Is(ingo#regexp#split#PrefixGroupsSuffix(''), [''], 'empty pattern')
 call vimtap#Is(ingo#regexp#split#PrefixGroupsSuffix('foo'), ['foo'], 'simple literal pattern')
@@ -14,8 +14,5 @@ call vimtap#Is(ingo#regexp#split#PrefixGroupsSuffix('\%(Foo\|Bar\|Fox\)\(Our\|Th
 
 call vimtap#Is(ingo#regexp#split#PrefixGroupsSuffix('my\%(Foo\|B\(ar\|il\|ox\)\|Fox\)Trott'), ['my', 'Foo\|B\(ar\|il\|ox\)\|Fox', 'Trott'], 'group with another group inside')
 call vimtap#Is(ingo#regexp#split#PrefixGroupsSuffix('my\%(F\(al\)\?oo\|B\(ar\|il\|ox\)\|\(F\|\%(Var\)\?i\)ox\)Trott'), ['my', 'F\(al\)\?oo\|B\(ar\|il\|ox\)\|\(F\|\%(Var\)\?i\)ox', 'Trott'], 'group with other groups inside')
-
-call vimtap#err#Throws('PrefixGroupsSuffix: Unmatched \(', "call ingo#regexp#split#PrefixGroupsSuffix('my\\%(Foo\\|B\\(ar\\|il\\|ox\\|Fox\\)Trott')", 'missing closing paren throws exception')
-call vimtap#err#Throws('PrefixGroupsSuffix: Unmatched \)', "call ingo#regexp#split#PrefixGroupsSuffix('my\\%(Foo\\|B\\(ar\\|il\\)\\|ox\\)\\|Fox\\)Trott')", 'missing opening paren throws exception')
 
 call vimtest#Quit()
