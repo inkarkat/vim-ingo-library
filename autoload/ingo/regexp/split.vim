@@ -129,15 +129,23 @@ function! ingo#regexp#split#AddPatternByProjectedMatchLength( branches, pattern 
 "* RETURN VALUES:
 "   Modified a:branches List.
 "******************************************************************************
-    let l:projectedPatternMinLength = ingo#regexp#length#Project(a:pattern)[0]
+    try
+	let l:projectedPatternMinLength = ingo#regexp#length#Project(a:pattern)[0]
+    catch /^PrefixGroupsSuffix:/
+	let l:projectedPatternMinLength = 0
+    endtry
 
     let l:i = 0
     while l:i < len(a:branches)
-	let [l:min, l:max] = ingo#regexp#length#Project(a:branches[l:i])
-	let l:compare = (l:max < 0x7FFFFFFF ? l:max : l:min)
-	if l:compare < l:projectedPatternMinLength
-	    break
-	endif
+	try
+	    let [l:min, l:max] = ingo#regexp#length#Project(a:branches[l:i])
+	    let l:compare = (l:max < 0x7FFFFFFF ? l:max : l:min)
+	    if l:compare < l:projectedPatternMinLength
+		break
+	    endif
+	catch /^PrefixGroupsSuffix:/
+	    " Skip invalid existing branch.
+	endtry
 
 	let l:i += 1
     endwhile
