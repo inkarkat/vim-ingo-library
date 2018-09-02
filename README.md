@@ -134,6 +134,7 @@ HISTORY
 - Add ingo/regexp/{deconstruct,length,multi} modules.
 - Add ingo#range#Is{In,Out}side().
 - Add ingo/cursor/keep.vim module.
+- Add ingo#folds#GetOpenFoldRange().
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.

@@ -233,4 +233,61 @@ function! ingo#folds#FoldedLines( startLine, endLine )
     return [ l:foldCnt, l:foldedAwayLines ]
 endfunction
 
+function! ingo#folds#GetOpenFoldRange( lnum )
+"******************************************************************************
+"* PURPOSE:
+"   Determine the range of the open fold around a:lnum.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:lnum  Line number to be considered.
+"* RETURN VALUES:
+"   [startLnum, endLnum] of the fold. If the line is fully in closed fold(s) or
+"   not inside a fold at all, returns the entire range of the buffer.
+"******************************************************************************
+    if foldlevel(a:lnum) == 0
+	" No fold at that line.
+	return [1, line('$')]
+    endif
+
+    let l:save_view = winsaveview()
+    try
+	let [l:originalClosedStartLnum, l:originalClosedEndLnum] = [foldclosed(a:lnum), foldclosedend(a:lnum)]
+
+	execute a:lnum . 'foldclose'
+	let l:isAtBeginningOfCurrentFold = (foldclosed(a:lnum) == a:lnum)
+
+	if foldclosed(a:lnum) == l:originalClosedStartLnum && foldclosedend(a:lnum) == l:originalClosedEndLnum
+	    " The :foldclose didn't have any noticeable effect; either the line
+	    " is on a toplevel closed fold, or on an nested open, same-size fold
+	    " (which we'll leave closed as a side effect).
+	else
+	    execute a:lnum . 'foldopen'
+	endif
+
+	if l:isAtBeginningOfCurrentFold
+	    " [z would jump to the beginning of the previous open fold, and
+	    " we've already determined the start of the open fold, anyway.
+	    let l:startLnum = a:lnum
+	else
+	    silent! execute a:lnum . 'normal! [z'
+	    let l:startLnum = line('.')
+	endif
+
+	silent! execute a:lnum . 'normal! ]z'
+	let l:endLnum = line('.')
+	if l:endLnum == l:startLnum
+	    " The cursor didn't move; there's no open fold, so return the whole
+	    " buffer.
+	    return [1, line('$')]
+	endif
+
+	return [l:startLnum, l:endLnum]
+    finally
+	call winrestview(l:save_view)
+    endtry
+endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
