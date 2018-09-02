@@ -199,12 +199,23 @@ function! ingo#folds#GetClosedFolds( startLnum, endLnum )
 endfunction
 
 
-" Determine the number of lines in the passed range that lie hidden in a closed
-" fold; that is, everything but the first line of a closed fold.
-" Returns [ number of folds in range, number of folded away (i.e. invisible)
-" lines ]. Sum both values to get the total number of lines in a fold in the
-" passed range.
 function! ingo#folds#FoldedLines( startLine, endLine )
+"******************************************************************************
+"* PURPOSE:
+"   Determine the number of lines in the passed range that lie hidden in a
+"   closed fold; that is, everything but the first line of a closed fold.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:startLnum First line of the range.
+"   a:endLnum   Last line of the range.
+"* RETURN VALUES:
+"   Returns [ number of folds in range, number of folded away (i.e. invisible)
+"   lines ]. Sum both values to get the total number of lines in a fold in the
+"   passed range.
+"******************************************************************************
     let l:foldCnt = 0
     let l:foldedAwayLines = 0
     let l:line = a:startLine
