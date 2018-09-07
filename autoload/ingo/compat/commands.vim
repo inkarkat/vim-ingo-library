@@ -7,6 +7,8 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
+let s:compatFor = (exists('g:IngoLibrary_CompatFor') ? ingo#collections#ToDict(split(g:IngoLibrary_CompatFor, ',')) : {})
+
 "******************************************************************************
 "* PURPOSE:
 "   Return ':keeppatterns' if supported or an emulation of it.
@@ -22,13 +24,13 @@
 "   <into >
 "	command! -range Foo execute ingo#compat#commands#keeppatterns() '<line1>,<line2>substitute/\<...\>/FOO/g'
 "******************************************************************************
-if exists(':keeppatterns') == 2
+if exists(':keeppatterns') == 2 && ! has_key(s:compatFor, 'keeppatterns')
     function! ingo#compat#commands#keeppatterns()
 	return 'keeppatterns'
     endfunction
 else
     if exists('ZzzzKeepPatterns') != 2
-	command! -nargs=* ZzzzKeepPatterns execute <q-args> | call histdel('search', -1) | let @/ = histget('search', -1) | nohlsearch
+	command! -nargs=* ZzzzKeepPatterns let g:ingo#compat#commands#histnr = histnr('search') | execute <q-args> | if g:ingo#compat#commands#histnr != histnr('search') | call histdel('search', -1) | let @/ = histget('search', -1) | nohlsearch | endif
     endif
     function! ingo#compat#commands#keeppatterns()
 	return 'ZzzzKeepPatterns'

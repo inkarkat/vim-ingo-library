@@ -135,6 +135,9 @@ HISTORY
 - Add ingo#range#Is{In,Out}side().
 - Add ingo/cursor/keep.vim module.
 - Add ingo#folds#GetOpenFoldRange().
+- ingo#compat#commands#keeppatterns(): Don't remove the last search pattern
+  when the search history wasn't modified. Allow to force compatibility
+  function via g:IngoLibrary\_CompatFor here, too.
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
