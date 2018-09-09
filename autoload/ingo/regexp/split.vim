@@ -116,7 +116,9 @@ function! ingo#regexp#split#AddPatternByProjectedMatchLength( branches, pattern 
 "   Add a:pattern to the List of regexp a:branches, in a position so that
 "   shorter earlier branches do not eclipse a following longer match.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   None.
+"   Does not consider "very magic" (/\v)-style syntax, in neither a:branches nor
+"   a:pattern. If you may have this, convert via ingo#regexp#magic#Normalize()
+"   first.
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
