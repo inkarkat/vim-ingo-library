@@ -1,7 +1,9 @@
 " ingo/regexp/split.vim: Functions to split a regular expression.
 "
 " DEPENDENCIES:
+"   - ingo/collections.vim autoload script
 "   - ingo/regexp/length.vim autoload script
+"   - ingo/regexp/magic.vim autoload script
 "
 " Copyright: (C) 2017-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -152,6 +154,28 @@ function! ingo#regexp#split#AddPatternByProjectedMatchLength( branches, pattern 
 	let l:i += 1
     endwhile
     return insert(a:branches, a:pattern, l:i)
+endfunction
+
+function! ingo#regexp#split#GlobalFlags( pattern )
+"******************************************************************************
+"* PURPOSE:
+"   Split global regular expression engine flags from a:pattern. These control
+"   case sensitivity (/\c, /\C) and engine type (/\%#=0).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:pattern   regular expression
+"* RETURN VALUES:
+"   [engineTypeFlag, caseSensitivityFlag, purePattern]
+"******************************************************************************
+    let [l:fragments, l:caseFlags] = ingo#collections#SeparateItemsAndSeparators(a:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\[cC]')
+    let [l:fragments, l:engineFlags] = ingo#collections#SeparateItemsAndSeparators(join(l:fragments, ''), '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%#=[012]')
+    let l:purePattern = join(l:fragments, '')
+
+    let l:caseSensitivityFlag = (index(l:caseFlags, '\c') == -1 ? get(l:caseFlags, 0, '') : '\c')
+    return [get(l:engineFlags, 0, ''), l:caseSensitivityFlag, l:purePattern]
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
