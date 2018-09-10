@@ -52,7 +52,7 @@ function! ingo#regexp#length#Project( pattern )
 "   Throws 'PrefixGroupsSuffix: Unmatched \(' or
 "   'PrefixGroupsSuffix: Unmatched \)' if a:pattern is invalid.
 "******************************************************************************
-    let l:branches = ingo#regexp#split#TopLevelBranches(a:pattern)
+    let l:branches = ingo#regexp#split#TopLevelBranches(ingo#regexp#split#GlobalFlags(a:pattern)[-1])
     let l:minMaxBranches = map(
     \   l:branches,
     \   's:ProjectBranch(v:val)'
