@@ -5,12 +5,14 @@
 "   - ingo/funcref.vim autoload script
 "   - ingo/lines.vim autoload script
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	007	10-Mar-2015	Handle custom exceptions / user aborts thrown by
+"				a:Command.
 "	006	12-May-2014	Enable aborting on error by returning the status
 "				from surroundings#Lines#SurroundCommand() and
 "				using ingo/err.vim.
@@ -120,6 +122,9 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, options, 
 	    endif
 	catch /^Vim\%((\a\+)\)\=:/
 	    call ingo#err#SetVimException()
+	    return 0
+	catch
+	    call ingo#err#Set(v:exception)
 	    return 0
 	endtry
     endif
