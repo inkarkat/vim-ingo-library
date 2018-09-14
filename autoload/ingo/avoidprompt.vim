@@ -227,7 +227,7 @@ function! ingo#avoidprompt#EchoMsg( text )
 	" Need to overwrite the overly long message (it's still in full in the
 	" message history).
 	redraw  " This avoids the hit-enter prompt.
-	echo l:truncatedText    " Use :echo because the full text already is in the message history.
+	echo l:truncatedText    | " Use :echo because the full text already is in the message history.
     endif
 endfunction
 function! ingo#avoidprompt#EchoAsSingleLine( text )
