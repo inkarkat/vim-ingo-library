@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2010-2016 Ingo Karkat
+" Copyright: (C) 2010-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -196,6 +196,32 @@ function! ingo#regexp#FromWildcard( wildcardExpr, additionalEscapeCharacters )
     let l:expr = substitute(l:expr, '\*\*', '\\.\\*', 'g')
     let l:expr = substitute(l:expr, '\*', '\\[^/\\\\]\\*', 'g')
     return l:expr
+endfunction
+
+function! ingo#regexp#IsValid( expr, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Test whether a:expr is a valid regular expression.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   In case of an invalid regular expression, makes Vim's error accessible via
+"   ingo#err#Get(...). Any desired custom a:context can be passed to this
+"   function as the optional argument.
+"* INPUTS:
+"   a:expr  Regular expression to test for correctness.
+"   a:context	Optional context for ingo#err#Get().
+"* RETURN VALUES:
+"   1 if Vim's regular expression parser accepts a:expr, 0 if an error is
+"   raised.
+"******************************************************************************
+    try
+	call match('', a:expr)
+	return 1
+    catch /^Vim\%((\a\+)\)\=:/
+	call call('ingo#err#SetVimException', a:000)
+	return 0
+    endtry
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
