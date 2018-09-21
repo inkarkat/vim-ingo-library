@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/list.vim autoload script
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -22,6 +22,24 @@ function! ingo#matches#CountMatches( text, pattern )
 	call substitute(l:line, a:pattern, '\=s:Count()', 'g')
     endfor
     return s:matchCnt
+endfunction
+
+
+function! ingo#matches#Any( text, patterns )
+    for l:pattern in a:patterns
+	if a:text =~# l:pattern
+	    return 1
+	endif
+    endfor
+    return empty(a:patterns)
+endfunction
+function! ingo#matches#All( text, patterns )
+    for l:pattern in a:patterns
+	if a:text !~# l:pattern
+	    return 0
+	endif
+    endfor
+    return 1
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

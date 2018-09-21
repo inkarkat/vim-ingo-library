@@ -140,6 +140,7 @@ HISTORY
   function via g:IngoLibrary\_CompatFor here, too.
 - Add ingo#regexp#split#GlobalFlags().
 - Add ingo#regexp#IsValid() (from mark.vim plugin).
+- Add ingo#matches#Any() and ingo#matches#All().
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
