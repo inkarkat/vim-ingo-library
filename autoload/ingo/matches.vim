@@ -7,10 +7,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.014.002	15-Oct-2013	Replace conditional with ingo#list#Make().
-"   1.004.001	07-Apr-2013	file creation
 
 function! s:Count()
     let s:matchCnt += 1
