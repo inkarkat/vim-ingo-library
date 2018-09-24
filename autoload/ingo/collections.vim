@@ -446,6 +446,10 @@ function! ingo#collections#Partition( list, Predicate )
 "* PURPOSE:
 "   Separate a List / Dictionary into two, depending on whether a:Predicate is
 "   true for each member of the collection.
+"* SEE ALSO:
+"   - If you want to split off only elements from the start of a List while
+"     a:Predicate matches (not elements from anywhere in a:list), use
+"     ingo#list#split#RemoveFromStartWhilePredicate() instead.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
