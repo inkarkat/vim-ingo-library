@@ -7,6 +7,8 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
+let s:fileOptionsExpr = '++\%(ff\|fileformat\|enc\|encoding\|bin\|binary\|nobin\|nobinary\|bad\|edit\)\%(=\S*\)\?'
+
 function! ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands( arguments )
 "*******************************************************************************
 "* PURPOSE:
@@ -31,7 +33,7 @@ function! ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands( arguments )
 "*******************************************************************************
     return matchlist(a:arguments,
     \   '\C^\(' .
-    \       '\%(++\%(ff\|fileformat\|enc\|encoding\|bin\|binary\|nobin\|nobinary\|bad\|edit\)\%(=\S*\)\?\s\+\)*' .
+    \       '\%(' . s:fileOptionsExpr . '\s\+\)*' .
     \	    '\%(+.\{-}\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<! \s*\)\?' .
     \   '\)\(.*\)$'
     \)[1:2]
@@ -63,9 +65,9 @@ function! ingo#cmdargs#file#FilterFileOptionsAndCommands( fileglobs )
 "   in another Ex command:
 "	join(map(l:fileOptionsAndCommands, "escape(v:val, '\\ ')"))
 "*******************************************************************************
-    let l:fileOptionsAndCommands = ingo#list#split#RemoveFromStartWhilePredicate(a:fileglobs, 'v:val =~# "^++"')
+    let l:fileOptionsAndCommands = ingo#list#split#RemoveFromStartWhilePredicate(a:fileglobs, 'v:val =~# ' . string('^' . s:fileOptionsExpr . '$'))
 
-    if get(a:fileglobs, 0, '') =~# '^+'
+    if get(a:fileglobs, 0, '') =~# '^++\@!'
 	call add(l:fileOptionsAndCommands, remove(a:fileglobs, 0))
     endif
 
