@@ -141,6 +141,7 @@ HISTORY
 - Add ingo#regexp#split#GlobalFlags().
 - Add ingo#regexp#IsValid() (from mark.vim plugin).
 - Add ingo#matches#Any() and ingo#matches#All().
+- Add ingo#list#split#RemoveFromStartWhilePredicate().
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
