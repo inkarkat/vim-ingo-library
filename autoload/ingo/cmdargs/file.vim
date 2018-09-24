@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2014 Ingo Karkat
+" Copyright: (C) 2012-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -51,11 +51,11 @@ endfunction
 function! ingo#cmdargs#file#FilterFileOptionsAndCommands( fileglobs )
 "*******************************************************************************
 "* PURPOSE:
-"   Strip off the optional ++opt +cmd file options and commands.
+"   Strip off the optional ++opt +cmd file options and command.
 "
 "   (In Vim 7.2,) options and commands can only appear at the beginning of the
-"   file list; there can be multiple options, but only one command. They are
-"   only applied to the first (opened) file, not to any other passed file.
+"   file list; there can be multiple options, followed by only one command. They
+"   are only applied to the first (opened) file, not to any other passed file.
 "
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
@@ -74,22 +74,13 @@ function! ingo#cmdargs#file#FilterFileOptionsAndCommands( fileglobs )
 "   in another Ex command:
 "	join(map(l:fileOptionsAndCommands, "escape(v:val, '\\ ')"))
 "*******************************************************************************
-    let l:startIdx = 0
-    while get(a:fileglobs, l:startIdx, '') =~# '^+\{1,2}'
-	if l:startIdx > 0 && a:fileglobs[l:startIdx - 1] !~# '^++' && a:fileglobs[l:startIdx] !~# '^++'
-	    " There can be multiple ++opt arguments, followed by only one
-	    " possible +cmd argument.
-	    break
-	endif
+    let l:fileOptionsAndCommands = ingo#list#split#RemoveFromStartWhilePredicate(a:fileglobs, 'v:val =~# "^++"')
 
-	let l:startIdx += 1
-    endwhile
-
-    if l:startIdx == 0
-	return [a:fileglobs, []]
-    else
-	return [a:fileglobs[l:startIdx : ], a:fileglobs[ : (l:startIdx - 1)]]
+    if get(a:fileglobs, 0, '') =~# '^+'
+	call add(l:fileOptionsAndCommands, remove(a:fileglobs, 0))
     endif
+
+    return [a:fileglobs, l:fileOptionsAndCommands]
 endfunction
 
 function! ingo#cmdargs#file#Unescape( fileArgument )
