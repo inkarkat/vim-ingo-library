@@ -12,42 +12,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.028.015	10-Oct-2016	Add
-"				ingo#collections#SeparateItemsAndSeparators(), a
-"				variant of
-"				ingo#collections#SplitKeepSeparators().
-"   1.025.014	24-Jul-2016	Add ingo#collections#Reduce().
-"   1.025.013	01-May-2015	Add ingo#collections#Partition().
-"   1.023.012	22-Oct-2014	Add ingo#collections#mapsort().
-"   1.014.011	15-Oct-2013	Use the extracted ingo#list#AddOrExtend().
-"   1.011.010	12-Jul-2013	Make ingo#collections#ToDict() handle empty list
-"				items via an optional a:emptyValue argument.
-"				This also distinguishes it from
-"				ingo#dict#FromKeys().
-"				ENH: Handle empty list items in
-"				ingo#collections#Unique() and
-"				ingo#collections#UniqueStable().
-"   1.009.009	25-Jun-2013	Add ingo#collections#Flatten() and
-"				ingo#collections#Flatten1().
-"				Delegate ingo#collections#ToDict()
-"				implementation to ingo#dict#FromKeys().
-"				Move ingo#collections#MakeUnique() to
-"				ingo/collections/unique.vim.
-"   1.001.008	21-Feb-2013	Move to ingo-library. Change case of *#unique*
-"				functions.
-"	007	09-Nov-2012	Add ingocollections#MakeUnique().
-"	006	16-Aug-2012	Add ingocollections#uniqueSorted() and
-"				ingocollections#uniqueStable() variants of
-"				ingocollections#unique().
-"	005	30-Jul-2012	Split off ingocollections#ToDict() from
-"				ingocollections#unique(); it is useful on its
-"				own.
-"	004	25-Jul-2012	Add ingocollections#numsort().
-"	003	17-Jun-2011	Add ingocollections#isort().
-"	002	11-Jun-2011	Add ingocollections#SplitKeepSeparators().
-"	001	08-Oct-2010	file creation
 
 function! ingo#collections#ToDict( list, ... )
 "******************************************************************************

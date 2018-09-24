@@ -6,17 +6,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.017.003	11-Feb-2014	CHG: Make
-"				ingo#cmdargs#file#FilterFileOptionsAndCommands()
-"				return the options and commands in a List, not
-"				as a joined String. This allows clients to
-"				easily re-escape them and handle multiple ones,
-"				e.g. ++ff=dos +setf\ foo.
-"   1.009.002	14-Jun-2013	Minor: Make matchlist() robust against
-"				'ignorecase'.
-"   1.007.001	01-Jun-2013	file creation from ingofileargs.vim
 
 function! ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands( arguments )
 "*******************************************************************************

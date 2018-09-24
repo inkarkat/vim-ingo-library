@@ -6,9 +6,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.029.001	28-Dec-2016	file creation
 
 function! ingo#list#split#ChunksOf( list, n, ... )
 "******************************************************************************
