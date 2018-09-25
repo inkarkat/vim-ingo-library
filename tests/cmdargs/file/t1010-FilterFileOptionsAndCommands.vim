@@ -1,4 +1,4 @@
-" Test modification of the passed-in fileglobs List.
+" Test modification of the passed-in fileglobs List when stripping options and commands.
 
 call vimtest#StartTap()
 call vimtap#Plan(2)

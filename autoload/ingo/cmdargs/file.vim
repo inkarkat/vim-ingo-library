@@ -39,10 +39,36 @@ function! ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands( arguments )
     \)[1:2]
 endfunction
 
+function! ingo#cmdargs#file#FilterFileOptions( fileglobs )
+"*******************************************************************************
+"* PURPOSE:
+"   Strip off the optional ++opt file options that can be given to :write and
+"   :saveas.
+"
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   (Potentially) removes options from a:fileglobs.
+"* INPUTS:
+"   a:fileglobs Raw list of file patterns. To get this from a <q-args> string,
+"		use ingo#cmdargs#file#SplitAndUnescape().
+"* RETURN VALUES:
+"   [a:fileglobs, fileOptions]	First element is the passed list, with any file
+"   options removed. Second element is a List containing all removed file
+"   options.
+"   Note: If the file arguments were obtained through
+"   ingo#cmdargs#file#SplitAndUnescape(), these must be re-escaped for use
+"   in another Ex command:
+"	join(map(l:fileOptionsAndCommands, "escape(v:val, '\\ ')"))
+"*******************************************************************************
+    return [a:fileglobs, ingo#list#split#RemoveFromStartWhilePredicate(a:fileglobs, 'v:val =~# ' . string('^' . s:fileOptionsExpr . '$'))]
+endfunction
+
 function! ingo#cmdargs#file#FilterFileOptionsAndCommands( fileglobs )
 "*******************************************************************************
 "* PURPOSE:
-"   Strip off the optional ++opt +cmd file options and command.
+"   Strip off the optional ++opt +cmd file options and command that can be given
+"   to :edit, :split, etc.
 "
 "   (In Vim 7.2,) options and commands can only appear at the beginning of the
 "   file list; there can be multiple options, followed by only one command. They
@@ -51,7 +77,7 @@ function! ingo#cmdargs#file#FilterFileOptionsAndCommands( fileglobs )
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
-"   None.
+"   (Potentially) removes options and commands from a:fileglobs.
 "* INPUTS:
 "   a:fileglobs Raw list of file patterns. To get this from a <q-args> string,
 "		use ingo#cmdargs#file#SplitAndUnescape(). Or alternatively
@@ -65,13 +91,13 @@ function! ingo#cmdargs#file#FilterFileOptionsAndCommands( fileglobs )
 "   in another Ex command:
 "	join(map(l:fileOptionsAndCommands, "escape(v:val, '\\ ')"))
 "*******************************************************************************
-    let l:fileOptionsAndCommands = ingo#list#split#RemoveFromStartWhilePredicate(a:fileglobs, 'v:val =~# ' . string('^' . s:fileOptionsExpr . '$'))
+    let [l:fileglobs, l:fileOptionsAndCommands] = ingo#cmdargs#file#FilterFileOptions(a:fileglobs)
 
-    if get(a:fileglobs, 0, '') =~# '^++\@!'
-	call add(l:fileOptionsAndCommands, remove(a:fileglobs, 0))
+    if get(l:fileglobs, 0, '') =~# '^++\@!'
+	call add(l:fileOptionsAndCommands, remove(l:fileglobs, 0))
     endif
 
-    return [a:fileglobs, l:fileOptionsAndCommands]
+    return [l:fileglobs, l:fileOptionsAndCommands]
 endfunction
 
 function! ingo#cmdargs#file#Unescape( fileArgument )
