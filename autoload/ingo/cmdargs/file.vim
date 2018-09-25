@@ -58,8 +58,8 @@ function! ingo#cmdargs#file#FilterFileOptions( fileglobs )
 "   options.
 "   Note: If the file arguments were obtained through
 "   ingo#cmdargs#file#SplitAndUnescape(), these must be re-escaped for use
-"   in another Ex command:
-"	join(map(l:fileOptionsAndCommands, "escape(v:val, '\\ ')"))
+"   in another Ex command via
+"   ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine():
 "*******************************************************************************
     return [a:fileglobs, ingo#list#split#RemoveFromStartWhilePredicate(a:fileglobs, 'v:val =~# ' . string('^' . s:fileOptionsExpr . '$'))]
 endfunction
@@ -88,8 +88,8 @@ function! ingo#cmdargs#file#FilterFileOptionsAndCommands( fileglobs )
 "   containing all removed file options and commands.
 "   Note: If the file arguments were obtained through
 "   ingo#cmdargs#file#SplitAndUnescape(), these must be re-escaped for use
-"   in another Ex command:
-"	join(map(l:fileOptionsAndCommands, "escape(v:val, '\\ ')"))
+"   in another Ex command via
+"   ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine():
 "*******************************************************************************
     let [l:fileglobs, l:fileOptionsAndCommands] = ingo#cmdargs#file#FilterFileOptions(a:fileglobs)
 
@@ -98,6 +98,10 @@ function! ingo#cmdargs#file#FilterFileOptionsAndCommands( fileglobs )
     endif
 
     return [l:fileglobs, l:fileOptionsAndCommands]
+endfunction
+
+function! ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine( fileOptionsAndCommands )
+    return join(map(a:fileOptionsAndCommands, "escape(v:val, '\\ ')"))
 endfunction
 
 function! ingo#cmdargs#file#Unescape( fileArgument )

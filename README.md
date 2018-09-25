@@ -142,6 +142,9 @@ HISTORY
 - Add ingo#regexp#IsValid() (from mark.vim plugin).
 - Add ingo#matches#Any() and ingo#matches#All().
 - Add ingo#list#split#RemoveFromStartWhilePredicate().
+- Add ingo#cmdargs#file#FilterFileOptions() variant of
+  ingo#cmdargs#file#FilterFileOptionsAndCommands()
+- Add ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine().
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
