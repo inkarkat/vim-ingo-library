@@ -39,6 +39,10 @@ function! ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands( arguments )
     \)[1:2]
 endfunction
 
+
+function! ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine( fileOptionsAndCommands )
+    return join(map(a:fileOptionsAndCommands, "escape(v:val, '\\ ')"))
+endfunction
 function! ingo#cmdargs#file#FilterFileOptions( fileglobs )
 "*******************************************************************************
 "* PURPOSE:
@@ -59,11 +63,32 @@ function! ingo#cmdargs#file#FilterFileOptions( fileglobs )
 "   Note: If the file arguments were obtained through
 "   ingo#cmdargs#file#SplitAndUnescape(), these must be re-escaped for use
 "   in another Ex command via
-"   ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine():
+"   ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine(). Or just
+"   use ingo#cmdargs#file#FilterFileOptionsToEscaped().
 "*******************************************************************************
     return [a:fileglobs, ingo#list#split#RemoveFromStartWhilePredicate(a:fileglobs, 'v:val =~# ' . string('^' . s:fileOptionsExpr . '$'))]
 endfunction
-
+function! ingo#cmdargs#file#FilterFileOptionsToEscaped( fileglobs )
+"*******************************************************************************
+"* PURPOSE:
+"   Strip off the optional ++opt file options that can be given to :write and
+"   :saveas.
+"
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   (Potentially) removes options from a:fileglobs.
+"* INPUTS:
+"   a:fileglobs Raw list of file patterns. To get this from a <q-args> string,
+"		use ingo#cmdargs#file#SplitAndUnescape().
+"* RETURN VALUES:
+"   [a:fileglobs, exFileOptions]    First element is the passed list, with any file
+"   options removed. Second element is a String with all removed file
+"   options joined together and escaped for use in an Ex command.
+"*******************************************************************************
+    let [l:fileglobs, l:fileOptions] = ingo#cmdargs#file#FilterFileOptions(a:fileglobs)
+    return [l:fileglobs, (empty(l:fileOptions) ? '' : ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine(l:fileOptions))]
+endfunction
 function! ingo#cmdargs#file#FilterFileOptionsAndCommands( fileglobs )
 "*******************************************************************************
 "* PURPOSE:
@@ -89,7 +114,8 @@ function! ingo#cmdargs#file#FilterFileOptionsAndCommands( fileglobs )
 "   Note: If the file arguments were obtained through
 "   ingo#cmdargs#file#SplitAndUnescape(), these must be re-escaped for use
 "   in another Ex command via
-"   ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine():
+"   ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine(). Or just
+"   use ingo#cmdargs#file#FilterFileOptionsAndCommandsToEscaped().
 "*******************************************************************************
     let [l:fileglobs, l:fileOptionsAndCommands] = ingo#cmdargs#file#FilterFileOptions(a:fileglobs)
 
@@ -99,10 +125,28 @@ function! ingo#cmdargs#file#FilterFileOptionsAndCommands( fileglobs )
 
     return [l:fileglobs, l:fileOptionsAndCommands]
 endfunction
-
-function! ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine( fileOptionsAndCommands )
-    return join(map(a:fileOptionsAndCommands, "escape(v:val, '\\ ')"))
+function! ingo#cmdargs#file#FilterFileOptionsAndCommandsToEscaped( fileglobs )
+"*******************************************************************************
+"* PURPOSE:
+"   Strip off the optional ++opt +cmd file options and command that can be given
+"   to :edit, :split, etc.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   (Potentially) removes options and commands from a:fileglobs.
+"* INPUTS:
+"   a:fileglobs Raw list of file patterns. To get this from a <q-args> string,
+"		use ingo#cmdargs#file#SplitAndUnescape(). Or alternatively
+"		use ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands().
+"* RETURN VALUES:
+"   [a:fileglobs, exFileOptionsAndCommands]	First element is the passed
+"   list, with any file options and commands removed. Second element is a String with all removed file
+"   options joined together and escaped for use in an Ex command.
+"*******************************************************************************
+    let [l:fileglobs, l:fileOptionsAndCommands] = ingo#cmdargs#file#FilterFileOptionsAndCommands(a:fileglobs)
+    return [l:fileglobs, (empty(l:fileOptionsAndCommands) ? '' : ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine(l:fileOptionsAndCommands))]
 endfunction
+
 
 function! ingo#cmdargs#file#Unescape( fileArgument )
 "******************************************************************************

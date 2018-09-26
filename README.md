@@ -144,7 +144,9 @@ HISTORY
 - Add ingo#list#split#RemoveFromStartWhilePredicate().
 - Add ingo#cmdargs#file#FilterFileOptions() variant of
   ingo#cmdargs#file#FilterFileOptionsAndCommands()
-- Add ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine().
+- Add ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine() and
+  combining ingo#cmdargs#file#FilterFileOptionsToEscaped() and
+  ingo#cmdargs#file#FilterFileOptionsAndCommandsToEscaped().
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.
