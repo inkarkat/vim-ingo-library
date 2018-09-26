@@ -41,7 +41,7 @@ endfunction
 
 
 function! ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine( fileOptionsAndCommands )
-    return join(map(a:fileOptionsAndCommands, "escape(v:val, '\\ ')"))
+    return join(map(copy(a:fileOptionsAndCommands), "escape(v:val, '\\ ')"))
 endfunction
 function! ingo#cmdargs#file#FilterFileOptions( fileglobs )
 "*******************************************************************************
@@ -179,9 +179,8 @@ function! ingo#cmdargs#file#SplitAndUnescape( fileArguments )
 "* RETURN VALUES:
 "   List of fileglobs with unescaped spaces.
 "   Note: If the file arguments can start with optional ++opt +cmd file options
-"   and commands, these must be re-escaped (after extracting them via
-"   ingo#cmdargs#file#FilterFileOptionsAndCommands()) for use in another Ex command:
-"	escape(l:fileOptionsAndCommands, '\ ')
+"   and commands, these can be extracted via
+"   ingo#cmdargs#file#FilterFileOptionsAndCommands().
 "******************************************************************************
     return map(split(a:fileArguments, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\s\+'), 'ingo#cmdargs#file#Unescape(v:val)')
 endfunction
