@@ -147,6 +147,7 @@ HISTORY
 - Add ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine() and
   combining ingo#cmdargs#file#FilterFileOptionsToEscaped() and
   ingo#cmdargs#file#FilterFileOptionsAndCommandsToEscaped().
+- Add ingo#list#AddNonEmpty().
 
 ##### 1.034   13-Feb-2018
 - Add ingo/regexp/split.vim module.

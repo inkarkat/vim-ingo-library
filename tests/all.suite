@@ -2,6 +2,7 @@ cmdargs/file/
 collections/
 compat/
 digest/
+list/
 list/lcs/
 list/pattern/
 list/sequence/

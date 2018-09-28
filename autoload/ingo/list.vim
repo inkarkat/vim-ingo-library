@@ -138,6 +138,34 @@ function! ingo#list#Join( ... )
     return l:result
 endfunction
 
+
+function! ingo#list#AddNonEmpty( list, val, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Add a:val if it is not empty as an item to a:list.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:list  List to be extended.
+"   a:val   Arbitrary value of arbitrary type.
+"   a:idx   Optional index before where in a:list to insert. Default to
+"	    appending.
+"* RETURN VALUES:
+"   Returns the resulting a:list.
+"******************************************************************************
+    if ! empty(a:val)
+	if a:0
+	    call insert(a:list, a:val, a:1)
+	else
+	    call add(a:list, a:val)
+	endif
+    endif
+
+    return a:list
+endfunction
+
 function! ingo#list#NonEmpty( list )
 "******************************************************************************
 "* PURPOSE:
