@@ -8,12 +8,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.029.002	23-Jan-2017	Add ingo#subst#FirstSubstitution(),
-"				ingo#subst#FirstPattern(),
-"				ingo#subst#FirstParameter().
-"   1.009.001	14-Jun-2013	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 

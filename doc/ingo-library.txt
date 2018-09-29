@@ -111,7 +111,7 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.035	RELEASEME
+1.035	29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
 - Add ingo#compat#haslocaldir().
 - Add ingo/workingdir.vim module.
