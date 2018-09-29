@@ -1,7 +1,7 @@
 " Test considering min or max length.
 
 call vimtest#StartTap()
-call vimtap#Plan(0)
+call vimtap#Plan(6)
 
 call vimtap#Is(ingo#regexp#split#AddPatternByProjectedMatchLength(['abcd\+', 'abc\+', 'ab\+', 'a\+', '0*'], 'ooo'), ['abcd\+', 'abc\+', 'ooo', 'ab\+', 'a\+', '0*'], 'add ooo to staggered multis behind max=3')
 call vimtap#Is(ingo#regexp#split#AddPatternByProjectedMatchLength(['abcd\+', 'abc\+', 'ab\+', 'a\+', '0*'], 'ooo\+'), ['abcd\+', 'abc\+', 'ooo\+', 'ab\+', 'a\+', '0*'], 'add ooo\+ to staggered multis behind max=3')
