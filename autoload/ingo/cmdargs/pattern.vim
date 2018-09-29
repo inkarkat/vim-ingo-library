@@ -7,42 +7,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.028.008	17-Oct-2016	BUG: Support of optional a:flagsMatchCount in
-"				ingo#cmdargs#pattern#ParseUnescaped() and
-"				ingo#cmdargs#pattern#ParseUnescapedWithLiteralWholeWord()
-"				broke no-flags String type return value by
-"				returning a one-element list.
-"   1.028.007	06-Oct-2016	Add ingo#cmdargs#pattern#Render().
-"   1.028.006	05-Oct-2016	ENH: Also support optional a:flagsMatchCount in
-"				ingo#cmdargs#pattern#ParseUnescaped() and
-"				ingo#cmdargs#pattern#ParseUnescapedWithLiteralWholeWord().
-"				Add missing
-"				ingo#cmdargs#pattern#ParseWithLiteralWholeWord()
-"				variant.
-"   1.027.005	29-Sep-2016	ENH: ingo#cmdargs#pattern#Parse(): Add second
-"				optional a:flagsMatchCount argument, similar to
-"				what ingo#cmdargs#substitute#Parse() has in
-"				a:options.
-"				Add ingo#cmdargs#pattern#RawParse().
-"   1.023.004	03-Jan-2015	Add ingo#cmdargs#pattern#IsDelimited().
-"   1.020.003	29-May-2014	Use ingo#escape#Unescape() in
-"				ingo#cmdargs#pattern#Unescape().
-"				Add ingo#cmdargs#pattern#ParseUnescaped() to
-"				avoid the double and inefficient
-"				ingo#cmdargs#pattern#Unescape(ingo#cmdargs#pattern#Parse())
-"				Add
-"				ingo#cmdargs#pattern#ParseUnescapedWithLiteralWholeWord()
-"				for the common [/]{pattern}[/ behavior as
-"				built-in commands like |:djump|]. When the
-"				pattern isn't delimited by /.../, the returned
-"				pattern is modified so that only literal whole
-"				words are matched.
-"				so far used by many clients.
-"   1.011.002	24-Jul-2013	FIX: Use the rules for the /pattern/ separator
-"				as stated in :help E146.
-"   1.007.001	01-Jun-2013	file creation
 
 function! s:Parse( arguments, ... )
     return matchlist(a:arguments, '^\([[:alnum:]\\"|]\@![\x00-\xFF]\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . (a:0 ? a:1 : '') . '$')

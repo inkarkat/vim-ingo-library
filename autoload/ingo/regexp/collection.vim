@@ -6,13 +6,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.030.003	15-May-2017	ENH: ingo#regexp#collection#LiteralToRegexp():
-"				Support inverted collection via optional
-"				a:isInvert flag.
-"   1.029.002	23-Jan-2017	Add ingo#regexp#collection#Expr().
-"   1.027.001	30-Sep-2016	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 

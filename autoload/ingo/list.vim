@@ -6,11 +6,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.028.003	10-Oct-2016	Add ingo#list#Join().
-"   1.024.002	16-Mar-2015	Add ingo#list#Zip() and ingo#list#ZipLongest().
-"   1.014.001	15-Oct-2013	file creation
 
 function! ingo#list#Make( val, ... )
 "******************************************************************************
