@@ -1,49 +1,17 @@
 " ingo/collections.vim: Functions to operate on collections.
 "
 " DEPENDENCIES:
+"   - ingo/actions.vim autoload script
+"   - ingo/compat.vim autoload script
 "   - ingo/dict.vim autoload script
+"   - ingo/dict/count.vim autoload script
 "   - ingo/list.vim autoload script
+"   - ingocollections.vim autoload script
 "
-" Copyright: (C) 2011-2017 Ingo Karkat
+" Copyright: (C) 2011-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.028.015	10-Oct-2016	Add
-"				ingo#collections#SeparateItemsAndSeparators(), a
-"				variant of
-"				ingo#collections#SplitKeepSeparators().
-"   1.025.014	24-Jul-2016	Add ingo#collections#Reduce().
-"   1.025.013	01-May-2015	Add ingo#collections#Partition().
-"   1.023.012	22-Oct-2014	Add ingo#collections#mapsort().
-"   1.014.011	15-Oct-2013	Use the extracted ingo#list#AddOrExtend().
-"   1.011.010	12-Jul-2013	Make ingo#collections#ToDict() handle empty list
-"				items via an optional a:emptyValue argument.
-"				This also distinguishes it from
-"				ingo#dict#FromKeys().
-"				ENH: Handle empty list items in
-"				ingo#collections#Unique() and
-"				ingo#collections#UniqueStable().
-"   1.009.009	25-Jun-2013	Add ingo#collections#Flatten() and
-"				ingo#collections#Flatten1().
-"				Delegate ingo#collections#ToDict()
-"				implementation to ingo#dict#FromKeys().
-"				Move ingo#collections#MakeUnique() to
-"				ingo/collections/unique.vim.
-"   1.001.008	21-Feb-2013	Move to ingo-library. Change case of *#unique*
-"				functions.
-"	007	09-Nov-2012	Add ingocollections#MakeUnique().
-"	006	16-Aug-2012	Add ingocollections#uniqueSorted() and
-"				ingocollections#uniqueStable() variants of
-"				ingocollections#unique().
-"	005	30-Jul-2012	Split off ingocollections#ToDict() from
-"				ingocollections#unique(); it is useful on its
-"				own.
-"	004	25-Jul-2012	Add ingocollections#numsort().
-"	003	17-Jun-2011	Add ingocollections#isort().
-"	002	11-Jun-2011	Add ingocollections#SplitKeepSeparators().
-"	001	08-Oct-2010	file creation
 
 function! ingo#collections#ToDict( list, ... )
 "******************************************************************************
@@ -192,7 +160,7 @@ function! ingo#collections#SplitKeepSeparators( expr, pattern, ... )
 "		Other empty items are kept when {pattern} matches at least one
 "		character or when {keepempty} is non-zero.
 "* RETURN VALUES:
-"   List of items.
+"   List of items: [item1, sep1, item2, sep2, item3, ...]
 "******************************************************************************
     let l:keepempty = (a:0 ? a:1 : 0)
     let l:prevIndex = 0
@@ -246,7 +214,7 @@ function! ingo#collections#SeparateItemsAndSeparators( expr, pattern, ... )
 "		Other empty items are kept when {pattern} matches at least one
 "		character or when {keepempty} is non-zero.
 "* RETURN VALUES:
-"   List of [items, separators].
+"   List of [items, separators]: [[item1, item2, item3, ...], [sep1, sep2, ...]]
 "******************************************************************************
     let l:keepempty = (a:0 ? a:1 : 0)
     let l:prevIndex = 0
@@ -281,6 +249,69 @@ function! ingo#collections#SeparateItemsAndSeparators( expr, pattern, ... )
     endwhile
 
     return [l:items, l:separators]
+endfunction
+function! ingo#collections#SplitIntoMatches( expr, pattern, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Like the built-in |split()|, but only return the separators matched by
+"   a:pattern, and discard the text in between (what is normally returned by
+"   split()). Optionally it checks that the discarded text only matches
+"   a:allowedDiscardPattern, and throws an exception if something else would be
+"   discarded.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:expr	Text to be split.
+"   a:pattern	Regular expression that specifies the separator text that
+"		delimits the items to be discarded.
+"   a:allowedDiscardPattern Optional regular expression that if given checks all
+"                           discarded text in between separators for match. If
+"                           one does not match, a "SplitIntoMatches: Cannot
+"                           discard TEXT" exception is thrown. To ensure that
+"                           everything matches as separators, and all items are
+"                           empty, pass "" or "^$".
+"* RETURN VALUES:
+"   List of separators matching a:pattern: [sep1, ...].
+"******************************************************************************
+    let l:allowedDiscardPattern = (a:0 ? (empty(a:1) ? '^$' : a:1) : '')
+    let l:prevIndex = 0
+    let l:index = 0
+    let l:separator = ''
+    let l:separators = []
+
+    while ! empty(a:expr)
+	let l:index = match(a:expr, a:pattern, l:prevIndex)
+	if l:index == -1
+	    let l:remainder = strpart(a:expr, l:prevIndex)
+	    if ! empty(l:allowedDiscardPattern) && matchstr(l:remainder, '\C' . l:allowedDiscardPattern) !=# l:remainder
+		throw 'SplitIntoMatches: Cannot discard ' . string(l:remainder)
+	    endif
+
+	    break
+	endif
+	let l:item = strpart(a:expr, l:prevIndex, (l:index - l:prevIndex))
+	if ! empty(l:allowedDiscardPattern) && matchstr(l:item, '\C' . l:allowedDiscardPattern) !=# l:item
+	    throw 'SplitIntoMatches: Cannot discard ' . string(l:item)
+	endif
+
+	let l:prevIndex = matchend(a:expr, a:pattern, l:prevIndex)
+	let l:separator = strpart(a:expr, l:index, (l:prevIndex - l:index))
+
+	if empty(l:item) && empty(l:separator)
+	    " We have a zero-width separator; consume at least one character to
+	    " avoid the endless loop.
+	    let l:prevIndex = matchend(a:expr, '\_.', l:index)
+	    if l:prevIndex == -1
+		break
+	    endif
+	else
+	    call s:add(l:separators, l:separator, 1)
+	endif
+    endwhile
+
+    return l:separators
 endfunction
 
 function! ingo#collections#isort( i1, i2 )
@@ -379,6 +410,10 @@ function! ingo#collections#Partition( list, Predicate )
 "* PURPOSE:
 "   Separate a List / Dictionary into two, depending on whether a:Predicate is
 "   true for each member of the collection.
+"* SEE ALSO:
+"   - If you want to split off only elements from the start of a List while
+"     a:Predicate matches (not elements from anywhere in a:list), use
+"     ingo#list#split#RemoveFromStartWhilePredicate() instead.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:

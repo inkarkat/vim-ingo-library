@@ -2,24 +2,10 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2014-2017 Ingo Karkat
+" Copyright: (C) 2014-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.030.005	26-Jan-2017	Add escaping of additional values to
-"				ingo#option#Join() and split into
-"				ingo#option#Append() and ingo#option#Prepend().
-"				Offer simpler ingo#option#JoinEscaped() and
-"				ingo#option#JoinUnescaped() for actual joining
-"				of values split via ingo#option#Split() /
-"				ingo#option#SplitAndUnescape().
-"   1.028.004	31-Oct-2016	Add ingo#option#Join().
-"   1.024.003	06-Mar-2015	Add ingo#option#SplitAndUnescape().
-"   1.021.002	12-Jun-2014	Add ingo#option#Contains() and
-"				ingo#option#ContainsOneOf().
-"   1.020.001	03-Jun-2014	file creation
 
 function! ingo#option#Split( optionValue, ... )
     return call('split', [a:optionValue, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!,'] + a:000)
@@ -95,6 +81,11 @@ function! ingo#option#Prepend( val1, ... )
 	endif
     endfor
     return l:result
+endfunction
+
+function! ingo#option#GetBinaryOptionValue( optionName )
+    execute 'let l:originalOptionValue = &' . a:optionName
+    return (l:originalOptionValue ? '' : 'no') . a:optionName
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

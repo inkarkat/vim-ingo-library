@@ -2,14 +2,13 @@
 "
 " DEPENDENCIES:
 "   - ingo/actions.vim autoload script
+"   - ingo/compat.vim autoload script
+"   - ingo/workingdir.vim autoload script
 "
-" Copyright: (C) 2016 Ingo Karkat
+" Copyright: (C) 2016-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.025.001	29-Jul-2016	file creation
 
 function! ingo#actions#special#NoAutoChdir( ... )
 "******************************************************************************
@@ -28,7 +27,7 @@ function! ingo#actions#special#NoAutoChdir( ... )
     " Unfortunately, restoring the 'autochdir' option clobbers any temporary CWD
     " override. So we may have to restore the CWD, too.
     let l:save_cwd = getcwd()
-    let l:chdirCommand = (exists('*haslocaldir') && haslocaldir() ? 'lchdir!' : 'chdir!')
+    let l:chdirCommand = ingo#workingdir#ChdirCommand()
 
     " The 'autochdir' option adapts the CWD, so any (relative) filepath to the
     " filename in the other window would be omitted. Temporarily turn this off;

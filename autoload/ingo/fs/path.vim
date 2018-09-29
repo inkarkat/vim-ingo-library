@@ -6,32 +6,10 @@
 "   - ingo/os.vim autoload script
 "   - ingo/fs/path/split.vim autoload script
 "
-" Copyright: (C) 2012-2017 Ingo Karkat
+" Copyright: (C) 2012-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.022.010	22-Sep-2014	Use new ingo#compat#glob().
-"   1.019.009	23-May-2014	Add ingo#fs#path#Exists().
-"   1.019.008	21-May-2014	Add ingo#fs#path#IsCaseInsensitive().
-"   1.019.007	07-May-2014	ingo#fs#path#Normalize(): Don't normalize to
-"				Cygwin /cygdrive/x/... when the chosen path
-"				separator is "\". This would result in a mixed
-"				separator style that is not actually handled.
-"				Add special normalization to "C:/" on Cygwin via
-"				":/" path separator argument.
-"   1.014.006	26-Sep-2013	ingo#fs#path#Normalize(): Also convert between
-"				the different D:\ and /cygdrive/d/ notations on
-"				Windows and Cygwin.
-"   1.013.005	13-Sep-2013	Use operating system detection functions from
-"				ingo/os.vim.
-"   1.011.004	01-Aug-2013	Extract ingo#fs#path#IsUncPathRoot().
-"   1.010.003	08-Jul-2013	Add prefix to exception thrown from
-"				ingo#fs#path#GetRootDir().
-"   1.009.002	26-Jun-2013	Add ingo#fs#path#Equals().
-"				Minor: Remove duplication.
-"   1.007.001	01-Jun-2013	file creation from ingofile.vim
 
 function! ingo#fs#path#Separator()
     return (exists('+shellslash') && ! &shellslash ? '\' : '/')
@@ -66,6 +44,35 @@ function! ingo#fs#path#Normalize( filespec, ... )
 	let l:result = substitute(l:result, '^\(\a\):', '/cygdrive/\l\1', '')
     endif
 
+    return l:result
+endfunction
+function! ingo#fs#path#Canonicalize( filespec, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Convert a:filespec into a unique, canonical form that other instances can be
+"   compared against for equality. Expands to an absolute filespec and may
+"   change case. Removes ../ etc. Only resolves shortcuts / symbolic links on
+"   demand, as it depends on the use case whether these should be identical or
+"   not.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:filespec      Filespec, potentially relative or with mixed / and \ path
+"                   separators.
+"   a:isResolveLinks    Flag whether to resolve shortcuts / symbolic links, too;
+"                       off by default.
+"* RETURN VALUES:
+"   Absolute a:filespec with uniform path separators and case, according to the
+"   platform.
+"******************************************************************************
+    let l:absoluteFilespec = fnamemodify(a:filespec, ':p')  " Expand to absolute filespec before resolving; as this handles ~/, too.
+    let l:simplifiedFilespec = (a:0 && a:1 ? resolve(l:absoluteFilespec) : simplify(l:absoluteFilespec))
+    let l:result = ingo#fs#path#Normalize(l:simplifiedFilespec)
+    if ingo#fs#path#IsCaseInsensitive(l:result)
+	let l:result = tolower(l:result)
+    endif
     return l:result
 endfunction
 

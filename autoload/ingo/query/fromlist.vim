@@ -1,11 +1,13 @@
 " ingo/query/fromlist.vim: Functions for querying elements from a list.
 "
 " DEPENDENCIES:
+"   - ingo/compat.vim autoload script
 "   - ingo/query.vim autoload script
 "   - ingo/query/confirm.vim autoload script
 "   - ingo/query/get.vim autoload script
+"   - ingo/query/recall.vim autoload script
 "
-" Copyright: (C) 2014-2017 Ingo Karkat
+" Copyright: (C) 2014-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -78,26 +80,42 @@ function! ingo#query#fromlist#Query( what, list, ... )
 	\)
     endif
 
+    let l:maxNum = len(a:list)
     let l:choice = ingo#query#get#Char()
-    let l:count = (empty(l:choice) ? -1 : index(l:accelerators, l:choice, 0, 1) + 1)
-    if l:count == 0
+    let l:count = (empty(l:choice) ? -1 : index(l:accelerators, l:choice, 0, 1)) + 1
+    if l:count == 0 && l:choice =~# '^\d$'
 	let l:count = str2nr(l:choice)
-	if len(a:list) > 10 * l:count
+	if l:maxNum > 10 * l:count
 	    " Need to query more numbers to be able to address all choices.
 	    echon ' ' . l:count
 
-	    while len(a:list) > 10 * l:count
-		let l:digit = ingo#query#get#Number(9)
-		if l:digit == -1
+	    let l:leadingZeroCnt = (l:choice ==# '0')
+	    while l:maxNum > 10 * l:count
+		let l:char = nr2char(getchar())
+		if l:char ==# "\<CR>"
+		    break
+		elseif l:char !~# '\d'
 		    redraw | echo ''
 		    return -1
 		endif
-		let l:count = 10 * l:count + l:digit
+
+		echon l:char
+		if l:char ==# '0' && l:count == 0
+		    let l:leadingZeroCnt += 1
+		    if l:leadingZeroCnt >= len(l:maxNum)
+			return -1
+		    endif
+		else
+		    let l:count = 10 * l:count + str2nr(l:char)
+		    if l:leadingZeroCnt + len(l:count) >= len(l:maxNum)
+			break
+		    endif
+		endif
 	    endwhile
 	endif
     endif
 
-    if l:count < 1 || l:count > len(a:list)
+    if l:count < 1 || l:count > l:maxNum
 	redraw | echo ''
 	return -1
     endif

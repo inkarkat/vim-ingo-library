@@ -1,17 +1,13 @@
 " ingo/subst.vim: Functions for substitutions.
 "
 " DEPENDENCIES:
+"   - ingo/format.vim autoload script
+"   - ingo/subst/replacement.vim autoload script
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.029.002	23-Jan-2017	Add ingo#subst#FirstSubstitution(),
-"				ingo#subst#FirstPattern(),
-"				ingo#subst#FirstParameter().
-"   1.009.001	14-Jun-2013	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 
@@ -128,6 +124,47 @@ function! ingo#subst#FirstParameter( expr, patternTemplate, replacement, flags, 
 	endif
     endfor
     return [-1, a:expr]
+endfunction
+
+function! ingo#subst#Indexed( expr, pattern, replacement, indices, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Substitute only / not the N+1'th matches for the N in a:indices. Other
+"   matches are kept as-is.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:expr  Text to be transformed.
+"   a:pattern   Regular expression.
+"   a:replacement       Replacement. Handles |sub-replace-expression|, & and \0,
+"                       \1 .. \9, and \r\n\t\b (but not \u, \U, etc.)
+"   a:indices   List of 0-based indices whose corresponding matches are
+"               replaced. A String value of "g" replaces globally, just like
+"               substitute(..., 'g').
+"   a:isInvert  Flag whether only those matches whose indices are NOT in
+"               a:indices are replaced. Does not invert the "g" String value.
+"               Default is false.
+"* RETURN VALUES:
+"   Replacement.
+"******************************************************************************
+    if type(a:indices) == type('') && a:indices ==# 'g'
+	return substitute(a:expr, a:pattern, a:replacement, 'g')
+    endif
+
+    let l:context = {
+    \   'matchCnt': 0,
+    \   'indices': a:indices,
+    \   'isInvert': (a:0 ? a:1 : 0),
+    \   'replacement': a:replacement
+    \}
+    return substitute(a:expr, a:pattern, '\=s:IndexReplacer(l:context)', 'g')
+endfunction
+function! s:IndexReplacer( context )
+    let a:context.matchCnt += 1
+    execute 'let l:isSelected = index(a:context.indices, a:context.matchCnt - 1)' (a:context.isInvert ? '==' : '!=') '-1'
+    return ingo#subst#replacement#DefaultReplacementOnPredicate(l:isSelected, a:context)
 endfunction
 
 let &cpo = s:save_cpo

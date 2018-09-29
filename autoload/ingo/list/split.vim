@@ -2,13 +2,10 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2016 Ingo Karkat
+" Copyright: (C) 2016-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.029.001	28-Dec-2016	file creation
 
 function! ingo#list#split#ChunksOf( list, n, ... )
 "******************************************************************************
@@ -40,6 +37,32 @@ function! ingo#list#split#ChunksOf( list, n, ... )
 	call add(l:result, l:subList)
     endwhile
     return l:result
+endfunction
+
+function! ingo#list#split#RemoveFromStartWhilePredicate( list, Predicate )
+"******************************************************************************
+"* PURPOSE:
+"   Split off elements from the start of a:list while a:Predicate is true.
+"* SEE ALSO:
+"   - If you want to split off _all_ elements where a:Predicate matches (not
+"     just from the start), use ingo#collections#Partition() instead.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Removes element(s) from the start of the list.
+"* INPUTS:
+"   a:list      Source list.
+"   a:Predicate Either a Funcref or an expression to be eval()ed where v:val
+"               represents the current element.
+"* RETURN VALUES:
+"   List of elements that matched a:Predicate at the start of a:list.
+"******************************************************************************
+    let l:idx = 0
+    while l:idx < len(a:list) && ingo#actions#EvaluateWithValOrFunc(a:Predicate, a:list[l:idx])
+	let l:idx += 1
+    endwhile
+
+    return (l:idx > 0 ? remove(a:list, 0, l:idx - 1) : [])
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

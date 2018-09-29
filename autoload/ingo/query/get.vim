@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2017 Ingo Karkat
+" Copyright: (C) 2012-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -28,6 +28,7 @@ function! ingo#query#get#Number( maxNum, ... )
 "   when an invalid (i.e. non-digit) number was entered.
 "******************************************************************************
     let l:nr = 0
+    let l:leadingZeroCnt = 0
     while 1
 	let l:char = nr2char(getchar())
 
@@ -38,9 +39,16 @@ function! ingo#query#get#Number( maxNum, ... )
 	endif
 	echon l:char
 
-	let l:nr = 10 * l:nr + str2nr(l:char)
-	if a:maxNum < 10 * l:nr
-	    return l:nr
+	if l:char ==# '0' && l:nr == 0
+	    let l:leadingZeroCnt += 1
+	    if l:leadingZeroCnt >= len(a:maxNum)
+		return 0
+	    endif
+	else
+	    let l:nr = 10 * l:nr + str2nr(l:char)
+	    if a:maxNum < 10 * l:nr || l:leadingZeroCnt + len(l:nr) >= len(a:maxNum)
+		return l:nr
+	    endif
 	endif
     endwhile
 endfunction

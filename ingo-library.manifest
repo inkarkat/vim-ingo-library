@@ -6,6 +6,7 @@ autoload/ingo/area/frompattern.vim
 autoload/ingo/avoidprompt.vim
 autoload/ingo/binary.vim
 autoload/ingo/buffer.vim
+autoload/ingo/buffer/ephemeral.vim
 autoload/ingo/buffer/generate.vim
 autoload/ingo/buffer/locate.vim
 autoload/ingo/buffer/scratch.vim
@@ -42,6 +43,7 @@ autoload/ingo/compat/regexp.vim
 autoload/ingo/compat/shellcommand.vim
 autoload/ingo/compat/window.vim
 autoload/ingo/cursor.vim
+autoload/ingo/cursor/keep.vim
 autoload/ingo/cursor/move.vim
 autoload/ingo/date.vim
 autoload/ingo/date/epoch.vim
@@ -60,6 +62,7 @@ autoload/ingo/event.vim
 autoload/ingo/external.vim
 autoload/ingo/filetype.vim
 autoload/ingo/folds.vim
+autoload/ingo/folds/containment.vim
 autoload/ingo/folds/persistence.vim
 autoload/ingo/foldtext.vim
 autoload/ingo/format.vim
@@ -71,6 +74,7 @@ autoload/ingo/fs/tempfile.vim
 autoload/ingo/fs/traversal.vim
 autoload/ingo/ftplugin/converter/external.vim
 autoload/ingo/ftplugin/onbufwinenter.vim
+autoload/ingo/ftplugin/setting.vim
 autoload/ingo/ftplugin/windowsettings.vim
 autoload/ingo/funcref.vim
 autoload/ingo/gui/position.vim
@@ -84,8 +88,11 @@ autoload/ingo/lines/replace.vim
 autoload/ingo/list.vim
 autoload/ingo/list/find.vim
 autoload/ingo/list/lcs.vim
+autoload/ingo/list/pattern.vim
 autoload/ingo/list/sequence.vim
 autoload/ingo/list/split.vim
+autoload/ingo/lists.vim
+autoload/ingo/lists/find.vim
 autoload/ingo/lnum.vim
 autoload/ingo/mapmaker.vim
 autoload/ingo/matches.vim
@@ -123,10 +130,14 @@ autoload/ingo/range/merge.vim
 autoload/ingo/record.vim
 autoload/ingo/regexp.vim
 autoload/ingo/regexp/build.vim
+autoload/ingo/regexp/capture.vim
 autoload/ingo/regexp/comments.vim
 autoload/ingo/regexp/collection.vim
+autoload/ingo/regexp/deconstruct.vim
 autoload/ingo/regexp/fromwildcard.vim
+autoload/ingo/regexp/length.vim
 autoload/ingo/regexp/magic.vim
+autoload/ingo/regexp/multi.vim
 autoload/ingo/regexp/pairs.vim
 autoload/ingo/regexp/previoussubstitution.vim
 autoload/ingo/regexp/split.vim
@@ -140,12 +151,14 @@ autoload/ingo/selection.vim
 autoload/ingo/selection/area.vim
 autoload/ingo/selection/frompattern.vim
 autoload/ingo/selection/patternmatch.vim
+autoload/ingo/selection/virtcols.vim
 autoload/ingo/smartcase.vim
 autoload/ingo/str.vim
 autoload/ingo/str/find.vim
 autoload/ingo/str/frompattern.vim
 autoload/ingo/str/fromrange.vim
 autoload/ingo/str/join.vim
+autoload/ingo/str/list.vim
 autoload/ingo/str/restricted.vim
 autoload/ingo/str/split.vim
 autoload/ingo/strdisplaywidth.vim
@@ -175,4 +188,5 @@ autoload/ingo/window/preview.vim
 autoload/ingo/window/quickfix.vim
 autoload/ingo/window/special.vim
 autoload/ingo/window/switches.vim
+autoload/ingo/workingdir.vim
 doc/ingo-library.txt

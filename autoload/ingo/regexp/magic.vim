@@ -5,30 +5,10 @@
 "   - ingo/collections/fromsplit.vim autoload script
 "   - ingo/regexp/collection.vim autoload script
 "
-" Copyright: (C) 2011-2017 Ingo Karkat
+" Copyright: (C) 2011-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.029.004	24-Jan-2017	Test failure in
-"				PatternsOnText/t7580-SubstituteMultiple-magic.vim
-"				alerted me to the fact that \V[1] needs to be
-"				escaped as \[1]. Also process the collections
-"				through new
-"				ingo#regexp#magic#ConvertMagicnessOfCollection().
-"   1.029.003	23-Jan-2017	BUG: ingo#regexp#magic#Normalize() also
-"				processes the contents of collections [...];
-"				especially the escaping of "]" wreaks havoc on
-"				the pattern. Rename s:ConvertMagicness() into
-"				ingo#regexp#magic#ConvertMagicnessOfElement()
-"				and introduce intermediate
-"				s:ConvertMagicnessOfFragment() that first
-"				separates collections from other elements and
-"				only invokes the former on those other elements.
-"   1.009.002	14-Jun-2013	Minor: Make substitute() robust against
-"				'ignorecase'.
-"   1.006.001	24-May-2013	file creation from ingosearch.vim.
 let s:save_cpo = &cpo
 set cpo&vim
 
@@ -65,7 +45,7 @@ let s:specialSearchCharacterExpressions = {
 \   'V': '\\',
 \}
 function! s:ConvertMagicnessOfFragment( fragment, sourceSpecialCharacterExpr, targetSpecialCharacterExpr )
-    let l:elements = ingo#collections#fromsplit#MapItemsAndSeparators(a:fragment, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\?' . ingo#regexp#collection#Expr(),
+    let l:elements = ingo#collections#fromsplit#MapItemsAndSeparators(a:fragment, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\?' . ingo#regexp#collection#Expr({'isBarePattern': 1}),
     \	printf('ingo#regexp#magic#ConvertMagicnessOfElement(v:val, %s, %s)', string(a:sourceSpecialCharacterExpr), string(a:targetSpecialCharacterExpr)),
     \	printf('ingo#regexp#magic#ConvertMagicnessOfCollection(v:val, %s, %s)', string(a:sourceSpecialCharacterExpr), string(a:targetSpecialCharacterExpr))
     \)

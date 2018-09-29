@@ -3,65 +3,18 @@
 " DEPENDENCIES:
 "   - ingo/list.vim autoload script
 "
-" Copyright: (C) 2012-2017 Ingo Karkat
+" Copyright: (C) 2012-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.021.011	20-Jun-2014	FIX: ingo#cmdargs#substitute#Parse() branch for
-"				special case of {flags} without /pat/string/
-"				must only be entered when a:arguments is not
-"				empty.
-"   1.014.010	15-Oct-2013	Factor out s:EnsureList() to ingo/list.vim.
-"   1.011.009	24-Jul-2013	FIX: Use the rules for the /pattern/ separator
-"				as stated in :help E146.
-"   1.009.008	14-Jun-2013	Minor: Make matchlist() robust against
-"				'ignorecase'.
-"   1.007.007	01-Jun-2013	Move functions from ingo/cmdargs.vim to
-"				ingo/cmdargs/pattern.vim and
-"				ingo/cmdargs/substitute.vim.
-"   1.006.006	29-May-2013	Again change
-"				ingo#cmdargs#ParseSubstituteArgument() interface
-"				to parse the :substitute [flags] [count] by
-"				default.
-"   1.006.005	28-May-2013	BUG: ingo#cmdargs#ParseSubstituteArgument()
-"				mistakenly returns a:defaultFlags when full
-"				/pat/repl/ or a literal pat is passed. Only
-"				return a:defaultFlags when the passed
-"				a:arguments is really empty.
-"				CHG: Redesign
-"				ingo#cmdargs#ParseSubstituteArgument() interface
-"				to the existing use cases. a:defaultReplacement
-"				should only be used when a:arguments is really
-"				empty, too. Introduce an optional options
-"				Dictionary and preset replacement / flags
-"				defaults of "~" and "&" resp. for when
-"				a:arguments is really empty, which makes sense
-"				for use with :substitute. Allow submatches for
-"				a:flagsExpr via a:options.flagsMatchCount, to
-"				avoid further parsing in the client.
-"				ENH: Also parse lone {flags} (if a:flagsExpr is
-"				given) by default, and allow to turn this off
-"				via a:options.isAllowLoneFlags.
-"				ENH: Allow to pass a:options.emptyPattern, too.
-"   1.001.004	21-Feb-2013	Move to ingo-library.
-"	003	29-Jan-2013	Add ingocmdargs#ParseSubstituteArgument() for
-"				use in PatternsOnText/Except.vim and
-"				ExtractMatchesToReg.vim.
-"				Change ingocmdargs#UnescapePatternArgument() to
-"				take the result of
-"				ingocmdargs#ParsePatternArgument() instead of
-"				invoking that function itself. And make it
-"				handle an empty separator.
-"	002	21-Jan-2013	Add ingocmdargs#ParsePatternArgument() and
-"				ingocmdargs#UnescapePatternArgument() from
-"				PatternsOnText.vim.
-"	001	25-Nov-2012	file creation from CaptureClipboard.vim.
 
 function! s:ApplyEmptyFlags( emptyFlags, parsedFlags)
     return (empty(filter(copy(a:parsedFlags), '! empty(v:val)')) ? a:emptyFlags : a:parsedFlags)
 endfunction
+function! ingo#cmdargs#substitute#GetFlags( ... )
+    return '&\?[cegiInp#lr' . (a:0 ? a:1 : '') . ']*'
+endfunction
+
 function! ingo#cmdargs#substitute#Parse( arguments, ... )
 "******************************************************************************
 "* PURPOSE:
@@ -120,7 +73,7 @@ function! ingo#cmdargs#substitute#Parse( arguments, ... )
 "******************************************************************************
     let l:options = (a:0 ? a:1 : {})
     let l:additionalFlags = get(l:options, 'additionalFlags', '')
-    let l:flagsExpr = get(l:options, 'flagsExpr', '\(&\?[cegiInp#lr' . l:additionalFlags . ']*\)\(\s*\d*\)')
+    let l:flagsExpr = get(l:options, 'flagsExpr', '\(' . ingo#cmdargs#substitute#GetFlags(l:additionalFlags) . '\)\(\s*\d*\)')
     let l:isParseFlags = (! empty(l:flagsExpr))
     let l:flagsMatchCount = get(l:options, 'flagsMatchCount', (has_key(l:options, 'flagsExpr') ? (l:isParseFlags ? 1 : 0) : 2))
     let l:defaultFlags = (l:isParseFlags ? repeat([''], l:flagsMatchCount) : [])

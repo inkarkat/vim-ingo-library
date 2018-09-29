@@ -19,6 +19,23 @@ duplicating the functionality, or installing potentially conflicting versions
 with each plugin, this one core dependency fosters a lean Vim runtime and
 easier plugin updates.
 
+Separating common functions is explicitly recommended by Vim; see
+|write-library-script|. The |autoload| mechanism was created to make this
+really easy and efficient. Only those scripts that contain functions that are
+actually used are loaded, the rest is ignored; it just "wastes" the space on
+disk. (Not using autoload functions, and duplicating utility functions in the
+plugin script itself, now that would be truly bad.)
+
+Still, if you only use one or few of my plugins, yes, this might look
+wasteful. However, I have published an awful lot of plugins (most of which now
+use ingo-library), and intend to continue to do so. Considering that, the
+decision to extract the common functionality (which caused a lot of effort for
+me) benefits both users (no duplication, no incompatibilities, faster updates)
+and me (less overall effort in maintaining, more time for features). Please
+keep that in mind before complaining about this dependency.
+
+Furthermore, several other authors have been following the same approach:
+
 RELATED WORKS								     *
 
 Other authors have published separate support libraries, too:
@@ -93,6 +110,58 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 
 ==============================================================================
 HISTORY							*ingo-library-history*
+
+1.035	29-Sep-2018
+- Add ingo#compat#commands#NormalWithCount().
+- Add ingo#compat#haslocaldir().
+- Add ingo/workingdir.vim module.
+- Add ingo/selection/virtcols.vim module.
+- Add ingo/str/list.vim module.
+- Add ingo#funcref#AsString().
+- Add ingo#compat#execute().
+- Add ingo#option#GetBinaryOptionValue().
+- Add ingo/buffer/ephemeral.vim module.
+- Add ingo/lists/find.vim module.
+- Add ingo/folds/containment.vim module.
+- Add ingo/ftplugin/setting.vim module.
+- Extract generic ingo#plugin#cmdcomplete#MakeCompleteFunc().
+- Add ingo#fs#path#split#StartsWith() (we already had
+  ingo#fs#path#split#EndsWith()).
+- Add ingo#fs#path#Canonicalize().
+- Add ingo#avoidprompt#EchoMsg() and ingo#avoidprompt#EchoMsgAsSingleLine().
+- Tweak ingo#avoidprompt#MaxLength() algorithm; empirical testing showed that
+  1 more needs to be subtracted if :set noshowcmd ruler. Thanks to an9wer for
+  making me aware of this.
+- CHG: Move ingo#list#Matches() to ingo#list#pattern#AllItemsMatch(). The
+  previous name wasn't very clear.
+- Add ingo#list#pattern#{First,All}Match[Index]() functions.
+- ingo#query#{get#Number,fromlist#Query}(): ENH: Also support number entry with leading zeros
+- ingo#query#fromlist#Query(): BUG: Cannot conclude multi-digit entry with <Enter>
+- ingo#query#fromlist#Query(): BUG: Typing non-accellerator non-number characters are treated as literal "0"
+- Add ingo/lists.vim module.
+- Add ingo/regexp/capture.vim module.
+- Add ingo#cmdargs#substitute#GetFlags().
+- Add ingo#subst#Indexed().
+- Add ingo#regexp#split#PrefixGroupsSuffix().
+- Add ingo#collections#SplitIntoMatches().
+- Add ingo#regexp#collection#ToBranches().
+- Add ingo/regexp/{deconstruct,length,multi} modules.
+- Add ingo#range#Is{In,Out}side().
+- Add ingo/cursor/keep.vim module.
+- Add ingo#folds#GetOpenFoldRange().
+- ingo#compat#commands#keeppatterns(): Don't remove the last search pattern
+  when the search history wasn't modified. Allow to force compatibility
+  function via g:IngoLibrary_CompatFor here, too.
+- Add ingo#regexp#split#GlobalFlags().
+- Add ingo#regexp#IsValid() (from mark.vim plugin).
+- Add ingo#matches#Any() and ingo#matches#All().
+- Add ingo#list#split#RemoveFromStartWhilePredicate().
+- Add ingo#cmdargs#file#FilterFileOptions() variant of
+  ingo#cmdargs#file#FilterFileOptionsAndCommands()
+- Add ingo#cmdargs#file#FileOptionsAndCommandsToEscapedExCommandLine() and
+  combining ingo#cmdargs#file#FilterFileOptionsToEscaped() and
+  ingo#cmdargs#file#FilterFileOptionsAndCommandsToEscaped().
+- Add ingo#list#AddNonEmpty().
 
 1.034	13-Feb-2018
 - Add ingo/regexp/split.vim module.

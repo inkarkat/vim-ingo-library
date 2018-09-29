@@ -3,26 +3,12 @@
 " DEPENDENCIES:
 "   - ingo/regexp/collection.vim autoload script
 "   - ingo/regexp/virtcols.vim autoload script
+"   - ingo/str/list.vim autoload script
 "
-" Copyright: (C) 2013-2016 Ingo Karkat
+" Copyright: (C) 2013-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.027.007	30-Sep-2016	Add ingo#str#trd().
-"   1.025.006	30-Apr-2015	Add ingo#str#Contains().
-"   1.024.005	01-Apr-2015	Add ingo#str#GetVirtCols().
-"   1.019.004	21-May-2014	Allow optional a:ignorecase argument for
-"				ingo#str#StartsWith() and ingo#str#EndsWith().
-"				Add ingo#str#Equals() for when it's convenient
-"				to pass in the a:ignorecase flag. This avoids
-"				coding the conditional between ==# and ==?
-"				yourself.
-"   1.016.003	23-Dec-2013	Add ingo#str#StartsWith() and
-"				ingo#str#EndsWith().
-"   1.011.002	26-Jul-2013	Add ingo#str#Reverse().
-"   1.009.001	19-Jun-2013	file creation
 
 function! ingo#str#Trim( string )
 "******************************************************************************
@@ -41,7 +27,7 @@ function! ingo#str#Trim( string )
 endfunction
 
 function! ingo#str#Reverse( string )
-    return join(reverse(split(a:string, '\zs')), '')
+    return join(reverse(ingo#str#list#OfCharacters(a:string)), '')
 endfunction
 
 function! ingo#str#StartsWith( string, substring, ... )

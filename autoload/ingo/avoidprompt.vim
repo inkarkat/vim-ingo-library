@@ -21,28 +21,10 @@
 " TODO:
 "   - Consider 'cmdheight', add argument isSingleLine.
 "
-" Copyright: (C) 2008-2016 Ingo Karkat
+" Copyright: (C) 2008-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.028.003	18-Nov-2016	ENH: Add optional a:reservedColumns also to
-"				ingo#avoidprompt#TruncateTo(), and pass this
-"				from ingo#avoidprompt#Truncate().
-"				ingo#avoidprompt#TruncateTo(): The strright()
-"				cannot precisely account for the rendering of
-"				tab widths. Check the result, and if necessary,
-"				remove further characters until we go below the
-"				limit.
-"   1.026.002	11-Aug-2016	ENH: ingo#avoidprompt#TruncateTo() has a
-"				configurable ellipsis string
-"				g:IngoLibrary_TruncateEllipsis, now defaulting
-"				to a single-char UTF-8 variant if we're in such
-"				encoding. Thanks to Daniel Hahler for sending a
-"				patch! It also handles pathologically small
-"				lengths that only show / cut into the ellipsis.
-"   1.008.001	07-Jun-2013	file creation from EchoWithoutScrolling.vim
 
 function! ingo#avoidprompt#MaxLength()
     let l:maxLength = &columns
@@ -57,7 +39,7 @@ function! ingo#avoidprompt#MaxLength()
 	if &showcmd == 1
 	    let l:maxLength -= 12
 	else
-	    let l:maxLength -= 1
+	    let l:maxLength -= 2 " Ruler does not occupy the last cell, and there has to be one empty cell between ruler and message.
 	endif
 	if &ruler == 1 && has('statusline') && ((&laststatus == 0) || (&laststatus == 1 && winnr('$') == 1))
 	    if &rulerformat == ''
@@ -73,7 +55,7 @@ function! ingo#avoidprompt#MaxLength()
 	    endif
 	endif
     else
-	let l:maxLength -= 1
+	let l:maxLength -= 1 " Cannot occupy the last cell in the line.
     endif
     return l:maxLength
 endfunction
@@ -223,8 +205,36 @@ endfunction
 function! ingo#avoidprompt#Echo( text )
     echo ingo#avoidprompt#Truncate(a:text)
 endfunction
+function! ingo#avoidprompt#EchoMsg( text )
+"******************************************************************************
+"* PURPOSE:
+"   Echo as much as can be viewed in the command-line area of a:text, while
+"   saving the full message in the message history. This way, there's no
+"   hit-enter prompt, but the user can still recall the message history to see
+"   the full message (in case important bits were truncated).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Echos a:text and saves it in the message history. May redraw the window.
+"* INPUTS:
+"   a:text	Text which may be truncated to fit.
+"* RETURN VALUES:
+"   None.
+"******************************************************************************
+    let l:truncatedText = ingo#avoidprompt#Truncate(a:text)
+    echomsg a:text
+    if l:truncatedText !=# a:text
+	" Need to overwrite the overly long message (it's still in full in the
+	" message history).
+	redraw  " This avoids the hit-enter prompt.
+	echo l:truncatedText    | " Use :echo because the full text already is in the message history.
+    endif
+endfunction
 function! ingo#avoidprompt#EchoAsSingleLine( text )
     echo ingo#avoidprompt#Truncate(ingo#avoidprompt#TranslateLineBreaks(a:text))
+endfunction
+function! ingo#avoidprompt#EchoMsgAsSingleLine( text )
+    call ingo#avoidprompt#EchoMsg(ingo#avoidprompt#TranslateLineBreaks(a:text))
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
