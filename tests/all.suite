@@ -16,6 +16,7 @@ regexp/collection/
 regexp/deconstruct/
 regexp/length/
 regexp/split/
+strdisplaywidth/
 subs/BraceCreation/
 subs/BraceExpansion/
 subst/

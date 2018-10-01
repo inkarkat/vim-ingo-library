@@ -97,6 +97,10 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.036   RELEASEME
+- FIX: ingo#strdisplaywidth#strleft includes multi-width character that
+  straddles the specified width. Need to exclude this one.
+
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
 - Add ingo#compat#haslocaldir().
