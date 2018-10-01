@@ -37,15 +37,7 @@ function! ingo#strdisplaywidth#GetMinMax( lines, ... )
 endfunction
 
 function! ingo#strdisplaywidth#strleft( expr, virtCol )
-    " Must add 1 because a "before-column" pattern is used in case the exact
-    " column cannot be matched (because its halfway through a tab or other wide
-    " character), and include that before-column in the match, too.
-    let l:text = matchstr(a:expr, '^.*\%<' . (a:virtCol + 1) . 'v.')
-
-    if ingo#strdisplaywidth#HasMoreThan(l:text, a:virtCol)
-	let l:text = substitute(l:text, '.$', '', '')
-    endif
-    return l:text
+    return substitute(a:expr, '\zs.\%>' . (a:virtCol + 1) . 'v.*$', '', '')
 endfunction
 function! ingo#strdisplaywidth#CutLeft( expr, virtCol )
     let l:left = ingo#strdisplaywidth#strleft(a:expr, a:virtCol)
