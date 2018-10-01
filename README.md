@@ -100,6 +100,7 @@ HISTORY
 ##### 1.036   RELEASEME
 - FIX: ingo#strdisplaywidth#strleft includes multi-width character that
   straddles the specified width. Need to exclude this one.
+- Add ingo#strdisplaywidth#pad#Repeat\[Exact]().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
