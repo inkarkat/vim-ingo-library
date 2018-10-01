@@ -5,7 +5,7 @@
 "   - ingo/funcref.vim autoload script
 "   - ingo/lines.vim autoload script
 "
-" Copyright: (C) 2013-2015 Ingo Karkat
+" Copyright: (C) 2013-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -86,7 +86,8 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, options, 
 "		    Hook to transform the range of lines before they have been
 "		    surrounded.
 "		    When not empty, is invoked as a Funcref / Ex command with
-"		    the a:startLnum,a:endLnum range. Should transform the range.
+"		    the a:firstline, a:lastline range and no arguments. Should
+"		    transform the range.
 "   a:options.TransformerAfter
 "		    Hook to transform the surrounded range of lines.
 "   a:count         Range as <count> to check for default. When no range is
