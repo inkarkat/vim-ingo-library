@@ -8,9 +8,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.014.001	27-Sep-2013	file creation
 
 if ! exists('g:IngoLibrary_DateCommand')
     let g:IngoLibrary_DateCommand = (ingo#os#IsWinOrDos() ? 'unixdate' : 'date')
