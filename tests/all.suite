@@ -2,6 +2,7 @@ cmdargs/file/
 collections/
 compat/
 digest/
+fs/paths/split/
 list/
 list/lcs/
 list/pattern/

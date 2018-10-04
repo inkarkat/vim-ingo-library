@@ -105,6 +105,7 @@ HISTORY
   g:IngoLibrary\_DateCommand.
 - ENH: Allow passing of a:truncationIndicator to
   ingo#avoidprompt#Truncate\[To]().
+- Add ingo#fs#path#split#TruncateTo().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
