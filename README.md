@@ -103,6 +103,8 @@ HISTORY
 - Add ingo#strdisplaywidth#pad#Repeat\[Exact]().
 - Make Unix date command used in ingo#date#epoch#ConvertTo() configurable via
   g:IngoLibrary\_DateCommand.
+- ENH: Allow passing of a:truncationIndicator to
+  ingo#avoidprompt#Truncate\[To]().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
