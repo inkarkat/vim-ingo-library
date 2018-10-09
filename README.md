@@ -106,6 +106,7 @@ HISTORY
 - ENH: Allow passing of a:truncationIndicator to
   ingo#avoidprompt#Truncate\[To]().
 - Add ingo#fs#path#split#TruncateTo().
+- Add ingo#str#TrimPattern() variant of ingo#str#Trim().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
