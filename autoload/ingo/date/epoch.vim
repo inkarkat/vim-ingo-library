@@ -22,4 +22,28 @@ function! ingo#date#epoch#ConvertTo( date )
     return str2nr(system(printf('%s -d %s +%%s', ingo#compat#shellescape(g:IngoLibrary_DateCommand), ingo#compat#shellescape(a:date))))
 endfunction
 
+if exists('g:IngoLibrary_NowEpoch')
+    function! ingo#date#epoch#Now()
+	return g:IngoLibrary_NowEpoch
+    endfunction
+else
+    function! ingo#date#epoch#Now()
+"******************************************************************************
+"* PURPOSE:
+"   Get the Unix Epoch for the current date and time.
+"   Supports a "testing mode" be defining g:IngoLibrary_NowEpoch (before first
+"   use of this module) with the constant value to be returned instead.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   None.
+"* RETURN VALUES:
+"   Integer representing the seconds since 1970 as of now.
+"******************************************************************************
+	return strftime('%s')
+    endfunction
+endif
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
