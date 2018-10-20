@@ -37,6 +37,23 @@ function! ingo#range#Get( range )
 endfunction
 
 function! ingo#range#NetStart( ... )
+"******************************************************************************
+"* PURPOSE:
+"   Vim accounts for closed folds and adapts <line1>,<line2> when passed a
+"   :{from},{to} range, but not with a single :{lnum} range! As long as the
+"   range is forwarded to Ex commands, that's fine. But if you do line
+"   arithmethic or use low-level functions like |getline()|, you need to convert
+"   via this function.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:lnum  Optional line number; defaults to the current one.
+"* RETURN VALUES:
+"   Start line number of the fold covering the line, or the current / passed
+"   line number itself.
+"******************************************************************************
     let l:lnum = (a:0 ? a:1 : line('.'))
     return foldclosed(l:lnum) == -1 ? l:lnum : foldclosed(l:lnum)
 endfunction
