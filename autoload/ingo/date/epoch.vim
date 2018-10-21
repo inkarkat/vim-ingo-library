@@ -31,7 +31,7 @@ else
 "******************************************************************************
 "* PURPOSE:
 "   Get the Unix Epoch for the current date and time.
-"   Supports a "testing mode" be defining g:IngoLibrary_NowEpoch (before first
+"   Supports a "testing mode" by defining g:IngoLibrary_NowEpoch (before first
 "   use of this module) with the constant value to be returned instead.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
@@ -42,7 +42,7 @@ else
 "* RETURN VALUES:
 "   Integer representing the seconds since 1970 as of now.
 "******************************************************************************
-	return strftime('%s')
+	return localtime()
     endfunction
 endif
 
