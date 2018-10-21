@@ -1,6 +1,7 @@
 cmdargs/file/
 collections/
 compat/
+date/
 digest/
 fs/paths/split/
 list/
