@@ -109,6 +109,7 @@ HISTORY
 - Add ingo#str#TrimPattern() variant of ingo#str#Trim().
 - Add ingo#date#epoch#Now().
 - Add ingo#date#strftime().
+- Add ingo#compat#trim().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().

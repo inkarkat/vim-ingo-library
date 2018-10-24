@@ -156,6 +156,37 @@ else
     endfunction
 endif
 
+if exists('*trim') && ! has_key(s:compatFor, 'trim')
+    function! ingo#compat#trim( ... )
+	return call('trim', a:000)
+    endfunction
+else
+    function! ingo#compat#trim( text, ... )
+	let l:mask = (a:0 ? a:1 : "\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f \xa0")
+	let l:text = a:text
+
+	while ! empty(a:text)
+	    let [l:head, l:rest] = matchlist(l:text, '^\(.\)\(.*\)$')[1:2]
+	    if stridx(l:mask, l:head) == -1
+		break
+	    endif
+
+	    let l:text = l:rest
+	endwhile
+
+	while ! empty(a:text)
+	    let [l:rest, l:tail] = matchlist(l:text, '^\(.*\)\(.\)$')[1:2]
+	    if stridx(l:mask, l:tail) == -1
+		break
+	    endif
+
+	    let l:text = l:rest
+	endwhile
+
+	return l:text
+    endfunction
+endif
+
 function! ingo#compat#fnameescape( filespec )
 "*******************************************************************************
 "* PURPOSE:
