@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2016 Ingo Karkat
+" Copyright: (C) 2016-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -64,6 +64,32 @@ function! ingo#buffer#locate#BufTabPageWinNr( bufNr )
     endfor
 
     return [0, 0]
+endfunction
+
+function! ingo#buffer#locate#OtherWindowWithSameBuffer()
+"******************************************************************************
+"* PURPOSE:
+"   Locate the first window that contains the same buffer as the current window,
+"   but is not identical to the current window.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   None.
+"* RETURN VALUES:
+"   winnr or 0 if there's no windows split on this tab page that contains the
+"   same buffer
+"******************************************************************************
+    let [l:currentWinNr, l:currentBufNr] = [winnr(), bufnr('')]
+
+    for l:winNr in range(1, winnr('$'))
+	if l:winNr != l:currentWinNr && winbufnr(l:winNr) == l:currentBufNr
+	    return l:winNr
+	endif
+    endfor
+
+    return 0
 endfunction
 
 function! ingo#buffer#locate#NearestWindow( isSearchOtherTabPages, bufNr )
