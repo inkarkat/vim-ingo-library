@@ -41,9 +41,9 @@
 "
 " REVISION	DATE		REMARKS
 "	029	23-Aug-2017	ENH: Add a:options.isAllowOtherDirs to configure
-"				handling of absolute argleads. The completion so
-"				far just kept a leading "/", which isn't so
-"				helpful.
+"				handling of absolute argleads or those moving
+"				outside the a:dirspecs. The completion so far
+"				just kept a leading "/", which isn't so helpful.
 "	028	20-Feb-2017	ENH: Get <mods> information into s:Command() and
 "				pass this on to a:Action, and make this
 "				accessible to a:Action Funcrefs via a context
@@ -205,13 +205,20 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
 	let l:resolvedDirspecs = []
 	let l:sourceCnt = 0
 
-	if ! empty(a:argLead) && ingo#fs#path#IsAbsolute(a:argLead) " Let's ignore relative upwards addressing with ../.. for now.
+	if ! empty(a:argLead) && ingo#fs#path#IsAbsolute(a:argLead)
 	    if a:isAllowOtherDirs
 		" As we have an absolute arglead, we do not need (in fact: must
 		" not use) the provided a:dirspecs. If we replace those with a
 		" single empty one, the logic below will do exactly what we
 		" need, as it concatenates dirspec and arglead.
 		let l:dirspecs = ['']
+	    else
+		return []
+	    endif
+	elseif ! empty(a:argLead) && ingo#fs#path#IsUpwards(a:argLead)
+	    if a:isAllowOtherDirs
+		" The upwards arglead will combine just fine with the a:dirspecs
+		" (which have a trailing path separator).
 	    else
 		return []
 	    endif
@@ -263,6 +270,12 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
 	    \   ),
 	    \   'ingo#compat#fnameescape(fnamemodify(v:val, ":t"))'
 	    \)
+	endif
+
+	if a:argLead =~# '^\.\{1,2}$' && ! a:isAllowOtherDirs
+	    " The globbing would include "../", but this isn't allowed here.
+	    " Remove it.
+	    call filter(l:filespecs, '! ingo#fs#path#IsUpwards(v:val)')
 	endif
 
 	if l:sourceCnt > 1
