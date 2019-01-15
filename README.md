@@ -1,4 +1,4 @@
-INGO-LIBRARY   
+INGO-LIBRARY
 ===============================================================================
 _by Ingo Karkat_
 
@@ -111,6 +111,7 @@ HISTORY
 - Add ingo#date#strftime().
 - Add ingo#compat#trim().
 - Add ingo#buffer#locate#OtherWindowWithSameBuffer().
+- Add ingo#search#timelimited#FirstPatternThatMatchesInBuffer().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
@@ -892,7 +893,7 @@ HISTORY
 - Started development of shared autoload functionality.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2009-2018 Ingo Karkat -
+Copyright: (C) 2009-2019 Ingo Karkat -
 Contains URL encoding / decoding algorithms written by Tim Pope. -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 

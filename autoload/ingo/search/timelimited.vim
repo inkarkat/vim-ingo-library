@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -30,6 +30,29 @@ function! ingo#search#timelimited#search( pattern, flags, ... )
 endfunction
 function! ingo#search#timelimited#IsBufferContains( pattern, ... )
     return call('ingo#search#timelimited#search', [a:pattern, 'cnw'] + a:000)
+endfunction
+function! ingo#search#timelimited#FirstPatternThatMatchesInBuffer( patterns, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Search for matches of any of a:patterns in the buffer, and return the first
+"   pattern that matches.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:patterns  List of regular expressions.
+"   a:timeout   Optional timeout in milliseconds; default 100.
+"* RETURN VALUES:
+"   First pattern from a:patterns that matches somewhere in the current buffer,
+"   or empty String.
+"******************************************************************************
+    for l:pattern in a:patterns
+	if call('ingo#search#timelimited#search', [l:pattern, 'cnw'] + a:000)
+	    return l:pattern
+	endif
+    endfor
+    return ''
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
