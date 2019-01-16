@@ -112,6 +112,8 @@ HISTORY
 - Add ingo#compat#trim().
 - Add ingo#buffer#locate#OtherWindowWithSameBuffer().
 - Add ingo#search#timelimited#FirstPatternThatMatchesInBuffer().
+- Add optional a:isPreferText flag to
+  ingo#cmdargs#register#Parse{Prepended,Appended}WritableRegister().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
