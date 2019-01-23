@@ -7,49 +7,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.031.008	27-Jun-2017	BUG: ingo#comments#SplitIndentAndText() and
-"				ingo#comments#RemoveCommentPrefix() fail with
-"				nestable comment prefixes with "E688: More
-"				targets than List items". Implementation in
-"				s:SplitIndentAndText() was based on unnestable
-"				prefixes. Instead of adding 1 to the actual
-"				nesting level to obtain the pattern multiplier,
-"				ensure it is at least 1.
-"   1.029.007	09-Jan-2017	Add ingo#comments#SplitAll(), a more powerful
-"				variant of ingo#comments#SplitIndentAndText().
-"   1.029.006	02-Dec-2016	CHG: ingo#comments#RemoveCommentPrefix() isn't
-"				useful as it omits any indent before the comment
-"				prefix. Change its implementation to just erase
-"				the prefix itself.
-"				Add ingo#comments#SplitIndentAndText() to
-"				provide what ingo#comments#RemoveCommentPrefix()
-"				was previously used to: The line broken into
-"				indent (before, after, and with the comment
-"				prefix), and the remaining text.
-"				FIX: Wrong negation in a:options.isIgnoreIndent
-"				documentation.
-"   1.013.005	06-Sep-2013	CHG: Make a:isIgnoreIndent flag to
-"				ingo#comments#CheckComment() optional and add
-"				a:isStripNonEssentialWhiteSpaceFromCommentString,
-"				which is also on by default for DWIM.
-"				CHG: Don't strip whitespace in
-"				ingo#comments#RemoveCommentPrefix(); with the
-"				changed ingo#comments#CheckComment() default
-"				behavior, this isn't necessary, and is
-"				unexpected.
-"				ingo#comments#RenderComment: When the text
-"				starts with indent identical to what
-"				'commentstring' would render, avoid having
-"				duplicate indent.
-"   1.005.004	02-May-2013	Move to ingo-library.
-"	003	24-May-2012	Add ingocomments#RemoveCommentPrefix().
-"	002	09-Nov-2011	Add ingocomments#CheckComment() and
-"				ingocomments#RenderComment(), used by
-"				s:ReplaceWithEllided() in
-"				plugin/ingosubstitutions2.vim.
-"	001	22-Sep-2011	file creation
 
 function! s:CommentDefinitions()
     return map(split(&l:comments, ','), 'matchlist(v:val, ''\([^:]*\):\(.*\)'')[1:2]')
