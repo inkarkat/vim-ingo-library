@@ -172,13 +172,12 @@ function! ingo#comments#RemoveCommentPrefix( line )
     endif
     return l:indent . l:text
 endfunction
-function! ingo#comments#GetSplitIndentAndTextPattern( lineOrStartLnum, ... )
+function! ingo#comments#GetSplitIndentPattern( lineOrStartLnum, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Analyze a:line (or the a:startLnum, a:endLnum range of lines in the current
-"   buffer) and generate a regular expression that matches (in capture groups)
-"   possible indent with comment prefix and the text after it. If there's no
-"   comment, split indent from text.
+"   buffer) and generate a regular expression that matches possible indent with
+"   comment prefix. If there's no comment, just match indent.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -189,19 +188,19 @@ function! ingo#comments#GetSplitIndentAndTextPattern( lineOrStartLnum, ... )
 "   a:endLnum   Last line number in the current buffer to be analyzed; the first
 "               line in the range that has a comment prefix is used.
 "* RETURN VALUES:
-"   Regular expression with capture group 1 one for the indent plus potential
-"   comment prefix, capture group 2 for the text after it.
+"   Regular expression matching the indent plus potential comment prefix,
+"   anchored to the start of a line.
 "******************************************************************************
     if a:0
 	for l:lnum in range(a:lineOrStartLnum, a:1)
 	    let l:checkComment = ingo#comments#CheckComment(getline(l:lnum))
 	    if ! empty(l:checkComment)
-		return s:GetSplitIndentAndTextPattern(l:checkComment)
+		return s:GetSplitIndentPattern(l:checkComment)
 	    endif
 	endfor
-	return s:GetSplitIndentAndTextPattern([])
+	return s:GetSplitIndentPattern([])
     else
-	return s:GetSplitIndentAndTextPattern(ingo#comments#CheckComment(a:lineOrStartLnum))
+	return s:GetSplitIndentPattern(ingo#comments#CheckComment(a:lineOrStartLnum))
     endif
 endfunction
 function! ingo#comments#SplitIndentAndText( line )
@@ -224,16 +223,19 @@ function! ingo#comments#SplitIndentAndText( line )
 "******************************************************************************
     return s:SplitIndentAndText(a:line, ingo#comments#CheckComment(a:line))
 endfunction
-function! s:GetSplitIndentAndTextPattern( checkComment )
+function! s:GetSplitIndentPattern( checkComment )
     if empty(a:checkComment)
-	return '^\(\s*\)\(.*\)$'
+	return '^\(\s*\)'
     endif
 
     let [l:commentprefix, l:type, l:nestingLevel, l:isBlankRequired] = a:checkComment
 
     return '\V\C\^' .
-    \   '\(\s\*\%(' . escape(l:commentprefix, '\') . (l:isBlankRequired ? '\s\+' : '\s\*'). '\)\{' . max([1, l:nestingLevel]) . '}\)' .
-    \   '\(\.\*\)\$'
+    \   '\s\*\%(' . escape(l:commentprefix, '\') . (l:isBlankRequired ? '\s\+' : '\s\*'). '\)\{' . max([1, l:nestingLevel]) . '}' .
+    \   '\m'
+endfunction
+function! s:GetSplitIndentAndTextPattern( checkComment )
+    return '\(' . s:GetSplitIndentPattern(a:checkComment) . '\)\(.*\)$'
 endfunction
 function! s:SplitIndentAndText( line, checkComment )
     return matchlist(a:line, s:GetSplitIndentAndTextPattern(a:checkComment))[1:2]
