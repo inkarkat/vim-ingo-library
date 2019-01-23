@@ -172,6 +172,38 @@ function! ingo#comments#RemoveCommentPrefix( line )
     endif
     return l:indent . l:text
 endfunction
+function! ingo#comments#GetSplitIndentAndTextPattern( lineOrStartLnum, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Analyze a:line (or the a:startLnum, a:endLnum range of lines in the current
+"   buffer) and generate a regular expression that matches (in capture groups)
+"   possible indent with comment prefix and the text after it. If there's no
+"   comment, split indent from text.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:line  The line to be analyzed for splitting, or:
+"   a:startLnum First line number in the current buffer to be analyzed.
+"   a:endLnum   Last line number in the current buffer to be analyzed; the first
+"               line in the range that has a comment prefix is used.
+"* RETURN VALUES:
+"   Regular expression with capture group 1 one for the indent plus potential
+"   comment prefix, capture group 2 for the text after it.
+"******************************************************************************
+    if a:0
+	for l:lnum in range(a:lineOrStartLnum, a:1)
+	    let l:checkComment = ingo#comments#CheckComment(getline(l:lnum))
+	    if ! empty(l:checkComment)
+		return s:GetSplitIndentAndTextPattern(l:checkComment)
+	    endif
+	endfor
+	return s:GetSplitIndentAndTextPattern([])
+    else
+	return s:GetSplitIndentAndTextPattern(ingo#comments#CheckComment(a:lineOrStartLnum))
+    endif
+endfunction
 function! ingo#comments#SplitIndentAndText( line )
 "******************************************************************************
 "* PURPOSE:

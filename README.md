@@ -114,6 +114,8 @@ HISTORY
 - Add ingo#search#timelimited#FirstPatternThatMatchesInBuffer().
 - Add optional a:isPreferText flag to
   ingo#cmdargs#register#Parse{Prepended,Appended}WritableRegister().
+- Add ingo#comments#GetSplitIndentAndTextPattern() variant of
+  ingo#comments#SplitIndentAndText() that just returns the pattern.
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
