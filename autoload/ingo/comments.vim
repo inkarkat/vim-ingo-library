@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/compat.vim autoload script
 "
-" Copyright: (C) 2011-2017 Ingo Karkat
+" Copyright: (C) 2011-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -235,18 +235,19 @@ function! ingo#comments#SplitIndentAndText( line )
 "******************************************************************************
     return s:SplitIndentAndText(a:line, ingo#comments#CheckComment(a:line))
 endfunction
-function! s:SplitIndentAndText( line, checkComment )
+function! s:GetSplitIndentAndTextPattern( checkComment )
     if empty(a:checkComment)
-	return matchlist(a:line, '^\(\s*\)\(.*\)$')[1:2]
+	return '^\(\s*\)\(.*\)$'
     endif
 
     let [l:commentprefix, l:type, l:nestingLevel, l:isBlankRequired] = a:checkComment
 
-    return matchlist(
-    \   a:line,
-    \   '\V\C\^\(\s\*\%(' . escape(l:commentprefix, '\') . (l:isBlankRequired ? '\s\+' : '\s\*'). '\)\{' . max([1, l:nestingLevel]) . '}\)' .
-    \       '\(\.\*\)\$'
-    \)[1:2]
+    return '\V\C\^' .
+    \   '\(\s\*\%(' . escape(l:commentprefix, '\') . (l:isBlankRequired ? '\s\+' : '\s\*'). '\)\{' . max([1, l:nestingLevel]) . '}\)' .
+    \   '\(\.\*\)\$'
+endfunction
+function! s:SplitIndentAndText( line, checkComment )
+    return matchlist(a:line, s:GetSplitIndentAndTextPattern(a:checkComment))[1:2]
 endfunction
 function! ingo#comments#SplitAll( line )
 "******************************************************************************
