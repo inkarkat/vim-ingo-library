@@ -107,6 +107,7 @@ autoload/ingo/nary.vim
 autoload/ingo/number.vim
 autoload/ingo/option.vim
 autoload/ingo/os.vim
+autoload/ingo/plugin/cmd/withpattern.vim
 autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/compiler.vim
 autoload/ingo/plugin/marks.vim

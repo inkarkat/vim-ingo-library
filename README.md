@@ -118,6 +118,7 @@ HISTORY
   ingo#comments#SplitIndentAndText() that just returns the pattern.
 - Extract ingo#cmdrange#FromCount() from
   ingo#cmdrangeconverter#LineToBufferRange().
+- Add ingo/plugin/cmd/withpattern.vim module.
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
