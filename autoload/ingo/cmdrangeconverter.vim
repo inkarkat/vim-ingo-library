@@ -71,15 +71,9 @@ function! ingo#cmdrangeconverter#LineToBufferRange( cmd, ... )
 "   True if successful; False when a Vim error or exception occurred.
 "   Get the error message via ingo#err#Get().
 "******************************************************************************
-    let l:count = (a:0 ? a:1 : v:count)
     call ingo#err#Clear()
     try
-	if l:count
-	    let l:range = (l:count == 1 ? '.' : '.,.+' . (l:count - 1))
-	else
-	    let l:range = '%'
-	endif
-	execute l:range . a:cmd
+	execute call('ingo#cmdrange#FromCount', ['%'] + a:000) . a:cmd
 	return 1
     catch
 	call ingo#err#SetVimException()

@@ -116,6 +116,8 @@ HISTORY
   ingo#cmdargs#register#Parse{Prepended,Appended}WritableRegister().
 - Add ingo#comments#GetSplitIndentPattern() variant of
   ingo#comments#SplitIndentAndText() that just returns the pattern.
+- Extract ingo#cmdrange#FromCount() from
+  ingo#cmdrangeconverter#LineToBufferRange().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
