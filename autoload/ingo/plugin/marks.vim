@@ -67,7 +67,7 @@ function! ingo#plugin#marks#FindUnused( ... )
 "* RETURN VALUES:
 "   Mark name. Throws exception if no mark is available.
 "******************************************************************************
-    let l:consideredMarks = (a:0 ? a:1 : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    let l:consideredMarks = (a:0 && ! empty(a:1) ? a:1 : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
 
     for l:mark in (type(l:consideredMarks) == type([]) ? l:consideredMarks : split(l:consideredMarks, '\zs'))
 	if getpos("'" . l:mark)[1:2] == [0, 0]
