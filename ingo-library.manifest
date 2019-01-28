@@ -181,6 +181,7 @@ autoload/ingo/text/frompattern.vim
 autoload/ingo/text/replace.vim
 autoload/ingo/undo.vim
 autoload/ingo/units.vim
+autoload/ingo/view.vim
 autoload/ingo/window.vim
 autoload/ingo/window/adjacent.vim
 autoload/ingo/window/cmdwin.vim
