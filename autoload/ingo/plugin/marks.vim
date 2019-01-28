@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2010-2017 Ingo Karkat
+" Copyright: (C) 2010-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -90,11 +90,14 @@ function! ingo#plugin#marks#Reserve( number, ... )
 "   override the mark location, anyway.
 "* INPUTS:
 "   a:number	Number of marks to be reserved.
+"   a:marks	Optional string of concatenated marks. If passed, those marks
+"               will be taken (and current positions will be saved in the undo
+"               information). If empty or omitted, unused marks will be used.
 "* RETURN VALUES:
 "   reservedMarksRecord. Use keys(reservedMarksRecord) to get the names of the
 "   reserved marks.  The records object must also be passed back to
 "   ingo#plugin#marks#Unreserve().
-"   Throws exception if no mark is available.
+"   Throws exception if no mark is available (and no a:marks had been passed).
 "******************************************************************************
     let l:marksRecord = {}
     for l:cnt in range(0, (a:number - 1))
