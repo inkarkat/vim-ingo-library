@@ -72,7 +72,7 @@ function! ingo#plugin#marks#FindUnused( ... )
     for l:mark in (type(l:consideredMarks) == type([]) ? l:consideredMarks : split(l:consideredMarks, '\zs'))
 	if getpos("'" . l:mark)[1:2] == [0, 0]
 	    " Reserve mark so that the next invocation doesn't return it again.
-	    execute 'normal! m' . l:mark
+	    call setpos("'" . l:mark, getpos('.'))
 	    return l:mark
 	endif
     endfor
