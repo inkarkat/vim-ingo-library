@@ -35,8 +35,16 @@ function! ingo#view#Save( isUseMark )
     let s:save_count = v:count
     let w:save_view = winsaveview()
     if a:isUseMark
-	let w:save_mark = getpos("'z")
-	call setpos("'z", getpos('.'))
+	try
+	    let w:save_mark = ingo#plugin#marks#FindUnused()
+	    let l:markExpr = "'" . w:save_mark
+	    call setpos(l:markExpr, getpos('.'))
+	catch /^ReserveMarks:/
+	    " If no marks are available, just use the saved view. Grabbing a
+	    " used mark and clobber its position could be worse than just be off
+	    " with the restored view.
+	    unlet! w:save_mark
+	endtry
     else
 	unlet! w:save_mark
     endif
@@ -48,7 +56,7 @@ function! ingo#view#RestoreCommands()
 	call add(l:commands, 'call winrestview(w:save_view)|unlet w:save_view')
     endif
     if exists('w:save_mark')
-	call add(l:commands, "execute 'silent! normal! g`z'|call setpos(\"'z\", w:save_mark)|unlet w:save_mark")
+	call add(l:commands, printf("execute 'silent! normal! g`%s'|call setpos(\"'%s\", [0, 0, 0, 0])|unlet! w:save_mark", w:save_mark, w:save_mark))
     endif
     return join(l:commands, '|')
 endfunction
