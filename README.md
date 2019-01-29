@@ -120,6 +120,7 @@ HISTORY
   ingo#cmdrangeconverter#LineToBufferRange().
 - Add ingo/plugin/cmd/withpattern.vim module.
 - Add ingo/view.vim module.
+- Add ingo#compat#commands#ForceSynchronousFeedkeys().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
