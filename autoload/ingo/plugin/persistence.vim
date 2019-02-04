@@ -135,16 +135,20 @@ function! ingo#plugin#persistence#Remove( variableName, expr )
     if exists(l:globalVariableName)
 	let l:original = ingo#plugin#persistence#Load(a:variableName)
 
-	if l:isList
-	    call remove(l:original, a:1)
+	if type(l:original) == type([])
+	    call remove(l:original, a:expr)
+	elseif type(l:original) == type({})
+	    unlet! l:original[a:expr]
 	else
-	    unlet! l:original[a:1]
+	    throw 'Remove: Not list nor dict'
 	endif
+
+	return ingo#plugin#persistence#Store(a:variableName, l:original)
     else
-	let l:original = (l:isList ? [] : {})
+	" Nothing to do.
+	return ingo#plugin#persistence#CanPersist(a:variableName)
     endif
 
-    return ingo#plugin#persistence#Store(a:variableName, l:original)
 endfunction
 
 function! ingo#plugin#persistence#Load( variableName, ... )
