@@ -181,4 +181,28 @@ function! ingo#plugin#persistence#Load( variableName, ... )
     endif
 endfunction
 
+function! ingo#plugin#persistence#QueryYesNo( question )
+"******************************************************************************
+"* PURPOSE:
+"   Ask the user whether a:question should be accepted or declined, with
+"   variants for the current instance, the current Vim session, or persistently
+"   across sessions.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Queries user via confirm().
+"* INPUTS:
+"   a:question  Text to be shown to the user.
+"* RETURN VALUES:
+"   One of "Yes", "No", "Always", "Never", "Forever", "Never ever", or empty
+"   string if the dialog was aborted.
+"******************************************************************************
+    let l:choices = ['&Yes', '&No', '&Always', 'Ne&ver' ]
+    if ingo#plugin#persistence#CanPersist()
+	let l:choices += ['&Forever', 'Never &ever']
+    endif
+
+    return ingo#query#ConfirmAsText(a:question, l:choices, 0, 'Question')
+endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
