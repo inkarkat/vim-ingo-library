@@ -121,6 +121,8 @@ HISTORY
 - Add ingo/plugin/cmd/withpattern.vim module.
 - Add ingo/view.vim module.
 - Add ingo#compat#commands#ForceSynchronousFeedkeys().
+- Add ingo/plugin/persistence.vim module; implementation based on my mark.vim
+  plugin.
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
