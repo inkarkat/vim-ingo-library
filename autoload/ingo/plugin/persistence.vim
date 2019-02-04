@@ -68,6 +68,85 @@ function! ingo#plugin#persistence#Store( variableName, value )
     return ingo#plugin#persistence#CanPersist(a:variableName)
 endfunction
 
+function! ingo#plugin#persistence#Add( variableName, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Add a:value / a:key + a:value in the List / Dict a:variableName.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Defines / updates global a:variableName.
+"* INPUTS:
+"   a:variableName  Global variable under which a:value is to be stored, if
+"                   uppercased and configured, also in the viminfo file.
+"   a:key           Optional key under which a:value is stored in a Dict-type
+"                   a:variableName.
+"   a:value         Value to be stored.
+"* RETURN VALUES:
+"   1 if persisted successfully, 0 if persistence is not configured, or the
+"   variable is not all-uppercase.
+"   Throws "Add: Wrong variable type" if a:variableName is already defined by
+"   does not have the correct type for the number of arguments passed.
+"******************************************************************************
+    if a:0 < 1 || a:0 > 2
+	throw "Add: Must pass [key, ] value"
+    endif
+    let l:isList = (a:0 == 1)
+
+    let l:globalVariableName = 'g:' . a:variableName
+
+    if exists(l:globalVariableName)
+	let l:original = ingo#plugin#persistence#Load(a:variableName)
+	if type(l:original) != type(l:isList ? [] : {})
+	    throw "Add: Wrong variable type"
+	endif
+    else
+	let l:original = (l:isList ? [] : {})
+    endif
+
+    if l:isList
+	call add(l:original, a:1)
+    else
+	let l:original[a:1] = a:2
+    endif
+
+    return ingo#plugin#persistence#Store(a:variableName, l:original)
+endfunction
+
+function! ingo#plugin#persistence#Remove( variableName, expr )
+"******************************************************************************
+"* PURPOSE:
+"   Remove a:expr (representing an index / key) from the List / Dict
+"   a:variableName.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Updates global a:variableName.
+"* INPUTS:
+"   a:variableName  Global variable under which a:value is to be stored, if
+"                   uppercased and configured, also in the viminfo file.
+"   a:expr          List index / Dictionary key to be removed.
+"* RETURN VALUES:
+"   1 if persisted successfully, 0 if persistence is not configured, or the
+"   variable is not all-uppercase.
+"******************************************************************************
+    let l:globalVariableName = 'g:' . a:variableName
+
+    if exists(l:globalVariableName)
+	let l:original = ingo#plugin#persistence#Load(a:variableName)
+
+	if l:isList
+	    call remove(l:original, a:1)
+	else
+	    unlet! l:original[a:1]
+	endif
+    else
+	let l:original = (l:isList ? [] : {})
+    endif
+
+    return ingo#plugin#persistence#Store(a:variableName, l:original)
+endfunction
+
 function! ingo#plugin#persistence#Load( variableName, ... )
 "******************************************************************************
 "* PURPOSE:
