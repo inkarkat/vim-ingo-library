@@ -123,6 +123,8 @@ HISTORY
 - Add ingo#compat#commands#ForceSynchronousFeedkeys().
 - Add ingo/plugin/persistence.vim module; implementation based on my mark.vim
   plugin.
+- Add ingo#collections#SortOnOneAttribute(), ingo#collections#PrioritySort(),
+  and ingo#collections#SortOnTwoAttributes().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
