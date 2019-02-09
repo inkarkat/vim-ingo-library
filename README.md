@@ -125,6 +125,7 @@ HISTORY
   plugin.
 - Add ingo#collections#SortOnOneAttribute(), ingo#collections#PrioritySort(),
   and ingo#collections#SortOnTwoAttributes().
+- Add ingo/collections/recursive.vim module.
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().

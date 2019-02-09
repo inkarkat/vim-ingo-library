@@ -33,6 +33,7 @@ autoload/ingo/collections/find.vim
 autoload/ingo/collections/fromsplit.vim
 autoload/ingo/collections/memoized.vim
 autoload/ingo/collections/permute.vim
+autoload/ingo/collections/recursive.vim
 autoload/ingo/collections/rotate.vim
 autoload/ingo/collections/unique.vim
 autoload/ingo/comments.vim

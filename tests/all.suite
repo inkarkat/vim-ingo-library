@@ -1,5 +1,6 @@
 cmdargs/file/
 collections/
+collections/recursive/
 compat/
 date/
 digest/
