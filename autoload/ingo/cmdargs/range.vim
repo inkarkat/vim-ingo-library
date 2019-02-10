@@ -71,6 +71,54 @@ function! ingo#cmdargs#range#Parse( commandLine, ... )
     return matchlist(a:commandLine, l:parseExpr)[0:4]
 endfunction
 
+function! ingo#cmdargs#range#ParsePrependedRange( arguments, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Parse a:arguments into a range at the beginning, and any following stuff,
+"   separated by non-alphanumeric character or whitespace (or the optional
+"   a:directSeparator).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:arguments Command arguments to parse.
+"   a:options.directSeparator   Optional regular expression for the separator
+"                               (parsed into text) between the text and range
+"                               (with optional whitespace in between; mandatory
+"                               whitespace is always an alternative). Defaults
+"                               to any whitespace. If empty: there must be
+"                               whitespace between text and register.
+"   a:options.isPreferText      Optional flag that if the arguments consist
+"                               solely of an range, whether this is counted as
+"                               text (1, default) or as a sole range (0).
+"   a:options.isOnlySingleAddress   Flag whether only a single address should be
+"                                   allowed, and double line addresses are not
+"                                   recognized as valid. False by default.
+"* RETURN VALUES:
+"   [address, text], or ['', a:arguments] if no address could be parsed.
+"******************************************************************************
+    let l:options = (a:0 ? a:1 : {})
+    let l:rangeExpr = (get(l:options, 'isOnlySingleAddress', 0) ?
+    \   ingo#cmdargs#range#SingleRangeExpr() :
+    \   ingo#cmdargs#range#RangeExpr()
+    \)
+    let l:directSeparator = (empty(get(l:options, 'directSeparator', '')) ?
+    \   '\%$\%^' :
+    \   get(l:options, 'directSeparator', '')
+    \)
+    let l:isPreferText = get(l:options, 'isPreferText', 1)
+
+    let l:matches = matchlist(a:arguments, '^\(' . l:rangeExpr . '\)\%(\%(\s*' . l:directSeparator . '\)\@=\|\s\+\)\(.*\)$')
+    return (empty(l:matches) ?
+    \   (! l:isPreferText && a:arguments =~# '^' . l:rangeExpr . '$' ?
+    \       [a:arguments , ''] :
+    \       ['', a:arguments]
+    \   ) :
+    \   l:matches[1:2]
+    \)
+endfunction
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

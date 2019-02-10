@@ -141,6 +141,7 @@ HISTORY							*ingo-library-history*
   and ingo#collections#SortOnTwoAttributes().
 - Add ingo/collections/recursive.vim module.
 - ENH: ingo#cmdargs#range#Parse(): Add a:options.isOnlySingleAddress flag.
+- ENH: Add ingo#cmdargs#range#ParsePrependedRange().
 
 1.035	29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
