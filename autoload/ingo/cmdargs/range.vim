@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/cmdargs/commandcommands.vim autoload script
 "
-" Copyright: (C) 2012-2014 Ingo Karkat
+" Copyright: (C) 2012-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -56,6 +56,9 @@ function! ingo#cmdargs#range#Parse( commandLine, ... )
 "				    a:options.isAllowEmptyCommand.
 "   a:options.isParseFirstRange     Flag whether the first range should be
 "				    parsed. False by default.
+"   a:options.isOnlySingleAddress   Flag whether only a single address should be
+"                                   allowed, and double line addresses are not
+"                                   recognized as valid. False by default.
 "* RETURN VALUES:
 "   List of [fullCommandUnderCursor, combiner, commandCommands, range, remainder]
 "	fullCommandUnderCursor  The entire command, potentially starting with
@@ -72,12 +75,16 @@ function! ingo#cmdargs#range#Parse( commandLine, ... )
     let l:options = (a:0 ? a:1 : {})
     let l:isAllowEmptyCommand = get(l:options, 'isAllowEmptyCommand', 1)
     let l:isParseFirstRange = get(l:options, 'isParseFirstRange', 0)
+    let l:rangeExpr = (get(l:options, 'isOnlySingleAddress', 0) ?
+    \   ingo#cmdargs#range#SingleRangeExpr() :
+    \   ingo#cmdargs#range#RangeExpr()
+    \)
     let l:commandExpr = get(l:options, 'commandExpr', (l:isAllowEmptyCommand ? '\(\h\w*.*\|$\)' : '\(\h\w*.*\)'))
 
     let l:parseExpr =
     \	(l:isParseFirstRange ? '\C^\(\s*\)' : '\C^\(.*\\\@<!|\)\?\s*') .
     \	'\(' . ingo#cmdargs#commandcommands#GetExpr() . '\)\?' .
-    \	'\(' . ingo#cmdargs#range#RangeExpr() . '\)\s*' .
+    \	'\(' . l:rangeExpr . '\)\s*' .
     \   l:commandExpr
     return matchlist(a:commandLine, l:parseExpr)[0:4]
 endfunction
