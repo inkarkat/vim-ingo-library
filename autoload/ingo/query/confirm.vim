@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -33,7 +33,8 @@ function! ingo#query#confirm#AutoAccelerators( choices, ... )
 "   a:choices   List of choices where the accelerators should be inserted.
 "   a:defaultChoice Number (i.e. index + 1) of the default in a:choices. It is
 "		    assumed that this item does not need an accelerator (in the
-"		    GUI dialog).
+"		    GUI dialog). Pass -1 if there's no default (so that all
+"		    items get accelerators).
 "* RETURN VALUES:
 "   Modified a:choices.
 "******************************************************************************
@@ -47,7 +48,7 @@ function! ingo#query#confirm#AutoAccelerators( choices, ... )
     \   '! empty(v:val)'
     \)
 
-    if ! l:isGui && a:choices[l:defaultChoiceIdx] !~# '&.'
+    if ! l:isGui && l:defaultChoiceIdx >= 0 && a:choices[l:defaultChoiceIdx] !~# '&.'
 	" When no GUI dialog is used, the default choice automatically gets an
 	" accelerator, so don't assign that one to avoid masking another choice.
 	call add(l:usedAccelerators, matchstr(a:choices[l:defaultChoiceIdx], '^.'))
