@@ -63,7 +63,7 @@ function! s:AddAccelerator( usedAccelerators, value, isWantFirstCharacter )
     endif
 
     if a:isWantFirstCharacter
-	let l:candidates = [tolower(matchstr(a:value, s:acceleratorPattern))]
+	let l:candidates = ingo#list#NonEmpty([tolower(matchstr(a:value, s:acceleratorPattern))])
     else
 	let l:candidates = split(
 	\   tolower(substitute(a:value, '\%(' . s:acceleratorPattern . '\)\@!.', '', 'g')),
