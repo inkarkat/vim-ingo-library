@@ -6,7 +6,7 @@ DESCRIPTION
 ------------------------------------------------------------------------------
 
 This library contains common autoload functions that are used by almost all of
-my plugins (http://www.vim.org/account/profile.php?user\_id=9713). Instead of
+my plugins (http://www.vim.org/account/profile.php?user_id=9713). Instead of
 duplicating the functionality, or installing potentially conflicting versions
 with each plugin, this one core dependency fosters a lean Vim runtime and
 easier plugin updates.
@@ -128,6 +128,7 @@ HISTORY
 - Add ingo/collections/recursive.vim module.
 - ENH: ingo#cmdargs#range#Parse(): Add a:options.isOnlySingleAddress flag.
 - ENH: Add ingo#cmdargs#range#ParsePrependedRange().
+- Minor fixes to ingo#query#confirm#AutoAccelerators().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
