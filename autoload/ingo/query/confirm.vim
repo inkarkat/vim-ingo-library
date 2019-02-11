@@ -52,7 +52,6 @@ function! ingo#query#confirm#AutoAccelerators( choices, ... )
 	" When no GUI dialog is used, the default choice automatically gets an
 	" accelerator, so don't assign that one to avoid masking another choice.
 	call add(l:usedAccelerators, matchstr(a:choices[l:defaultChoiceIdx], '^.'))
-	let l:defaultChoiceIdx = -1
     endif
 
     call   map(a:choices, 'v:key == l:defaultChoiceIdx ? v:val : s:AddAccelerator(l:usedAccelerators, v:val, 1)')
