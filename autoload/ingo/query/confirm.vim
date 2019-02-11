@@ -6,15 +6,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.019.002	20-May-2014	Correct ingo#query#confirm#AutoAccelerators()
-"				default choice when not given (1 instead of 0).
-"				Avoid using the default choice's first character
-"				as accelerator unless in GUI dialog, as the
-"				plain text confirm() assigns a default
-"				accelerator.
-"   1.014.001	15-Oct-2013	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 
