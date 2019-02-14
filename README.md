@@ -129,6 +129,7 @@ HISTORY
 - ENH: ingo#cmdargs#range#Parse(): Add a:options.isOnlySingleAddress flag.
 - ENH: Add ingo#cmdargs#range#ParsePrependedRange().
 - Minor fixes to ingo#query#confirm#AutoAccelerators().
+- Expose ingo#collections#fromsplit#MapOne().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
