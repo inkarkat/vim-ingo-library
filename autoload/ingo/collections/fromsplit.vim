@@ -8,11 +8,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.029.002	24-Jan-2017	Add
-"				ingo#collections#fromsplit#MapItemsAndSeparators().
-"   1.028.001	10-Oct-2016	file creation
 
 function! ingo#collections#fromsplit#MapOne( isItems, expr, pattern, Expr2 )
 "******************************************************************************
