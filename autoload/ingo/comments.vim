@@ -235,7 +235,7 @@ endfunction
 function! s:GetSplitIndentPattern( checkComment, ... )
     let l:minNumberOfCommentPrefixesExpr = (a:0 && a:1 isnot# '' ? a:1 . ',' : '')
     if empty(a:checkComment)
-	return '^\(\s*\)'
+	return '^\%(\s*\)'
     endif
 
     let [l:commentprefix, l:type, l:nestingLevel, l:isBlankRequired] = a:checkComment
