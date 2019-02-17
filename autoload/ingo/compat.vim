@@ -7,7 +7,7 @@
 "   - ingo/os.vim autoload script
 "   - ingo/strdisplaywidth.vim autoload script
 "
-" Copyright: (C) 2013-2018 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -459,13 +459,19 @@ else
 endif
 
 " Patch 7.4.1707: Allow using an empty dictionary key
-if v:version == 704 && has('patch1707') || v:version > 704
+if (v:version == 704 && has('patch1707') || v:version > 704) && ! has_key(s:compatFor, 'DictKey')
     function! ingo#compat#DictKey( key )
+	return a:key
+    endfunction
+    function! ingo#compat#FromKey( key )
 	return a:key
     endfunction
 else
     function! ingo#compat#DictKey( key )
 	return (empty(a:key) ? "\<Nul>" : a:key)
+    endfunction
+    function! ingo#compat#FromKey( key )
+	return (a:key ==# "\<Nul>" ? '' : a:key)
     endfunction
 endif
 

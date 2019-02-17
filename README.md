@@ -131,6 +131,7 @@ HISTORY
 - Minor fixes to ingo#query#confirm#AutoAccelerators().
 - Expose ingo#collections#fromsplit#MapOne().
 - Add function/uniquify.vim module.
+- Add ingo#compat#FromKey() for the reversing of ingo#compat#DictKey().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
