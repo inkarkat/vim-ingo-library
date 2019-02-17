@@ -132,6 +132,8 @@ HISTORY
 - Expose ingo#collections#fromsplit#MapOne().
 - Add function/uniquify.vim module.
 - Add ingo#compat#FromKey() for the reversing of ingo#compat#DictKey().
+- Add ingo#collections#SortOnOneListElement(), a variant of
+  ingo#collections#SortOnOneAttribute().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().

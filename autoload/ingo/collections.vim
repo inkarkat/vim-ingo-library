@@ -426,6 +426,12 @@ function! ingo#collections#SortOnTwoAttributes( firstAttribute, secondAttribute,
     let l:second2 = get(a:o2, a:secondAttribute, l:secondDefaultValue)
     return (l:second1 ==# l:second2 ? 0 : l:second1 ># l:second2 ? 1 : -1)
 endfunction
+function! ingo#collections#SortOnOneListElement( index, l1, l2, ... )
+    let l:defaultValue = (a:0 ? a:1 : 0)
+    let l:i1 = get(a:l1, a:index, l:defaultValue)
+    let l:i2 = get(a:l2, a:index, l:defaultValue)
+    return (l:i1 ==# l:i2 ? 0 : l:i1 ># l:i2 ? 1 : -1)
+endfunction
 
 function! ingo#collections#Flatten1( list )
     let l:result = []
