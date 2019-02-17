@@ -134,6 +134,8 @@ HISTORY
 - Add ingo#compat#FromKey() for the reversing of ingo#compat#DictKey().
 - Add ingo#collections#SortOnOneListElement(), a variant of
   ingo#collections#SortOnOneAttribute().
+- Add ingo#regexp#MakeWholeWORDSearch() variant of
+  ingo#regexp#MakeWholeWordSearch().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().

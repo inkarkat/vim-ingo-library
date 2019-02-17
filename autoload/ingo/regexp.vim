@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2010-2018 Ingo Karkat
+" Copyright: (C) 2010-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -73,7 +73,7 @@ function! ingo#regexp#MakeWholeWordSearch( text, ... )
 "* RETURN VALUES:
 "   a:text / a:pattern, with additional \< / \> atoms if applicable.
 "******************************************************************************
-let l:pattern = (a:0 ? a:1 : a:text)
+    let l:pattern = (a:0 ? a:1 : a:text)
     if a:text =~# '^\k'
 	let l:pattern = '\<' . l:pattern
     endif
@@ -96,6 +96,36 @@ function! ingo#regexp#MakeEndWordSearch( text, ... )
     endif
     return l:pattern
 endfunction
+function! ingo#regexp#MakeWholeWORDSearch( text, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Generate a pattern that searches only for whole WORDs of a:text, but only if
+"   a:text actually starts / ends with non-whitespace characters.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:text  Text / pattern to be searched for. Note that this isn't escaped in any form;
+"	    you probably want to escape backslashes beforehand and use \V "very
+"	    nomagic" on the result.
+"   a:pattern   If passed, this is adapted according to what a:text is about.
+"		Useful if the pattern has already been so warped (e.g. by
+"		enclosing in /\(...\|...\)/) that word boundary detection on the
+"		original text wouldn't work.
+"* RETURN VALUES:
+"   a:text / a:pattern, with additional atoms if applicable.
+"******************************************************************************
+    let l:pattern = (a:0 ? a:1 : a:text)
+    if a:text =~# '^\S'
+	let l:pattern = '\%(^\|\s\)\@<=' . l:pattern
+    endif
+    if a:text =~# '\S$'
+	let l:pattern .= '\%(\s\|$\)\@='
+    endif
+    return l:pattern
+endfunction
+
 function! ingo#regexp#FromLiteralText( text, isWholeWordSearch, additionalEscapeCharacters )
 "*******************************************************************************
 "* PURPOSE:
