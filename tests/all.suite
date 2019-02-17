@@ -4,6 +4,7 @@ collections/recursive/
 compat/
 date/
 digest/
+function/uniquify/
 fs/paths/split/
 list/
 list/lcs/
