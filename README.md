@@ -136,6 +136,7 @@ HISTORY
   ingo#collections#SortOnOneAttribute().
 - Add ingo#regexp#MakeWholeWORDSearch() variant of
   ingo#regexp#MakeWholeWordSearch().
+- Add ingo/file.vim module.
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
