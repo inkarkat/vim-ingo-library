@@ -3,6 +3,7 @@
 			INGO-LIBRARY    by Ingo Karkat
 							    *ingo-library.vim*
 description			|ingo-library-description|
+configuration			|ingo-library-configuration|
 installation			|ingo-library-installation|
 usage				|ingo-library-usage|
 limitations			|ingo-library-limitations|
@@ -73,6 +74,34 @@ resembling) the short function name, so that it's possible to |:catch| these
 and e.g. convert them into a proper error (e.g. via
 |ingo#err#SetCustomException()|).
 
+==============================================================================
+CONFIGURATION					  *ingo-library-configuration*
+						   *g:IngoLibrary_DateCommand*
+The filespec to the external "date" command can be set via: >
+    let g:IngoLibrary_DateCommand = 'date'
+<
+					   *g:IngoLibrary_PreferredDateFormat*
+The preferred date format used by ingo#date#format#Preferred() can be set to a
+|strftime()| format via: >
+    let g:IngoLibrary_PreferredDateFormat = '%x'
+<
+					      *g:IngoLibrary_FileCacheMaxSize*
+The size of the file cache (in bytes) used by ingo#file#GetLines() can be set
+via: >
+    let g:IngoLibrary_FileCacheMaxSize = 1048576
+<
+					      *g:IngoLibrary_TruncateEllipsis*
+The string used as a replacement for truncated text can be set via: >
+    let g:IngoLibrary_TruncateEllipsis = "\u2026"
+<
+				       *g:IngoLibrary_SpecialWindowPredicates*
+The check for special windows in ingo#window#special#IsSpecialWindow() can be
+customized via a List of Expressions or Funcrefs that are passed the window
+number, and which should return a boolean flag. If any predicate is true, the
+window is deemed special. >
+    let g:IngoLibrary_SpecialWindowPredicates =
+    \	['bufname(winbufnr(v:val)) =~# "^\\[\\%(Scratch\\|clipboard\\)\\]$"']
+<
 ==============================================================================
 INSTALLATION					   *ingo-library-installation*
 

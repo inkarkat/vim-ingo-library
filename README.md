@@ -65,6 +65,35 @@ USAGE
     and e.g. convert them into a proper error (e.g. via
     ingo#err#SetCustomException()).
 
+CONFIGURATION
+------------------------------------------------------------------------------
+
+The filespec to the external "date" command can be set via:
+
+    let g:IngoLibrary_DateCommand = 'date'
+
+The preferred date format used by ingo#date#format#Preferred() can be set to a
+strftime() format via:
+
+    let g:IngoLibrary_PreferredDateFormat = '%x'
+
+The size of the file cache (in bytes) used by ingo#file#GetLines() can be set
+via:
+
+    let g:IngoLibrary_FileCacheMaxSize = 1048576
+
+The string used as a replacement for truncated text can be set via:
+
+    let g:IngoLibrary_TruncateEllipsis = "\u2026"
+
+The check for special windows in ingo#window#special#IsSpecialWindow() can be
+customized via a List of Expressions or Funcrefs that are passed the window
+number, and which should return a boolean flag. If any predicate is true, the
+window is deemed special.
+
+    let g:IngoLibrary_SpecialWindowPredicates =
+    \   ['bufname(winbufnr(v:val)) =~# "^\\[\\%(Scratch\\|clipboard\\)\\]$"']
+
 INSTALLATION
 ------------------------------------------------------------------------------
 
