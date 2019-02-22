@@ -53,7 +53,12 @@ function! s:IsCached( filespec, ftime )
     return has_key(s:cachedFileInfo, a:filespec) && s:cachedFileInfo[a:filespec].ftime == a:ftime
 endfunction
 function! s:RemoveFromCache( filespec )
-    unlet! s:cachedFileInfo[a:filespec] s:cachedFileContents[a:filespec]
+    if has_key(s:cachedFileInfo, a:filespec)
+	unlet! s:cachedFileInfo[a:filespec]
+    endif
+    if has_key(s:cachedFileContents, a:filespec)
+	unlet! s:cachedFileContents[a:filespec]
+    endif
 endfunction
 
 function! ingo#file#GetLines( filespec )
