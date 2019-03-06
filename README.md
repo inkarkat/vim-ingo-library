@@ -167,6 +167,8 @@ HISTORY
   ingo#regexp#MakeWholeWordSearch().
 - Add ingo/file.vim module.
 - Add ingo#cmdargs#pattern#PatternExpr().
+- BUG: ingo#text#replace#Between() and ingo#text#replace#Area() mistakenly
+  update current line instead of passed position.
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
