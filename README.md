@@ -169,6 +169,8 @@ HISTORY
 - Add ingo#cmdargs#pattern#PatternExpr().
 - BUG: ingo#text#replace#Between() and ingo#text#replace#Area() mistakenly
   update current line instead of passed position.
+- BUG: ingo#text#replace#Between() and ingo#text#replace#Area() cause "E684:
+  list index out of range: 0" when the replacement text is empty.
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().

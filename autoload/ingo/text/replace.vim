@@ -45,7 +45,7 @@ function! ingo#text#replace#Between( startPos, endPos, Text )
     " Because of setline(), we can only (easily) handle text replacement in a
     " single line, so replace with the first (non-empty) line only should the
     " replacement text consist of multiple lines.
-    let l:text = split(l:text, "\n")[0]
+    let l:text = split(l:text, "\n", 1)[0]
 
     if l:currentText !=# l:text
 	call setline(a:startPos[0], s:ReplaceRange(l:line, a:startPos[1] - 1, a:endPos[1] - 1, l:text))
