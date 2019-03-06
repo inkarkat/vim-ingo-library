@@ -166,6 +166,7 @@ HISTORY
 - Add ingo#regexp#MakeWholeWORDSearch() variant of
   ingo#regexp#MakeWholeWordSearch().
 - Add ingo/file.vim module.
+- Add ingo#cmdargs#pattern#PatternExpr().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
