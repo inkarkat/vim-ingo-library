@@ -171,6 +171,7 @@ HISTORY
   update current line instead of passed position.
 - BUG: ingo#text#replace#Between() and ingo#text#replace#Area() cause "E684:
   list index out of range: 0" when the replacement text is empty.
+- FIX: Off-by-one in ingo#area#IsEmpty(). Also check for invalid area.
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
