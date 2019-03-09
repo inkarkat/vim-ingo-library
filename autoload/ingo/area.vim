@@ -34,4 +34,8 @@ function! ingo#area#IsEmpty( area )
     return 0
 endfunction
 
+function! ingo#area#EmptyArea( pos ) abort
+    return [a:pos, ingo#pos#Before(a:pos)]
+endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
