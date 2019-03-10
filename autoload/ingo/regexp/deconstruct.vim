@@ -77,8 +77,9 @@ endfunction
 function! ingo#regexp#deconstruct#RemoveCharacterClasses( pattern ) abort
 "******************************************************************************
 "* PURPOSE:
-"   Remove character classes (e.g. \d, \k), collections ([...]), and optionally
-"   matched atoms from a:pattern.
+"   Remove character classes (e.g. \d, \k), collections ([...]; unless they only
+"   contain a single literal character), and optionally matched atoms from
+"   a:pattern.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   Does not consider "very magic" (/\v)-style syntax. If you may have this,
 "   convert via ingo#regexp#magic#Normalize() first.
@@ -91,11 +92,18 @@ function! ingo#regexp#deconstruct#RemoveCharacterClasses( pattern ) abort
 "******************************************************************************
     let l:pattern = a:pattern
 
-    let l:pattern = substitute(l:pattern, '\C\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\_\?[iIkKfFpPsSdDxXoOwWhHaAlLuU]', '', 'g')
-    let l:pattern = substitute(l:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%\[\%(\[\[\]\|\[\]\]\|[^][]\)\+\]', '', 'g') " Optional sequence of atoms \%[]
-    let l:pattern = substitute(l:pattern, ingo#regexp#collection#Expr(), '', 'g')
+    let l:pattern = substitute(l:pattern, '\C\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\_\?[iIkKfFpPsSdDxXoOwWhHaAlLuU]', "", 'g')
+
+    " Optional sequence of atoms \%[]. Note: Because these can contain
+    " collection-like stuff, it has to be processed before collections.
+    let l:pattern = substitute(l:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%\[\(\%(\[\[\]\|\[\]\]\|[^][]\|' . ingo#regexp#collection#Expr({'isBarePattern': 1}) . '\)\+\)\]', '\1', 'g')
+
+    let l:pattern = substitute(l:pattern, ingo#regexp#collection#Expr({'isCapture': 1}), '\=s:TransformCollection(submatch(1))', 'g')
 
     return l:pattern
+endfunction
+function! s:TransformCollection( characters ) abort
+    return (a:characters =~# '^\\\?.$' ? matchstr(a:characters, '.$') : "\u2026")
 endfunction
 
 function! ingo#regexp#deconstruct#TranslateNumberEscapes( pattern ) abort
