@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2016-2018 Ingo Karkat
+" Copyright: (C) 2016-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -37,7 +37,7 @@ function! ingo#regexp#collection#Expr( ... )
 
     let l:prefixExpr = (l:isBarePattern ?
     \   '' :
-    \   '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!' . (l:isMagic ?
+    \   '\%(\%(^\|[^\\]\)\%(\\\\\)*\\%\?\)\@<!' . (l:isMagic ?
     \       (l:isIncludeEolVariant ? '\%(\\_\)\?' : '') :
     \       (l:isIncludeEolVariant ? '\\_\?' : '\\')
     \   )
