@@ -78,7 +78,7 @@ function! ingo#regexp#deconstruct#RemoveCharacterClasses( pattern ) abort
 "******************************************************************************
 "* PURPOSE:
 "   Remove character classes (e.g. \d, \k), collections ([...]), and optionally
-"   matched atoms from a:pattern. Convert characters escaped as numbers.
+"   matched atoms from a:pattern.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   Does not consider "very magic" (/\v)-style syntax. If you may have this,
 "   convert via ingo#regexp#magic#Normalize() first.
@@ -94,6 +94,25 @@ function! ingo#regexp#deconstruct#RemoveCharacterClasses( pattern ) abort
     let l:pattern = substitute(l:pattern, '\C\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\_\?[iIkKfFpPsSdDxXoOwWhHaAlLuU]', '', 'g')
     let l:pattern = substitute(l:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%\[\%(\[\[\]\|\[\]\]\|[^][]\)\+\]', '', 'g') " Optional sequence of atoms \%[]
     let l:pattern = substitute(l:pattern, ingo#regexp#collection#Expr(), '', 'g')
+
+    return l:pattern
+endfunction
+
+function! ingo#regexp#deconstruct#TranslateNumberEscapes( pattern ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Convert characters escaped as numbers from a:pattern.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   Does not consider "very magic" (/\v)-style syntax. If you may have this,
+"   convert via ingo#regexp#magic#Normalize() first.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:pattern   regular expression
+"* RETURN VALUES:
+"   Modified a:pattern with numbered escapes translated to literal characters.
+"******************************************************************************
+    let l:pattern = a:pattern
 
     let l:pattern = substitute(l:pattern, '\C\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%d\(\d\+\)', '\=nr2char(str2nr(submatch(1)))', 'g')
     let l:pattern = substitute(l:pattern, '\C\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%o\(\o\+\)', '\=nr2char(str2nr(submatch(1), 8))', 'g')
@@ -124,6 +143,7 @@ function! ingo#regexp#deconstruct#ToQuasiLiteral( pattern )
     let l:result = ingo#regexp#deconstruct#RemoveMultis(l:result)
     let l:result = ingo#regexp#deconstruct#UnescapeSpecialCharacters(l:result)
     let l:result = ingo#regexp#deconstruct#RemoveCharacterClasses(l:result)
+    let l:result = ingo#regexp#deconstruct#TranslateNumberEscapes(l:result)
     return l:result
 endfunction
 
