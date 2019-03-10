@@ -129,12 +129,16 @@ function! ingo#regexp#deconstruct#TranslateCharacterClasses( pattern, ... ) abor
     " collection-like stuff, it has to be processed before collections.
     let l:pattern = substitute(l:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%\[\(\%(\[\[\]\|\[\]\]\|[^][]\|' . ingo#regexp#collection#Expr({'isBarePattern': 1}) . '\)\+\)\]', '\1', 'g')
 
-    let l:pattern = substitute(l:pattern, ingo#regexp#collection#Expr({'isCapture': 1}), '\=s:TransformCollection(submatch(1), get(l:replacements, "[]", ""))', 'g')
+    let l:pattern = substitute(l:pattern, ingo#regexp#collection#Expr({'isCapture': 1}), '\=s:TransformCollection(replacements, submatch(1))', 'g')
 
     return l:pattern
 endfunction
-function! s:TransformCollection( characters, replacement ) abort
-    return (a:characters =~# '^\\\?.$' ? matchstr(a:characters, '.$') :a:replacement)
+function! s:TransformCollection( replacements, characters ) abort
+    let l:literalCharacter = matchstr(a:characters, '^\\\?\zs.$')
+    if ! empty(l:literalCharacter)
+	return l:literalCharacter
+    endif
+    return get(a:replacements, '[]', '')
 endfunction
 function! ingo#regexp#deconstruct#RemoveCharacterClasses( pattern ) abort
 "******************************************************************************
