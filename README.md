@@ -177,6 +177,8 @@ HISTORY
   1; this matches the behavior of ingo#pos#After(), which also returns a
   non-existent position directly after the last character, and this fits in
   well with the area functions.
+- Add ingo#regexp#deconstruct#RemoveCharacterClasses() and include it in
+  ingo#regexp#deconstruct#ToQuasiLiteral().
 
 ##### 1.035   29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().

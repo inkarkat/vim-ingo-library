@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2018 Ingo Karkat
+" Copyright: (C) 2018-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -74,11 +74,41 @@ function! ingo#regexp#deconstruct#UnescapeSpecialCharacters( pattern )
     return l:result
 endfunction
 
+function! ingo#regexp#deconstruct#RemoveCharacterClasses( pattern ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Remove character classes (e.g. \d, \k), collections ([...]), and optionally
+"   matched atoms from a:pattern. Convert characters escaped as numbers.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   Does not consider "very magic" (/\v)-style syntax. If you may have this,
+"   convert via ingo#regexp#magic#Normalize() first.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:pattern   regular expression
+"* RETURN VALUES:
+"   Modified a:pattern with character classes removed.
+"******************************************************************************
+    let l:pattern = a:pattern
+
+    let l:pattern = substitute(l:pattern, '\C\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\_\?[iIkKfFpPsSdDxXoOwWhHaAlLuU]', '', 'g')
+    let l:pattern = substitute(l:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%\[\%(\[\[\]\|\[\]\]\|[^][]\)\+\]', '', 'g') " Optional sequence of atoms \%[]
+    let l:pattern = substitute(l:pattern, ingo#regexp#collection#Expr(), '', 'g')
+
+    let l:pattern = substitute(l:pattern, '\C\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%d\(\d\+\)', '\=nr2char(str2nr(submatch(1)))', 'g')
+    let l:pattern = substitute(l:pattern, '\C\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%o\(\o\+\)', '\=nr2char(str2nr(submatch(1), 8))', 'g')
+    let l:pattern = substitute(l:pattern, '\C\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%x\(\x\{1,2}\)', '\=nr2char(str2nr(submatch(1), 16))', 'g')
+    let l:pattern = substitute(l:pattern, '\C\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%u\(\x\{1,4}\)', '\=nr2char(str2nr(submatch(1), 16))', 'g')
+    let l:pattern = substitute(l:pattern, '\C\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%U\(\x\{1,8}\)', '\=nr2char(str2nr(submatch(1), 16))', 'g')
+
+    return l:pattern
+endfunction
+
 function! ingo#regexp#deconstruct#ToQuasiLiteral( pattern )
 "******************************************************************************
 "* PURPOSE:
 "   Turn a:pattern into something resembling a literal match of it by removing
-"   position atoms, multis, and unescaping.
+"   position atoms, multis, character classes / collections, and unescaping.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   Does not consider "very magic" (/\v)-style syntax. If you may have this,
 "   convert via ingo#regexp#magic#Normalize() first.
@@ -93,6 +123,7 @@ function! ingo#regexp#deconstruct#ToQuasiLiteral( pattern )
     let l:result = ingo#regexp#deconstruct#RemovePositionAtoms(l:result)
     let l:result = ingo#regexp#deconstruct#RemoveMultis(l:result)
     let l:result = ingo#regexp#deconstruct#UnescapeSpecialCharacters(l:result)
+    let l:result = ingo#regexp#deconstruct#RemoveCharacterClasses(l:result)
     return l:result
 endfunction
 
