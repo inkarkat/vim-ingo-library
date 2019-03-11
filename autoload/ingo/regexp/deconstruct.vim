@@ -94,6 +94,12 @@ function! ingo#regexp#deconstruct#TranslateCharacterClasses( pattern, ... ) abor
 "******************************************************************************
     let l:pattern = a:pattern
     let l:replacements = (a:0 ? a:1 : {
+    \   'blank': ' ',
+    \   'return': "\r",
+    \   'tab': "\t",
+    \   'escape': "\e",
+    \   'backspace': "\b",
+    \   'cntrl': "^",
     \   'i': "\U1D456",
     \   'I': "\U1D43C",
     \   'k': "\U1D458",
@@ -101,13 +107,20 @@ function! ingo#regexp#deconstruct#TranslateCharacterClasses( pattern, ... ) abor
     \   'f': "\U1D453",
     \   'F': "\U1D439",
     \   'p': "\U1D45D",
+    \   'print': "\U1D45D",
+    \   'graph': "\U1D45D",
     \   'P': "\U1D443",
+    \   'PRINT': "\U1D443",
     \   's': "\U1D460",
+    \   'space': "\U1D460",
     \   'S': "\U1D446",
+    \   'SPACE': "\U1D446",
     \   'd': "\U1D451",
     \   'D': "\U1D437",
     \   'x': "\U1D465",
+    \   'xdigit': "\U1D465",
     \   'X': "\U1D44B",
+    \   'XDIGIT': "\U1D44B",
     \   'o': "\U1D45C",
     \   'O': "\U1D442",
     \   'w': "\U1D464",
@@ -115,11 +128,19 @@ function! ingo#regexp#deconstruct#TranslateCharacterClasses( pattern, ... ) abor
     \   'h': "\U1D455",
     \   'H': "\U1D43B",
     \   'a': "\U1D44E",
+    \   'alpha': "\U1D44E",
+    \   'alnum': "\U1D44E",
     \   'A': "\U1D434",
+    \   'ALPHA': "\U1D434",
+    \   'ALNUM': "\U1D434",
     \   'l': "\U1D459",
+    \   'lower': "\U1D459",
     \   'L': "\U1D43F",
+    \   'LOWER': "\U1D43F",
     \   'u': "\U1D462",
+    \   'upper': "\U1D462",
     \   'U': "\U1D448",
+    \   'UPPER': "\U1D448",
     \   '[]': "\u2026",
     \})
 
@@ -129,7 +150,7 @@ function! ingo#regexp#deconstruct#TranslateCharacterClasses( pattern, ... ) abor
     " collection-like stuff, it has to be processed before collections.
     let l:pattern = substitute(l:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%\[\(\%(\[\[\]\|\[\]\]\|[^][]\|' . ingo#regexp#collection#Expr({'isBarePattern': 1}) . '\)\+\)\]', '\1', 'g')
 
-    let l:pattern = substitute(l:pattern, ingo#regexp#collection#Expr({'isCapture': 1}), '\=s:TransformCollection(replacements, submatch(1))', 'g')
+    let l:pattern = substitute(l:pattern, ingo#regexp#collection#Expr({'isCapture': 1}), '\=s:TransformCollection(l:replacements, submatch(1))', 'g')
 
     return l:pattern
 endfunction
@@ -138,6 +159,15 @@ function! s:TransformCollection( replacements, characters ) abort
     if ! empty(l:literalCharacter)
 	return l:literalCharacter
     endif
+    let l:characterClass = matchstr(a:characters, '^\[:\zs\a\+\ze:\]$')
+    if ! empty(l:characterClass)
+	return get(a:replacements, l:characterClass, '')
+    endif
+    let l:invertedCharacterClass = matchstr(a:characters, '^\^\[:\zs\a\+\ze:\]$')
+    if ! empty(l:invertedCharacterClass)
+	return get(a:replacements, toupper(l:invertedCharacterClass), '')
+    endif
+
     return get(a:replacements, '[]', '')
 endfunction
 function! ingo#regexp#deconstruct#RemoveCharacterClasses( pattern ) abort
