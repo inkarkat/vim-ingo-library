@@ -214,11 +214,36 @@ function! ingo#regexp#deconstruct#TranslateNumberEscapes( pattern ) abort
     return l:pattern
 endfunction
 
+function! ingo#regexp#deconstruct#TranslateBranches( pattern ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Translate regular expression branches (/\(foo\|bar\)/) inside a:pattern into
+"   simpler notation (foo|bar).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   Does not consider "very magic" (/\v)-style syntax. If you may have this,
+"   convert via ingo#regexp#magic#Normalize() first.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:pattern   regular expression
+"* RETURN VALUES:
+"   Modified a:pattern with branches translated.
+"******************************************************************************
+    let l:pattern = a:pattern
+
+    for [l:search, l:replace] in [['%\?(', '('], ['|', '|'], [')', ')']]
+	let l:pattern = substitute(l:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\' . l:search, l:replace, 'g')
+    endfor
+
+    return l:pattern
+endfunction
+
 function! ingo#regexp#deconstruct#ToQuasiLiteral( pattern )
 "******************************************************************************
 "* PURPOSE:
 "   Turn a:pattern into something resembling a literal match of it by removing
-"   position atoms, multis, character classes / collections, and unescaping.
+"   position atoms, multis, translating character classes / collections and
+"   branches, and unescaping.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   Does not consider "very magic" (/\v)-style syntax. If you may have this,
 "   convert via ingo#regexp#magic#Normalize() first.
@@ -235,6 +260,7 @@ function! ingo#regexp#deconstruct#ToQuasiLiteral( pattern )
     let l:result = ingo#regexp#deconstruct#UnescapeSpecialCharacters(l:result)
     let l:result = ingo#regexp#deconstruct#TranslateCharacterClasses(l:result)
     let l:result = ingo#regexp#deconstruct#TranslateNumberEscapes(l:result)
+    let l:result = ingo#regexp#deconstruct#TranslateBranches(l:result)
     return l:result
 endfunction
 

@@ -191,9 +191,10 @@ HISTORY							*ingo-library-history*
   1; this matches the behavior of ingo#pos#After(), which also returns a
   non-existent position directly after the last character, and this fits in
   well with the area functions.
-- Add ingo#regexp#deconstruct#{Translate,Remove}CharacterClasses() and
-  ingo#regexp#deconstruct#TranslateNumberEscapes() and include both
-  translations in ingo#regexp#deconstruct#ToQuasiLiteral().
+- Add ingo#regexp#deconstruct#{Translate,Remove}CharacterClasses(),
+  ingo#regexp#deconstruct#TranslateNumberEscapes(),
+  ingo#regexp#deconstruct#TranslateBranches()  and include all translations in
+  ingo#regexp#deconstruct#ToQuasiLiteral().
 - FIX: Don't match optionally matched atoms \%[] in
   ingo#regexp#collection#Expr().
 - ENH: Add a:option.isCapture to ingo#regexp#collection#Expr().
