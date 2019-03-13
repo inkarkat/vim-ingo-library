@@ -257,10 +257,12 @@ function! ingo#regexp#deconstruct#ToQuasiLiteral( pattern )
     let l:result = a:pattern
     let l:result = ingo#regexp#deconstruct#RemovePositionAtoms(l:result)
     let l:result = ingo#regexp#deconstruct#RemoveMultis(l:result)
-    let l:result = ingo#regexp#deconstruct#UnescapeSpecialCharacters(l:result)
     let l:result = ingo#regexp#deconstruct#TranslateCharacterClasses(l:result)
     let l:result = ingo#regexp#deconstruct#TranslateNumberEscapes(l:result)
     let l:result = ingo#regexp#deconstruct#TranslateBranches(l:result)
+
+    " Do the unescaping last.
+    let l:result = ingo#regexp#deconstruct#UnescapeSpecialCharacters(l:result)
     return l:result
 endfunction
 
