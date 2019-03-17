@@ -152,6 +152,73 @@ function! ingo#fs#path#split#ChangeBasePath( filespec, basePath, newBasePath )
     return ingo#fs#path#Combine(ingo#fs#path#Normalize(a:newBasePath, '/'), l:remainder)
 endfunction
 
+if ! exists('g:IngoLibrary_TruncateEllipsis')
+    let g:IngoLibrary_TruncateEllipsis = (&encoding ==# 'utf-8' ? "\u2026" : '...')
+endif
+function! ingo#fs#path#split#TruncateTo( filespec, virtCol, ...)
+"******************************************************************************
+"* PURPOSE:
+"   Truncate a:filespec to a maximum of a:virtCol virtual columns by removing
+"   directories from the inside, and replacing those with a "..." indicator.
+"* SEE ALSO:
+"   - ingo#avoidprompt#TruncateTo() does something similar with hard truncation
+"     in the middle of a:text, without regards to (path or other) boundaries.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   The default ellipsis can be configured by g:IngoLibrary_TruncateEllipsis.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:filespec  Filespec. It is assumed to be in normalized form already.
+"   a:virtCol   Maximum virtual columns for a:text.
+"   a:pathSeparator Optional path separator to be used. Defaults to the
+"                   platform's default one.
+"   a:truncationIndicator   Optional text to be appended when truncation
+"			    appears. a:text is further reduced to account for
+"			    its width. Default is "..." or the single-char UTF-8
+"			    variant if the encoding also is UTF-8.
+"* RETURN VALUES:
+"   Truncated a:filespec.
+"******************************************************************************
+    let l:sep = (a:0 ? a:1 : ingo#fs#path#Separator())
+
+    if ingo#compat#strdisplaywidth(a:filespec) <= a:virtCol
+	return a:filespec " Short circuit.
+    endif
+
+    let l:truncationIndicator = (a:0 >= 2 ? a:2 : g:IngoLibrary_TruncateEllipsis)
+    let l:fragments = split(a:filespec, '\C\V' . escape(l:sep, '\'), 1)
+
+    let l:i = 0
+    let l:result = l:fragments[-1]
+    while 2 * l:i <= len(l:fragments)
+	let l:joinedFragments = join(l:fragments[0: l:i] + [l:truncationIndicator] + l:fragments[-1 * (l:i + 1) : -1], l:sep)
+	if ingo#compat#strdisplaywidth(l:joinedFragments) > a:virtCol
+	    break
+	endif
+
+	let l:result = l:joinedFragments
+	let l:i += 1
+    endwhile
+
+    " Try adding one more, with a preference to the deeper subdirectory.
+    let l:joinedFragments = join(l:fragments[0: (l:i - 1)] + [l:truncationIndicator] + l:fragments[-1 * (l:i + 1) : -1], l:sep)
+    if ingo#compat#strdisplaywidth(l:joinedFragments) <= a:virtCol
+	let l:result = l:joinedFragments
+    else
+	let l:joinedFragments = join(l:fragments[0: l:i] + [l:truncationIndicator] + l:fragments[-1 * l:i : -1], l:sep)
+	if ingo#compat#strdisplaywidth(l:joinedFragments) <= a:virtCol
+	    let l:result = l:joinedFragments
+	endif
+    endif
+
+    " Corner case: Also handle truncation in a single large final fragment.
+    if l:i == 0
+	let l:result = ingo#avoidprompt#TruncateTo(l:result, a:virtCol, 0, l:truncationIndicator)
+    endif
+
+    return l:result
+endfunction
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

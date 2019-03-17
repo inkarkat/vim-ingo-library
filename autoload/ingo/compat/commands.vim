@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2017-2018 Ingo Karkat
+" Copyright: (C) 2017-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -80,5 +80,19 @@ function! ingo#compat#commands#NormalWithCount( ... )
 	return 0
     endif
 endfunction
+
+if v:version == 704 && has('patch601') || v:version > 704
+" For these Vim versions, repeat.vim uses feedkeys(), which is asynchronous, so
+" the actual sequence would only be executed after the caller finished. With
+" this function, callers can force synchronous execution of the typeahead now to
+" be able to work on the effects of command repetition.
+function! ingo#compat#commands#ForceSynchronousFeedkeys()
+    call feedkeys('', 'x')
+endfunction
+else
+function! ingo#compat#commands#ForceSynchronousFeedkeys()
+    return
+endfunction
+endif
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

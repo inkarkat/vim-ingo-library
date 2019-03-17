@@ -15,10 +15,10 @@ function! ingo#option#SplitAndUnescape( optionValue, ... )
 endfunction
 
 function! ingo#option#Contains( optionValue, expr )
-    return (index(ingo#option#Split(a:optionValue), a:expr) != -1)
+    return (index(ingo#option#SplitAndUnescape(a:optionValue), a:expr) != -1)
 endfunction
 function! ingo#option#ContainsOneOf( optionValue, list )
-    let l:optionValues = ingo#option#Split(a:optionValue)
+    let l:optionValues = ingo#option#SplitAndUnescape(a:optionValue)
     for l:expr in a:list
 	if (index(l:optionValues, l:expr) != -1)
 	    return 1

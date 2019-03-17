@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/pos.vim autoload script
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -29,6 +29,7 @@ function! ingo#selection#area#Get( ... )
 "					[0, 0]] will be returned.
 "* RETURN VALUES:
 "   [[startLnum, startCol], [endLnum, endCol]], or a:returnValueOnNoSelection
+"   endCol points to the last character, not beyond it!
 "******************************************************************************
     let l:options = (a:0 ? a:1 : {})
     let l:isClipLinewise = get(l:options, 'isClipLinewise', 1)

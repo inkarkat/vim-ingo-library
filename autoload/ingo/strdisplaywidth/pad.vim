@@ -4,7 +4,7 @@
 "   - ingo/compat.vim autoload script
 "   - ingo/tabstops.vim autoload script
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -151,6 +151,67 @@ function! ingo#strdisplaywidth#pad#Middle( text, width, ... )
     endif
 
     return l:left . repeat(' ', ingo#strdisplaywidth#pad#Width(l:renderedText, a:width)) . l:right
+endfunction
+
+function! ingo#strdisplaywidth#pad#Repeat( text, width, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Duplicate a:text so often that the overall display width is at least
+"   a:width.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:text  Text to be padded / repeated.
+"   a:width Desired display width.
+"   a:tabstop	    Optional tabstop value; defaults to the buffer's 'tabstop'
+"		    value.
+"   a:startColumn   Optional column at which the text is to be rendered (default
+"		    1).
+"* RETURN VALUES:
+"   Padded text, or original text if its width is already (more than) enough.
+"******************************************************************************
+    " Any contained <Tab> characters would change their width when the padding
+    " is prepended. Therefore, render them first into spaces.
+    let l:renderedText = call('ingo#tabstops#Render', [a:text] + a:000)
+
+    let l:textWidth = call('ingo#compat#strdisplaywidth', [l:renderedText] + a:000)
+    if l:textWidth == 0 | return l:renderedText | endif
+
+    let l:padWidth = max([0, a:width - l:textWidth])
+    return (l:padWidth > 0 ? repeat(l:renderedText, (l:padWidth - 1) / l:textWidth + 2) : l:renderedText)
+endfunction
+function! ingo#strdisplaywidth#pad#RepeatExact( text, width, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Duplicate a:text so often that the overall display width is exactly a:width.
+"   If a multi-cell character would have to be cut, it instead appends spaces /
+"   a:filler to make up for the shortcoming.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:text  Text to be padded / repeated.
+"   a:width Desired display width.
+"   a:filler        Optional character to append (as often as necessary) if a
+"                   multi-cell character at the end has to be cut. Default is
+"                   <Space>. Must be a single-cell character itself. Pass empty
+"                   String if you then want the result to be slightly shorter.
+"   a:tabstop	    Optional tabstop value; defaults to the buffer's 'tabstop'
+"		    value.
+"   a:startColumn   Optional column at which the text is to be rendered (default
+"		    1).
+"* RETURN VALUES:
+"   Padded text, or original text if its width is already (more than) enough.
+"******************************************************************************
+    let l:filler = (a:0 ? a:1 : ' ')
+    let l:paddedText = call('ingo#strdisplaywidth#pad#Repeat', [a:text, a:width] + a:000[1:])
+    let l:truncatedText = ingo#strdisplaywidth#strleft(l:paddedText, a:width)
+
+    let l:padWidth = max([0, a:width - ingo#compat#strdisplaywidth(l:truncatedText)])
+    return l:truncatedText . repeat(l:filler, l:padWidth)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

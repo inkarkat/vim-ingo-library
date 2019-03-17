@@ -24,6 +24,7 @@ autoload/ingo/cmdargs/range.vim
 autoload/ingo/cmdargs/register.vim
 autoload/ingo/cmdargs/substitute.vim
 autoload/ingo/cmdline/showmode.vim
+autoload/ingo/cmdrange.vim
 autoload/ingo/cmdrangeconverter.vim
 autoload/ingo/codec/URL.vim
 autoload/ingo/collections.vim
@@ -32,6 +33,7 @@ autoload/ingo/collections/find.vim
 autoload/ingo/collections/fromsplit.vim
 autoload/ingo/collections/memoized.vim
 autoload/ingo/collections/permute.vim
+autoload/ingo/collections/recursive.vim
 autoload/ingo/collections/rotate.vim
 autoload/ingo/collections/unique.vim
 autoload/ingo/comments.vim
@@ -60,6 +62,7 @@ autoload/ingo/escape/file.vim
 autoload/ingo/escape/shellcommand.vim
 autoload/ingo/event.vim
 autoload/ingo/external.vim
+autoload/ingo/file.vim
 autoload/ingo/filetype.vim
 autoload/ingo/folds.vim
 autoload/ingo/folds/containment.vim
@@ -77,6 +80,7 @@ autoload/ingo/ftplugin/onbufwinenter.vim
 autoload/ingo/ftplugin/setting.vim
 autoload/ingo/ftplugin/windowsettings.vim
 autoload/ingo/funcref.vim
+autoload/ingo/function/uniquify.vim
 autoload/ingo/gui/position.vim
 autoload/ingo/hlgroup.vim
 autoload/ingo/indent.vim
@@ -106,9 +110,11 @@ autoload/ingo/nary.vim
 autoload/ingo/number.vim
 autoload/ingo/option.vim
 autoload/ingo/os.vim
+autoload/ingo/plugin/cmd/withpattern.vim
 autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/compiler.vim
 autoload/ingo/plugin/marks.vim
+autoload/ingo/plugin/persistence.vim
 autoload/ingo/plugin/rendered.vim
 autoload/ingo/plugin/rendered/Confirmeach.vim
 autoload/ingo/plugin/rendered/Subset.vim
@@ -179,6 +185,7 @@ autoload/ingo/text/frompattern.vim
 autoload/ingo/text/replace.vim
 autoload/ingo/undo.vim
 autoload/ingo/units.vim
+autoload/ingo/view.vim
 autoload/ingo/window.vim
 autoload/ingo/window/adjacent.vim
 autoload/ingo/window/cmdwin.vim

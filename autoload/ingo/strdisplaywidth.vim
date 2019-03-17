@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/str.vim autoload script
 "
-" Copyright: (C) 2008-2017 Ingo Karkat
+" Copyright: (C) 2008-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -37,10 +37,7 @@ function! ingo#strdisplaywidth#GetMinMax( lines, ... )
 endfunction
 
 function! ingo#strdisplaywidth#strleft( expr, virtCol )
-    " Must add 1 because a "before-column" pattern is used in case the exact
-    " column cannot be matched (because its halfway through a tab or other wide
-    " character), and include that before-column in the match, too.
-    return matchstr(a:expr, '^.*\%<' . (a:virtCol + 1) . 'v.')
+    return substitute(a:expr, '\zs.\%>' . (a:virtCol + 1) . 'v.*$', '', '')
 endfunction
 function! ingo#strdisplaywidth#CutLeft( expr, virtCol )
     let l:left = ingo#strdisplaywidth#strleft(a:expr, a:virtCol)

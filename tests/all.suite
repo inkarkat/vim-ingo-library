@@ -1,7 +1,12 @@
 cmdargs/file/
 collections/
+collections/recursive/
 compat/
+date/
 digest/
+file/
+function/uniquify/
+fs/paths/split/
 list/
 list/lcs/
 list/pattern/
@@ -16,6 +21,9 @@ regexp/collection/
 regexp/deconstruct/
 regexp/length/
 regexp/split/
+str/
+strdisplaywidth/
+strdisplaywidth/pad/
 subs/BraceCreation/
 subs/BraceExpansion/
 subst/

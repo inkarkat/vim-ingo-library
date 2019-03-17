@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2014-2016 Ingo Karkat
+" Copyright: (C) 2014-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -46,8 +46,11 @@ function! ingo#pos#IsInsideVisualSelection( pos, ... )
     endif
 endfunction
 
-
 function! ingo#pos#Before( pos )
+    if a:pos[1] == 1
+	return [a:pos[0], 0]
+    endif
+
     let l:charBeforePosition = matchstr(getline(a:pos[0]), '.\%' . a:pos[1] . 'c')
     return (empty(l:charBeforePosition) ? [0, 0] : [a:pos[0], a:pos[1] - len(l:charBeforePosition)])
 endfunction

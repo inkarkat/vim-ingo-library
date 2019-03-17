@@ -60,6 +60,9 @@ function! ingo#avoidprompt#MaxLength()
     return l:maxLength
 endfunction
 
+if ! exists('g:IngoLibrary_TruncateEllipsis')
+    let g:IngoLibrary_TruncateEllipsis = (&encoding ==# 'utf-8' ? "\u2026" : '...')
+endif
 function! ingo#avoidprompt#TruncateTo( text, length, ... )
 "*******************************************************************************
 "* PURPOSE:
@@ -80,6 +83,10 @@ function! ingo#avoidprompt#TruncateTo( text, length, ... )
 "			line (before a:text, this matters for tab rendering); if
 "			specified, a:text will be truncated to (MaxLength() -
 "			a:reservedColumns).
+"   a:truncationIndicator   Optional text to be appended when truncation
+"			    appears. a:text is further reduced to account for
+"			    its width. Default is "..." or the single-char UTF-8
+"			    variant if the encoding also is UTF-8.
 "* RETURN VALUES:
 "   Truncated a:text.
 "*******************************************************************************
@@ -88,6 +95,7 @@ function! ingo#avoidprompt#TruncateTo( text, length, ... )
     endif
     let l:reservedColumns = (a:0 > 0 ? a:1 : 0)
     let l:reservedPadding = repeat(' ', l:reservedColumns)
+    let l:truncationIndicator = (a:0 >= 2 ? a:2 : g:IngoLibrary_TruncateEllipsis)
 
     " The \%<23v regexp item uses the local 'tabstop' value to determine the
     " virtual column. As we want to echo with default tabstop 8, we need to
@@ -98,13 +106,13 @@ function! ingo#avoidprompt#TruncateTo( text, length, ... )
     let l:text = a:text
     try
 	if ingo#strdisplaywidth#HasMoreThan(l:reservedPadding . l:text, a:length + l:reservedColumns)
-	    let l:ellipsisLength = ingo#compat#strchars(g:IngoLibrary_TruncateEllipsis)
+	    let l:ellipsisLength = ingo#compat#strchars(l:truncationIndicator)
 
 	    " Handle pathological cases.
 	    if a:length == l:ellipsisLength
-		return g:IngoLibrary_TruncateEllipsis
+		return l:truncationIndicator
 	    elseif a:length < l:ellipsisLength
-		return ingo#compat#strcharpart(g:IngoLibrary_TruncateEllipsis, 0, a:length)
+		return ingo#compat#strcharpart(l:truncationIndicator, 0, a:length)
 	    endif
 
 	    " Consider the length of the (configurable) "..." ellipsis.
@@ -116,7 +124,7 @@ function! ingo#avoidprompt#TruncateTo( text, length, ... )
 	    while 1
 		let l:fullText =
 		\   ingo#strdisplaywidth#strleft(l:reservedPadding . l:text, l:frontCol) .
-		\   g:IngoLibrary_TruncateEllipsis .
+		\   l:truncationIndicator .
 		\   ingo#strdisplaywidth#strright(l:text, l:backCol)
 
 		" The strright() cannot precisely account for the rendering of
@@ -154,6 +162,10 @@ function! ingo#avoidprompt#Truncate( text, ... )
 "			line (before a:text, this matters for tab rendering); if
 "			specified, a:text will be truncated to (MaxLength() -
 "			a:reservedColumns).
+"   a:truncationIndicator   Optional text to be appended when truncation
+"			    appears. a:text is further reduced to account for
+"			    its width. Default is "..." or the single-char UTF-8
+"			    variant if the encoding also is UTF-8.
 "* RETURN VALUES:
 "   Truncated a:text.
 "*******************************************************************************
@@ -166,7 +178,7 @@ function! ingo#avoidprompt#Truncate( text, ... )
     let l:reservedColumns = (a:0 > 0 ? a:1 : 0)
     let l:maxLength = ingo#avoidprompt#MaxLength() - l:reservedColumns
 
-    return ingo#avoidprompt#TruncateTo( a:text, l:maxLength, l:reservedColumns )
+    return call('ingo#avoidprompt#TruncateTo', [a:text, l:maxLength] + a:000)
 endfunction
 
 function! ingo#avoidprompt#TranslateLineBreaks( text )

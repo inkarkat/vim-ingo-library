@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2016-2018 Ingo Karkat
+" Copyright: (C) 2016-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -27,6 +27,8 @@ function! ingo#regexp#collection#Expr( ... )
 "                                   well. Default true.
 "   a:option.isMagic                Flag whether 'magic' is set, and [] is used
 "                                   instead of \[]. Default true.
+"   a:option.isCapture              Flag whether to capture the stuff inside the
+"                                   collection. Default false.
 "* RETURN VALUES:
 "   Regular expression.
 "******************************************************************************
@@ -34,16 +36,18 @@ function! ingo#regexp#collection#Expr( ... )
     let l:isBarePattern = get(l:options, 'isBarePattern', 0)
     let l:isIncludeEolVariant = get(l:options, 'isIncludeEolVariant', 1)
     let l:isMagic = get(l:options, 'isMagic', 1)
+    let l:isCapture = get(l:options, 'isCapture', 0)
+    let [l:capturePrefix, l:captureSuffix] = (l:isCapture ? ['\(', '\)'] : ['', ''])
 
     let l:prefixExpr = (l:isBarePattern ?
     \   '' :
-    \   '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!' . (l:isMagic ?
+    \   '\%(\%(^\|[^\\]\)\%(\\\\\)*\\%\?\)\@<!' . (l:isMagic ?
     \       (l:isIncludeEolVariant ? '\%(\\_\)\?' : '') :
     \       (l:isIncludeEolVariant ? '\\_\?' : '\\')
     \   )
     \)
 
-    return l:prefixExpr . '\[\%(\]$\)\@!\]\?\%(\[:\a\+:\]\|\[=.\{-}=\]\|\[\..\.\]\|[^\]]\)*\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\]'
+    return l:prefixExpr . '\[' . l:capturePrefix . '\%(\]$\)\@!\]\?\%(\[:\a\+:\]\|\[=.\{-}=\]\|\[\..\.\]\|[^\]]\)*\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!' . l:captureSuffix . '\]'
 endfunction
 
 function! ingo#regexp#collection#GetSpecialCharacters()

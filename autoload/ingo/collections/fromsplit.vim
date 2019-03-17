@@ -4,17 +4,30 @@
 "   - ingo/collections.vim autoload script
 "   - ingo/list.vim autoload script
 "
-" Copyright: (C) 2016-2017 Ingo Karkat
+" Copyright: (C) 2016-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.029.002	24-Jan-2017	Add
-"				ingo#collections#fromsplit#MapItemsAndSeparators().
-"   1.028.001	10-Oct-2016	file creation
 
-function! s:Map( isItems, expr, pattern, Expr2 )
+function! ingo#collections#fromsplit#MapOne( isItems, expr, pattern, Expr2 )
+"******************************************************************************
+"* PURPOSE:
+"   Split a:expr on a:pattern, then apply a:Expr2 over the List of items or
+"   separators, depending on a:isItems, and return a List of [ item1,
+"   delimiter1, item2, delimiter2, ...]
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:isItems   Flag whether separators (0) or items (1) are to be mapped.
+"   a:expr	Text to be split.
+"   a:pattern	Regular expression that specifies the separator text that
+"		delimits the items.
+"   a:Expr2     String or Funcref argument to |map()|.
+"* RETURN VALUES:
+"   Single list of split items and separators interspersed.
+"******************************************************************************
     let l:result = ingo#collections#SeparateItemsAndSeparators(a:expr, a:pattern, 1)
     call map(l:result[! a:isItems], a:Expr2)
     return ingo#list#Join(l:result[0], l:result[1])
@@ -37,7 +50,7 @@ function! ingo#collections#fromsplit#MapItems( expr, pattern, Expr2 )
 "* RETURN VALUES:
 "   Single list of split items and separators interspersed.
 "******************************************************************************
-    return s:Map(1, a:expr, a:pattern, a:Expr2)
+    return ingo#collections#fromsplit#MapOne(1, a:expr, a:pattern, a:Expr2)
 endfunction
 function! ingo#collections#fromsplit#MapSeparators( expr, pattern, Expr2 )
 "******************************************************************************
@@ -57,7 +70,7 @@ function! ingo#collections#fromsplit#MapSeparators( expr, pattern, Expr2 )
 "* RETURN VALUES:
 "   Single list of split items and separators interspersed.
 "******************************************************************************
-    return s:Map(0, a:expr, a:pattern, a:Expr2)
+    return ingo#collections#fromsplit#MapOne(0, a:expr, a:pattern, a:Expr2)
 endfunction
 function! ingo#collections#fromsplit#MapItemsAndSeparators( expr, pattern, ItemExpr2, SeparatorExpr2 )
 "******************************************************************************

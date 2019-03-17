@@ -8,7 +8,7 @@
 "   - ingo/list.vim autoload script
 "   - ingocollections.vim autoload script
 "
-" Copyright: (C) 2011-2018 Ingo Karkat
+" Copyright: (C) 2011-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -382,6 +382,55 @@ function! ingo#collections#mapsort( string, i1, i2 )
 "******************************************************************************
     let [l:i1, l:i2] = map([a:i1, a:i2], a:string)
     return l:i1 == l:i2 ? 0 : l:i1 > l:i2 ? 1 : -1
+endfunction
+function! ingo#collections#SortOnOneAttribute( attribute, o1, o2, ... )
+    let l:defaultValue = (a:0 ? a:1 : 0)
+    let l:a1 = get(a:o1, a:attribute, l:defaultValue)
+    let l:a2 = get(a:o2, a:attribute, l:defaultValue)
+    return (l:a1 ==# l:a2 ? 0 : l:a1 ># l:a2 ? 1 : -1)
+endfunction
+function! ingo#collections#PrioritySort( o1, o2, ... )
+    return call('ingo#collections#SortOnOneAttribute', ['priority', a:o1, a:o2] + a:000)
+endfunction
+function! ingo#collections#SortOnTwoAttributes( firstAttribute, secondAttribute, o1, o2, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Helper sort function for objects that sort on a:firstAttribute first; if
+"   that is equal or does not exist on both, sort on a:secondAttribute.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:firstAttribute    Primary attribute to sort on.
+"   a:secondAttribute   Secondary attribute to sort on; is used when two objects
+"                       don't have the primary attribute or it is equal.
+"   a:o1, a:o2          Objects to be compared.
+"   a:firstDefaultValue Optional default value if a:firstAttribute does not
+"                       exist. Default is 0.
+"   a:secondDefaultValue
+"* RETURN VALUES:
+"   -1, 0 or 1, as specified by the sort() function.
+"******************************************************************************
+    let l:firstDefaultValue = (a:0 ? a:1 : 0)
+    if has_key(a:o1, a:firstAttribute) || has_key(a:o2, a:firstAttribute)
+	let l:first1 = get(a:o1, a:firstAttribute, l:firstDefaultValue)
+	let l:first2 = get(a:o2, a:firstAttribute, l:firstDefaultValue)
+	if l:first1 !=# l:first2
+	    return (l:first1 ># l:first2 ? 1 : -1)
+	endif
+    endif
+
+    let l:secondDefaultValue = (a:0 >= 2 ? a:2 : l:firstDefaultValue)
+    let l:second1 = get(a:o1, a:secondAttribute, l:secondDefaultValue)
+    let l:second2 = get(a:o2, a:secondAttribute, l:secondDefaultValue)
+    return (l:second1 ==# l:second2 ? 0 : l:second1 ># l:second2 ? 1 : -1)
+endfunction
+function! ingo#collections#SortOnOneListElement( index, l1, l2, ... )
+    let l:defaultValue = (a:0 ? a:1 : 0)
+    let l:i1 = get(a:l1, a:index, l:defaultValue)
+    let l:i2 = get(a:l2, a:index, l:defaultValue)
+    return (l:i1 ==# l:i2 ? 0 : l:i1 ># l:i2 ? 1 : -1)
 endfunction
 
 function! ingo#collections#Flatten1( list )

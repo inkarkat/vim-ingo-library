@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -89,5 +89,42 @@ function! ingo#date#HumanReltime( timeElapsed, ... )
 	return s:Relative(l:isShortFormat, l:isRightAligned, l:isInFuture, (l:timeElapsed / 86400 / 365), l:years)
     endif
 endfunction
+
+if exists('g:IngoLibrary_StrftimeEmulation')
+    function! ingo#date#strftime( format, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Get the formatted date and time according to a:format, of a:time or the
+"   current time.
+"   Supports a "testing mode" by defining g:IngoLibrary_StrftimeEmulation
+"   (before first use of this module), with a Dictionary that maps possible
+"   a:format values to either a static value, or a Funcref that is invoked with
+"   a:format and a:time (if given) that should return the value. A special key
+"   of "*" acts as a fallback for those a:format values that don't have a key.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:format    According to manual of strftime().
+"   a:time      Optional time used for formatting instead of now.
+"* RETURN VALUES:
+"   Formatted date / time according to a:format.
+"******************************************************************************
+	if has_key(g:IngoLibrary_StrftimeEmulation, a:format)
+	    let l:Emulator = g:IngoLibrary_StrftimeEmulation[a:format]
+	elseif has_key(g:IngoLibrary_StrftimeEmulation, '*')
+	    let l:Emulator = g:IngoLibrary_StrftimeEmulation['*']
+	else
+	    throw printf('strftime: Unhandled format %s and no fallback * key in g:IngoLibrary_StrftimeEmulation', a:format)
+	endif
+
+	return (a:0 ? ingo#actions#ValueOrFunc(l:Emulator, a:format, a:1) : ingo#actions#ValueOrFunc(l:Emulator, a:format))
+    endfunction
+else
+    function! ingo#date#strftime( ... )
+	return call('strftime', a:000)
+    endfunction
+endif
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

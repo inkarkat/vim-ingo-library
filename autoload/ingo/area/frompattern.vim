@@ -4,7 +4,7 @@
 "   - ingo/text.vim autoload script
 "   - ingo/text/frompattern.vim autoload script
 "
-" Copyright: (C) 2017 Ingo Karkat
+" Copyright: (C) 2017-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -30,6 +30,7 @@ function! ingo#area#frompattern#GetHere( pattern, ... )
 "				omitted, [[0, 0], [0, 0]] will be returned.
 "* RETURN VALUES:
 "   [[startLnum, startCol], [endLnum, endCol]], or a:returnValueOnNoSelection.
+"   endCol points to the last character, not beyond it!
 "******************************************************************************
     let l:startPos = getpos('.')[1:2]
     let l:endPos = searchpos(a:pattern, 'cenW', (a:0 ? a:1 : line('.')))
@@ -62,6 +63,7 @@ function! ingo#area#frompattern#GetAroundHere( pattern, ... )
 "				omitted, [[0, 0], [0, 0]] will be returned.
 "* RETURN VALUES:
 "   [[startLnum, startCol], [endLnum, endCol]], or a:returnValueOnNoSelection.
+"   endCol points to the last character, not beyond it!
 "******************************************************************************
     let l:startPos = searchpos(a:pattern, 'bcnW', (a:0 >= 2 ? a:2 : line('.')))
     if l:startPos == [0, 0]
@@ -99,6 +101,7 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, isOnlyFirstMa
 "			unique content.
 "* RETURN VALUES:
 "   [[[startLnum, startCol], [endLnum, endCol]], ...], or [].
+"   endCol points to the last character, not beyond it!
 "******************************************************************************
     let l:save_view = winsaveview()
 	let l:areas = []

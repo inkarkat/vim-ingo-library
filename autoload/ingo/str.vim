@@ -25,6 +25,25 @@ function! ingo#str#Trim( string )
 "******************************************************************************
     return substitute(a:string, '^\_s*\(.\{-}\)\_s*$', '\1', '')
 endfunction
+function! ingo#str#TrimPattern( string, pattern, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Remove leading and trailing matches of a:pattern from a:string.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:string    Text.
+"   a:pattern   Regular expression. Must not use capture groups itself.
+"   a:pattern2  Regular expression. If given, a:pattern is only used for the
+"               leading matches, and a:pattern2 is used for trailing matches.
+"               Must not use capture groups itself.
+"* RETURN VALUES:
+"   a:string with leading and trailing matches of a:pattern removed.
+"******************************************************************************
+    return substitute(a:string, '^\%(' . a:pattern . '\)*\(.\{-}\)\%(' . (a:0 ? a:1 : a:pattern) . '\)*$', '\1', '')
+endfunction
 
 function! ingo#str#Reverse( string )
     return join(reverse(ingo#str#list#OfCharacters(a:string)), '')

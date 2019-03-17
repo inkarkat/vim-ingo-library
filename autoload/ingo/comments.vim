@@ -3,53 +3,10 @@
 " DEPENDENCIES:
 "   - ingo/compat.vim autoload script
 "
-" Copyright: (C) 2011-2017 Ingo Karkat
+" Copyright: (C) 2011-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.031.008	27-Jun-2017	BUG: ingo#comments#SplitIndentAndText() and
-"				ingo#comments#RemoveCommentPrefix() fail with
-"				nestable comment prefixes with "E688: More
-"				targets than List items". Implementation in
-"				s:SplitIndentAndText() was based on unnestable
-"				prefixes. Instead of adding 1 to the actual
-"				nesting level to obtain the pattern multiplier,
-"				ensure it is at least 1.
-"   1.029.007	09-Jan-2017	Add ingo#comments#SplitAll(), a more powerful
-"				variant of ingo#comments#SplitIndentAndText().
-"   1.029.006	02-Dec-2016	CHG: ingo#comments#RemoveCommentPrefix() isn't
-"				useful as it omits any indent before the comment
-"				prefix. Change its implementation to just erase
-"				the prefix itself.
-"				Add ingo#comments#SplitIndentAndText() to
-"				provide what ingo#comments#RemoveCommentPrefix()
-"				was previously used to: The line broken into
-"				indent (before, after, and with the comment
-"				prefix), and the remaining text.
-"				FIX: Wrong negation in a:options.isIgnoreIndent
-"				documentation.
-"   1.013.005	06-Sep-2013	CHG: Make a:isIgnoreIndent flag to
-"				ingo#comments#CheckComment() optional and add
-"				a:isStripNonEssentialWhiteSpaceFromCommentString,
-"				which is also on by default for DWIM.
-"				CHG: Don't strip whitespace in
-"				ingo#comments#RemoveCommentPrefix(); with the
-"				changed ingo#comments#CheckComment() default
-"				behavior, this isn't necessary, and is
-"				unexpected.
-"				ingo#comments#RenderComment: When the text
-"				starts with indent identical to what
-"				'commentstring' would render, avoid having
-"				duplicate indent.
-"   1.005.004	02-May-2013	Move to ingo-library.
-"	003	24-May-2012	Add ingocomments#RemoveCommentPrefix().
-"	002	09-Nov-2011	Add ingocomments#CheckComment() and
-"				ingocomments#RenderComment(), used by
-"				s:ReplaceWithEllided() in
-"				plugin/ingosubstitutions2.vim.
-"	001	22-Sep-2011	file creation
 
 function! s:CommentDefinitions()
     return map(split(&l:comments, ','), 'matchlist(v:val, ''\([^:]*\):\(.*\)'')[1:2]')
@@ -215,6 +172,46 @@ function! ingo#comments#RemoveCommentPrefix( line )
     endif
     return l:indent . l:text
 endfunction
+function! ingo#comments#GetSplitIndentPattern( minNumberOfCommentPrefixesExpr, lineOrStartLnum, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Analyze a:line (or the a:startLnum, a:endLnum range of lines in the current
+"   buffer) and generate a regular expression that matches possible indent with
+"   comment prefix. If there's no comment, just match indent.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:minNumberOfCommentPrefixesExpr    Number of comment prefixes (if any are
+"                                       detected) that must exist. If empty, the
+"                                       exact number of detected (nested)
+"                                       comment prefixes has to exist. If 1, at
+"                                       least one comment prefix has to exist.
+"                                       If 0, indent and comment prefixes are
+"                                       purely optional; the returned pattern
+"                                       may match nothing at all at the
+"                                       beginning of a line.
+"   a:line  The line to be analyzed for splitting, or:
+"   a:startLnum First line number in the current buffer to be analyzed.
+"   a:endLnum   Last line number in the current buffer to be analyzed; the first
+"               line in the range that has a comment prefix is used.
+"* RETURN VALUES:
+"   Regular expression matching the indent plus potential comment prefix,
+"   anchored to the start of a line.
+"******************************************************************************
+    if a:0
+	for l:lnum in range(a:lineOrStartLnum, a:1)
+	    let l:checkComment = ingo#comments#CheckComment(getline(l:lnum))
+	    if ! empty(l:checkComment)
+		return s:GetSplitIndentPattern(l:checkComment, a:minNumberOfCommentPrefixesExpr)
+	    endif
+	endfor
+	return s:GetSplitIndentPattern([], a:minNumberOfCommentPrefixesExpr)
+    else
+	return s:GetSplitIndentPattern(ingo#comments#CheckComment(a:lineOrStartLnum), a:minNumberOfCommentPrefixesExpr)
+    endif
+endfunction
 function! ingo#comments#SplitIndentAndText( line )
 "******************************************************************************
 "* PURPOSE:
@@ -235,18 +232,23 @@ function! ingo#comments#SplitIndentAndText( line )
 "******************************************************************************
     return s:SplitIndentAndText(a:line, ingo#comments#CheckComment(a:line))
 endfunction
-function! s:SplitIndentAndText( line, checkComment )
+function! s:GetSplitIndentPattern( checkComment, ... )
+    let l:minNumberOfCommentPrefixesExpr = (a:0 && a:1 isnot# '' ? a:1 . ',' : '')
     if empty(a:checkComment)
-	return matchlist(a:line, '^\(\s*\)\(.*\)$')[1:2]
+	return '^\%(\s*\)'
     endif
 
     let [l:commentprefix, l:type, l:nestingLevel, l:isBlankRequired] = a:checkComment
 
-    return matchlist(
-    \   a:line,
-    \   '\V\C\^\(\s\*\%(' . escape(l:commentprefix, '\') . (l:isBlankRequired ? '\s\+' : '\s\*'). '\)\{' . max([1, l:nestingLevel]) . '}\)' .
-    \       '\(\.\*\)\$'
-    \)[1:2]
+    return '\V\C\^' .
+    \   '\s\*\%(' . escape(l:commentprefix, '\') . (l:isBlankRequired ? '\s\+' : '\s\*'). '\)\{' . l:minNumberOfCommentPrefixesExpr . max([1, l:nestingLevel]) . '}' .
+    \   '\m'
+endfunction
+function! s:GetSplitIndentAndTextPattern( checkComment )
+    return '\(' . s:GetSplitIndentPattern(a:checkComment) . '\)\(.*\)$'
+endfunction
+function! s:SplitIndentAndText( line, checkComment )
+    return matchlist(a:line, s:GetSplitIndentAndTextPattern(a:checkComment))[1:2]
 endfunction
 function! ingo#comments#SplitAll( line )
 "******************************************************************************

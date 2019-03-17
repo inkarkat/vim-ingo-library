@@ -3,13 +3,16 @@
 " DEPENDENCIES:
 "   - ingo/escape.vim autoload script
 "
-" Copyright: (C) 2013-2018 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
+function! ingo#cmdargs#pattern#PatternExpr( ... ) abort
+    return '\([[:alnum:]\\"|]\@![\x00-\xFF]\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\' . (a:0 ? a:1 : 1)
+endfunction
 function! s:Parse( arguments, ... )
-    return matchlist(a:arguments, '^\([[:alnum:]\\"|]\@![\x00-\xFF]\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . (a:0 ? a:1 : '') . '$')
+    return matchlist(a:arguments, '^' . ingo#cmdargs#pattern#PatternExpr() . (a:0 ? a:1 : '') . '$')
 endfunction
 function! ingo#cmdargs#pattern#RawParse( arguments, returnValueOnNoMatch, ... )
 "******************************************************************************

@@ -2,19 +2,10 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.019.002	20-May-2014	Correct ingo#query#confirm#AutoAccelerators()
-"				default choice when not given (1 instead of 0).
-"				Avoid using the default choice's first character
-"				as accelerator unless in GUI dialog, as the
-"				plain text confirm() assigns a default
-"				accelerator.
-"   1.014.001	15-Oct-2013	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 
@@ -33,7 +24,8 @@ function! ingo#query#confirm#AutoAccelerators( choices, ... )
 "   a:choices   List of choices where the accelerators should be inserted.
 "   a:defaultChoice Number (i.e. index + 1) of the default in a:choices. It is
 "		    assumed that this item does not need an accelerator (in the
-"		    GUI dialog).
+"		    GUI dialog). Pass -1 if there's no default (so that all
+"		    items get accelerators).
 "* RETURN VALUES:
 "   Modified a:choices.
 "******************************************************************************
@@ -47,11 +39,10 @@ function! ingo#query#confirm#AutoAccelerators( choices, ... )
     \   '! empty(v:val)'
     \)
 
-    if ! l:isGui && a:choices[l:defaultChoiceIdx] !~# '&.'
+    if ! l:isGui && l:defaultChoiceIdx >= 0 && a:choices[l:defaultChoiceIdx] !~# '&.'
 	" When no GUI dialog is used, the default choice automatically gets an
 	" accelerator, so don't assign that one to avoid masking another choice.
 	call add(l:usedAccelerators, matchstr(a:choices[l:defaultChoiceIdx], '^.'))
-	let l:defaultChoiceIdx = -1
     endif
 
     call   map(a:choices, 'v:key == l:defaultChoiceIdx ? v:val : s:AddAccelerator(l:usedAccelerators, v:val, 1)')
@@ -63,7 +54,7 @@ function! s:AddAccelerator( usedAccelerators, value, isWantFirstCharacter )
     endif
 
     if a:isWantFirstCharacter
-	let l:candidates = [tolower(matchstr(a:value, s:acceleratorPattern))]
+	let l:candidates = ingo#list#NonEmpty([tolower(matchstr(a:value, s:acceleratorPattern))])
     else
 	let l:candidates = split(
 	\   tolower(substitute(a:value, '\%(' . s:acceleratorPattern . '\)\@!.', '', 'g')),

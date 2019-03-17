@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/msg.vim autoload script
 "
-" Copyright: (C) 2012-2017 Ingo Karkat
+" Copyright: (C) 2012-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -45,10 +45,10 @@ function! ingo#text#replace#Between( startPos, endPos, Text )
     " Because of setline(), we can only (easily) handle text replacement in a
     " single line, so replace with the first (non-empty) line only should the
     " replacement text consist of multiple lines.
-    let l:text = split(l:text, "\n")[0]
+    let l:text = split(l:text, "\n", 1)[0]
 
     if l:currentText !=# l:text
-	call setline('.', s:ReplaceRange(l:line, a:startPos[1] - 1, a:endPos[1] - 1, l:text))
+	call setline(a:startPos[0], s:ReplaceRange(l:line, a:startPos[1] - 1, a:endPos[1] - 1, l:text))
 	call setpos("'[", [0, a:startPos[0], a:startPos[1], 0])
 	call setpos("']", [0, a:startPos[0], a:startPos[1] + len(l:text) - len(matchstr(l:text, '.$')), 0])
 	return [l:currentText, l:text, 1]

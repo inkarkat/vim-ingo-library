@@ -3,28 +3,10 @@
 " DEPENDENCIES:
 "   - ingo/cmdargs/commandcommands.vim autoload script
 "
-" Copyright: (C) 2012-2014 Ingo Karkat
+" Copyright: (C) 2012-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.020.007	10-Jun-2014	ENH: Add a:options.commandExpr to
-"				ingo#cmdargs#range#Parse().
-"   1.010.006	08-Jul-2013	Move into ingo-library.
-"   	005	14-Jun-2013	Minor: Make matchlist() robust against
-"				'ignorecase'.
-"	004	31-May-2013	Add ingoexcommands#ParseRange().
-"				FIX: :* is also a valid range: shortcut for
-"				'<,'>.
-"	003	30-Dec-2012	Add missing ":help" and ":command" to
-"				s:builtInCommandCommands.
-"	002	19-Jun-2012	Return all parsed fragments in
-"				ingoexcommands#ParseCommand() so that the
-"				command can be re-assembled again.
-"				Allow parsing of whitespace-separated arguments,
-"				too, by passing in an optional regexp for them.
-"	001	15-Jun-2012	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 
@@ -56,6 +38,9 @@ function! ingo#cmdargs#range#Parse( commandLine, ... )
 "				    a:options.isAllowEmptyCommand.
 "   a:options.isParseFirstRange     Flag whether the first range should be
 "				    parsed. False by default.
+"   a:options.isOnlySingleAddress   Flag whether only a single address should be
+"                                   allowed, and double line addresses are not
+"                                   recognized as valid. False by default.
 "* RETURN VALUES:
 "   List of [fullCommandUnderCursor, combiner, commandCommands, range, remainder]
 "	fullCommandUnderCursor  The entire command, potentially starting with
@@ -72,14 +57,66 @@ function! ingo#cmdargs#range#Parse( commandLine, ... )
     let l:options = (a:0 ? a:1 : {})
     let l:isAllowEmptyCommand = get(l:options, 'isAllowEmptyCommand', 1)
     let l:isParseFirstRange = get(l:options, 'isParseFirstRange', 0)
+    let l:rangeExpr = (get(l:options, 'isOnlySingleAddress', 0) ?
+    \   ingo#cmdargs#range#SingleRangeExpr() :
+    \   ingo#cmdargs#range#RangeExpr()
+    \)
     let l:commandExpr = get(l:options, 'commandExpr', (l:isAllowEmptyCommand ? '\(\h\w*.*\|$\)' : '\(\h\w*.*\)'))
 
     let l:parseExpr =
     \	(l:isParseFirstRange ? '\C^\(\s*\)' : '\C^\(.*\\\@<!|\)\?\s*') .
     \	'\(' . ingo#cmdargs#commandcommands#GetExpr() . '\)\?' .
-    \	'\(' . ingo#cmdargs#range#RangeExpr() . '\)\s*' .
+    \	'\(' . l:rangeExpr . '\)\s*' .
     \   l:commandExpr
     return matchlist(a:commandLine, l:parseExpr)[0:4]
+endfunction
+
+function! ingo#cmdargs#range#ParsePrependedRange( arguments, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Parse a:arguments into a range at the beginning, and any following stuff,
+"   separated by non-alphanumeric character or whitespace (or the optional
+"   a:directSeparator).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:arguments Command arguments to parse.
+"   a:options.directSeparator   Optional regular expression for the separator
+"                               (parsed into text) between the text and range
+"                               (with optional whitespace in between; mandatory
+"                               whitespace is always an alternative). Defaults
+"                               to any whitespace. If empty: there must be
+"                               whitespace between text and register.
+"   a:options.isPreferText      Optional flag that if the arguments consist
+"                               solely of an range, whether this is counted as
+"                               text (1, default) or as a sole range (0).
+"   a:options.isOnlySingleAddress   Flag whether only a single address should be
+"                                   allowed, and double line addresses are not
+"                                   recognized as valid. False by default.
+"* RETURN VALUES:
+"   [address, text], or ['', a:arguments] if no address could be parsed.
+"******************************************************************************
+    let l:options = (a:0 ? a:1 : {})
+    let l:rangeExpr = (get(l:options, 'isOnlySingleAddress', 0) ?
+    \   ingo#cmdargs#range#SingleRangeExpr() :
+    \   ingo#cmdargs#range#RangeExpr()
+    \)
+    let l:directSeparator = (empty(get(l:options, 'directSeparator', '')) ?
+    \   '\%$\%^' :
+    \   get(l:options, 'directSeparator', '')
+    \)
+    let l:isPreferText = get(l:options, 'isPreferText', 1)
+
+    let l:matches = matchlist(a:arguments, '^\(' . l:rangeExpr . '\)\%(\%(\s*' . l:directSeparator . '\)\@=\|\s\+\)\(.*\)$')
+    return (empty(l:matches) ?
+    \   (! l:isPreferText && a:arguments =~# '^' . l:rangeExpr . '$' ?
+    \       [a:arguments , ''] :
+    \       ['', a:arguments]
+    \   ) :
+    \   l:matches[1:2]
+    \)
 endfunction
 
 let &cpo = s:save_cpo

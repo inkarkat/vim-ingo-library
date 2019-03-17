@@ -7,7 +7,7 @@
 "   - ingo/os.vim autoload script
 "   - ingo/strdisplaywidth.vim autoload script
 "
-" Copyright: (C) 2013-2018 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -153,6 +153,37 @@ else
 	endtry
 
 	return l:output
+    endfunction
+endif
+
+if exists('*trim') && ! has_key(s:compatFor, 'trim')
+    function! ingo#compat#trim( ... )
+	return call('trim', a:000)
+    endfunction
+else
+    function! ingo#compat#trim( text, ... )
+	let l:mask = (a:0 ? a:1 : "\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f \xa0")
+	let l:text = a:text
+
+	while ! empty(a:text)
+	    let [l:head, l:rest] = matchlist(l:text, '^\(.\)\(.*\)$')[1:2]
+	    if stridx(l:mask, l:head) == -1
+		break
+	    endif
+
+	    let l:text = l:rest
+	endwhile
+
+	while ! empty(a:text)
+	    let [l:rest, l:tail] = matchlist(l:text, '^\(.*\)\(.\)$')[1:2]
+	    if stridx(l:mask, l:tail) == -1
+		break
+	    endif
+
+	    let l:text = l:rest
+	endwhile
+
+	return l:text
     endfunction
 endif
 
@@ -428,13 +459,19 @@ else
 endif
 
 " Patch 7.4.1707: Allow using an empty dictionary key
-if v:version == 704 && has('patch1707') || v:version > 704
+if (v:version == 704 && has('patch1707') || v:version > 704) && ! has_key(s:compatFor, 'DictKey')
     function! ingo#compat#DictKey( key )
+	return a:key
+    endfunction
+    function! ingo#compat#FromKey( key )
 	return a:key
     endfunction
 else
     function! ingo#compat#DictKey( key )
 	return (empty(a:key) ? "\<Nul>" : a:key)
+    endfunction
+    function! ingo#compat#FromKey( key )
+	return (a:key ==# "\<Nul>" ? '' : a:key)
     endfunction
 endif
 

@@ -3,6 +3,7 @@
 			INGO-LIBRARY    by Ingo Karkat
 							    *ingo-library.vim*
 description			|ingo-library-description|
+configuration			|ingo-library-configuration|
 installation			|ingo-library-installation|
 usage				|ingo-library-usage|
 limitations			|ingo-library-limitations|
@@ -74,6 +75,34 @@ and e.g. convert them into a proper error (e.g. via
 |ingo#err#SetCustomException()|).
 
 ==============================================================================
+CONFIGURATION					  *ingo-library-configuration*
+						   *g:IngoLibrary_DateCommand*
+The filespec to the external "date" command can be set via: >
+    let g:IngoLibrary_DateCommand = 'date'
+<
+					   *g:IngoLibrary_PreferredDateFormat*
+The preferred date format used by ingo#date#format#Preferred() can be set to a
+|strftime()| format via: >
+    let g:IngoLibrary_PreferredDateFormat = '%x'
+<
+					      *g:IngoLibrary_FileCacheMaxSize*
+The size of the file cache (in bytes) used by ingo#file#GetLines() can be set
+via: >
+    let g:IngoLibrary_FileCacheMaxSize = 1048576
+<
+					      *g:IngoLibrary_TruncateEllipsis*
+The string used as a replacement for truncated text can be set via: >
+    let g:IngoLibrary_TruncateEllipsis = "\u2026"
+<
+				       *g:IngoLibrary_SpecialWindowPredicates*
+The check for special windows in ingo#window#special#IsSpecialWindow() can be
+customized via a List of Expressions or Funcrefs that are passed the window
+number, and which should return a boolean flag. If any predicate is true, the
+window is deemed special. >
+    let g:IngoLibrary_SpecialWindowPredicates =
+    \	['bufname(winbufnr(v:val)) =~# "^\\[\\%(Scratch\\|clipboard\\)\\]$"']
+<
+==============================================================================
 INSTALLATION					   *ingo-library-installation*
 
 The code is hosted in a Git repo at
@@ -110,6 +139,65 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 
 ==============================================================================
 HISTORY							*ingo-library-history*
+
+1.036	17-Mar-2019
+- FIX: ingo#strdisplaywidth#strleft includes multi-width character that
+  straddles the specified width. Need to exclude this one.
+- Add ingo#strdisplaywidth#pad#Repeat[Exact]().
+- Make Unix date command used in ingo#date#epoch#ConvertTo() configurable via
+  g:IngoLibrary_DateCommand.
+- ENH: Allow passing of a:truncationIndicator to
+  ingo#avoidprompt#Truncate[To]().
+- Add ingo#fs#path#split#TruncateTo().
+- Add ingo#str#TrimPattern() variant of ingo#str#Trim().
+- Add ingo#date#epoch#Now().
+- Add ingo#date#strftime().
+- Add ingo#compat#trim().
+- Add ingo#buffer#locate#OtherWindowWithSameBuffer().
+- Add ingo#search#timelimited#FirstPatternThatMatchesInBuffer().
+- Add optional a:isPreferText flag to
+  ingo#cmdargs#register#Parse{Prepended,Appended}WritableRegister().
+- Add ingo#comments#GetSplitIndentPattern() variant of
+  ingo#comments#SplitIndentAndText() that just returns the pattern.
+- Extract ingo#cmdrange#FromCount() from
+  ingo#cmdrangeconverter#LineToBufferRange().
+- Add ingo/plugin/cmd/withpattern.vim module.
+- Add ingo/view.vim module.
+- Add ingo#compat#commands#ForceSynchronousFeedkeys().
+- Add ingo/plugin/persistence.vim module; implementation based on my mark.vim
+  plugin.
+- Add ingo#collections#SortOnOneAttribute(), ingo#collections#PrioritySort(),
+  and ingo#collections#SortOnTwoAttributes().
+- Add ingo/collections/recursive.vim module.
+- ENH: ingo#cmdargs#range#Parse(): Add a:options.isOnlySingleAddress flag.
+- ENH: Add ingo#cmdargs#range#ParsePrependedRange().
+- Minor fixes to ingo#query#confirm#AutoAccelerators().
+- Expose ingo#collections#fromsplit#MapOne().
+- Add function/uniquify.vim module.
+- Add ingo#compat#FromKey() for the reversing of ingo#compat#DictKey().
+- Add ingo#collections#SortOnOneListElement(), a variant of
+  ingo#collections#SortOnOneAttribute().
+- Add ingo#regexp#MakeWholeWORDSearch() variant of
+  ingo#regexp#MakeWholeWordSearch().
+- Add ingo/file.vim module.
+- Add ingo#cmdargs#pattern#PatternExpr().
+- BUG: ingo#text#replace#Between() and ingo#text#replace#Area() mistakenly
+  update current line instead of passed position.
+- BUG: ingo#text#replace#Between() and ingo#text#replace#Area() cause "E684:
+  list index out of range: 0" when the replacement text is empty.
+- FIX: Off-by-one in ingo#area#IsEmpty(). Also check for invalid area.
+- Add ingo#area#EmptyArea().
+- FIX: Make ingo#pos#Before() return column 0 if passed a position with column
+  1; this matches the behavior of ingo#pos#After(), which also returns a
+  non-existent position directly after the last character, and this fits in
+  well with the area functions.
+- Add ingo#regexp#deconstruct#{Translate,Remove}CharacterClasses(),
+  ingo#regexp#deconstruct#TranslateNumberEscapes(),
+  ingo#regexp#deconstruct#TranslateBranches()  and include all translations in
+  ingo#regexp#deconstruct#ToQuasiLiteral().
+- FIX: Don't match optionally matched atoms \%[] in
+  ingo#regexp#collection#Expr().
+- ENH: Add a:option.isCapture to ingo#regexp#collection#Expr().
 
 1.035	29-Sep-2018
 - Add ingo#compat#commands#NormalWithCount().
@@ -891,7 +979,7 @@ First published version as separate shared library.
 Started development of shared autoload functionality.
 
 ==============================================================================
-Copyright: (C) 2009-2018 Ingo Karkat
+Copyright: (C) 2009-2019 Ingo Karkat
 Contains URL encoding / decoding algorithms written by Tim Pope.
 The VIM LICENSE applies to this plugin; see |copyright|.
 
