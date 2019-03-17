@@ -62,6 +62,7 @@ autoload/ingo/escape/file.vim
 autoload/ingo/escape/shellcommand.vim
 autoload/ingo/event.vim
 autoload/ingo/external.vim
+autoload/ingo/file.vim
 autoload/ingo/filetype.vim
 autoload/ingo/folds.vim
 autoload/ingo/folds/containment.vim
@@ -79,6 +80,7 @@ autoload/ingo/ftplugin/onbufwinenter.vim
 autoload/ingo/ftplugin/setting.vim
 autoload/ingo/ftplugin/windowsettings.vim
 autoload/ingo/funcref.vim
+autoload/ingo/function/uniquify.vim
 autoload/ingo/gui/position.vim
 autoload/ingo/hlgroup.vim
 autoload/ingo/indent.vim
