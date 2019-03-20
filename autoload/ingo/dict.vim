@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -19,6 +19,26 @@
 "				ingo#dict#Mirror().
 "   1.016.002	23-Dec-2013	Add ingo#dict#Mirror().
 "   1.009.001	21-Jun-2013	file creation
+
+function! ingo#dict#Make( val, defaultKey, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Ensure that the passed a:val is a Dict; if not, wrap it in one, with
+"   a:defaultKey as the key.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:val   Arbitrary value of arbitrary type.
+"   a:defaultKey            Key for a:val if it's not a Dict yet.
+"   a:isCopyOriginalDict    Optional flag; when set, an original a:val Dict is
+"			    copied before returning.
+"* RETURN VALUES:
+"   Dict; either the original one or a new one containing a:defaultKey : a:val.
+"******************************************************************************
+    return (type(a:val) == type({}) ? (a:0 && a:1 ? copy(a:val) : a:val) : {a:defaultKey : a:val})
+endfunction
 
 function! ingo#dict#FromItems( items, ... )
 "******************************************************************************

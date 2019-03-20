@@ -126,6 +126,9 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.037   RELEASEME
+- Add ingo#dict#Make() (analog to ingo#list#Make()).
+
 ##### 1.036   17-Mar-2019
 - FIX: ingo#strdisplaywidth#strleft includes multi-width character that
   straddles the specified width. Need to exclude this one.
