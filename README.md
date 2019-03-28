@@ -126,6 +126,9 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.037   28-Mar-2019
+- Add ingo#dict#Make() (analog to ingo#list#Make()).
+
 ##### 1.036   17-Mar-2019
 - FIX: ingo#strdisplaywidth#strleft includes multi-width character that
   straddles the specified width. Need to exclude this one.
@@ -181,7 +184,7 @@ HISTORY
   ingo#regexp#deconstruct#TranslateNumberEscapes(),
   ingo#regexp#deconstruct#TranslateBranches()  and include all translations in
   ingo#regexp#deconstruct#ToQuasiLiteral().
-- FIX: Don't match optionally matched atoms \%[] in
+- FIX: Don't match optionally matched atoms \\%[] in
   ingo#regexp#collection#Expr().
 - ENH: Add a:option.isCapture to ingo#regexp#collection#Expr().
 
@@ -210,7 +213,7 @@ HISTORY
   previous name wasn't very clear.
 - Add ingo#list#pattern#{First,All}Match\[Index]() functions.
 - ingo#query#{get#Number,fromlist#Query}(): ENH: Also support number entry with leading zeros
-- ingo#query#fromlist#Query(): BUG: Cannot conclude multi-digit entry with <Enter>
+- ingo#query#fromlist#Query(): BUG: Cannot conclude multi-digit entry with &lt;Enter&gt;
 - ingo#query#fromlist#Query(): BUG: Typing non-accellerator non-number characters are treated as literal "0"
 - Add ingo/lists.vim module.
 - Add ingo/regexp/capture.vim module.
@@ -280,7 +283,7 @@ HISTORY
 - ingo#event#Trigger(): Temporarily disable modeline processing in
   compatibility implementation.
 - Add ingo#event#TriggerEverywhere() and ingo#event#TriggerEverywhereCustom()
-  compatibility wrappers for :doautoall <nomodeline>.
+  compatibility wrappers for :doautoall &lt;nomodeline&gt;.
 
 ##### 1.032   20-Sep-2017
 - ingo#query#get#{Register,Mark}(): Avoid throwing E523 on invalid user input
@@ -563,7 +566,7 @@ HISTORY
 - ingo#text#frompattern#GetHere(): Do not move the cursor (to the end of the
   matched pattern); this is unexpected and can be easily avoided.
 - FIX: ingo#cmdargs#GetStringExpr(): Escape (unescaped) double quotes when the
-  argument contains backslashes; else, the expansion of \x will silently fail.
+  argument contains backslashes; else, the expansion of \\x will silently fail.
 - Add ingo#cmdargs#GetUnescapedExpr(); when there's no need for empty
   expressions, the removal of the (single / double) quotes may be unexpected.
 - ingo#text#Insert(): Also allow insertion one beyond the last line (in column
@@ -579,7 +582,7 @@ HISTORY
 
 ##### 1.023   09-Feb-2015
 - ENH: Make ingo#selection#frompattern#GetPositions() automatically convert
-  \%# in the passed a:pattern to the hard-coded cursor column.
+  \\%# in the passed a:pattern to the hard-coded cursor column.
 - Add ingo#collections#mapsort().
 - Add ingo/collections/memoized.vim module.
 - ENH: Add optional a:isReturnAsList flag to ingo#buffer#temp#Execute() and
@@ -688,7 +691,7 @@ HISTORY
 - Add ingo/pos.vim module.
 - Add optional a:isBeep argument to ingo#msg#ErrorMsg().
 - ingo#fs#path#Normalize(): Don't normalize to Cygwin /cygdrive/x/... when the
-  chosen path separator is "\". This would result in a mixed separator style
+  chosen path separator is "\\". This would result in a mixed separator style
   that is not actually handled.
 - ingo#fs#path#Normalize(): Add special normalization to "C:/" on Cygwin via
   ":/" path separator argument.
@@ -729,11 +732,11 @@ HISTORY
 ##### 1.017   13-Mar-2014
 - CHG: Make ingo#cmdargs#file#FilterFileOptionsAndCommands() return the
   options and commands in a List, not as a joined String. This allows clients
-  to easily re-escape them and handle multiple ones, e.g. ++ff=dos +setf\ foo.
+  to easily re-escape them and handle multiple ones, e.g. ++ff=dos +setf\\ foo.
 - Add workarounds for fnameescape() bugs on Windows for ! and [] characters.
 - Add ingo#escape#UnescapeExpr().
 - Add ingo/str/restricted.vim module.
-- Make ingo#query#get#Char() only abort on <Esc> when that character is not in
+- Make ingo#query#get#Char() only abort on &lt;Esc&gt; when that character is not in
   the validExpr (to allow to explicitly query it).
 - Add ingo/query/substitute.vim module.
 - Add ingo/subst/expr/emulation.vim module.
@@ -775,7 +778,7 @@ HISTORY
 - Add ingo#os#PathSeparator().
 - Add ingo/foldtext.vim module.
 - Add ingo#os#IsCygwin().
-- ingo#fs#path#Normalize(): Also convert between the different D:\ and
+- ingo#fs#path#Normalize(): Also convert between the different D:\\ and
   /cygdrive/d/ notations on Windows and Cygwin.
 - Add ingo#text#frompattern#GetHere().
 - Add ingo/date/epoch.vim module.
@@ -808,7 +811,7 @@ HISTORY
   what 'commentstring' would render, avoid having duplicate indent.
 - Minor: Return last search pattern instead of empty string on
   ingo#search#pattern#GetLastForwardSearch(0).
-- Avoid using \ze in ingo#regexp#comments#CommentToExpression(). It may be
+- Avoid using \\ze in ingo#regexp#comments#CommentToExpression(). It may be
   used in a larger expression that still wants to match after the prefix.
 - FIX: Correct case of ingo#os#IsWin\*() function names.
 - ingo#regexp#FromWildcard(): Limit \* glob matching to individual path
@@ -969,4 +972,4 @@ Copyright: (C) 2009-2019 Ingo Karkat -
 Contains URL encoding / decoding algorithms written by Tim Pope. -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
-Maintainer:     Ingo Karkat <ingo@karkat.de>
+Maintainer:     Ingo Karkat &lt;ingo@karkat.de&gt;
