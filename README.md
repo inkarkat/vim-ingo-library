@@ -128,6 +128,7 @@ HISTORY
 
 ##### 1.037   28-Mar-2019
 - Add ingo#dict#Make() (analog to ingo#list#Make()).
+- Add ingo#selection#Set() and ingo#selection#Make().
 
 ##### 1.036   17-Mar-2019
 - FIX: ingo#strdisplaywidth#strleft includes multi-width character that
