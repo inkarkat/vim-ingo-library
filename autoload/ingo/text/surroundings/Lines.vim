@@ -11,6 +11,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	008	02-Oct-2018	ENH: Allow passing of additional OPTIONs to
+"                               :Command {cmd} by configuring an
+"                               a:options.CommandParser hook that extracts
+"                               a:Command and puts additional stuff into
+"                               g:surroundingsContext.
 "	007	10-Mar-2015	Handle custom exceptions / user aborts thrown by
 "				a:Command.
 "	006	12-May-2014	Enable aborting on error by returning the status
@@ -90,6 +95,13 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, options, 
 "		    transform the range.
 "   a:options.TransformerAfter
 "		    Hook to transform the surrounded range of lines.
+"   a:options.CommandParser
+"		    Hook to extract the actual command from a:Command (which is
+"		    passed to the Funcref, and additionally an empty
+"		    surroundingsContext Dict, into which parsed OPTIONs can be
+"		    put, and then retrieved by transformers via
+"		    g:surroundingsContext). Useful to support
+"		    :Command {OPTION} ... {cmd}.
 "   a:count         Range as <count> to check for default. When no range is
 "		    passed in a command defined with -range=-1, the last
 "		    modified range '[,'] is used instead of the following two
@@ -106,6 +118,12 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, options, 
 "******************************************************************************
     let l:TransformerBefore = get(a:options, 'TransformerBefore', '')
     let l:TransformerAfter = get(a:options, 'TransformerAfter', '')
+    let l:Command = a:Command
+    let l:CommandParser = get(a:options, 'CommandParser', '')
+    if ! empty(l:CommandParser)
+	let g:surroundingsContext = {}
+	let l:Command = call(l:CommandParser, [l:Command, g:surroundingsContext])
+    endif
 
     if a:count == -1
 	" When no [range] is passed, -range=-1 defaults to <count> == -1.
@@ -113,12 +131,12 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, options, 
     else
 	let [l:startLnum, l:endLnum] = [a:startLnum, a:endLnum]
     endif
-    if ! empty(a:Command)
+    if ! empty(l:Command)
 	try
-	    if type(a:Command) == type(function('tr'))
-		let [l:startLnum, l:endLnum] = call(a:Command, [l:startLnum, l:endLnum])
+	    if type(l:Command) == type(function('tr'))
+		let [l:startLnum, l:endLnum] = call(l:Command, [l:startLnum, l:endLnum])
 	    else
-		execute a:Command
+		execute l:Command
 		let [l:startLnum, l:endLnum] = [line("'["), line("']")]
 	    endif
 	catch /^Vim\%((\a\+)\)\=:/
@@ -164,6 +182,8 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, options, 
     " was added last.
     call setpos("'[", [0, l:startLnum, 1, 0])
     call setpos("']", [0, l:endLnum, 1, 0])
+
+    unlet! g:surroundingsContext    " Sloppily clean this up only on the happy path, but it's really not that important.
 
     return 1
 endfunction
