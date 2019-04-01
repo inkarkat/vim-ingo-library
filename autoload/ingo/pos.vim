@@ -6,13 +6,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.029.004	16-Dec-2016	Add ingo#pos#SameLineIs[OnOr]After/Before()
-"				variants.
-"   1.025.003	29-Apr-2016	Add ingo#pos#IsInsideVisualSelection().
-"   1.022.002	21-Jul-2014	Add ingo#pos#Before() and ingo#pos#After().
-"   1.019.001	30-Apr-2014	file creation
 
 function! ingo#pos#Make4( pos ) abort
     return (len(a:pos) >= 4 ? a:pos : [0, get(a:pos, 0, 0), get(a:pos, 1, 0), 0])
