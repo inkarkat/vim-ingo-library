@@ -14,6 +14,14 @@
 "   1.022.002	21-Jul-2014	Add ingo#pos#Before() and ingo#pos#After().
 "   1.019.001	30-Apr-2014	file creation
 
+function! ingo#pos#Make4( pos ) abort
+    return (len(a:pos) >= 4 ? a:pos : [0, get(a:pos, 0, 0), get(a:pos, 1, 0), 0])
+endfunction
+function! ingo#pos#Make2( pos ) abort
+    return (len(a:pos) >= 3 ? a:pos[1:2] : a:pos)
+endfunction
+
+
 function! ingo#pos#IsOnOrAfter( posA, posB )
     return (a:posA[0] > a:posB[0] || a:posA[0] == a:posB[0] && a:posA[1] >= a:posB[1])
 endfunction
