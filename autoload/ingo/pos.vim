@@ -7,7 +7,14 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
-function! ingo#pos#Make4( pos ) abort
+function! ingo#pos#Make4( pos, ... ) abort
+    if a:0 > 0
+	if a:0 != 1
+	    throw 'Make4: Must pass exactly two line, column arguments or a List'
+	endif
+	return [0, a:pos, a:1, 0]
+    endif
+
     return (len(a:pos) >= 4 ? a:pos : [0, get(a:pos, 0, 0), get(a:pos, 1, 0), 0])
 endfunction
 function! ingo#pos#Make2( pos ) abort
