@@ -59,8 +59,10 @@ function! ingo#selection#Set( startPos, endPos, ... ) abort
 "* EFFECTS / POSTCONDITIONS:
 "   Affects what the next gv command will select.
 "* INPUTS:
-"   a:startPos  [lnum, col] of the start ('<) of the new selection.
-"   a:endPos    [lnum, col] of the end ('>) of the new selection.
+"   a:startPos  [lnum, col] or [0, lnum, col, 0] of the start ('<) of the new
+"               selection.
+"   a:endPos    [lnum, col] or [0, lnum, col, 0] of the end ('>) of the new
+"               selection.
 "   a:mode      One of v, V, or CTRL-V. Defaults to characterwise.
 "* RETURN VALUES:
 "   1 if successful, 0 if one position could not be set.
@@ -70,8 +72,8 @@ function! ingo#selection#Set( startPos, endPos, ... ) abort
 	execute 'normal!' l:mode . "\<Esc>"
     endif
     let l:result = 0
-    let l:result += ingo#compat#setpos("'<", [0, a:startPos[0], a:startPos[1], 0])
-    let l:result += ingo#compat#setpos("'>", [0, a:endPos[0], a:endPos[1], 0])
+    let l:result += ingo#compat#setpos("'<", ingo#pos#Make4(a:startPos))
+    let l:result += ingo#compat#setpos("'>", ingo#pos#Make4(a:endPos))
 
     return (l:result == 0)
 endfunction
