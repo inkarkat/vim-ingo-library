@@ -4,7 +4,7 @@
 "   - ingo/lines.vim autoload script
 "   - ingo/undo.vim autoload script
 "
-" Copyright: (C) 2018 Ingo Karkat
+" Copyright: (C) 2018-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -73,8 +73,7 @@ function! ingo#buffer#ephemeral#Call( Funcref, arguments, ... )
 	    let &l:modified = l:save_modified
 	endtry
 
-	call setpos("'[", l:save_change_begin)
-	call setpos("']", l:save_change_end)
+	call ingo#change#Set(l:save_change_begin, l:save_change_end)
 	call winrestview(l:save_view)
     endtry
 endfunction

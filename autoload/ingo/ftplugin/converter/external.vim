@@ -7,7 +7,7 @@
 "   - ingo/format.vim autoload script
 "   - ingo/ftplugin/converter/external.vim autoload script
 "
-" Copyright: (C) 2017 Ingo Karkat
+" Copyright: (C) 2017-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -82,8 +82,7 @@ function! ingo#ftplugin#converter#external#ToText( externalCommandDefinitionsVar
 	silent %delete _
 	setlocal endofline nobinary fileencoding<
 	call setline(1, l:text)
-	call setpos("'[", [0, 1, 1, 0])
-	call setpos("']", [0, line('$'), 1, 0])
+	call ingo#change#Set([1, 1], [line('$'), 1])
 
 	let &l:filetype = get(l:commandDefinition, 'filetype', 'text')
 

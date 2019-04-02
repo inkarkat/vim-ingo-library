@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/range.vim autoload script
 "
-" Copyright: (C) 2012-2017 Ingo Karkat
+" Copyright: (C) 2012-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -81,8 +81,7 @@ function! ingo#lines#Replace( startLnum, endLnum, lines, ... )
 	if l:isEntireBuffer
 	    silent $delete _
 
-	    call setpos("'[", [0, 1, 1, 0])
-	    call setpos("']", [0, line('$'), 1, 0])
+	    call ingo#change#Set([1, 1], [line('$'), 1])
 	endif
     endif
 endfunction
