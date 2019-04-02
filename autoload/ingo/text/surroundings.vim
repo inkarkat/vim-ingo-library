@@ -11,8 +11,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"	016	26-May-2014	XXX: Work around repositioning bug by using
-"				cursor() instead of setpos('.').
+"	016	26-May-2014	Use cursor() instead of setpos('.') to set the
+"				curswant column for subsequent vertical movement.
 "	015	18-Nov-2013	Use ingo#register#KeepRegisterExecuteOrFunc().
 "	014	03-Jul-2013	Move ingocursormove.vim into ingo-library.
 "	013	08-May-2013	Use ingo-library for warning messages.
@@ -307,7 +307,7 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 
 	" Adapt saved cursor position to consider inserted text.
 	let l:save_cursor[2] += strlen(a:textBefore)
-	call cursor(l:save_cursor[1:2]) " Use cursor() instead of setpos('.') due to repositioning bug when followed by j or k; cp. https://groups.google.com/d/msg/vim_dev/kydw6-vTuvM/NSnKkPVVnuwJ
+	call cursor(l:save_cursor[1:2]) " Use cursor() instead of setpos('.') to set the curswant column for subsequent vertical movement.
 
 	" Mark the changed area.
 	call setpos("'[", l:begin_pos)
