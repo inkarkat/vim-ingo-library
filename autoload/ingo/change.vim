@@ -120,8 +120,7 @@ function! ingo#change#GetOverwrittenText()
 	silent execute 'undo' l:undoChangeNumber
 
 	" The :undo clobbered the change marks; restore them.
-	call setpos("'[", l:startPos)
-	call setpos("']", l:endPos)
+	call ingo#change#Set(l:startPos, l:endPos)
 
 	" The :undo also affected the cursor position.
 	call winrestview(l:save_view)
