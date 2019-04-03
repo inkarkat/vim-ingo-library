@@ -145,8 +145,8 @@ function! ingo#change#Set( startPos, endPos ) abort
 "   1 if successful, 0 if one position could not be set.
 "******************************************************************************
     let l:result = 0
-    let l:result += ingo#compat#setpos("'[", ingo#pos#Make4(a:startPos))
-    let l:result += ingo#compat#setpos("']", ingo#pos#Make4(a:endPos))
+    let l:result += setpos("'[", ingo#pos#Make4(a:startPos))
+    let l:result += setpos("']", ingo#pos#Make4(a:endPos))
     return (l:result == 0)
 endfunction
 
