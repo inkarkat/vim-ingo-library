@@ -52,8 +52,7 @@ endfunction
 function! ingo#ftplugin#converter#external#ToText( externalCommandDefinitionsVariable, arguments, filespec )
 "******************************************************************************
 "* PURPOSE:
-"   Build a command that converts the current buffer via an external command to
-"   just text.
+"   Build a command that converts a file via an external command to just text.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -68,6 +67,12 @@ function! ingo#ftplugin#converter#external#ToText( externalCommandDefinitionsVar
 "	filetype:   Optional value to :setlocal filetype to (default: "text")
 "	extension:  Optional file extension (for
 "		    ingo#ftplugin#converter#external#ExtractText())
+"   a:arguments     Converter argument (optional if there's just one configured
+"                   converter) passed to the built command.
+"   a:filespec      Filespec of the source file, usually representing the
+"                   current buffer. It's read from the file system instead of
+"                   being piped from Vim's buffer because it may be in binary
+"                   format.
 "* USAGE:
 "   command! -bar -nargs=? FooToText call setline(1, getline(1)) |
 "   \   if ! ingo#ftplugin#converter#external#ToText('g:foo_converters',
@@ -96,8 +101,8 @@ endfunction
 function! ingo#ftplugin#converter#external#ExtractText( externalCommandDefinitionsVariable, mods, arguments, filespec )
 "******************************************************************************
 "* PURPOSE:
-"   Build a command that converts the current buffer via an external command to
-"   another scratch buffer that contains just text.
+"   Build a command that converts a file via an external command to another
+"   scratch buffer that contains just text.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -106,6 +111,14 @@ function! ingo#ftplugin#converter#external#ExtractText( externalCommandDefinitio
 "   a:externalCommandDefinitionsVariable    Name of a List of Definitions
 "					    objects (cp.
 "					    ingo#ftplugin#converter#external#ToText())
+"   a:mods          Any command modifiers supplied to the built command (to open
+"                   the scratch buffer in a split and control its location).
+"   a:arguments     Converter argument (optional if there's just one configured
+"                   converter) passed to the built command.
+"   a:filespec      Filespec of the source file, usually representing the
+"                   current buffer. It's read from the file system instead of
+"                   being piped from Vim's buffer because it may be in binary
+"                   format.
 "* USAGE:
 "   command! -bar -nargs=? FooExtractText
 "   \   if ! ingo#ftplugin#converter#external#ExtractText('g:foo_converters',
