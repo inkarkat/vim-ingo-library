@@ -33,18 +33,29 @@ function! s:GetExternalCommandDefinition( externalCommandDefinitionsVariable, ar
 	endif
 
 	let l:command = l:externalCommandDefinitions[0]
+	let l:commandArguments = ''
     else
-	let l:command = get(filter(copy(l:externalCommandDefinitions), 'a:arguments == s:GetName(v:val)'), 0, '')
+	let l:parse = matchlist(a:arguments, '^\(\S\+\)\s\+\(.*\)$')
+	let [l:selectedName, l:commandArguments] = (empty(l:parse) ? [a:arguments, ''] : l:parse[1:2])
+
+	let l:command = get(filter(copy(l:externalCommandDefinitions), 'l:selectedName == s:GetName(v:val)'), 0, '')
 	if empty(l:command)
-	    throw printf('external: No such converter: %s', a:arguments)
+	    if len(l:externalCommandDefinitions) > 1
+		throw printf('external: No such converter: %s', l:selectedName)
+	    else
+		" With a single default command, these are just custom command
+		" arguments passed through.
+		let l:command = l:externalCommandDefinitions[0]
+		let l:commandArguments = a:arguments
+	    endif
 	endif
     endif
 
-    return l:command
+    return [l:command, l:commandArguments]
 endfunction
 
-function! s:ObtainText( commandDefinition, filespec )
-    let l:command = call('ingo#format#Format', [a:commandDefinition.commandline] + map([a:commandDefinition.command, expand(a:filespec)], 'ingo#compat#shellescape(v:val)'))
+function! s:ObtainText( commandDefinition, commandArguments, filespec )
+    let l:command = call('ingo#format#Format', [a:commandDefinition.commandline] + map([a:commandDefinition.command, a:commandArguments, expand(a:filespec)], 'ingo#compat#shellescape(v:val)'))
     let l:result = ingo#compat#systemlist(l:command)
     if v:shell_error != 0
 	throw 'external: Conversion failed: shell returned ' . v:shell_error . (empty(l:result) ? '' : ': ' . join(l:result))
@@ -52,8 +63,8 @@ function! s:ObtainText( commandDefinition, filespec )
 
     return l:result
 endfunction
-function! s:FilterBuffer( commandDefinition, range )
-    let l:command = ingo#format#Format(a:commandDefinition.commandline, ingo#compat#shellescape(a:commandDefinition.command))
+function! s:FilterBuffer( commandDefinition, commandArguments, range )
+    let l:command = ingo#format#Format(a:commandDefinition.commandline, ingo#compat#shellescape(a:commandDefinition.command), a:commandArguments)
     silent! execute a:range . '!' . l:command
     if v:shell_error != 0
 	throw 'external: Conversion failed: shell returned ' . v:shell_error
@@ -93,8 +104,8 @@ function! ingo#ftplugin#converter#external#ToText( externalCommandDefinitionsVar
 "   1 if successful, 0 if ingo#err#Set().
 "******************************************************************************
     try
-	let l:commandDefinition = s:GetExternalCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
-	let l:text = s:ObtainText(l:commandDefinition, a:filespec)
+	let [l:commandDefinition, l:commandArguments] = s:GetExternalCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
+	let l:text = s:ObtainText(l:commandDefinition, l:commandArguments, a:filespec)
 
 	silent %delete _
 	setlocal endofline nobinary fileencoding<
@@ -140,8 +151,8 @@ function! ingo#ftplugin#converter#external#ExtractText( externalCommandDefinitio
 "   1 if successful, 0 if ingo#err#Set().
 "******************************************************************************
     try
-	let l:commandDefinition = s:GetExternalCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
-	let l:text = s:ObtainText(l:commandDefinition, a:filespec)
+	let [l:commandDefinition, l:commandArguments] = s:GetExternalCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
+	let l:text = s:ObtainText(l:commandDefinition, l:commandArguments, a:filespec)
 
 	let l:status = ingo#buffer#scratch#Create('', expand('%:r') . '.' . get(l:commandDefinition, 'extension', 'txt'), 1, l:text, (empty(a:mods) ? 'enew' : a:mods . ' new'))
 	if l:status == 0
@@ -157,13 +168,13 @@ endfunction
 
 function! ingo#ftplugin#converter#external#DifferentFiletype( targetFiletype, externalCommandDefinitionsVariable, range, arguments, ... ) abort
     try
-	let l:commandDefinition = s:GetExternalCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
+	let [l:commandDefinition, l:commandArguments] = s:GetExternalCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
 
 	if a:0
 	    execute a:1
 	endif
 
-	call s:FilterBuffer(l:commandDefinition, a:range)
+	call s:FilterBuffer(l:commandDefinition, l:commandArguments, a:range)
 	let &l:filetype = a:targetFiletype
 
 	return 1
