@@ -18,9 +18,13 @@ endfunction
 function! ingo#ftplugin#converter#external#GetNames( externalCommandDefinitions )
     return map(copy(a:externalCommandDefinitions), "s:GetName(v:val)")
 endfunction
+function! ingo#ftplugin#converter#external#GetArgumentMaps( externalCommandDefinitions )
+    return ingo#dict#FromItems(map(copy(a:externalCommandDefinitions), "[v:val.name, get(v:val, 'arguments', [])]"))
+endfunction
 
 function! s:GetExternalCommandDefinition( externalCommandDefinitionsVariable, arguments )
     execute 'let l:externalCommandDefinitions =' a:externalCommandDefinitionsVariable
+
     if empty(l:externalCommandDefinitions)
 	throw printf('external: No converters are configured in %s.', a:externalCommandDefinitionsVariable)
     elseif empty(a:arguments)
