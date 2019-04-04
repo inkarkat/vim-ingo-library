@@ -48,6 +48,14 @@ function! s:ObtainText( commandDefinition, filespec )
 
     return l:result
 endfunction
+function! s:FilterBuffer( commandDefinition, range )
+    let l:command = ingo#format#Format(a:commandDefinition.commandline, ingo#compat#shellescape(a:commandDefinition.command))
+    silent! execute a:range . '!' . l:command
+    if v:shell_error != 0
+	throw 'external: Conversion failed: shell returned ' . v:shell_error
+    endif
+endfunction
+
 
 function! ingo#ftplugin#converter#external#ToText( externalCommandDefinitionsVariable, arguments, filespec )
 "******************************************************************************
@@ -139,6 +147,27 @@ function! ingo#ftplugin#converter#external#ExtractText( externalCommandDefinitio
 	return 1
     catch /^external:/
 	call ingo#err#SetCustomException('external')
+	return 0
+    endtry
+endfunction
+
+function! ingo#ftplugin#converter#external#DifferentFiletype( targetFiletype, externalCommandDefinitionsVariable, range, arguments, ... ) abort
+    try
+	let l:commandDefinition = s:GetExternalCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
+
+	if a:0
+	    execute a:1
+	endif
+
+	call s:FilterBuffer(l:commandDefinition, a:range)
+	let &l:filetype = a:targetFiletype
+
+	return 1
+    catch /^external:/
+	call ingo#err#SetCustomException('external')
+	return 0
+    catch /^Vim\%((\a\+)\)\=:/
+	call ingo#err#SetVimException()
 	return 0
     endtry
 endfunction
