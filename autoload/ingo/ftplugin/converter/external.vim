@@ -25,7 +25,7 @@ function! s:GetExternalCommandDefinition( externalCommandDefinitionsVariable, ar
 	throw printf('external: No converters are configured in %s.', a:externalCommandDefinitionsVariable)
     elseif empty(a:arguments)
 	if len(l:externalCommandDefinitions) > 1
-	    throw printf('external: Multiple converters are available; choose one: ', join(ingo#ftplugin#converter#external#GetNames(l:externalCommandDefinitions), ', '))
+	    throw 'external: Multiple converters are available; choose one: ' . join(ingo#ftplugin#converter#external#GetNames(l:externalCommandDefinitions), ', ')
 	endif
 
 	let l:command = l:externalCommandDefinitions[0]
