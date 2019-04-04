@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/cmdargs/range.vim autoload script
 "
-" Copyright: (C) 2012-2017 Ingo Karkat
+" Copyright: (C) 2012-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -68,10 +68,12 @@ function! ingo#cmdargs#command#Parse( commandLine, ... )
 "   None.
 "* INPUTS:
 "   a:commandLine   Ex command line containing a command.
-"   a:argumentExpr  Regular expression for matching arguments. When not given,
-"		    no whitespace-separated arguments must follow the command
-"		    for the parsing to succeed. You probably want to exclude the
-"		    command separator "|" via something like /\%([^|]\|\\|\)*$/.
+"   a:argumentExpr  Regular expression for matching arguments; probably should
+"                   be anchored to the end via /$/. When not given, no
+"                   whitespace-separated arguments must follow the command for
+"                   the parsing to succeed; it will only parse no-argument
+"                   commands then! You probably want to exclude the command
+"                   separator "|" via something like /\%([^|]\|\\|\)*$/.
 "   a:directArgumentExpr    Regular expression for matching direct arguments.
 "			    Defaults to parsing of arbitrary direct arguments.
 "* RETURN VALUES:
