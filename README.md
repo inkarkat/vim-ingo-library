@@ -134,6 +134,8 @@ HISTORY
 - Add ingo#ftplugin#converter#external#DifferentFiletype().
 - Add ingo#plugin#cmdcomplete#MakeTwoStageFixedListAndMapCompleteFunc(), a
   more complex variant of ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc().
+- Add ingo#ftplugin#converter#external#Filter() variant of
+  ingo#ftplugin#converter#external#DifferentFiletype().
 
 ##### 1.036   17-Mar-2019
 - FIX: ingo#strdisplaywidth#strleft includes multi-width character that

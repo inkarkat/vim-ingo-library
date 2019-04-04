@@ -166,7 +166,7 @@ function! ingo#ftplugin#converter#external#ExtractText( externalCommandDefinitio
     endtry
 endfunction
 
-function! ingo#ftplugin#converter#external#DifferentFiletype( targetFiletype, externalCommandDefinitionsVariable, range, arguments, ... ) abort
+function! ingo#ftplugin#converter#external#Filter( externalCommandDefinitionsVariable, range, arguments, ... ) abort
     try
 	let [l:commandDefinition, l:commandArguments] = s:GetExternalCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
 
@@ -175,7 +175,6 @@ function! ingo#ftplugin#converter#external#DifferentFiletype( targetFiletype, ex
 	endif
 
 	call s:FilterBuffer(l:commandDefinition, l:commandArguments, a:range)
-	let &l:filetype = a:targetFiletype
 
 	return 1
     catch /^external:/
@@ -185,6 +184,13 @@ function! ingo#ftplugin#converter#external#DifferentFiletype( targetFiletype, ex
 	call ingo#err#SetVimException()
 	return 0
     endtry
+endfunction
+function! ingo#ftplugin#converter#external#DifferentFiletype( targetFiletype, externalCommandDefinitionsVariable, range, arguments, ... ) abort
+    let l:success = call('ingo#ftplugin#converter#external#Filter', [a:externalCommandDefinitionsVariable, a:range, a:arguments] + a:000)
+    if l:success
+	let &l:filetype = a:targetFiletype
+    endif
+    return l:success
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
