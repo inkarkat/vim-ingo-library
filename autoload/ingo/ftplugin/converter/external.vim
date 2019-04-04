@@ -54,21 +54,33 @@ function! s:GetExternalCommandDefinition( externalCommandDefinitionsVariable, ar
     return [l:command, l:commandArguments]
 endfunction
 
+function! s:Action( actionName, commandDefinition ) abort
+    let l:Action = get(a:commandDefinition, a:actionName, '')
+    if ! empty(l:Action)
+	call ingo#actions#ExecuteOrFunc(l:Action)
+    endif
+endfunction
 function! s:ObtainText( commandDefinition, commandArguments, filespec )
     let l:command = call('ingo#format#Format', [a:commandDefinition.commandline] + map([a:commandDefinition.command, a:commandArguments, expand(a:filespec)], 'ingo#compat#shellescape(v:val)'))
-    let l:result = ingo#compat#systemlist(l:command)
-    if v:shell_error != 0
-	throw 'external: Conversion failed: shell returned ' . v:shell_error . (empty(l:result) ? '' : ': ' . join(l:result))
-    endif
+
+    call s:Action('preAction', a:commandDefinition)
+	let l:result = ingo#compat#systemlist(l:command)
+	if v:shell_error != 0
+	    throw 'external: Conversion failed: shell returned ' . v:shell_error . (empty(l:result) ? '' : ': ' . join(l:result))
+	endif
+    call s:Action('postAction', a:commandDefinition)
 
     return l:result
 endfunction
 function! s:FilterBuffer( commandDefinition, commandArguments, range )
     let l:command = ingo#format#Format(a:commandDefinition.commandline, ingo#compat#shellescape(a:commandDefinition.command), a:commandArguments)
-    silent! execute a:range . '!' . l:command
-    if v:shell_error != 0
-	throw 'external: Conversion failed: shell returned ' . v:shell_error
-    endif
+
+    call s:Action('preAction', a:commandDefinition)
+	silent! execute a:range . '!' . l:command
+	if v:shell_error != 0
+	    throw 'external: Conversion failed: shell returned ' . v:shell_error
+	endif
+    call s:Action('postAction', a:commandDefinition)
 endfunction
 
 
