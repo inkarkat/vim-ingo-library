@@ -7,12 +7,13 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
-function! s:FilterBuffer( commandDefinition, commandArguments, range )
+function! s:FilterBuffer( commandDefinition, commandArguments, range, isBang )
     if has_key(a:commandDefinition, 'commandline')
+	let l:commandLine = ingo#actions#ValueOrFunc(a:commandDefinition.commandline, a:isBang)
 	if has_key(a:commandDefinition, 'command')
-	    let l:command = ingo#format#Format(a:commandDefinition.commandline, ingo#compat#shellescape(a:commandDefinition.command), a:commandArguments)
+	    let l:command = ingo#format#Format(l:commandLine, ingo#compat#shellescape(a:commandDefinition.command), a:commandArguments)
 	else
-	    let l:command = ingo#format#Format(a:commandDefinition.commandline, a:commandArguments)
+	    let l:command = ingo#format#Format(l:commandLine, a:commandArguments)
 	endif
     elseif has_key(a:commandDefinition, 'command')
 	let l:command = a:commandDefinition.command
@@ -28,7 +29,7 @@ function! s:FilterBuffer( commandDefinition, commandArguments, range )
     call ingo#ftplugin#converter#PostAction(a:commandDefinition)
 endfunction
 
-function! ingo#ftplugin#converter#builder#Filter( commandDefinitionsVariable, range, arguments, ... ) abort
+function! ingo#ftplugin#converter#builder#Filter( commandDefinitionsVariable, range, isBang, arguments, ... ) abort
 "******************************************************************************
 "* PURPOSE:
 "   Build a command that filters the current buffer by filtering its contents
@@ -44,6 +45,8 @@ function! ingo#ftplugin#converter#builder#Filter( commandDefinitionsVariable, ra
 "		    command and command arguments to build the Ex command-line
 "		    to execute. a:range is prepended to this. To filter through
 "		    an external command, start the commandline with "!".
+"		    Or a Funcref that gets passed the a:isBang flag and should
+"		    return the (dynamically generated) commandline.
 "	arguments:  List of possible command-line arguments supported by
 "                   command, used as completion candidates.
 "	filetype:   Optional value to :setlocal filetype to.
@@ -63,9 +66,9 @@ function! ingo#ftplugin#converter#builder#Filter( commandDefinitionsVariable, ra
 "                   different pre commands for each definition, whereas this one
 "                   applies to all definitions.
 "* USAGE:
-"   command! -bar -range=% -nargs=? FooPrettyPrint call setline(1, getline(1)) |
+"   command! -bang -bar -range=% -nargs=? FooPrettyPrint call setline(1, getline(1)) |
 "   \   if ! ingo#ftplugin#converter#builder#Filter('g:Foo_PrettyPrinters',
-"   \       '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+"   \       '<line1>,<line2>', <bang>0, <q-args>) | echoerr ingo#err#Get() | endif
 "* RETURN VALUES:
 "   1 if successful, 0 if ingo#err#Set().
 "******************************************************************************
@@ -76,7 +79,7 @@ function! ingo#ftplugin#converter#builder#Filter( commandDefinitionsVariable, ra
 	    execute a:1
 	endif
 
-	call s:FilterBuffer(l:commandDefinition, l:commandArguments, a:range)
+	call s:FilterBuffer(l:commandDefinition, l:commandArguments, a:range, a:isBang)
 
 	let l:targetFiletype = get(l:commandDefinition, 'filetype', '')
 	if ! empty(l:targetFiletype)
@@ -92,7 +95,7 @@ function! ingo#ftplugin#converter#builder#Filter( commandDefinitionsVariable, ra
 	return 0
     endtry
 endfunction
-function! ingo#ftplugin#converter#builder#DifferentFiletype( targetFiletype, commandDefinitionsVariable, range, arguments, ... ) abort
+function! ingo#ftplugin#converter#builder#DifferentFiletype( targetFiletype, commandDefinitionsVariable, range, isBang, arguments, ... ) abort
 "******************************************************************************
 "* PURPOSE:
 "   Build a command that converts the current buffer's contents to a different
@@ -107,7 +110,7 @@ function! ingo#ftplugin#converter#builder#DifferentFiletype( targetFiletype, com
 "* RETURN VALUES:
 "   1 if successful, 0 if ingo#err#Set().
 "******************************************************************************
-    let l:success = call('ingo#ftplugin#converter#builder#Filter', [a:commandDefinitionsVariable, a:range, a:arguments] + a:000)
+    let l:success = call('ingo#ftplugin#converter#builder#Filter', [a:commandDefinitionsVariable, a:range, a:isBang, a:arguments] + a:000)
     if l:success
 	let &l:filetype = a:targetFiletype
     endif
