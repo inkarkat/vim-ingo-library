@@ -1,93 +1,33 @@
 " ingo/ftplugin/converter/external.vim: Build a file converter via an external command.
 "
 " DEPENDENCIES:
-"   - ingo/buffer/scratch.vim autoload script
-"   - ingo/compat.vim autoload script
-"   - ingo/err.vim autoload script
-"   - ingo/format.vim autoload script
-"   - ingo/ftplugin/converter/external.vim autoload script
 "
 " Copyright: (C) 2017-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
-function! s:GetName( externalCommandDefinition )
-    return (has_key(a:externalCommandDefinition, 'name') ? a:externalCommandDefinition.name : fnamemodify(a:externalCommandDefinition.command, ':t'))
-endfunction
-function! ingo#ftplugin#converter#external#GetNames( externalCommandDefinitions )
-    return map(copy(a:externalCommandDefinitions), "s:GetName(v:val)")
-endfunction
-function! ingo#ftplugin#converter#external#GetArgumentMaps( externalCommandDefinitions )
-    return ingo#dict#FromItems(map(copy(a:externalCommandDefinitions), "[v:val.name, get(v:val, 'arguments', [])]"))
-endfunction
-
-function! s:GetExternalCommandDefinition( externalCommandDefinitionsVariable, arguments )
-    execute 'let l:externalCommandDefinitions =' a:externalCommandDefinitionsVariable
-
-    if empty(l:externalCommandDefinitions)
-	throw printf('external: No converters are configured in %s.', a:externalCommandDefinitionsVariable)
-    elseif empty(a:arguments)
-	if len(l:externalCommandDefinitions) > 1
-	    throw 'external: Multiple converters are available; choose one: ' . join(ingo#ftplugin#converter#external#GetNames(l:externalCommandDefinitions), ', ')
-	endif
-
-	let l:command = l:externalCommandDefinitions[0]
-	let l:commandArguments = ''
-    else
-	let l:parse = matchlist(a:arguments, '^\(\S\+\)\s\+\(.*\)$')
-	let [l:selectedName, l:commandArguments] = (empty(l:parse) ? [a:arguments, ''] : l:parse[1:2])
-
-	let l:command = get(filter(copy(l:externalCommandDefinitions), 'l:selectedName == s:GetName(v:val)'), 0, '')
-	if empty(l:command)
-	    if len(l:externalCommandDefinitions) > 1
-		throw printf('external: No such converter: %s', l:selectedName)
-	    else
-		" With a single default command, these are just custom command
-		" arguments passed through.
-		let l:command = l:externalCommandDefinitions[0]
-		let l:commandArguments = a:arguments
-	    endif
-	endif
-    endif
-
-    return [l:command, l:commandArguments]
-endfunction
-
-function! s:Action( actionName, commandDefinition ) abort
-    let l:Action = get(a:commandDefinition, a:actionName, '')
-    if ! empty(l:Action)
-	call ingo#actions#ExecuteOrFunc(l:Action)
-    endif
-endfunction
-function! s:PreAction( commandDefinition ) abort
-    call s:Action('preAction', a:commandDefinition)
-endfunction
-function! s:PostAction( commandDefinition ) abort
-    call s:Action('postAction', a:commandDefinition)
-endfunction
-
 function! s:ObtainText( commandDefinition, commandArguments, filespec )
     let l:command = call('ingo#format#Format', [a:commandDefinition.commandline] + map([a:commandDefinition.command, a:commandArguments, expand(a:filespec)], 'ingo#compat#shellescape(v:val)'))
 
-    call s:PreAction(a:commandDefinition)
+    call ingo#ftplugin#converter#PreAction(a:commandDefinition)
 	let l:result = ingo#compat#systemlist(l:command)
 	if v:shell_error != 0
 	    throw 'external: Conversion failed: shell returned ' . v:shell_error . (empty(l:result) ? '' : ': ' . join(l:result))
 	endif
-    call s:PostAction(a:commandDefinition)
+    call ingo#ftplugin#converter#PostAction(a:commandDefinition)
 
     return l:result
 endfunction
 function! s:FilterBuffer( commandDefinition, commandArguments, range )
     let l:command = ingo#format#Format(a:commandDefinition.commandline, ingo#compat#shellescape(a:commandDefinition.command), a:commandArguments)
 
-    call s:PreAction(a:commandDefinition)
+    call ingo#ftplugin#converter#PreAction(a:commandDefinition)
 	silent! execute a:range . '!' . l:command
 	if v:shell_error != 0
 	    throw 'external: Conversion failed: shell returned ' . v:shell_error
 	endif
-    call s:PostAction(a:commandDefinition)
+    call ingo#ftplugin#converter#PostAction(a:commandDefinition)
 endfunction
 
 
@@ -132,7 +72,7 @@ function! ingo#ftplugin#converter#external#ToText( externalCommandDefinitionsVar
 "   1 if successful, 0 if ingo#err#Set().
 "******************************************************************************
     try
-	let [l:commandDefinition, l:commandArguments] = s:GetExternalCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
+	let [l:commandDefinition, l:commandArguments] = ingo#ftplugin#converter#GetCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
 	let l:text = s:ObtainText(l:commandDefinition, l:commandArguments, a:filespec)
 
 	silent %delete _
@@ -181,7 +121,7 @@ function! ingo#ftplugin#converter#external#ExtractText( externalCommandDefinitio
 "   1 if successful, 0 if ingo#err#Set().
 "******************************************************************************
     try
-	let [l:commandDefinition, l:commandArguments] = s:GetExternalCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
+	let [l:commandDefinition, l:commandArguments] = ingo#ftplugin#converter#GetCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
 	let l:text = s:ObtainText(l:commandDefinition, l:commandArguments, a:filespec)
 
 	let l:status = ingo#buffer#scratch#Create('', expand('%:r') . '.' . get(l:commandDefinition, 'extension', 'txt'), 1, l:text, (empty(a:mods) ? 'enew' : a:mods . ' new'))
@@ -226,7 +166,7 @@ function! ingo#ftplugin#converter#external#Filter( externalCommandDefinitionsVar
 "   1 if successful, 0 if ingo#err#Set().
 "******************************************************************************
     try
-	let [l:commandDefinition, l:commandArguments] = s:GetExternalCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
+	let [l:commandDefinition, l:commandArguments] = ingo#ftplugin#converter#GetCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
 
 	if a:0
 	    execute a:1

@@ -75,6 +75,7 @@ autoload/ingo/fs/path/asfilename.vim
 autoload/ingo/fs/path/split.vim
 autoload/ingo/fs/tempfile.vim
 autoload/ingo/fs/traversal.vim
+autoload/ingo/ftplugin/converter.vim
 autoload/ingo/ftplugin/converter/external.vim
 autoload/ingo/ftplugin/onbufwinenter.vim
 autoload/ingo/ftplugin/setting.vim
