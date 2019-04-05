@@ -98,12 +98,21 @@ function! ingo#ftplugin#converter#external#ToText( externalCommandDefinitionsVar
 "					    objects:
 "	command:    External command to execute.
 "	commandline:printf() (or ingo#format#Format()) template for inserting
-"		    command and a:filespec to build the command-line to execute.
+"		    command, command arguments, and a:filespec to build the
+"		    command-line to execute.
+"	arguments:  List of possible command-line arguments supported by
+"                   command, used as completion candidates.
 "	filetype:   Optional value to :setlocal filetype to (default: "text")
 "	extension:  Optional file extension (for
 "		    ingo#ftplugin#converter#external#ExtractText())
+"	preAction:  Optional Ex command or Funcref that is invoked before the
+"                   external command.
+"	postAction: Optional Ex command or Funcref that is invoked after
+"                   successful execution of the external command.
 "   a:arguments     Converter argument (optional if there's just one configured
-"                   converter) passed to the built command.
+"                   converter), followed by optional arguments for
+"                   a:externalCommandDefinitionsVariable.command, all passed by
+"                   the user to the built command.
 "   a:filespec      Filespec of the source file, usually representing the
 "                   current buffer. It's read from the file system instead of
 "                   being piped from Vim's buffer because it may be in binary
@@ -149,7 +158,9 @@ function! ingo#ftplugin#converter#external#ExtractText( externalCommandDefinitio
 "   a:mods          Any command modifiers supplied to the built command (to open
 "                   the scratch buffer in a split and control its location).
 "   a:arguments     Converter argument (optional if there's just one configured
-"                   converter) passed to the built command.
+"                   converter), followed by optional arguments for
+"                   a:externalCommandDefinitionsVariable.command, all passed by
+"                   the user to the built command.
 "   a:filespec      Filespec of the source file, usually representing the
 "                   current buffer. It's read from the file system instead of
 "                   being piped from Vim's buffer because it may be in binary
@@ -179,6 +190,34 @@ function! ingo#ftplugin#converter#external#ExtractText( externalCommandDefinitio
 endfunction
 
 function! ingo#ftplugin#converter#external#Filter( externalCommandDefinitionsVariable, range, arguments, ... ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Build a command that filters the current buffer by filtering its contents
+"   through an external command.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Changes the current buffer.
+"* INPUTS:
+"   a:externalCommandDefinitionsVariable    Name of a List of Definitions
+"                                           objects (cp.
+"                                           ingo#ftplugin#converter#external#ToText())
+"   a:range         Range of lines to be filtered.
+"   a:arguments     Converter argument (optional if there's just one configured
+"                   converter), followed by optional arguments for
+"                   a:externalCommandDefinitionsVariable.command, all passed by
+"                   the user to the built command.
+"   a:preCommand    Optional Ex command to be executed before anything else.
+"                   a:externalCommandDefinitionsVariable.preAction can configure
+"                   different pre commands for each definition, whereas this one
+"                   applies to all definitions.
+"* USAGE:
+"   command! -bar -range=% -nargs=? FooPrettyPrint call setline(1, getline(1)) |
+"   \   if ! ingo#ftplugin#converter#external#Filter('g:Foo_PrettyPrinters',
+"   \       '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+"* RETURN VALUES:
+"   1 if successful, 0 if ingo#err#Set().
+"******************************************************************************
     try
 	let [l:commandDefinition, l:commandArguments] = s:GetExternalCommandDefinition(a:externalCommandDefinitionsVariable, a:arguments)
 
@@ -198,6 +237,18 @@ function! ingo#ftplugin#converter#external#Filter( externalCommandDefinitionsVar
     endtry
 endfunction
 function! ingo#ftplugin#converter#external#DifferentFiletype( targetFiletype, externalCommandDefinitionsVariable, range, arguments, ... ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Build a command that converts the current buffer's contents to a different
+"   a:targetFiletype by filtering its contents through an external command.
+"   Like ingo#ftplugin#converter#external#Filter(), but additionally sets
+"   a:targetFiletype on a successful execution.
+"* INPUTS:
+"       a:targetFiletype    Target 'filetype' that the buffer is set to if the
+"                           filtering has been successful.
+"* RETURN VALUES:
+"   1 if successful, 0 if ingo#err#Set().
+"******************************************************************************
     let l:success = call('ingo#ftplugin#converter#external#Filter', [a:externalCommandDefinitionsVariable, a:range, a:arguments] + a:000)
     if l:success
 	let &l:filetype = a:targetFiletype
