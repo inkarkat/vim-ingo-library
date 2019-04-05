@@ -131,11 +131,11 @@ HISTORY
 - Add ingo#selection#Set() and ingo#selection#Make().
 - Add ingo#pos#Make4() and ingo#pos#Make2().
 - Add ingo#change#Set().
-- Add ingo#ftplugin#converter#external#DifferentFiletype().
+- Add ingo#ftplugin#converter#builder#DifferentFiletype().
 - Add ingo#plugin#cmdcomplete#MakeTwoStageFixedListAndMapCompleteFunc(), a
   more complex variant of ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc().
-- Add ingo#ftplugin#converter#external#Filter() variant of
-  ingo#ftplugin#converter#external#DifferentFiletype().
+- Add ingo#ftplugin#converter#builder#Filter() variant of
+  ingo#ftplugin#converter#builder#DifferentFiletype().
 
 ##### 1.036   17-Mar-2019
 - FIX: ingo#strdisplaywidth#strleft includes multi-width character that
