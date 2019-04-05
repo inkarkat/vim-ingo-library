@@ -8,7 +8,17 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
 function! s:FilterBuffer( commandDefinition, commandArguments, range )
-    let l:command = ingo#format#Format(a:commandDefinition.commandline, ingo#compat#shellescape(a:commandDefinition.command), a:commandArguments)
+    if has_key(a:commandDefinition, 'commandline')
+	if has_key(a:commandDefinition, 'command')
+	    let l:command = ingo#format#Format(a:commandDefinition.commandline, ingo#compat#shellescape(a:commandDefinition.command), a:commandArguments)
+	else
+	    let l:command = ingo#format#Format(a:commandDefinition.commandline, a:commandArguments)
+	endif
+    elseif has_key(a:commandDefinition, 'command')
+	let l:command = a:commandDefinition.command
+    else
+	throw 'converter: Neither command nor commandline defined for ' . get(a:commandDefinition, 'name', string(a:commandDefinition))
+    endif
 
     call ingo#ftplugin#converter#PreAction(a:commandDefinition)
 	silent! execute a:range . l:command
@@ -28,8 +38,21 @@ function! ingo#ftplugin#converter#builder#Filter( commandDefinitionsVariable, ra
 "* EFFECTS / POSTCONDITIONS:
 "   Changes the current buffer.
 "* INPUTS:
-"   a:commandDefinitionsVariable    Name of a List of Definitions objects (cp.
-"                                   ingo#ftplugin#converter#external#ToText())
+"   a:commandDefinitionsVariable    Name of a List of Definitions objects:
+"	command:    Command to execute.
+"	commandline:printf() (or ingo#format#Format()) template for inserting
+"		    command and command arguments to build the Ex command-line
+"		    to execute. a:range is prepended to this. To filter through
+"		    an external command, start the commandline with "!".
+"	arguments:  List of possible command-line arguments supported by
+"                   command, used as completion candidates.
+"	filetype:   Optional value to :setlocal filetype to.
+"	extension:  Optional file extension (for
+"		    ingo#ftplugin#converter#external#ExtractText())
+"	preAction:  Optional Ex command or Funcref that is invoked before the
+"                   external command.
+"	postAction: Optional Ex command or Funcref that is invoked after
+"                   successful execution of the external command.
 "   a:range         Range of lines to be filtered.
 "   a:arguments     Converter argument (optional if there's just one configured
 "                   converter), followed by optional arguments for

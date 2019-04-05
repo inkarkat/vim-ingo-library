@@ -31,20 +31,11 @@ function! ingo#ftplugin#converter#external#ToText( externalCommandDefinitionsVar
 "   and locks further editing.
 "* INPUTS:
 "   a:externalCommandDefinitionsVariable    Name of a List of Definitions
-"					    objects:
-"	command:    External command to execute.
-"	commandline:printf() (or ingo#format#Format()) template for inserting
-"		    command, command arguments, and a:filespec to build the
-"		    command-line to execute.
-"	arguments:  List of possible command-line arguments supported by
-"                   command, used as completion candidates.
-"	filetype:   Optional value to :setlocal filetype to (default: "text")
-"	extension:  Optional file extension (for
-"		    ingo#ftplugin#converter#external#ExtractText())
-"	preAction:  Optional Ex command or Funcref that is invoked before the
-"                   external command.
-"	postAction: Optional Ex command or Funcref that is invoked after
-"                   successful execution of the external command.
+"					    objects (cp.
+"					    ingo#ftplugin#converter#Builder#Format())
+"					    Here, the a:filespec is additionally
+"					    inserted (as the third placeholder)
+"					    into the commandline attribute.
 "   a:arguments     Converter argument (optional if there's just one configured
 "                   converter), followed by optional arguments for
 "                   a:externalCommandDefinitionsVariable.command, all passed by
