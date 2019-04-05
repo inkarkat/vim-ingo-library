@@ -227,6 +227,11 @@ function! ingo#ftplugin#converter#external#Filter( externalCommandDefinitionsVar
 
 	call s:FilterBuffer(l:commandDefinition, l:commandArguments, a:range)
 
+	let l:targetFiletype = get(l:commandDefinition, 'filetype', '')
+	if ! empty(l:targetFiletype)
+	    let &l:filetype = l:targetFiletype
+	endif
+
 	return 1
     catch /^external:/
 	call ingo#err#SetCustomException('external')
@@ -244,8 +249,10 @@ function! ingo#ftplugin#converter#external#DifferentFiletype( targetFiletype, ex
 "   Like ingo#ftplugin#converter#external#Filter(), but additionally sets
 "   a:targetFiletype on a successful execution.
 "* INPUTS:
-"       a:targetFiletype    Target 'filetype' that the buffer is set to if the
-"                           filtering has been successful.
+"   a:targetFiletype    Target 'filetype' that the buffer is set to if the
+"                       filtering has been successful. This overrides
+"                       a:externalCommandDefinitionsVariable.filetype (which is
+"                       not supposed to be used here).
 "* RETURN VALUES:
 "   1 if successful, 0 if ingo#err#Set().
 "******************************************************************************
