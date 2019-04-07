@@ -9,7 +9,7 @@
 
 function! s:FilterBuffer( commandDefinition, commandArguments, range, isBang )
     if has_key(a:commandDefinition, 'commandline')
-	let l:commandLine = ingo#actions#ValueOrFunc(a:commandDefinition.commandline, a:isBang)
+	let l:commandLine = ingo#actions#ValueOrFunc(a:commandDefinition.commandline, {'definition': a:commandDefinition, 'range': a:range, 'isBang': a:isBang, 'arguments': a:commandArguments})
 	if has_key(a:commandDefinition, 'command')
 	    let l:command = ingo#format#Format(l:commandLine, ingo#compat#shellescape(a:commandDefinition.command), a:commandArguments)
 	else
@@ -45,8 +45,10 @@ function! ingo#ftplugin#converter#builder#Filter( commandDefinitionsVariable, ra
 "		    command and command arguments to build the Ex command-line
 "		    to execute. a:range is prepended to this. To filter through
 "		    an external command, start the commandline with "!".
-"		    Or a Funcref that gets passed the a:isBang flag and should
-"		    return the (dynamically generated) commandline.
+"		    Or a Funcref that gets passed the invocation context (and
+"		    Dictionary with these keys: definition, range, isBang,
+"		    arguments) and should return the (dynamically generated)
+"		    commandline.
 "	arguments:  List of possible command-line arguments supported by
 "                   command, used as completion candidates.
 "	filetype:   Optional value to :setlocal filetype to.
