@@ -136,6 +136,7 @@ HISTORY
   more complex variant of ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc().
 - Add ingo#ftplugin#converter#builder#Filter() variant of
   ingo#ftplugin#converter#builder#DifferentFiletype().
+- Add ingo#str#Wrap().
 
 ##### 1.036   17-Mar-2019
 - FIX: ingo#strdisplaywidth#strleft includes multi-width character that
