@@ -126,6 +126,10 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.038   RELEASEME
+- ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
+  stand-alone &lt; and escaped \\&lt;, but not proper key notations like &lt;C-CR&gt;.
+
 ##### 1.037   28-Mar-2019
 - Add ingo#dict#Make() (analog to ingo#list#Make()).
 - Add ingo#selection#Set() and ingo#selection#Make().

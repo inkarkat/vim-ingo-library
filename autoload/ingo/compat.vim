@@ -363,6 +363,7 @@ if (v:version == 703 && has('patch32') || v:version > 703) && ! has_key(s:compat
 else
     function! ingo#compat#maparg( name, ... )
 	let l:rhs = call('maparg', [a:name] + a:000)
+	let l:rhs = substitute(l:rhs, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\zs<\|<\%([^<]\+>\)\@!', '<lt>', 'g')    " Escape stand-alone < (when not part of a key-notation), or when escaped \<, but not proper key-notation like <C-CR>.
 	let l:rhs = substitute(l:rhs, '|', '<Bar>', 'g')    " '|' must be escaped, or the map command will end prematurely.
 	return l:rhs
     endfunction
