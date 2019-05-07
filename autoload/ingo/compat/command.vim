@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2017 Ingo Karkat
+" Copyright: (C) 2017-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -14,11 +14,12 @@ function! ingo#compat#command#Mods( mods )
 "******************************************************************************
 "* PURPOSE:
 "   Return the command modifiers |<mods>| passed in raw as a:mods.
-"   In order to support older Vim versions that don't have this, one cannot use
-"   <q-mods>; this isn't understood and raises an error. Instead, we can benefit
-"   from the fact that the modifiers do not contain special characters, and do
-"   the quoting ourselves: '<mods>'. Now we only need to remove the identifer in
-"   case it hasn't been understood, and this is what this function is about.
+"   In order to support older Vim versions that don't have this (prior to
+"   Vim 7.4.1898), one cannot use <q-mods>; this isn't understood and raises an
+"   error. Instead, we can benefit from the fact that the modifiers do not
+"   contain special characters, and do the quoting ourselves: '<mods>'. Now we
+"   only need to remove the identifer in case it hasn't been understood, and
+"   this is what this function is about.
 "	-command! Sedit call SpecialEdit(<q-mods>)
 "	+command! Sedit call SpecialEdit(ingo#compat#command#Mods('<mods>'))
 "* ASSUMPTIONS / PRECONDITIONS:
