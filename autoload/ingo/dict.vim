@@ -80,7 +80,7 @@ function! ingo#dict#FromKeys( keys, defaultValue )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:keys  The keys of the Dictionary; must not be empty.
+"   a:keys  List of keys for the Dictionary.
 "   a:defaultValue  The value for each of the generated keys.
 "* RETURN VALUES:
 "   A new Dictionary with keys taken from a:keys and a:defaultValue.
@@ -93,6 +93,31 @@ function! ingo#dict#FromKeys( keys, defaultValue )
     let l:dict = {}
     for l:key in a:keys
 	let l:dict[l:key] = a:defaultValue
+    endfor
+    return l:dict
+endfunction
+
+function! ingo#dict#FromValues( KeyExtractor, values ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Create a Dictionary object from a:values, with the value taken from the List
+"   elements, and the key obtained through a:KeyExtractor.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:values    List of values for the Dictionary.
+"   a:KeyExtractor  Funcref that is passed a value and is expected to return a
+"                   (unique) key.
+"* RETURN VALUES:
+"   A new Dictionary with values taken from a:values and keys extracted through
+"   a:KeyExtractor.
+"******************************************************************************
+    let l:dict = {}
+    for l:val in a:values
+	let l:key = call(a:KeyExtractor, [l:val])
+	let l:dict[l:key] = l:val
     endfor
     return l:dict
 endfunction
