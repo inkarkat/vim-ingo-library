@@ -71,28 +71,38 @@ function! ingo#dict#FromItems( items, ... )
     return l:dict
 endfunction
 
-function! ingo#dict#FromKeys( keys, defaultValue )
+function! ingo#dict#FromKeys( keys, ValueExtractor )
 "******************************************************************************
 "* PURPOSE:
-"   Create a Dictionary object from a:keys, all having a:defaultValue.
+"   Create a Dictionary object from a:keys, with the key taken from the List
+"   elements, and the value obtained through a:KeyExtractor (which can be a
+"   constant default).
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
 "   a:keys  List of keys for the Dictionary.
-"   a:defaultValue  The value for each of the generated keys.
+"   a:ValueExtractor    Funcref that is passed a value and is expected to return
+"                       a value.
+"                       Or a static default value for each of the generated keys.
 "* RETURN VALUES:
-"   A new Dictionary with keys taken from a:keys and a:defaultValue.
+"   A new Dictionary with keys taken from a:keys and values extracted via /
+"   provided by a:ValueExtractor.
 "* SEE ALSO:
 "   ingo#collections#ToDict() handles empty key values, but uses a hard-coded
 "   default value.
 "   ingo#dict#count#Items() also creates a Dict from a List, and additionally
 "   counts the unique values.
 "******************************************************************************
+    let l:isFuncref = (type(a:ValueExtractor) == type(function('tr')))
     let l:dict = {}
     for l:key in a:keys
-	let l:dict[l:key] = a:defaultValue
+	let l:val = (l:isFuncref ?
+	\   call(a:ValueExtractor, [l:key]) :
+	\   a:ValueExtractor
+	\)
+	let l:dict[l:key] = l:val
     endfor
     return l:dict
 endfunction

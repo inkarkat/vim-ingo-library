@@ -142,6 +142,8 @@ HISTORY
   ingo#ftplugin#converter#builder#DifferentFiletype().
 - Add ingo#str#Wrap().
 - Add ingo#dict#FromValues().
+- ENH: ingo#dict#FromKeys() can also take a ValueExtractor Funcref in addition
+  to the static defaultValue.
 
 ##### 1.036   17-Mar-2019
 - FIX: ingo#strdisplaywidth#strleft includes multi-width character that
