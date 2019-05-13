@@ -6,19 +6,8 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.023.003	21-Nov-2014	ENH: Also allow passing an items List to
-"				ingo#dict#Mirror() and ingo#dict#AddMirrored()
-"				(useful to influence which key from equal values
-"				is used).
-"				ENH: Also support optional a:isEnsureUniqueness
-"				flag for ingo#dict#FromItems().
-"   1.016.002	16-Jan-2014	Add ingo#dict#AddMirrored(), and also add
-"				optional a:isEnsureUniqueness flag to
-"				ingo#dict#Mirror().
-"   1.016.002	23-Dec-2013	Add ingo#dict#Mirror().
-"   1.009.001	21-Jun-2013	file creation
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! ingo#dict#Make( val, defaultKey, ... )
 "******************************************************************************
@@ -198,4 +187,6 @@ function! ingo#dict#AddMirrored( dict, ... )
     return a:dict
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
