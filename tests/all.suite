@@ -3,6 +3,7 @@ collections/
 collections/recursive/
 compat/
 date/
+dict/
 digest/
 file/
 function/uniquify/
