@@ -125,6 +125,41 @@ function! ingo#regexp#MakeWholeWORDSearch( text, ... )
     endif
     return l:pattern
 endfunction
+function! ingo#regexp#MakeWholeWordOrWORDSearch( text, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Generate a pattern that searches only for whole words or whole WORDs of
+"   a:text, depending on whether a:text actually starts / ends with
+"   keyword or non-whitespace (not necessarily the same type at begin and end)
+"   characters.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:text  Text / pattern to be searched for. Note that this isn't escaped in any form;
+"	    you probably want to escape backslashes beforehand and use \V "very
+"	    nomagic" on the result.
+"   a:pattern   If passed, this is adapted according to what a:text is about.
+"		Useful if the pattern has already been so warped (e.g. by
+"		enclosing in /\(...\|...\)/) that word boundary detection on the
+"		original text wouldn't work.
+"* RETURN VALUES:
+"   a:text / a:pattern, with additional atoms if applicable.
+"******************************************************************************
+    let l:pattern = (a:0 ? a:1 : a:text)
+    if a:text =~# '^\k'
+	let l:pattern = '\<' . l:pattern
+    elseif a:text =~# '^\S'
+	let l:pattern = '\%(^\|\s\)\@<=' . l:pattern
+    endif
+    if a:text =~# '\k$'
+	let l:pattern .= '\>'
+    elseif a:text =~# '\S$'
+	let l:pattern .= '\%(\s\|$\)\@='
+    endif
+    return l:pattern
+endfunction
 
 function! ingo#regexp#FromLiteralText( text, isWholeWordSearch, additionalEscapeCharacters )
 "*******************************************************************************

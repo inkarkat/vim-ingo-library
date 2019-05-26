@@ -131,6 +131,7 @@ HISTORY
   stand-alone &lt; and escaped \\&lt;, but not proper key notations like &lt;C-CR&gt;.
 - FIX: Make ingo#cmdline#showmode#TemporaryNoShowMode() work again.
 - Factor out ingo#msg#MsgFromCustomException().
+- Add ingo#regexp#MakeWholeWordOrWORDSearch() variant.
 
 ##### 1.037   28-Mar-2019
 - Add ingo#dict#Make() (analog to ingo#list#Make()).

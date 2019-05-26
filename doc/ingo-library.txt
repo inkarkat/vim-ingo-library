@@ -145,6 +145,7 @@ HISTORY							*ingo-library-history*
   stand-alone < and escaped \<, but not proper key notations like <C-CR>.
 - FIX: Make ingo#cmdline#showmode#TemporaryNoShowMode() work again.
 - Factor out ingo#msg#MsgFromCustomException().
+- Add ingo#regexp#MakeWholeWordOrWORDSearch() variant.
 
 1.037	28-Mar-2019
 - Add ingo#dict#Make() (analog to ingo#list#Make()).
