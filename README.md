@@ -130,6 +130,7 @@ HISTORY
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
   stand-alone &lt; and escaped \\&lt;, but not proper key notations like &lt;C-CR&gt;.
 - FIX: Make ingo#cmdline#showmode#TemporaryNoShowMode() work again.
+- Factor out ingo#msg#MsgFromCustomException().
 
 ##### 1.037   28-Mar-2019
 - Add ingo#dict#Make() (analog to ingo#list#Make()).
