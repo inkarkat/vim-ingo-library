@@ -22,6 +22,14 @@ function! ingo#pos#Make2( pos ) abort
 endfunction
 
 
+function! ingo#pos#Compare( posA, posB )
+    if a:posA == a:posB
+	return 0
+    else
+	return (a:posA[0] > a:posB[0] || a:posA[0] == a:posB[0] && a:posA[1] > a:posB[1] ? 1 : -1)
+    endif
+endfunction
+
 function! ingo#pos#IsOnOrAfter( posA, posB )
     return (a:posA[0] > a:posB[0] || a:posA[0] == a:posB[0] && a:posA[1] >= a:posB[1])
 endfunction
