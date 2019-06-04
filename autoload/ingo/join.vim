@@ -33,7 +33,7 @@ function! ingo#join#Lines( lnum, isKeepSpace, separator )
 "   None.
 "******************************************************************************
     if a:lnum >= line('$')
-	return
+	return 0
     endif
 
     if a:isKeepSpace
@@ -62,6 +62,7 @@ function! ingo#join#Lines( lnum, isKeepSpace, separator )
 	    execute 'normal!' l:changeJoiner
 	endif
     endif
+    return 1
 endfunction
 
 function! ingo#join#Ranges( isKeepSpace, startLnum, endLnum, separator, ranges )
@@ -95,9 +96,10 @@ function! ingo#join#Ranges( isKeepSpace, startLnum, endLnum, separator, ranges )
 	for [l:rangeStartLnum, l:rangeEndLnum] in reverse(a:ranges)
 	    let l:cnt = l:rangeEndLnum - l:rangeStartLnum
 	    for l:i in range(l:cnt)
-		call ingo#join#Lines(l:rangeStartLnum, a:isKeepSpace, a:separator)
+		if ingo#join#Lines(l:rangeStartLnum, a:isKeepSpace, a:separator)
+		    let l:joinCnt += 1
+		endif
 	    endfor
-	    let l:joinCnt += l:cnt
 	endfor
     finally
 	let &foldenable = l:save_foldenable
@@ -124,7 +126,7 @@ function! ingo#join#Range( isKeepSpace, startLnum, endLnum, separator )
 "* RETURN VALUES:
 "   number of joined lines
 "******************************************************************************
-    return ingo#join#Ranges(a:isKeepSpace, 0, 0, a:separator, [a:startLnum, a:endLnum])[1]
+    return ingo#join#Ranges(a:isKeepSpace, 0, 0, a:separator, [[a:startLnum, a:endLnum]])[1]
 endfunction
 
 function! ingo#join#FoldedLines( isKeepSpace, startLnum, endLnum, separator )

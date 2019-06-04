@@ -134,6 +134,7 @@ HISTORY
 - Add ingo#regexp#MakeWholeWordOrWORDSearch() variant.
 - Add ingo#pos#Compare(), useful for sort().
 - FIX: Handle corner cases in ingo#join#Lines().
+  Return join success. Also do proper counting in ingo#join#Ranges().
 - Add ingo#join#Range() variant of ingo#join#Ranges().
 
 ##### 1.037   28-Mar-2019
