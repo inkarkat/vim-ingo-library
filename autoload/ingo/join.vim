@@ -105,6 +105,28 @@ function! ingo#join#Ranges( isKeepSpace, startLnum, endLnum, separator, ranges )
     return [len(a:ranges), l:joinCnt]
 endfunction
 
+function! ingo#join#Range( isKeepSpace, startLnum, endLnum, separator )
+"******************************************************************************
+"* PURPOSE:
+"   Join all lines in the a:startLnum, a:endLnum range.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   The 'formatoptions' option may affect the join, especially M, B, j.
+"* EFFECTS / POSTCONDITIONS:
+"   Joins lines.
+"* INPUTS:
+"   a:isKeepSpace   Flag whether to keep whitespace (i.e. trailing in a:lnum,
+"		    indent in a:lnum + 1) or remove it altogether. The joining
+"		    itself does not add whitespace.
+"   a:startLnum     First line of range.
+"   a:endLnum       Last line of range.
+"   a:separator     String to be put in between the lines (also when one of them
+"		    is completely empty).
+"* RETURN VALUES:
+"   number of joined lines
+"******************************************************************************
+    return ingo#join#Ranges(a:isKeepSpace, 0, 0, a:separator, [a:startLnum, a:endLnum])[1]
+endfunction
+
 function! ingo#join#FoldedLines( isKeepSpace, startLnum, endLnum, separator )
 "******************************************************************************
 "* PURPOSE:
