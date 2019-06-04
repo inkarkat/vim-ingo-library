@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/folds.vim autoload script
 "
-" Copyright: (C) 2014-2017 Ingo Karkat
+" Copyright: (C) 2014-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -32,6 +32,10 @@ function! ingo#join#Lines( lnum, isKeepSpace, separator )
 "* RETURN VALUES:
 "   None.
 "******************************************************************************
+    if a:lnum >= line('$')
+	return
+    endif
+
     if a:isKeepSpace
 	let l:lineLen = len(getline(a:lnum))
 	execute a:lnum . 'join!'
@@ -45,10 +49,17 @@ function! ingo#join#Lines( lnum, isKeepSpace, separator )
 	    endif
 	endif
     else
-	execute a:lnum
-	normal! J
-	if ! empty(a:separator)
-	    execute 'normal! "_ciw' . a:separator . "\<Esc>"
+	execute a:lnum . 'normal! J'
+
+	let l:changeJoiner = (empty(a:separator) ? '"_diw' : '"_ciw' . a:separator . "\<Esc>")
+	" The J command inserts one space in place of the <EOL> unless there is
+	" trailing white space or the next line starts with a ')'. The
+	" whitespace will be handed by "ciw", but we need a special case for ).
+	if ! search('\%#\s\|\s\%#', 'bcW', line('.'))
+	    let l:changeJoiner = (empty(a:separator) ? '' : 'i' . a:separator . "\<Esc>")
+	endif
+	if ! empty(l:changeJoiner)
+	    execute 'normal!' l:changeJoiner
 	endif
     endif
 endfunction

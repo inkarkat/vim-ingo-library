@@ -133,6 +133,7 @@ HISTORY
 - Factor out ingo#msg#MsgFromCustomException().
 - Add ingo#regexp#MakeWholeWordOrWORDSearch() variant.
 - Add ingo#pos#Compare(), useful for sort().
+- FIX: Handle corner cases in ingo#join#Lines().
 
 ##### 1.037   28-Mar-2019
 - Add ingo#dict#Make() (analog to ingo#list#Make()).
