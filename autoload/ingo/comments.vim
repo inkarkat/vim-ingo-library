@@ -268,7 +268,7 @@ function! ingo#comments#SplitAll( line )
     let l:checkComment = ingo#comments#CheckComment(a:line)
     if empty(l:checkComment)
 	let l:split = matchlist(a:line, '^\(\s*\)\(.*\)$')[1:2]
-	return [l:split[0], '', '', l:split[1]]
+	return [l:split[0], '', '', l:split[1], 0]
     endif
 
     let [l:commentprefix, l:type, l:nestingLevel, l:isBlankRequired] = l:checkComment

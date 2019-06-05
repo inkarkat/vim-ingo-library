@@ -136,6 +136,8 @@ HISTORY
 - FIX: Handle corner cases in ingo#join#Lines().
   Return join success. Also do proper counting in ingo#join#Ranges().
 - Add ingo#join#Range() variant of ingo#join#Ranges().
+- FIX: ingo#comments#SplitAll(): isBlankRequired is missing from the returned
+  List when there's no comment.
 
 ##### 1.037   28-Mar-2019
 - Add ingo#dict#Make() (analog to ingo#list#Make()).
