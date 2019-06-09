@@ -6,19 +6,8 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.023.003	21-Nov-2014	ENH: Also allow passing an items List to
-"				ingo#dict#Mirror() and ingo#dict#AddMirrored()
-"				(useful to influence which key from equal values
-"				is used).
-"				ENH: Also support optional a:isEnsureUniqueness
-"				flag for ingo#dict#FromItems().
-"   1.016.002	16-Jan-2014	Add ingo#dict#AddMirrored(), and also add
-"				optional a:isEnsureUniqueness flag to
-"				ingo#dict#Mirror().
-"   1.016.002	23-Dec-2013	Add ingo#dict#Mirror().
-"   1.009.001	21-Jun-2013	file creation
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! ingo#dict#Make( val, defaultKey, ... )
 "******************************************************************************
@@ -71,28 +60,63 @@ function! ingo#dict#FromItems( items, ... )
     return l:dict
 endfunction
 
-function! ingo#dict#FromKeys( keys, defaultValue )
+function! ingo#dict#FromKeys( keys, ValueExtractor )
 "******************************************************************************
 "* PURPOSE:
-"   Create a Dictionary object from a:keys, all having a:defaultValue.
+"   Create a Dictionary object from a:keys, with the key taken from the List
+"   elements, and the value obtained through a:KeyExtractor (which can be a
+"   constant default).
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:keys  The keys of the Dictionary; must not be empty.
-"   a:defaultValue  The value for each of the generated keys.
+"   a:keys  List of keys for the Dictionary.
+"   a:ValueExtractor    Funcref that is passed a value and is expected to return
+"                       a value.
+"                       Or a static default value for each of the generated keys.
 "* RETURN VALUES:
-"   A new Dictionary with keys taken from a:keys and a:defaultValue.
+"   A new Dictionary with keys taken from a:keys and values extracted via /
+"   provided by a:ValueExtractor.
 "* SEE ALSO:
 "   ingo#collections#ToDict() handles empty key values, but uses a hard-coded
 "   default value.
 "   ingo#dict#count#Items() also creates a Dict from a List, and additionally
 "   counts the unique values.
 "******************************************************************************
+    let l:isFuncref = (type(a:ValueExtractor) == type(function('tr')))
     let l:dict = {}
     for l:key in a:keys
-	let l:dict[l:key] = a:defaultValue
+	let l:val = (l:isFuncref ?
+	\   call(a:ValueExtractor, [l:key]) :
+	\   a:ValueExtractor
+	\)
+	let l:dict[l:key] = l:val
+    endfor
+    return l:dict
+endfunction
+
+function! ingo#dict#FromValues( KeyExtractor, values ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Create a Dictionary object from a:values, with the value taken from the List
+"   elements, and the key obtained through a:KeyExtractor.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:values    List of values for the Dictionary.
+"   a:KeyExtractor  Funcref that is passed a value and is expected to return a
+"                   (unique) key.
+"* RETURN VALUES:
+"   A new Dictionary with values taken from a:values and keys extracted through
+"   a:KeyExtractor.
+"******************************************************************************
+    let l:dict = {}
+    for l:val in a:values
+	let l:key = call(a:KeyExtractor, [l:val])
+	let l:dict[l:key] = l:val
     endfor
     return l:dict
 endfunction
@@ -163,4 +187,6 @@ function! ingo#dict#AddMirrored( dict, ... )
     return a:dict
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -159,11 +159,14 @@ function! ingo#msg#MsgFromVimException()
     " exception source info prepended, which we cut away.
     return substitute(v:exception, '^\CVim\%((\a\+)\)\=:', '', '')
 endfunction
+function! ingo#msg#MsgFromCustomException( customPrefixPattern ) abort
+    return substitute(v:exception, printf('^\C\%%(%s\):\s*', a:customPrefixPattern), '', '')
+endfunction
 function! ingo#msg#VimExceptionMsg()
     call ingo#msg#ErrorMsg(ingo#msg#MsgFromVimException())
 endfunction
 function! ingo#msg#CustomExceptionMsg( customPrefixPattern )
-    call ingo#msg#ErrorMsg(substitute(v:exception, printf('^\C\%%(%s\):\s*', a:customPrefixPattern), '', ''))
+    call ingo#msg#ErrorMsg(ingo#msg#MsgFromCustomException(a:customPrefixPattern))
 endfunction
 
 function! ingo#msg#MsgFromShellError( whatFailure, shellOutput )

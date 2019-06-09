@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2015 Ingo Karkat
+" Copyright: (C) 2011-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -48,6 +48,56 @@ function! ingo#selection#Get()
     let &clipboard = l:save_clipboard
 
     return l:selection
+endfunction
+
+function! ingo#selection#Set( startPos, endPos, ... ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Sets the visual selection to the passed area.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Affects what the next gv command will select.
+"* INPUTS:
+"   a:startPos  [lnum, col] or [0, lnum, col, 0] of the start ('<) of the new
+"               selection.
+"   a:endPos    [lnum, col] or [0, lnum, col, 0] of the end ('>) of the new
+"               selection.
+"   a:mode      One of v, V, or CTRL-V. Defaults to characterwise.
+"* RETURN VALUES:
+"   1 if successful, 0 if one position could not be set.
+"******************************************************************************
+    let l:mode = (a:0 ? a:1 : 'v')
+    if visualmode() !=# l:mode && ! empty(l:mode)
+	execute 'normal!' l:mode . "\<Esc>"
+    endif
+    let l:result = 0
+    let l:result += ingo#compat#setpos("'<", ingo#pos#Make4(a:startPos))
+    let l:result += ingo#compat#setpos("'>", ingo#pos#Make4(a:endPos))
+
+    return (l:result == 0)
+endfunction
+function! ingo#selection#Make( ... ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Creates a new visual selection on the passed area.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Changes to visual mode.
+"* INPUTS:
+"   a:startPos  [lnum, col] of the start ('<) of the new selection.
+"   a:endPos    [lnum, col] of the end ('>) of the new selection.
+"   a:mode      One of v, V, or CTRL-V. Defaults to characterwise.
+"* RETURN VALUES:
+"   1 if successful, 0 if one position could not be set.
+"******************************************************************************
+    if call('ingo#selection#Set', a:000) == 0
+	normal! gv
+	return 1
+    else
+	return 0
+    endif
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

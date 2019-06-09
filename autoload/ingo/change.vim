@@ -7,7 +7,7 @@
 "   - ingo/text.vim autoload script
 "   - ingo/undo.vim autoload script
 "
-" Copyright: (C) 2018 Ingo Karkat
+" Copyright: (C) 2018-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -120,12 +120,33 @@ function! ingo#change#GetOverwrittenText()
 	silent execute 'undo' l:undoChangeNumber
 
 	" The :undo clobbered the change marks; restore them.
-	call setpos("'[", l:startPos)
-	call setpos("']", l:endPos)
+	call ingo#change#Set(l:startPos, l:endPos)
 
 	" The :undo also affected the cursor position.
 	call winrestview(l:save_view)
     endtry
+endfunction
+
+function! ingo#change#Set( startPos, endPos ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Sets the change marks to the passed area.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Sets the change marks.
+"* INPUTS:
+"   a:startPos  [lnum, col] or [0, lnum, col, 0] of the start ('[) of the last
+"               change.
+"   a:endPos    [lnum, col] or [0, lnum, col, 0] of the end (']) of the last
+"               change.
+"* RETURN VALUES:
+"   1 if successful, 0 if one position could not be set.
+"******************************************************************************
+    let l:result = 0
+    let l:result += setpos("'[", ingo#pos#Make4(a:startPos))
+    let l:result += setpos("']", ingo#pos#Make4(a:endPos))
+    return (l:result == 0)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

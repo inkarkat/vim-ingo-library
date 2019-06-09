@@ -126,8 +126,35 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.038   09-Jun-2019
+- ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
+  stand-alone &lt; and escaped \\&lt;, but not proper key notations like &lt;C-CR&gt;.
+- FIX: Make ingo#cmdline#showmode#TemporaryNoShowMode() work again.
+- Factor out ingo#msg#MsgFromCustomException().
+- Add ingo#regexp#MakeWholeWordOrWORDSearch() variant.
+- Add ingo#pos#Compare(), useful for sort().
+- FIX: Handle corner cases in ingo#join#Lines().
+  Return join success. Also do proper counting in ingo#join#Ranges().
+- Add ingo#join#Range() variant of ingo#join#Ranges().
+- FIX: ingo#comments#SplitAll(): isBlankRequired is missing from the returned
+  List when there's no comment.
+- Add ingo/comments/indent.vim module.
+
 ##### 1.037   28-Mar-2019
 - Add ingo#dict#Make() (analog to ingo#list#Make()).
+- Add ingo#selection#Set() and ingo#selection#Make().
+- Add ingo#pos#Make4() and ingo#pos#Make2().
+- Add ingo#change#Set().
+- Add ingo#ftplugin#converter#builder#DifferentFiletype().
+- Add ingo#plugin#cmdcomplete#MakeTwoStageFixedListAndMapCompleteFunc(), a
+  more complex variant of ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc().
+- Add ingo#ftplugin#converter#builder#Filter() variant of
+  ingo#ftplugin#converter#builder#DifferentFiletype().
+- Add ingo#str#Wrap().
+- Add ingo#dict#FromValues().
+- ENH: ingo#dict#FromKeys() can also take a ValueExtractor Funcref in addition
+  to the static defaultValue.
+- Add ingo#collections#FileModificationTimeSort().
 
 ##### 1.036   17-Mar-2019
 - FIX: ingo#strdisplaywidth#strleft includes multi-width character that

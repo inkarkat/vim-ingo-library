@@ -37,6 +37,7 @@ autoload/ingo/collections/recursive.vim
 autoload/ingo/collections/rotate.vim
 autoload/ingo/collections/unique.vim
 autoload/ingo/comments.vim
+autoload/ingo/comments/indent.vim
 autoload/ingo/compat.vim
 autoload/ingo/compat/command.vim
 autoload/ingo/compat/commands.vim
@@ -75,6 +76,8 @@ autoload/ingo/fs/path/asfilename.vim
 autoload/ingo/fs/path/split.vim
 autoload/ingo/fs/tempfile.vim
 autoload/ingo/fs/traversal.vim
+autoload/ingo/ftplugin/converter.vim
+autoload/ingo/ftplugin/converter/builder.vim
 autoload/ingo/ftplugin/converter/external.vim
 autoload/ingo/ftplugin/onbufwinenter.vim
 autoload/ingo/ftplugin/setting.vim

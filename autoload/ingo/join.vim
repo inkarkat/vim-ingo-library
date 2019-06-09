@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/folds.vim autoload script
 "
-" Copyright: (C) 2014-2017 Ingo Karkat
+" Copyright: (C) 2014-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -32,6 +32,10 @@ function! ingo#join#Lines( lnum, isKeepSpace, separator )
 "* RETURN VALUES:
 "   None.
 "******************************************************************************
+    if a:lnum >= line('$')
+	return 0
+    endif
+
     if a:isKeepSpace
 	let l:lineLen = len(getline(a:lnum))
 	execute a:lnum . 'join!'
@@ -45,12 +49,20 @@ function! ingo#join#Lines( lnum, isKeepSpace, separator )
 	    endif
 	endif
     else
-	execute a:lnum
-	normal! J
-	if ! empty(a:separator)
-	    execute 'normal! "_ciw' . a:separator . "\<Esc>"
+	execute a:lnum . 'normal! J'
+
+	let l:changeJoiner = (empty(a:separator) ? '"_diw' : '"_ciw' . a:separator . "\<Esc>")
+	" The J command inserts one space in place of the <EOL> unless there is
+	" trailing white space or the next line starts with a ')'. The
+	" whitespace will be handed by "ciw", but we need a special case for ).
+	if ! search('\%#\s\|\s\%#', 'bcW', line('.'))
+	    let l:changeJoiner = (empty(a:separator) ? '' : 'i' . a:separator . "\<Esc>")
+	endif
+	if ! empty(l:changeJoiner)
+	    execute 'normal!' l:changeJoiner
 	endif
     endif
+    return 1
 endfunction
 
 function! ingo#join#Ranges( isKeepSpace, startLnum, endLnum, separator, ranges )
@@ -84,14 +96,37 @@ function! ingo#join#Ranges( isKeepSpace, startLnum, endLnum, separator, ranges )
 	for [l:rangeStartLnum, l:rangeEndLnum] in reverse(a:ranges)
 	    let l:cnt = l:rangeEndLnum - l:rangeStartLnum
 	    for l:i in range(l:cnt)
-		call ingo#join#Lines(l:rangeStartLnum, a:isKeepSpace, a:separator)
+		if ingo#join#Lines(l:rangeStartLnum, a:isKeepSpace, a:separator)
+		    let l:joinCnt += 1
+		endif
 	    endfor
-	    let l:joinCnt += l:cnt
 	endfor
     finally
 	let &foldenable = l:save_foldenable
     endtry
     return [len(a:ranges), l:joinCnt]
+endfunction
+
+function! ingo#join#Range( isKeepSpace, startLnum, endLnum, separator )
+"******************************************************************************
+"* PURPOSE:
+"   Join all lines in the a:startLnum, a:endLnum range.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   The 'formatoptions' option may affect the join, especially M, B, j.
+"* EFFECTS / POSTCONDITIONS:
+"   Joins lines.
+"* INPUTS:
+"   a:isKeepSpace   Flag whether to keep whitespace (i.e. trailing in a:lnum,
+"		    indent in a:lnum + 1) or remove it altogether. The joining
+"		    itself does not add whitespace.
+"   a:startLnum     First line of range.
+"   a:endLnum       Last line of range.
+"   a:separator     String to be put in between the lines (also when one of them
+"		    is completely empty).
+"* RETURN VALUES:
+"   number of joined lines
+"******************************************************************************
+    return ingo#join#Ranges(a:isKeepSpace, 0, 0, a:separator, [[a:startLnum, a:endLnum]])[1]
 endfunction
 
 function! ingo#join#FoldedLines( isKeepSpace, startLnum, endLnum, separator )

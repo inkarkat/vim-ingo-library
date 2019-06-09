@@ -49,8 +49,7 @@ function! ingo#text#replace#Between( startPos, endPos, Text )
 
     if l:currentText !=# l:text
 	call setline(a:startPos[0], s:ReplaceRange(l:line, a:startPos[1] - 1, a:endPos[1] - 1, l:text))
-	call setpos("'[", [0, a:startPos[0], a:startPos[1], 0])
-	call setpos("']", [0, a:startPos[0], a:startPos[1] + len(l:text) - len(matchstr(l:text, '.$')), 0])
+	call ingo#change#Set(a:startPos, ingo#pos#Make4(a:startPos[0], a:startPos[1] + len(l:text) - len(matchstr(l:text, '.$'))))
 	return [l:currentText, l:text, 1]
     else
 	" The range already contains the new text in the correct format, no

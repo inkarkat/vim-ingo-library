@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2016 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -14,6 +14,7 @@
 "   1.009.002	20-Jun-2013	Indicate activation with return code.
 "   1.009.001	18-Jun-2013	file creation from SnippetComplete.vim
 
+let s:record = []
 function! ingo#cmdline#showmode#TemporaryNoShowMode()
 "******************************************************************************
 "* PURPOSE:
@@ -36,6 +37,8 @@ function! ingo#cmdline#showmode#TemporaryNoShowMode()
     endif
 
     set noshowmode
+    let s:record = ingo#record#Position(0)
+    let s:record[2] += 1
 
     " Use a single-use autocmd to restore the 'showmode' setting when the cursor
     " is moved or insert mode is left.
@@ -46,9 +49,9 @@ function! ingo#cmdline#showmode#TemporaryNoShowMode()
 	" again. A jump with scrolling or another mode change has to happen.
 	" Neither :redraw nor :redrawstatus will do, but apparently :echo
 	" triggers an update.
-	autocmd CursorMovedI * set showmode | echo '' | autocmd! IngoLibraryNoShowMode
+	autocmd CursorMovedI * if s:record != ingo#record#Position(0) | set showmode | echo '' | execute 'autocmd! IngoLibraryNoShowMode' | endif
 
-	autocmd InsertLeave  * set showmode |           autocmd! IngoLibraryNoShowMode
+	autocmd InsertLeave  * if s:record != ingo#record#Position(0) | set showmode |           execute 'autocmd! IngoLibraryNoShowMode' | endif
     augroup END
     return 1
 endfunction

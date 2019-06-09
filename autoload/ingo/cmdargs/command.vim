@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/cmdargs/range.vim autoload script
 "
-" Copyright: (C) 2012-2017 Ingo Karkat
+" Copyright: (C) 2012-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -68,10 +68,17 @@ function! ingo#cmdargs#command#Parse( commandLine, ... )
 "   None.
 "* INPUTS:
 "   a:commandLine   Ex command line containing a command.
-"   a:argumentExpr  Regular expression for matching arguments. When not given,
-"		    no whitespace-separated arguments must follow the command
-"		    for the parsing to succeed. You probably want to exclude the
-"		    command separator "|" via something like /\%([^|]\|\\|\)*$/.
+"   a:argumentExpr  Regular expression for matching arguments; probably should
+"                   be anchored to the end via /$/. When not given, no
+"                   whitespace-separated arguments must follow the command for
+"                   the parsing to succeed; it will only parse no-argument
+"                   commands then!
+"                   To parse |:bar| commands that see | as their argument, use
+"                   '.*$'
+"                   To parse any regular commands (without -bar), use a pattern
+"                   that excludes the | command separator, e.g.
+"                   '\%([^|]\|\\|\)*$'. You can also supply the special argument
+"                   value "*" for that.
 "   a:directArgumentExpr    Regular expression for matching direct arguments.
 "			    Defaults to parsing of arbitrary direct arguments.
 "* RETURN VALUES:
@@ -104,7 +111,7 @@ function! ingo#cmdargs#command#Parse( commandLine, ... )
     \	'\(' . ingo#cmdargs#commandcommands#GetExpr() . '\)\?' .
     \	'\(' . ingo#cmdargs#range#RangeExpr() . '\)\s*' .
     \	'\(\h\w*\)\(!\?\)\(' . ingo#cmdargs#command#DelimiterExpr() . (a:0 > 1 ? a:2 : '.*') . '\)\?' .
-    \   '\(' . (a:0 && ! empty(a:1) ? '$\|\s\+' . a:1 : '$') . '\)'
+    \   '\(' . (a:0 && ! empty(a:1) ? '$\|\s\+' . (a:1 ==# '*' ? '\%([^|]\|\\|\)*$' : a:1) : '$') . '\)'
 
     for l:anchor in ['\s*\\\@<!|\s*', '^\s*']
 	let l:parse = matchlist(a:commandLine,

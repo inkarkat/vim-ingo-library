@@ -5,7 +5,7 @@
 "   - ingo/escape/file.vim autoload script
 "   - ingo/fs/path.vim autoload script
 "
-" Copyright: (C) 2009-2017 Ingo Karkat
+" Copyright: (C) 2009-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -201,8 +201,7 @@ function! ingo#buffer#generate#Create( dirspec, filename, isFile, contentsComman
 	if type(a:contentsCommand) == type([])
 	    call setline(1, a:contentsCommand)
 	    call cursor(1, 1)
-	    call setpos("'[", [0, 1, 1, 0])
-	    call setpos("']", [0, line('$'), 1, 0])
+	    call ingo#change#Set([1, 1], [line('$'), 1])
 	else
 	    execute a:contentsCommand
 	    " ^ Keeps the existing line at the top of the buffer, if :1{cmd} is used.

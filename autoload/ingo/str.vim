@@ -5,7 +5,7 @@
 "   - ingo/regexp/virtcols.vim autoload script
 "   - ingo/str/list.vim autoload script
 "
-" Copyright: (C) 2013-2018 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -124,6 +124,25 @@ function! ingo#str#trd( src, fromstr )
 "   Copy of a:src that has all instances of the characters in a:fromstr removed.
 "******************************************************************************
     return substitute(a:src, '\C' . ingo#regexp#collection#LiteralToRegexp(a:fromstr), '', 'g')
+endfunction
+
+function! ingo#str#Wrap( string, commonOrPrefix, ... ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Surround a:string with a prefix + suffix or a common string.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:string    Text.
+"   a:commonOrPrefix    Text to be put in front of a:string, and unless a:suffix
+"                       is also given, also at the back.
+"   a:suffix            Optional different text to be put at the back.
+"* RETURN VALUES:
+"   a:string with prefix and suffix text.
+"******************************************************************************
+    return a:commonOrPrefix . a:string . (a:0 ? a:1 : a:commonOrPrefix)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
