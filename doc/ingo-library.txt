@@ -140,7 +140,7 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 ==============================================================================
 HISTORY							*ingo-library-history*
 
-1.038	RELEASEME
+1.038	09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider <; in fact, it needs to escape
   stand-alone < and escaped \<, but not proper key notations like <C-CR>.
 - FIX: Make ingo#cmdline#showmode#TemporaryNoShowMode() work again.

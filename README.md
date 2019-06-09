@@ -126,7 +126,7 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
-##### 1.038   RELEASEME
+##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
   stand-alone &lt; and escaped \\&lt;, but not proper key notations like &lt;C-CR&gt;.
 - FIX: Make ingo#cmdline#showmode#TemporaryNoShowMode() work again.
