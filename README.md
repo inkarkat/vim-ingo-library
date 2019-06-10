@@ -126,6 +126,9 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.039   RELEASEME
+- Add ingo#date#format#Epoch().
+
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
   stand-alone &lt; and escaped \\&lt;, but not proper key notations like &lt;C-CR&gt;.

@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/os.vim autoload script
 "
-" Copyright: (C) 2012-2015 Ingo Karkat
+" Copyright: (C) 2012-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -24,6 +24,9 @@ if ! exists('g:IngoLibrary_PreferredDateFormat')
     let g:IngoLibrary_PreferredDateFormat = '%x'
 endif
 
+function! ingo#date#format#Epoch( ... )
+    return call('strftime', ['%s'] + a:000)
+endfunction
 function! ingo#date#format#International( ... )
     return call('strftime', ['%d-%b-%Y'] + a:000)
 endfunction
