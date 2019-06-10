@@ -7,18 +7,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.024.004	22-Apr-2015	Rename ingo#date#format#Human() to
-"				ingo#date#format#Preferred(), default to %x
-"				value for strftime(), and allow to customize
-"				that (even dynamically, maybe based on
-"				'spelllang').
-"   1.014.003	16-Sep-2013	Allow to pass optional date to all functions.
-"   1.014.002	13-Sep-2013	Move into ingo-library.
-"				Use operating system detection functions from
-"				ingo/os.vim.
-"	001	14-Apr-2012	file creation from InsertDate.vim
 
 if ! exists('g:IngoLibrary_PreferredDateFormat')
     let g:IngoLibrary_PreferredDateFormat = '%x'
