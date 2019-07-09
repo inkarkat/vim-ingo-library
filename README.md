@@ -128,6 +128,9 @@ HISTORY
 
 ##### 1.039   RELEASEME
 - Add ingo#date#format#Epoch().
+- Add ingo#collections#SortOnFirstListElement() and
+  ingo#collections#SortOnSecondListElement().
+- Add ingo#range#sort#AscendingByStartLnum().
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape

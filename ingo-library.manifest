@@ -136,6 +136,7 @@ autoload/ingo/range/borders.vim
 autoload/ingo/range/invert.vim
 autoload/ingo/range/lines.vim
 autoload/ingo/range/merge.vim
+autoload/ingo/range/sort.vim
 autoload/ingo/record.vim
 autoload/ingo/regexp.vim
 autoload/ingo/regexp/build.vim
