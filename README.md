@@ -132,6 +132,7 @@ HISTORY
   ingo#collections#SortOnSecondListElement().
 - Add ingo#range#sort#AscendingByStartLnum().
 - Add ingo#buffer#scratch#CreateWithWriter().
+- Add ingo#register#IsWritable().
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
