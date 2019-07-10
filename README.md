@@ -138,6 +138,7 @@ HISTORY
 - ingo#window#switches#Win{Save,Restore}CurrentBuffer(): ENH: Also record /
   search in other tabpages if the new a:isSaveTabPage / a:isSearchTabPages is
   true.
+- Add ingo#window#special#HasDiffWindow().
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape

@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2008-2016 Ingo Karkat
+" Copyright: (C) 2008-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -77,6 +77,11 @@ function! ingo#window#special#RestoreSpecialWindowSize()
 	execute 'vert' l:w . 'resize' s:specialWindowSizes[l:w][0]
 	execute        l:w . 'resize' s:specialWindowSizes[l:w][1]
     endfor
+endfunction
+
+function! ingo#window#special#HasDiffWindow()
+    let l:diffedWinNrs = filter( range(1, winnr('$')), 'getwinvar(v:val, "&diff")' )
+    return ! empty(l:diffedWinNrs)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
