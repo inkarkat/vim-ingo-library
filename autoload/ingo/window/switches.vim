@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/msg.vim autoload script
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -59,15 +59,16 @@ function! ingo#window#switches#GotoPreviousWindow( ... )
 endfunction
 
 " Record the current buffer's window and try to later return exactly to the same
-" window, even if in the meantime, windows have been added or removed. This is
-" an enhanced version of bufwinnr(), which will always yield the _first_ window
-" containing a buffer.
+" window (and tabpage if a:isSearchTabPages is true), even if in the meantime,
+" windows have been added or removed. This is an enhanced version of bufwinnr(),
+" which will always yield the _first_ window containing a buffer.
 function! ingo#window#switches#WinSaveCurrentBuffer()
     let l:buffersUpToCurrent = tabpagebuflist()[0 : winnr() - 1]
     let l:occurrenceCnt= len(filter(l:buffersUpToCurrent, 'v:val == bufnr("")'))
     return {'bufnr': bufnr(''), 'occurrenceCnt': l:occurrenceCnt}
 endfunction
-function! ingo#window#switches#WinRestoreCurrentBuffer( dict )
+function! ingo#window#switches#WinRestoreCurrentBuffer( dict, ... )
+    let l:isSearchTabPages = (a:0 && a:1)
     let l:targetWinNr = -1
 
     if a:dict.occurrenceCnt == 1
@@ -92,7 +93,14 @@ function! ingo#window#switches#WinRestoreCurrentBuffer( dict )
     endif
 
     if l:targetWinNr == -1
-	throw printf('WinRestoreCurrentBuffer: target buffer %d not found', a:dict.bufnr)
+	if l:isSearchTabPages
+	    let [l:targetTabNr, l:targetWinNr] = ingo#window#locate#NearestByPredicate(1, 'bufnr', 'v:val == ' . a:dict.bufnr)
+	endif
+	if l:targetWinNr <= 0
+	    throw printf('WinRestoreCurrentBuffer: target buffer %d not found', a:dict.bufnr)
+	elseif l:targetTabNr > 0 && l:targetTabNr != tabpagenr()
+	    execute l:targetTabNr . 'tabnext'
+	endif
     endif
 
     execute l:targetWinNr . 'wincmd w'

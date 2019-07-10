@@ -135,6 +135,8 @@ HISTORY
 - Add ingo#register#IsWritable().
 - ingo/window/locate.vim: ENH: Support special a:winVarName of "bufnr" that
   allows searching for bufnr instead of window-local variables.
+- ingo#window#switches#WinRestoreCurrentBuffer(): ENH: Also search in other
+  tabpages if the new a:isSearchTabPages is true.
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
