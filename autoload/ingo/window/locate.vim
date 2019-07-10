@@ -3,21 +3,25 @@
 " DEPENDENCIES:
 "   - ingo/actions.vim autoload script
 "
-" Copyright: (C) 2016 Ingo Karkat
+" Copyright: (C) 2016-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
 "   1.028.001	25-Nov-2016	file creation
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! s:Match( winVarName, Predicate, winNr, ... )
     if a:0 >= 2 && a:winNr == a:2
 	return 0
     endif
     let l:tabNr = (a:0 ? a:1 : tabpagenr())
-
-    let l:value = gettabwinvar(l:tabNr, a:winNr, a:winVarName)
+    let l:value = (a:winVarName ==# 'bufnr' ?
+    \   get(tabpagebuflist(l:tabNr), a:winNr - 1, '') :
+    \   gettabwinvar(l:tabNr, a:winNr, a:winVarName)
+    \)
     return !! ingo#actions#EvaluateWithValOrFunc(a:Predicate, l:value)
 endfunction
 
@@ -45,8 +49,8 @@ endfunction
 function! ingo#window#locate#NearestByPredicate( isSearchOtherTabPages, winVarName, Predicate )
 "******************************************************************************
 "* PURPOSE:
-"   Locate the window closest to the current one where the window variable a:winVarName makes
-"   a:Predicate (passed in as argument or v:val) true.
+"   Locate the window closest to the current one where the window variable
+"   a:winVarName makes a:Predicate (passed in as argument or v:val) true.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -55,7 +59,8 @@ function! ingo#window#locate#NearestByPredicate( isSearchOtherTabPages, winVarNa
 "   a:isSearchOtherTabPages Flag whether windows in other tab pages should also
 "			    be considered.
 "   a:winVarName            Name of the window-local variable, like in
-"			    |gettabwinvar()|
+"			    |gettabwinvar()|. Also supports a special "bufnr"
+"			    variable that resolves to |bufnr()|.
 "   a:Predicate             Either a Funcref or an expression to be eval()ed.
 "			    Gets the value of a:winVarName passed, should return
 "			    a boolean value.
@@ -105,7 +110,8 @@ function! ingo#window#locate#FirstByPredicate( isSearchOtherTabPages, winVarName
 "   a:isSearchOtherTabPages Flag whether windows in other tab pages should also
 "			    be considered.
 "   a:winVarName            Name of the window-local variable, like in
-"			    |gettabwinvar()|
+"			    |gettabwinvar()|. Also supports a special "bufnr"
+"			    variable that resolves to |bufnr()|.
 "   a:Predicate             Either a Funcref or an expression to be eval()ed.
 "			    Gets the value of a:winVarName passed, should return
 "			    a boolean value.
@@ -151,7 +157,8 @@ function! ingo#window#locate#ByPredicate( strategy, isSearchOtherTabPages, winVa
 "   a:isSearchOtherTabPages Flag whether windows in other tab pages should also
 "			    be considered.
 "   a:winVarName            Name of the window-local variable, like in
-"			    |gettabwinvar()|
+"			    |gettabwinvar()|. Also supports a special "bufnr"
+"			    variable that resolves to |bufnr()|.
 "   a:Predicate             Either a Funcref or an expression to be eval()ed.
 "			    Gets the value of a:winVarName passed, should return
 "			    a boolean value.
@@ -170,4 +177,6 @@ function! ingo#window#locate#ByPredicate( strategy, isSearchOtherTabPages, winVa
     endif
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vism: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

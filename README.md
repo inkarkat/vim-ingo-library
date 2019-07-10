@@ -133,6 +133,8 @@ HISTORY
 - Add ingo#range#sort#AscendingByStartLnum().
 - Add ingo#buffer#scratch#CreateWithWriter().
 - Add ingo#register#IsWritable().
+- ingo/window/locate.vim: ENH: Support special a:winVarName of "bufnr" that
+  allows searching for bufnr instead of window-local variables.
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
