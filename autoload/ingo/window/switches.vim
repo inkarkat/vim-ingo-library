@@ -58,18 +58,31 @@ function! ingo#window#switches#GotoPreviousWindow( ... )
     return (l:isReturnError ? '' : 1)
 endfunction
 
-" Record the current buffer's window and try to later return exactly to the same
-" window (and tabpage if a:isSearchTabPages is true), even if in the meantime,
-" windows have been added or removed. This is an enhanced version of bufwinnr(),
-" which will always yield the _first_ window containing a buffer.
-function! ingo#window#switches#WinSaveCurrentBuffer()
+" Record the current buffer's window (and tabpage if a:isSaveTabPage is true)
+" and try to later return exactly to the same window (and tabpage if
+" a:isSearchTabPages is true), even if in the meantime, windows (and tabpages)
+" have been added or removed.
+" This is an enhanced version of bufwinnr(), which will always yield the _first_
+" window containing a buffer.
+function! ingo#window#switches#WinSaveCurrentBuffer( ... )
+    let l:isSaveTabPage = (a:0 && a:1)
     let l:buffersUpToCurrent = tabpagebuflist()[0 : winnr() - 1]
-    let l:occurrenceCnt= len(filter(l:buffersUpToCurrent, 'v:val == bufnr("")'))
-    return {'bufnr': bufnr(''), 'occurrenceCnt': l:occurrenceCnt}
+    let l:occurrenceCnt = len(filter(l:buffersUpToCurrent, 'v:val == bufnr("")'))
+    let l:record = {'bufnr': bufnr(''), 'occurrenceCnt': l:occurrenceCnt}
+    if l:isSaveTabPage
+	let l:record.tabnr = tabpagenr()
+    endif
+
+    return l:record
 endfunction
 function! ingo#window#switches#WinRestoreCurrentBuffer( dict, ... )
     let l:isSearchTabPages = (a:0 && a:1)
+    let l:originalTabNr = tabpagenr()
     let l:targetWinNr = -1
+
+    if l:isSearchTabPages && has_key(a:dict, 'tabnr') && l:originalTabNr != a:dict.tabnr
+	execute a:dict.tabnr . 'tabnext'
+    endif
 
     if a:dict.occurrenceCnt == 1
 	" We want the first occurrence of the buffer, bufwinnr() can do this for
@@ -97,6 +110,12 @@ function! ingo#window#switches#WinRestoreCurrentBuffer( dict, ... )
 	    let [l:targetTabNr, l:targetWinNr] = ingo#window#locate#NearestByPredicate(1, 'bufnr', 'v:val == ' . a:dict.bufnr)
 	endif
 	if l:targetWinNr <= 0
+	    if tabpagenr() != l:originalTabNr
+		" We've searched other tabpages for the window, but couldn't
+		" find it. Go back to where we came from.
+		execute l:originalTabNr . 'tabnext'
+	    endif
+
 	    throw printf('WinRestoreCurrentBuffer: target buffer %d not found', a:dict.bufnr)
 	elseif l:targetTabNr > 0 && l:targetTabNr != tabpagenr()
 	    execute l:targetTabNr . 'tabnext'
