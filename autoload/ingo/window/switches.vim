@@ -75,39 +75,39 @@ function! ingo#window#switches#WinSaveCurrentBuffer( ... )
 
     return l:record
 endfunction
-function! ingo#window#switches#WinRestoreCurrentBuffer( dict, ... )
+function! ingo#window#switches#WinRestoreCurrentBuffer( record, ... )
     let l:isSearchTabPages = (a:0 && a:1)
     let l:originalTabNr = tabpagenr()
     let l:targetWinNr = -1
 
-    if l:isSearchTabPages && has_key(a:dict, 'tabnr') && l:originalTabNr != a:dict.tabnr
-	execute a:dict.tabnr . 'tabnext'
+    if l:isSearchTabPages && has_key(a:record, 'tabnr') && l:originalTabNr != a:record.tabnr
+	execute a:record.tabnr . 'tabnext'
     endif
 
-    if a:dict.occurrenceCnt == 1
+    if a:record.occurrenceCnt == 1
 	" We want the first occurrence of the buffer, bufwinnr() can do this for
 	" us.
-	let l:targetWinNr = bufwinnr(a:dict.bufnr)
+	let l:targetWinNr = bufwinnr(a:record.bufnr)
     else
 	" Go through all windows and find the N'th window containing our buffer.
 	let l:winNrs = []
 	for l:winNr in range(1, winnr('$'))
-	    if winbufnr(l:winNr) == a:dict.bufnr
+	    if winbufnr(l:winNr) == a:record.bufnr
 		call add(l:winNrs, l:winNr)
 	    endif
 	endfor
 
-	if len(l:winNrs) < a:dict.occurrenceCnt
+	if len(l:winNrs) < a:record.occurrenceCnt
 	    " There are less windows showing that buffer now; choose the last.
 	    let l:targetWinNr = l:winNrs[-1]
 	else
-	    let l:targetWinNr = l:winNrs[a:dict.occurrenceCnt - 1]
+	    let l:targetWinNr = l:winNrs[a:record.occurrenceCnt - 1]
 	endif
     endif
 
     if l:targetWinNr == -1
 	if l:isSearchTabPages
-	    let [l:targetTabNr, l:targetWinNr] = ingo#window#locate#NearestByPredicate(1, 'bufnr', 'v:val == ' . a:dict.bufnr)
+	    let [l:targetTabNr, l:targetWinNr] = ingo#window#locate#NearestByPredicate(1, 'bufnr', 'v:val == ' . a:record.bufnr)
 	endif
 	if l:targetWinNr <= 0
 	    if tabpagenr() != l:originalTabNr
@@ -116,7 +116,7 @@ function! ingo#window#switches#WinRestoreCurrentBuffer( dict, ... )
 		execute l:originalTabNr . 'tabnext'
 	    endif
 
-	    throw printf('WinRestoreCurrentBuffer: target buffer %d not found', a:dict.bufnr)
+	    throw printf('WinRestoreCurrentBuffer: target buffer %d not found', a:record.bufnr)
 	elseif l:targetTabNr > 0 && l:targetTabNr != tabpagenr()
 	    execute l:targetTabNr . 'tabnext'
 	endif
