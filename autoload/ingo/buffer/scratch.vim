@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/buffer/generate.vim autoload script
 "
-" Copyright: (C) 2009-2017 Ingo Karkat
+" Copyright: (C) 2009-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -74,6 +74,56 @@ function! ingo#buffer#scratch#SetLocal( isFile, isInitialized )
     if a:isInitialized
 	setlocal readonly
     endif
+endfunction
+
+function! ingo#buffer#scratch#CreateWithWriter( scratchFilename, Writer, scratchCommand, windowOpenCommand )
+"*******************************************************************************
+"* PURPOSE:
+"   Create (or re-use an existing) scratch buffer that invokes a custom a:Writer
+"   when it is written.
+"
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   - Creates or opens scratch buffer and loads it in a window (as specified by
+"     a:windowOpenCommand) and activates that window.
+"   - Sets up autocmd that invokes a:Writer on :write.
+"* INPUTS:
+"   a:scratchFilename	The name for the scratch buffer.
+"   a:Writer            Ex command or Funcref that is invoked on :write.
+"   a:scratchCommand	Ex command(s) to populate the scratch buffer, e.g.
+"			":1read myfile". Use :1read so that the first empty line
+"			will be kept (it is deleted automatically), and there
+"			will be no trailing empty line.
+"			Pass empty string if you want to populate the scratch
+"			buffer yourself.
+"			Pass a List of lines to set the scratch buffer contents
+"			directly to the lines.
+"   a:windowOpenCommand	Ex command to open the scratch window, e.g. :vnew or
+"			:topleft new.
+"* RETURN VALUES:
+"   Indicator whether the scratch buffer has been opened:
+"   0	Failed to open scratch buffer.
+"   1	Already in scratch buffer window.
+"   2	Jumped to open scratch buffer window.
+"   3	Loaded existing scratch buffer in new window.
+"   4	Created scratch buffer in new window.
+"   Note: To handle errors caused by a:scratchCommand, you need to put this
+"   method call into a try..catch block and :close the scratch buffer when an
+"   exception is thrown.
+"*******************************************************************************
+    let l:status = ingo#buffer#generate#Create('', a:scratchFilename, 0, a:scratchCommand, a:windowOpenCommand, function('ingo#buffer#scratch#NextFilename'))
+    if l:status != 0
+	setlocal buftype=acwrite bufhidden=wipe nobuflisted noswapfile
+	if ! empty(a:scratchCommand)
+	    setlocal nomodified
+	endif
+
+	augroup IngoLibraryScratchWriter
+	    execute printf('autocmd! BufWriteCmd <buffer> call ingo#actions#ExecuteOrFunc(%s)', string(a:Writer))
+	augroup END
+    endif
+    return l:status
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
