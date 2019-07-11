@@ -76,6 +76,57 @@ function! ingo#area#frompattern#GetAroundHere( pattern, ... )
     return [l:startPos, l:endPos]
 endfunction
 
+function! ingo#area#frompattern#GetCurrent( pattern, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Extract the positions of the match of a:pattern that includes the current
+"   cursor position inside. This is a stronger condition than
+"   ingo#area#frompattern#GetAroundHere(), which may include text that matches
+"   before and after the current position, but does not neccessarily include the
+"   cursor position itself. So this function can be used when it's difficult to
+"   include a cursor position assertion (\%#) inside a:pattern.
+"* SEE ALSO:
+"   - ingo#text#frompattern#GetCurrent() returns the match, not the positions.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:pattern       Regular expression to search. 'ignorecase', 'smartcase' and
+"		    'magic' applies. When empty, the last search pattern |"/| is
+"		    used.
+"   a:returnValueOnNoSelection  Optional return value if there's no match. If
+"				omitted, [[0, 0], [0, 0]] will be returned.
+"   a:currentPos                Optional base position.
+"* RETURN VALUES:
+"   [[startLnum, startCol], [endLnum, endCol]], or a:returnValueOnNoSelection.
+"   endCol points to the last character, not beyond it!
+"******************************************************************************
+    let l:save_view = winsaveview()
+    if a:0 >= 2
+	let l:here = a:2
+	call setpos('.', ingo#pos#Make4(a:2))
+    else
+	let l:here = getpos('.')[1:2]
+    endif
+
+    let l:startPos = searchpos(a:pattern, 'bcnW', line('.'))
+    if l:startPos == [0, 0]
+	return (a:0 ? a:1 : [[0, 0], [0, 0]])
+    endif
+
+    try
+	call setpos('.', ingo#pos#Make4(l:startPos))
+	let l:endPos = searchpos(a:pattern, 'cenW', line('.'))
+	if l:endPos == [0, 0] || ingo#pos#IsBefore(l:endPos, l:here)
+	    return (a:0 ? a:1 : [[0, 0], [0, 0]])
+	endif
+	return [l:startPos, l:endPos]
+    finally
+	call winrestview(l:save_view)
+    endtry
+endfunction
+
 
 function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, isOnlyFirstMatch, isUnique )
 "******************************************************************************

@@ -141,6 +141,8 @@ HISTORY
 - Add ingo#window#special#HasDiffWindow().
 - Add ingo#funcref#UnaryIdentity().
 - Add ingo#pos#Sort().
+- Add ingo#area#frompattern#GetCurrent() and
+  ingo#text#frompattern#GetCurrent(), variants of ...#GetAroundHere().
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
