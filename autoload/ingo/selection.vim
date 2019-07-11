@@ -100,4 +100,25 @@ function! ingo#selection#Make( ... ) abort
     endif
 endfunction
 
+function! ingo#selection#GetInclusiveEndPos() abort
+    if &selection ==# 'exclusive'
+	let l:pos = getpos("'>")
+	let l:charBeforePosition = matchstr(getline(l:pos[1]), '.\%' . l:pos[2] . 'c')
+	let l:pos[2] -= len(l:charBeforePosition)
+	return l:pos
+    else
+	return getpos("'>")
+    endif
+endfunction
+function! ingo#selection#GetExclusiveEndPos() abort
+    if &selection ==# 'exclusive'
+	return getpos("'>")
+    else
+	let l:pos = getpos("'>")
+	let l:charAtPosition = matchstr(getline(l:pos[1]), '\%' . l:pos[2] . 'c.')
+	let l:pos[2] += len(l:charAtPosition)
+	return l:pos
+    endif
+endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
