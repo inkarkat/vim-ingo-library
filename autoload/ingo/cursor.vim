@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -61,8 +61,9 @@ function! ingo#cursor#IsAtEndOfLine( ... )
 endfunction
 
 
-function! ingo#cursor#StartInsert( isAtEndOfLine )
-    if a:isAtEndOfLine
+function! ingo#cursor#StartInsert( ... )
+    let l:isAtEndOfLine = (a:0 ? a:1 : ingo#cursor#IsAtEndOfLine())
+    if l:isAtEndOfLine
 	startinsert!
     else
 	startinsert
