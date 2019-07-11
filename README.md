@@ -140,6 +140,7 @@ HISTORY
   true.
 - Add ingo#window#special#HasDiffWindow().
 - Add ingo#funcref#UnaryIdentity().
+- Add ingo#pos#Sort().
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape

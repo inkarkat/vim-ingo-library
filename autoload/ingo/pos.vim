@@ -29,6 +29,9 @@ function! ingo#pos#Compare( posA, posB )
 	return (a:posA[0] > a:posB[0] || a:posA[0] == a:posB[0] && a:posA[1] > a:posB[1] ? 1 : -1)
     endif
 endfunction
+function! ingo#pos#Sort( positions ) abort
+    return sort(a:positions, function('ingo#pos#Compare'))
+endfunction
 
 function! ingo#pos#IsOnOrAfter( posA, posB )
     return (a:posA[0] > a:posB[0] || a:posA[0] == a:posB[0] && a:posA[1] >= a:posB[1])
