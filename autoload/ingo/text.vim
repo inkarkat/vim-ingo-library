@@ -5,7 +5,7 @@
 "   - ingo/pos.vim autoload script
 "   - ingo/regexp/virtcols.vim autoload script
 "
-" Copyright: (C) 2012-2018 Ingo Karkat
+" Copyright: (C) 2012-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -171,6 +171,34 @@ function! ingo#text#Insert( pos, text )
     endif
     return (setline(l:lnum, strpart(l:line, 0, l:col - 1) . a:text . strpart(l:line, l:col - 1)) == 0)
 endfunction
+function! ingo#text#Replace( pos, len, replacement, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Replace a:len bytes of text at a:pos with a:replacement.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   Buffer is modifiable.
+"* EFFECTS / POSTCONDITIONS:
+"   Changes the buffer.
+"* INPUTS:
+"   a:pos   [line, col]; col is the 1-based byte-index.
+"   a:len   Number of bytes to replace.
+"   a:replacement   Replacement text.
+"* RETURN VALUES:
+"   Flag whether the position existed and replacement was done.
+"******************************************************************************
+    let [l:lnum, l:col] = a:pos
+    if l:lnum > line('$')
+	return 0
+    endif
+
+    let l:line = getline(l:lnum)
+    if l:col > len(l:line)
+	return 0
+    elseif l:col < 1
+	throw (a:0 ? a:1 : 'Replace') . ': Column must be at least 1'
+    endif
+    return (setline(l:lnum, strpart(l:line, 0, l:col - 1) . a:replacement . strpart(l:line, l:col - 1 + a:len)) == 0)
+endfunction
 function! ingo#text#Remove( pos, len )
 "******************************************************************************
 "* PURPOSE:
@@ -185,18 +213,7 @@ function! ingo#text#Remove( pos, len )
 "* RETURN VALUES:
 "   Flag whether the position existed and removal was done.
 "******************************************************************************
-    let [l:lnum, l:col] = a:pos
-    if l:lnum > line('$')
-	return 0
-    endif
-
-    let l:line = getline(l:lnum)
-    if l:col > len(l:line)
-	return 0
-    elseif l:col < 1
-	throw 'Remove: Column must be at least 1'
-    endif
-    return (setline(l:lnum, strpart(l:line, 0, l:col - 1) . strpart(l:line, l:col - 1 + a:len)) == 0)
+    return ingo#text#Replace(a:pos, a:len, '', 'Remove')
 endfunction
 function! ingo#text#ReplaceChar( startPos, replacement, ... )
 "******************************************************************************

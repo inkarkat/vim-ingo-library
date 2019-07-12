@@ -144,6 +144,7 @@ HISTORY
 - Add ingo#area#frompattern#GetCurrent() and
   ingo#text#frompattern#GetCurrent(), variants of ...#GetAroundHere().
 - Add ingo#selection#Get{Ex,In}clusiveEndPos().
+- Add ingo#text#Replace(), a more generic variant of ingo#text#Remove().
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
