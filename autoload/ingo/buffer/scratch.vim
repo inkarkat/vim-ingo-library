@@ -11,7 +11,7 @@
 function! ingo#buffer#scratch#NextFilename( filespec )
     return ingo#buffer#generate#NextBracketedFilename(a:filespec, 'Scratch')
 endfunction
-function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIsFile, scratchCommand, windowOpenCommand )
+function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIsFile, scratchCommand, windowOpenCommand, ... )
 "*******************************************************************************
 "* PURPOSE:
 "   Create (or re-use an existing) scratch buffer (i.e. doesn't correspond to a
@@ -35,7 +35,9 @@ function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIs
 "			maintaining the current CWD is important for
 "			a:scratchCommand.
 "   a:scratchFilename	The name for the scratch buffer, so it can be saved via
-"			either :w! or :w <newname>.
+"			either :w! or :w <newname>. If this already exists (but
+"			isn't a scratch buffer), a different one will be
+"			generated.
 "   a:scratchIsFile	Flag whether the scratch buffer should behave like a
 "			file (i.e. adapt to changes in the global CWD), or not.
 "			If false and a:scratchDirspec is empty, there will be
@@ -51,6 +53,10 @@ function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIs
 "			directly to the lines.
 "   a:windowOpenCommand	Ex command to open the scratch window, e.g. :vnew or
 "			:topleft new.
+"   a:NextFilenameFuncref   Optional funcref that is invoked (with a:filename)
+"                           to generate file names for the generated buffer
+"                           should the desired one (a:filename) already exist
+"                           but not be a generated buffer.
 "* RETURN VALUES:
 "   Indicator whether the scratch buffer has been opened:
 "   0	Failed to open scratch buffer.
@@ -62,7 +68,7 @@ function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIs
 "   method call into a try..catch block and :close the scratch buffer when an
 "   exception is thrown.
 "*******************************************************************************
-    let l:status = ingo#buffer#generate#Create(a:scratchDirspec, a:scratchFilename, a:scratchIsFile, a:scratchCommand, a:windowOpenCommand, function('ingo#buffer#scratch#NextFilename'))
+    let l:status = ingo#buffer#generate#Create(a:scratchDirspec, a:scratchFilename, a:scratchIsFile, a:scratchCommand, a:windowOpenCommand, (a:0 ? a:1 : function('ingo#buffer#scratch#NextFilename')))
     if l:status != 0
 	call ingo#buffer#scratch#SetLocal(a:scratchIsFile, ! empty(a:scratchCommand))
     endif
@@ -76,7 +82,7 @@ function! ingo#buffer#scratch#SetLocal( isFile, isInitialized )
     endif
 endfunction
 
-function! ingo#buffer#scratch#CreateWithWriter( scratchFilename, Writer, scratchCommand, windowOpenCommand )
+function! ingo#buffer#scratch#CreateWithWriter( scratchFilename, Writer, scratchCommand, windowOpenCommand, ... )
 "*******************************************************************************
 "* PURPOSE:
 "   Create (or re-use an existing) scratch buffer that invokes a custom a:Writer
@@ -89,7 +95,9 @@ function! ingo#buffer#scratch#CreateWithWriter( scratchFilename, Writer, scratch
 "     a:windowOpenCommand) and activates that window.
 "   - Sets up autocmd that invokes a:Writer on :write.
 "* INPUTS:
-"   a:scratchFilename	The name for the scratch buffer.
+"   a:scratchFilename	The name for the scratch buffer. If this already exists
+"                       (but isn't a scratch buffer), a different one will be
+"                       generated.
 "   a:Writer            Ex command or Funcref that is invoked on :write.
 "   a:scratchCommand	Ex command(s) to populate the scratch buffer, e.g.
 "			":1read myfile". Use :1read so that the first empty line
@@ -101,6 +109,10 @@ function! ingo#buffer#scratch#CreateWithWriter( scratchFilename, Writer, scratch
 "			directly to the lines.
 "   a:windowOpenCommand	Ex command to open the scratch window, e.g. :vnew or
 "			:topleft new.
+"   a:NextFilenameFuncref   Optional funcref that is invoked (with a:filename)
+"                           to generate file names for the generated buffer
+"                           should the desired one (a:filename) already exist
+"                           but not be a generated buffer.
 "* RETURN VALUES:
 "   Indicator whether the scratch buffer has been opened:
 "   0	Failed to open scratch buffer.
@@ -112,7 +124,7 @@ function! ingo#buffer#scratch#CreateWithWriter( scratchFilename, Writer, scratch
 "   method call into a try..catch block and :close the scratch buffer when an
 "   exception is thrown.
 "*******************************************************************************
-    let l:status = ingo#buffer#generate#Create('', a:scratchFilename, 0, a:scratchCommand, a:windowOpenCommand, function('ingo#buffer#scratch#NextFilename'))
+    let l:status = ingo#buffer#generate#Create('', a:scratchFilename, 0, a:scratchCommand, a:windowOpenCommand, (a:0 ? a:1 : function('ingo#buffer#scratch#NextFilename')))
     if l:status != 0
 	setlocal buftype=acwrite bufhidden=wipe nobuflisted noswapfile
 	if ! empty(a:scratchCommand)

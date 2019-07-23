@@ -159,6 +159,8 @@ HISTORY							*ingo-library-history*
   ingo#text#frompattern#GetCurrent(), variants of ...#GetAroundHere().
 - Add ingo#selection#Get{Ex,In}clusiveEndPos().
 - Add ingo#text#Replace(), a more generic variant of ingo#text#Remove().
+- Add optional a:NextFilenameFuncref to
+  ingo#buffer#scratch#Create[WithWriter]().
 
 1.038	09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider <; in fact, it needs to escape
