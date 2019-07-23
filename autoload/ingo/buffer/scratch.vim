@@ -99,6 +99,8 @@ function! ingo#buffer#scratch#CreateWithWriter( scratchFilename, Writer, scratch
 "                       (but isn't a scratch buffer), a different one will be
 "                       generated.
 "   a:Writer            Ex command or Funcref that is invoked on :write.
+"			If empty, writing will not be supported, and this will
+"			work like ingo#buffer#scratch#Create().
 "   a:scratchCommand	Ex command(s) to populate the scratch buffer, e.g.
 "			":1read myfile". Use :1read so that the first empty line
 "			will be kept (it is deleted automatically), and there
@@ -125,6 +127,9 @@ function! ingo#buffer#scratch#CreateWithWriter( scratchFilename, Writer, scratch
 "   exception is thrown.
 "*******************************************************************************
     let l:status = ingo#buffer#generate#Create('', a:scratchFilename, 0, a:scratchCommand, a:windowOpenCommand, (a:0 ? a:1 : function('ingo#buffer#scratch#NextFilename')))
+    if empty(a:Writer)
+	return l:status
+    endif
     if l:status != 0
 	setlocal buftype=acwrite bufhidden=wipe nobuflisted noswapfile
 	if ! empty(a:scratchCommand)
