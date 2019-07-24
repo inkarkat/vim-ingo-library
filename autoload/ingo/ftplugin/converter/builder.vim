@@ -122,16 +122,17 @@ function! ingo#ftplugin#converter#builder#DifferentFiletype( targetFiletype, com
 endfunction
 
 function! s:MakeConverter( commandDefinition, commandArguments, isBang ) abort
-    return printf('%s call ingo#ftplugin#converter#builder#FilterBuffer(%s, %s, "%%", %d)',
+    return printf('%s call ingo#ftplugin#converter#builder#FilterBuffer(%s, %s, "''[,'']", %d)',
     \   (exists(':KeepView') == 2 ? 'KeepView' : ''),
     \   string(a:commandDefinition), string(a:commandArguments), a:isBang
     \)
 endfunction
-function! ingo#ftplugin#converter#builder#EditAsFiletype( targetFiletype, forwardCommandDefinitionsVariable, backwardCommandDefinitionsVariable, isBang, arguments, windowOpenCommand, ... ) abort
+function! ingo#ftplugin#converter#builder#EditAsFiletype( targetFiletype, forwardCommandDefinitionsVariable, backwardCommandDefinitionsVariable, startLnum, endLnum, isBang, arguments, windowOpenCommand, ... ) abort
 "******************************************************************************
 "* PURPOSE:
-"   Build a command that allows editing the current buffer in a converted
-"   scratch buffer by converting its contents through an command and back.
+"   Build a command that allows editing the a:startLnum,a:endLnum range in the
+"   current buffer in a converted scratch buffer by converting its contents
+"   through an command and back.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -147,6 +148,8 @@ function! ingo#ftplugin#converter#builder#EditAsFiletype( targetFiletype, forwar
 "   a:backwardCommandDefinitionsVariable
 "		    Name of a List of Definitions objects for converting back to
 "		    the original filetype.
+"   a:startLnum     First line number in the current buffer to be edited.
+"   a:endLnum       Last line number in the current buffer to be edited.
 "   a:isBang        Flag whether [!] has been supplied.
 "   a:arguments     Converter argument (optional if there's just one configured
 "                   converter), followed by optional arguments for
@@ -163,9 +166,10 @@ function! ingo#ftplugin#converter#builder#EditAsFiletype( targetFiletype, forwar
 "                   different pre commands for each definition, whereas this one
 "                   applies to all definitions.
 "* USAGE:
-"   command! -bang -bar -nargs=? FooEditAsBar
+"   command! -bang -bar -range=% -nargs=? FooEditAsBar
 "   \   if ! ingo#ftplugin#converter#builder#EditAsFiletype('bar', 'g:Foo_Converters',
-"   \       'g:Bar_Converters', 0, <q-args>, 'new') | echoerr ingo#err#Get() | endif
+"   \       'g:Bar_Converters', <line1>, <line2>, 0, <q-args>, 'new') |
+"   \       echoerr ingo#err#Get() | endif
 "* RETURN VALUES:
 "   1 if successful, 0 if ingo#err#Set().
 "******************************************************************************
@@ -190,6 +194,7 @@ function! ingo#ftplugin#converter#builder#EditAsFiletype( targetFiletype, forwar
 	let l:targetName = (empty(bufname('')) ? 'untitled' : expand('%:r')) . '.' . l:targetFiletype
 
 	if ! ingo#buffer#scratch#converted#Create(
+	\   a:startLnum, a:endLnum,
 	\   l:targetName,
 	\   s:MakeConverter(l:forwardCommandDefinition, l:commandArguments, a:isBang),
 	\   s:MakeConverter(l:backwardCommandDefinition, l:commandArguments, a:isBang),

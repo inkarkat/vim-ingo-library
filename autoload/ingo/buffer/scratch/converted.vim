@@ -9,7 +9,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! ingo#buffer#scratch#converted#Create( scratchFilename, ForwardConverter, BackwardConverter, windowOpenCommand, ... ) abort
+function! ingo#buffer#scratch#converted#Create( startLnum, endLnum, scratchFilename, ForwardConverter, BackwardConverter, windowOpenCommand, ... ) abort
 "******************************************************************************
 "* PURPOSE:
 "   Convert the current buffer via a:ForwardConverter into a scratch buffer
@@ -22,8 +22,13 @@ function! ingo#buffer#scratch#converted#Create( scratchFilename, ForwardConverte
 "     a:windowOpenCommand) and activates that window.
 "   - Sets up autocmd, buffer-local mappings and commands.
 "* INPUTS:
+"   a:startLnum     First line number in the current buffer to be edited.
+"   a:endLnum       Last line number in the current buffer to be edited.
 "   a:scratchFilename	The name for the scratch buffer.
 "   a:ForwardConverter  Ex command or Funcref that converts the buffer contents.
+"			To support updates to arbitrary ranges in the original
+"			buffer, the conversion should be applied to :'[,'], the
+"			changed area, and keep / adapt those marks.
 "   a:BackwardConverter Ex command or Funcref that converts the buffer contents
 "                       back to the original contents.
 "   a:windowOpenCommand	Ex command to open the scratch window, e.g. :vnew or
@@ -58,6 +63,7 @@ function! ingo#buffer#scratch#converted#Create( scratchFilename, ForwardConverte
 "   3	Loaded existing scratch buffer in new window.
 "   4	Created scratch buffer in new window.
 "******************************************************************************
+    let [l:startLnum, l:endLnum] = [ingo#range#NetStart(a:startLnum), ingo#range#NetEnd(a:endLnum)]
     let l:options = (a:0 ? a:1 : {})
     let l:NextFilenameFuncref = get(l:options, 'NextFilenameFuncref', '')
     let l:toggleCommand = get(l:options, 'toggleCommand', 'Toggle')
@@ -70,9 +76,10 @@ function! ingo#buffer#scratch#converted#Create( scratchFilename, ForwardConverte
     let l:originalBufNr = bufnr('')
     let l:originalBuffer = ingo#window#switches#WinSaveCurrentBuffer(1)
     let g:ingo#buffer#scratch#converted#CreationContext = {
-    \   'lines': getline(1, '$'),
+    \   'lines': getline(l:startLnum, l:endLnum),
     \   'Converter': a:ForwardConverter,
     \}
+    call ingo#change#Set([l:startLnum, 1], [l:endLnum, 1])  " Mark the affected area with the change marks for writing back any updates.
     if l:isShowDiff
 	diffthis
     endif
@@ -115,9 +122,13 @@ function! ingo#buffer#scratch#converted#Create( scratchFilename, ForwardConverte
     \}
     return l:status
 endfunction
+function! s:ConvertEntireBuffer( Converter ) abort
+    call ingo#change#Set([1, 1], [line('$'), 1])
+    call ingo#actions#ExecuteOrFunc(a:Converter)
+endfunction
 function! ingo#buffer#scratch#converted#Creator() abort
     call setline(1, g:ingo#buffer#scratch#converted#CreationContext.lines)
-    call ingo#actions#ExecuteOrFunc(g:ingo#buffer#scratch#converted#CreationContext.Converter)
+    call s:ConvertEntireBuffer(g:ingo#buffer#scratch#converted#CreationContext.Converter)
     unlet g:ingo#buffer#scratch#converted#CreationContext
 endfunction
 function! ingo#buffer#scratch#converted#Toggle() abort
@@ -125,7 +136,7 @@ function! ingo#buffer#scratch#converted#Toggle() abort
     let l:Converter = get(b:IngoLibrary_scratch_converted, l:isConverted ? 'BackwardConverter' : 'ForwardConverter')
     let l:save_modified = &l:modified
     try
-	call ingo#actions#ExecuteOrFunc(l:Converter)
+	call s:ConvertEntireBuffer(l:Converter)
 	let &l:modified = l:save_modified
 	let b:IngoLibrary_scratch_converted.isConverted = ! l:isConverted
 
@@ -145,7 +156,7 @@ function! ingo#buffer#scratch#converted#Toggle() abort
 endfunction
 function! ingo#buffer#scratch#converted#Writer() abort
     let l:record = b:IngoLibrary_scratch_converted  " Need to save this here as we're switching buffers.
-    let l:lines = getline(1, '$')
+    let l:lines = getline(1, '$')   " Always write back the entire scratch buffer contents.
 
     let l:scratchTabNr = tabpagenr()
     let l:previousWinNr = winnr('#') ? winnr('#') : 1
@@ -162,8 +173,9 @@ function! ingo#buffer#scratch#converted#Writer() abort
     endtry
 
     let l:success = 1
-    let l:save_lines = getline(1, '$')
-    call ingo#lines#Replace(1, line('$'), l:lines)
+    let [l:startLnum, l:endLnum] = [line("'["), line("']")]
+    let l:save_lines = getline(l:startLnum, l:endLnum)
+    call ingo#lines#Replace(l:startLnum, l:endLnum, l:lines)
     if l:record.isConverted
 	" Need to convert back.
 	try
@@ -173,7 +185,7 @@ function! ingo#buffer#scratch#converted#Writer() abort
 	    call ingo#err#SetVimException()
 
 	    " Restore the original buffer contents.
-	    call ingo#lines#Replace(1, line('$'), l:save_lines)
+	    call ingo#lines#Replace(l:startLnum, l:endLnum, l:save_lines)
 
 	    " Don't return yet, we still need to go back to the scratch buffer.
 	endtry
