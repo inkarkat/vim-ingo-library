@@ -152,7 +152,7 @@ function! ingo#buffer#generate#Create( dirspec, filename, isFile, ContentsComman
 "   3	Loaded existing buffer in new window.
 "   4	Created buffer in new window.
 "   Note: To handle errors caused by a:ContentsCommand, you need to put this
-"   method call into a try..catch block and :close the buffer when an exception
+"   method call into a try..catch block and :bwipe the buffer when an exception
 "   is thrown.
 "*******************************************************************************
     let l:currentWinNr = winnr()
