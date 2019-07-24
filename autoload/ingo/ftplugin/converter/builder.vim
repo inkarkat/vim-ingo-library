@@ -119,6 +119,11 @@ function! ingo#ftplugin#converter#builder#DifferentFiletype( targetFiletype, com
     return l:success
 endfunction
 
+function! s:MakeConverter( commandDefinition, commandArguments, isBang ) abort
+    return printf('call ingo#ftplugin#converter#builder#FilterBuffer(%s, %s, "%%", %d)',
+    \   string(a:commandDefinition), string(a:commandArguments), a:isBang
+    \)
+endfunction
 function! ingo#ftplugin#converter#builder#EditAsFiletype( targetFiletype, forwardCommandDefinitionsVariable, backwardCommandDefinitionsVariable, isBang, arguments, windowOpenCommand, ... ) abort
 "******************************************************************************
 "* PURPOSE:
@@ -197,12 +202,8 @@ function! ingo#ftplugin#converter#builder#EditAsFiletype( targetFiletype, forwar
 
 	if ! ingo#buffer#scratch#converted#Create(
 	\   l:targetName,
-	\   printf('call ingo#ftplugin#converter#builder#FilterBuffer(%s, %s, "%%", %d)',
-	\       string(l:forwardCommandDefinition), string(l:commandArguments), a:isBang
-	\   ),
-	\   printf('call ingo#ftplugin#converter#builder#FilterBuffer(%s, %s, "%%", %d)',
-	\       string(l:backwardCommandDefinition), string(l:commandArguments), a:isBang
-	\   ),
+	\   s:MakeConverter(l:forwardCommandDefinition, l:commandArguments, a:isBang),
+	\   s:MakeConverter(l:backwardCommandDefinition, l:commandArguments, a:isBang),
 	\   a:windowOpenCommand,
 	\   l:options
 	\)
