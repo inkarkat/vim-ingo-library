@@ -65,13 +65,14 @@ function! ingo#buffer#scratch#converted#Create( startLnum, endLnum, scratchFilen
 "   4	Created scratch buffer in new window.
 "******************************************************************************
     let [l:startLnum, l:endLnum] = [ingo#range#NetStart(a:startLnum), ingo#range#NetEnd(a:endLnum)]
+    let l:isEntireBuffer = ingo#range#IsEntireBuffer(l:startLnum, l:endLnum)
 
     let l:options = (a:0 ? a:1 : {})
     let l:NextFilenameFuncref = get(l:options, 'NextFilenameFuncref', '')
     let l:toggleCommand = get(l:options, 'toggleCommand', 'Toggle')
     let l:toggleMapping = get(l:options, 'toggleMapping', '<LocalLeader><LocalLeader>')
     let l:quitMapping = get(l:options, 'quitMapping', 'q')
-    let l:isShowDiff = get(l:options, 'isShowDiff', ingo#range#IsEntireBuffer(l:startLnum, l:endLnum))
+    let l:isShowDiff = get(l:options, 'isShowDiff', l:isEntireBuffer)
     let l:isAllowUpdate = get(l:options, 'isAllowUpdate', 1)
 
     let l:originalDiff = &l:diff
@@ -81,7 +82,16 @@ function! ingo#buffer#scratch#converted#Create( startLnum, endLnum, scratchFilen
     \   'lines': getline(l:startLnum, l:endLnum),
     \   'Converter': a:ForwardConverter,
     \}
-    call ingo#change#Set([l:startLnum, 1], [l:endLnum, 1])  " Mark the affected area with the change marks for writing back any updates.
+    if l:isAllowUpdate && ! l:isEntireBuffer
+	" Use marks to keep track of the changed area in the original buffer, so
+	" that other edits (which clobber the change marks) can be made in
+	" parallel.
+	let l:reservedMarksRecord = ingo#plugin#marks#Reserve(2)
+	let l:reservedMarks = keys(l:reservedMarksRecord)
+	call setpos("'" . l:reservedMarks[0], [0, l:startLnum, 1, 0])
+	call setpos("'" . l:reservedMarks[1], [0, l:endLnum, 1, 0])
+    endif
+
     if l:isShowDiff
 	diffthis
     endif
@@ -96,6 +106,20 @@ function! ingo#buffer#scratch#converted#Create( startLnum, endLnum, scratchFilen
     if l:status == 0
 	let &l:diff = l:originalDiff    " The other participant isn't there, so undo enabling of diff mode.
 	return l:status
+    endif
+
+    " We're in the scratch buffer now.
+    if exists('l:reservedMarksRecord')
+	" Unreserve the reserved marks. As these are local marks in the original
+	" buffer, we do this when we enter it after the scratch buffer got
+	" deleted.
+	augroup IngoLibraryScratchConverter
+	    execute printf('autocmd! BufEnter <buffer=%d> if ! bufexists(%d) | call ingo#plugin#marks#Unreserve(%s) | execute "autocmd! IngoLibraryScratchConverter * <buffer>" | endif',
+	    \   l:originalBufNr,
+	    \   bufnr(''),
+	    \   string(l:reservedMarksRecord)
+	    \)
+	augroup END
     endif
 
     if ! empty(l:toggleCommand)
@@ -122,6 +146,10 @@ function! ingo#buffer#scratch#converted#Create( startLnum, endLnum, scratchFilen
     \   'ForwardConverter': a:ForwardConverter,
     \   'BackwardConverter': a:BackwardConverter,
     \}
+    if exists('l:reservedMarksRecord')
+	let b:IngoLibrary_scratch_converted.reservedMarks = l:reservedMarks
+    endif
+
     return l:status
 endfunction
 function! s:ConvertEntireBuffer( Converter ) abort
@@ -175,13 +203,22 @@ function! ingo#buffer#scratch#converted#Writer() abort
     endtry
 
     let l:success = 1
-    let [l:startLnum, l:endLnum] = [line("'["), line("']")]
+    let [l:startLnum, l:endLnum] = (has_key(l:record, 'reservedMarks') ?
+    \   [line("'" . l:record.reservedMarks[0]), line("'" . l:record.reservedMarks[1])] :
+    \   [1, line('$')]
+    \)
     let l:save_lines = getline(l:startLnum, l:endLnum)
     call ingo#lines#Replace(l:startLnum, l:endLnum, l:lines)
     if l:record.isConverted
 	" Need to convert back.
 	try
 	    call ingo#actions#ExecuteOrFunc(l:record.BackwardConverter)
+
+	    if has_key(l:record, 'reservedMarks')
+		" The marks need to be redone after the change.
+		call setpos("'" . l:record.reservedMarks[0], getpos("'["))
+		call setpos("'" . l:record.reservedMarks[1], getpos("']"))
+	    endif
 	catch /^Vim\%((\a\+)\)\=:/
 	    let l:success = 0
 	    call ingo#err#SetVimException()
