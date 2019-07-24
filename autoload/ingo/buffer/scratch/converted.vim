@@ -123,8 +123,10 @@ endfunction
 function! ingo#buffer#scratch#converted#Toggle() abort
     let l:isConverted = b:IngoLibrary_scratch_converted.isConverted
     let l:Converter = get(b:IngoLibrary_scratch_converted, l:isConverted ? 'BackwardConverter' : 'ForwardConverter')
+    let l:save_modified = &l:modified
     try
 	call ingo#actions#ExecuteOrFunc(l:Converter)
+	let &l:modified = l:save_modified
 	let b:IngoLibrary_scratch_converted.isConverted = ! l:isConverted
 
 	if b:IngoLibrary_scratch_converted.isShowDiff
