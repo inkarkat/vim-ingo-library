@@ -7,7 +7,7 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
-function! s:FilterBuffer( commandDefinition, commandArguments, range, isBang )
+function! ingo#ftplugin#converter#builder#FilterBuffer( commandDefinition, commandArguments, range, isBang )
     if has_key(a:commandDefinition, 'commandline')
 	let l:commandLine = ingo#actions#ValueOrFunc(a:commandDefinition.commandline, {'definition': a:commandDefinition, 'range': a:range, 'isBang': a:isBang, 'arguments': a:commandArguments})
 	if has_key(a:commandDefinition, 'command')
@@ -81,7 +81,7 @@ function! ingo#ftplugin#converter#builder#Filter( commandDefinitionsVariable, ra
 	    execute a:1
 	endif
 
-	call s:FilterBuffer(l:commandDefinition, l:commandArguments, a:range, a:isBang)
+	call ingo#ftplugin#converter#builder#FilterBuffer(l:commandDefinition, l:commandArguments, a:range, a:isBang)
 
 	let l:targetFiletype = get(l:commandDefinition, 'filetype', '')
 	if ! empty(l:targetFiletype)
