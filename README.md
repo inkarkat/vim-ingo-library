@@ -94,6 +94,11 @@ window is deemed special.
     let g:IngoLibrary_SpecialWindowPredicates =
     \   ['bufname(winbufnr(v:val)) =~# "^\\[\\%(Scratch\\|clipboard\\)\\]$"']
 
+ingo#plugin#marks#Reserve() by default uses any unused mark. You can instead
+assign a fixed set of marks that will be available for plugins via:
+
+    let g:IngoLibrary_Marks = 'abcABC'
+
 INSTALLATION
 ------------------------------------------------------------------------------
 
@@ -153,6 +158,8 @@ HISTORY
   a scratch buffer with the possibility to sync back and
   ingo#ftplugin#converter#builder#EditAsFiletype() that can be used by
   filetype plugins to edit one filetype in an intermediate different format.
+- ENH: Allow to preset reserved marks for ingo#plugin#marks#Reserve() via
+  g:IngoLibrary\_Marks.
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
