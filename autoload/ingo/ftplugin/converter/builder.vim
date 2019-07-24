@@ -60,6 +60,7 @@ function! ingo#ftplugin#converter#builder#Filter( commandDefinitionsVariable, ra
 "	postAction: Optional Ex command or Funcref that is invoked after
 "                   successful execution of the external command.
 "   a:range         Range of lines to be filtered.
+"   a:isBang        Flag whether [!] has been supplied.
 "   a:arguments     Converter argument (optional if there's just one configured
 "                   converter), followed by optional arguments for
 "                   a:commandDefinitionsVariable.command, all passed by the user
@@ -139,28 +140,14 @@ function! ingo#ftplugin#converter#builder#EditAsFiletype( targetFiletype, forwar
 "   a:targetFiletype    Target 'filetype' that the buffer is set to if the
 "                       filtering has been successful. If not empty, overrides
 "                       a:forwardCommandDefinitionsVariable.filetype.
-"   a:forwardCommandDefinitionsVariable Name of a List of Definitions objects to
-"                                       convert to the target filetype:
-"	command:    Command to execute.
-"	commandline:printf() (or ingo#format#Format()) template for inserting
-"		    command and command arguments to build the Ex command-line
-"		    to execute. a:range is prepended to this. To filter through
-"		    an external command, start the commandline with "!".
-"		    Or a Funcref that gets passed the invocation context (and
-"		    Dictionary with these keys: definition, range, isBang,
-"		    arguments) and should return the (dynamically generated)
-"		    commandline.
-"	arguments:  List of possible command-line arguments supported by
-"                   command, used as completion candidates.
-"	filetype:   Optional value to :setlocal filetype to.
-"	extension:  Optional file extension (for
-"		    ingo#ftplugin#converter#external#ExtractText())
-"	preAction:  Optional Ex command or Funcref that is invoked before the
-"                   external command.
-"	postAction: Optional Ex command or Funcref that is invoked after
-"                   successful execution of the external command.
-"   a:backwardCommandDefinitionsVariable    Name of a List of Definitions
-"                   objects for converting back to the original filetype.
+"   a:forwardCommandDefinitionsVariable
+"		    Name of a List of Definitions objects to convert to the
+"		    target filetype; see
+"		    ingo#ftplugin#converter#builder#Filter() for details.
+"   a:backwardCommandDefinitionsVariable
+"		    Name of a List of Definitions objects for converting back to
+"		    the original filetype.
+"   a:isBang        Flag whether [!] has been supplied.
 "   a:arguments     Converter argument (optional if there's just one configured
 "                   converter), followed by optional arguments for
 "                   a:commandDefinitionsVariable.command, all passed by the user
@@ -176,7 +163,7 @@ function! ingo#ftplugin#converter#builder#EditAsFiletype( targetFiletype, forwar
 "                   different pre commands for each definition, whereas this one
 "                   applies to all definitions.
 "* USAGE:
-"   command! -bang -bar -range=% -nargs=? FooEditAsBar
+"   command! -bang -bar -nargs=? FooEditAsBar
 "   \   if ! ingo#ftplugin#converter#builder#EditAsFiletype('bar', 'g:Foo_Converters',
 "   \       'g:Bar_Converters', 0, <q-args>, 'new') | echoerr ingo#err#Get() | endif
 "* RETURN VALUES:
