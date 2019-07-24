@@ -10,6 +10,7 @@ autoload/ingo/buffer/ephemeral.vim
 autoload/ingo/buffer/generate.vim
 autoload/ingo/buffer/locate.vim
 autoload/ingo/buffer/scratch.vim
+autoload/ingo/buffer/scratch/converted.vim
 autoload/ingo/buffer/temp.vim
 autoload/ingo/buffer/temprange.vim
 autoload/ingo/buffer/visible.vim

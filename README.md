@@ -149,6 +149,10 @@ HISTORY
   ingo#buffer#scratch#Create\[WithWriter]().
 - ENH: Also support Funcref a:contentsCommand / a:scratchCommand for
   ingo#buffer#generate#Create() and ingo#buffer#scratch#Create\[WithWriter]().
+- Add ingo#buffer#scratch#converted#Create() to convert buffer contents to
+  a scratch buffer with the possibility to sync back and
+  ingo#ftplugin#converter#builder#EditAsFiletype() that can be used by
+  filetype plugins to edit one filetype in an intermediate different format.
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape

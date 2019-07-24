@@ -119,4 +119,114 @@ function! ingo#ftplugin#converter#builder#DifferentFiletype( targetFiletype, com
     return l:success
 endfunction
 
+function! ingo#ftplugin#converter#builder#EditAsFiletype( targetFiletype, forwardCommandDefinitionsVariable, backwardCommandDefinitionsVariable, isBang, arguments, windowOpenCommand, ... ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Build a command that allows editing the current buffer in a converted
+"   scratch buffer by converting its contents through an command and back.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Changes the current buffer.
+"* INPUTS:
+"   a:targetFiletype    Target 'filetype' that the buffer is set to if the
+"                       filtering has been successful. If not empty, overrides
+"                       a:forwardCommandDefinitionsVariable.filetype.
+"   a:forwardCommandDefinitionsVariable Name of a List of Definitions objects to
+"                                       convert to the target filetype:
+"	command:    Command to execute.
+"	commandline:printf() (or ingo#format#Format()) template for inserting
+"		    command and command arguments to build the Ex command-line
+"		    to execute. a:range is prepended to this. To filter through
+"		    an external command, start the commandline with "!".
+"		    Or a Funcref that gets passed the invocation context (and
+"		    Dictionary with these keys: definition, range, isBang,
+"		    arguments) and should return the (dynamically generated)
+"		    commandline.
+"	arguments:  List of possible command-line arguments supported by
+"                   command, used as completion candidates.
+"	filetype:   Optional value to :setlocal filetype to.
+"	extension:  Optional file extension (for
+"		    ingo#ftplugin#converter#external#ExtractText())
+"	preAction:  Optional Ex command or Funcref that is invoked before the
+"                   external command.
+"	postAction: Optional Ex command or Funcref that is invoked after
+"                   successful execution of the external command.
+"   a:backwardCommandDefinitionsVariable    Name of a List of Definitions
+"                   objects for converting back to the original filetype.
+"   a:arguments     Converter argument (optional if there's just one configured
+"                   converter), followed by optional arguments for
+"                   a:commandDefinitionsVariable.command, all passed by the user
+"                   to the built command.
+"   a:windowOpenCommand	Ex command to open the scratch window, e.g. :vnew or
+"			:topleft new.
+"   a:options       Optional configuration of
+"                   ingo#buffer#scratch#converted#Create(). In addition, these
+"                   values can be set:
+"   a:options.preCommand
+"		    Optional Ex command to be executed before anything else.
+"                   a:forwardCommandDefinitionsVariable.preAction can configure
+"                   different pre commands for each definition, whereas this one
+"                   applies to all definitions.
+"* USAGE:
+"   command! -bang -bar -range=% -nargs=? FooEditAsBar
+"   \   if ! ingo#ftplugin#converter#builder#EditAsFiletype('bar', 'g:Foo_Converters',
+"   \       'g:Bar_Converters', 0, <q-args>, 'new') | echoerr ingo#err#Get() | endif
+"* RETURN VALUES:
+"   1 if successful, 0 if ingo#err#Set().
+"******************************************************************************
+    let l:options = (a:0 ? a:1 : {})
+    if ! &l:modifiable && ! has_key(l:options, 'isAllowUpdate')
+	" Disable persistence to original buffer if that one cannot be modified.
+	let l:options.isAllowUpdate = 0
+    endif
+    let l:preCommand = get(l:options, 'preCommand', '')
+    let l:originalBufNr = bufnr('')
+
+    try
+	let [l:forwardCommandDefinition, l:commandArguments] = ingo#ftplugin#converter#GetCommandDefinition(a:forwardCommandDefinitionsVariable, a:arguments)
+	let [l:backwardCommandDefinition, l:ignoredDuplicateCommandArguments] = ingo#ftplugin#converter#GetCommandDefinition(a:backwardCommandDefinitionsVariable, a:arguments)
+
+	execute l:preCommand
+
+	let l:targetFiletype = (empty(a:targetFiletype) ?
+	\   get(l:forwardCommandDefinition, 'filetype', '') :
+	\   a:targetFiletype
+	\)
+	let l:targetName = (empty(bufname('')) ? 'untitled' : expand('%:r')) . '.' . l:targetFiletype
+
+	if ! ingo#buffer#scratch#converted#Create(
+	\   l:targetName,
+	\   printf('call ingo#ftplugin#converter#builder#FilterBuffer(%s, %s, "%%", %d)',
+	\       string(l:forwardCommandDefinition), string(l:commandArguments), a:isBang
+	\   ),
+	\   printf('call ingo#ftplugin#converter#builder#FilterBuffer(%s, %s, "%%", %d)',
+	\       string(l:backwardCommandDefinition), string(l:commandArguments), a:isBang
+	\   ),
+	\   a:windowOpenCommand,
+	\   l:options
+	\)
+	    call ingo#err#Set('Failed to open scratch buffer for ' . l:targetName)
+	    return 0
+	endif
+
+	if ! empty(l:targetFiletype)
+	    let &l:filetype = l:targetFiletype
+	endif
+
+	return 1
+    catch /^converter:/
+	call ingo#err#SetCustomException('converter')
+	return 0
+    catch /^Vim\%((\a\+)\)\=:/
+	call ingo#err#SetVimException()
+
+	if bufnr('') != l:originalBufNr
+	    bwipe!  " A scratch buffer has already been opened; remove it.
+	endif
+
+	return 0
+    endtry
+endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
