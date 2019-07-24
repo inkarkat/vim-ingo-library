@@ -49,6 +49,7 @@ function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIs
 "			will be no trailing empty line.
 "			Pass empty string if you want to populate the scratch
 "			buffer yourself.
+"			Pass a Funcref to build the scratch contents with it.
 "			Pass a List of lines to set the scratch buffer contents
 "			directly to the lines.
 "   a:windowOpenCommand	Ex command to open the scratch window, e.g. :vnew or
@@ -107,6 +108,7 @@ function! ingo#buffer#scratch#CreateWithWriter( scratchFilename, Writer, scratch
 "			will be no trailing empty line.
 "			Pass empty string if you want to populate the scratch
 "			buffer yourself.
+"			Pass a Funcref to build the scratch contents with it.
 "			Pass a List of lines to set the scratch buffer contents
 "			directly to the lines.
 "   a:windowOpenCommand	Ex command to open the scratch window, e.g. :vnew or

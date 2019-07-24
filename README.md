@@ -147,6 +147,8 @@ HISTORY
 - Add ingo#text#Replace(), a more generic variant of ingo#text#Remove().
 - Add optional a:NextFilenameFuncref to
   ingo#buffer#scratch#Create\[WithWriter]().
+- ENH: Also support Funcref a:contentsCommand / a:scratchCommand for
+  ingo#buffer#generate#Create() and ingo#buffer#scratch#Create\[WithWriter]().
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
