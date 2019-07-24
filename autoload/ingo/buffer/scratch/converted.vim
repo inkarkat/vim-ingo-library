@@ -39,8 +39,8 @@ function! ingo#buffer#scratch#converted#Create( scratchFilename, ForwardConverte
 "                           empty String is passed.
 "   a:option.toggleMapping  Name of a buffer-local mapping to toggle the scratch
 "                           contents between original and converted formats.
-"                           Defaults to <CR>. No mapping is defined when an
-"                           empty String is passed.
+"                           Defaults to <LocalLeader><LocalLeader>. No mapping
+"                           is defined when an empty String is passed.
 "   a:option.quitMapping    Name of a buffer-local mapping to exit the scratch
 "                           buffer. Defaults to q.
 "   a:option.isShowDiff     Flag whether the scratch buffer is diffed with the
@@ -61,7 +61,7 @@ function! ingo#buffer#scratch#converted#Create( scratchFilename, ForwardConverte
     let l:options = (a:0 ? a:1 : {})
     let l:NextFilenameFuncref = get(l:options, 'NextFilenameFuncref', '')
     let l:toggleCommand = get(l:options, 'toggleCommand', 'Toggle')
-    let l:toggleMapping = get(l:options, 'toggleMapping', '<CR>')
+    let l:toggleMapping = get(l:options, 'toggleMapping', '<LocalLeader><LocalLeader>')
     let l:quitMapping = get(l:options, 'quitMapping', 'q')
     let l:isShowDiff = get(l:options, 'isShowDiff', 1)
     let l:isAllowUpdate = get(l:options, 'isAllowUpdate', 1)
