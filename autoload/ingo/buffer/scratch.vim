@@ -129,18 +129,18 @@ function! ingo#buffer#scratch#CreateWithWriter( scratchFilename, Writer, scratch
 "   exception is thrown.
 "*******************************************************************************
     let l:status = ingo#buffer#generate#Create('', a:scratchFilename, 0, a:scratchCommand, a:windowOpenCommand, (a:0 ? a:1 : function('ingo#buffer#scratch#NextFilename')))
-    if empty(a:Writer)
-	return l:status
-    endif
     if l:status != 0
-	setlocal buftype=acwrite bufhidden=wipe nobuflisted noswapfile
+	let &l:buftype = (empty(a:Writer) ? 'nofile' : 'acwrite')
+	setlocal bufhidden=wipe nobuflisted noswapfile
 	if ! empty(a:scratchCommand)
 	    setlocal nomodified
 	endif
 
-	augroup IngoLibraryScratchWriter
-	    execute printf('autocmd! BufWriteCmd <buffer> call ingo#actions#ExecuteOrFunc(%s)', string(a:Writer))
-	augroup END
+	if ! empty(a:Writer)
+	    augroup IngoLibraryScratchWriter
+		execute printf('autocmd! BufWriteCmd <buffer> call ingo#actions#ExecuteOrFunc(%s)', string(a:Writer))
+	    augroup END
+	endif
     endif
     return l:status
 endfunction
