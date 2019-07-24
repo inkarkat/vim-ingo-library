@@ -1,6 +1,7 @@
 " ingo/ftplugin/converter/builder.vim: Build a file converter via an Ex command.
 "
 " DEPENDENCIES:
+"   - :KeepView command (from anwolib.vim) (optional)
 "
 " Copyright: (C) 2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -120,7 +121,8 @@ function! ingo#ftplugin#converter#builder#DifferentFiletype( targetFiletype, com
 endfunction
 
 function! s:MakeConverter( commandDefinition, commandArguments, isBang ) abort
-    return printf('call ingo#ftplugin#converter#builder#FilterBuffer(%s, %s, "%%", %d)',
+    return printf('%s call ingo#ftplugin#converter#builder#FilterBuffer(%s, %s, "%%", %d)',
+    \   (exists(':KeepView') == 2 ? 'KeepView' : ''),
     \   string(a:commandDefinition), string(a:commandArguments), a:isBang
     \)
 endfunction
