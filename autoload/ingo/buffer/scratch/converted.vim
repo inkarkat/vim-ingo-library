@@ -49,7 +49,8 @@ function! ingo#buffer#scratch#converted#Create( startLnum, endLnum, scratchFilen
 "   a:option.quitMapping    Name of a buffer-local mapping to exit the scratch
 "                           buffer. Defaults to q.
 "   a:option.isShowDiff     Flag whether the scratch buffer is diffed with the
-"                           original buffer when it is toggled back. Default true.
+"                           original buffer when it is toggled back. By default
+"                           is turned on if the entire buffer is being edited.
 "   a:option.isAllowUpdate  Flag whether :write can be used to update the
 "                           original buffer. Default true.
 "   Note: To handle errors caused by the initial conversion via
@@ -64,12 +65,13 @@ function! ingo#buffer#scratch#converted#Create( startLnum, endLnum, scratchFilen
 "   4	Created scratch buffer in new window.
 "******************************************************************************
     let [l:startLnum, l:endLnum] = [ingo#range#NetStart(a:startLnum), ingo#range#NetEnd(a:endLnum)]
+
     let l:options = (a:0 ? a:1 : {})
     let l:NextFilenameFuncref = get(l:options, 'NextFilenameFuncref', '')
     let l:toggleCommand = get(l:options, 'toggleCommand', 'Toggle')
     let l:toggleMapping = get(l:options, 'toggleMapping', '<LocalLeader><LocalLeader>')
     let l:quitMapping = get(l:options, 'quitMapping', 'q')
-    let l:isShowDiff = get(l:options, 'isShowDiff', 1)
+    let l:isShowDiff = get(l:options, 'isShowDiff', ingo#range#IsEntireBuffer(l:startLnum, l:endLnum))
     let l:isAllowUpdate = get(l:options, 'isAllowUpdate', 1)
 
     let l:originalDiff = &l:diff
