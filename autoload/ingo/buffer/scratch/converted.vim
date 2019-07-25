@@ -72,12 +72,17 @@ function! ingo#buffer#scratch#converted#Create( startLnum, endLnum, scratchFilen
     let l:toggleCommand = get(l:options, 'toggleCommand', 'Toggle')
     let l:toggleMapping = get(l:options, 'toggleMapping', '<LocalLeader><LocalLeader>')
     let l:quitMapping = get(l:options, 'quitMapping', 'q')
-    let l:isShowDiff = get(l:options, 'isShowDiff', l:isEntireBuffer)
     let l:isAllowUpdate = get(l:options, 'isAllowUpdate', 1)
 
-    let l:originalDiff = &l:diff
-    let l:originalBufNr = bufnr('')
-    let l:originalBuffer = ingo#window#switches#WinSaveCurrentBuffer(1)
+    let l:record = {
+    \   'isConverted': 1,
+    \   'ForwardConverter': a:ForwardConverter,
+    \   'BackwardConverter': a:BackwardConverter,
+    \   'isShowDiff': get(l:options, 'isShowDiff', l:isEntireBuffer),
+    \   'originalDiff': &l:diff,
+    \   'originalBufNr': bufnr(''),
+    \   'originalBuffer': ingo#window#switches#WinSaveCurrentBuffer(1),
+    \}
     let g:ingo#buffer#scratch#converted#CreationContext = {
     \   'lines': getline(l:startLnum, l:endLnum),
     \   'Converter': a:ForwardConverter,
@@ -92,7 +97,7 @@ function! ingo#buffer#scratch#converted#Create( startLnum, endLnum, scratchFilen
 	call setpos("'" . l:reservedMarks[1], [0, l:endLnum, 1, 0])
     endif
 
-    if l:isShowDiff
+    if l:record.isShowDiff
 	diffthis
     endif
 
@@ -104,7 +109,7 @@ function! ingo#buffer#scratch#converted#Create( startLnum, endLnum, scratchFilen
     \   (empty(l:NextFilenameFuncref) ? [] : [l:NextFilenameFuncref])
     \)
     if l:status == 0
-	let &l:diff = l:originalDiff    " The other participant isn't there, so undo enabling of diff mode.
+	let &l:diff = l:record.originalDiff    " The other participant isn't there, so undo enabling of diff mode.
 	return l:status
     endif
 
@@ -115,7 +120,7 @@ function! ingo#buffer#scratch#converted#Create( startLnum, endLnum, scratchFilen
 	" deleted.
 	augroup IngoLibraryScratchConverter
 	    execute printf('autocmd! BufEnter <buffer=%d> if ! bufexists(%d) | call ingo#plugin#marks#Unreserve(%s) | execute "autocmd! IngoLibraryScratchConverter * <buffer>" | endif',
-	    \   l:originalBufNr,
+	    \   l:record.originalBufNr,
 	    \   bufnr(''),
 	    \   string(l:reservedMarksRecord)
 	    \)
@@ -129,25 +134,17 @@ function! ingo#buffer#scratch#converted#Create( startLnum, endLnum, scratchFilen
 	execute printf('nnoremap <buffer> <silent> %s :<C-u>if ! ingo#buffer#scratch#converted#Toggle()<Bar>echoerr ingo#err#Get()<Bar>endif<CR>', l:toggleMapping)
     endif
     if ! empty(l:quitMapping)
-	if l:isShowDiff
+	if l:record.isShowDiff
 	    " Restore the original buffer's diff mode.
-	    execute printf('nnoremap <buffer> <silent> <nowait> %s :<C-u>let g:ingo#buffer#scratch#converted#record = b:IngoLibrary_scratch_converted<Bar>bwipe<Bar>call setbufvar(g:ingo#buffer#scratch#converted#record.originalBufNr, "&diff", g:ingo#buffer#scratch#converted#record.originalDiff)<Bar>unlet g:ingo#buffer#scratch#converted#record<CR>', l:quitMapping)
+	    execute printf('nnoremap <buffer> <silent> <nowait> %s :<C-u>let g:ingo#buffer#scratch#converted#record = b:IngoLibrary_scratch_converted_record<Bar>bwipe<Bar>call setbufvar(g:ingo#buffer#scratch#converted#record.originalBufNr, "&diff", g:ingo#buffer#scratch#converted#record.originalDiff)<Bar>unlet g:ingo#buffer#scratch#converted#record<CR>', l:quitMapping)
 	else
 	    execute printf('nnoremap <buffer> <silent> <nowait> %s :<C-u>bwipe<CR>', l:quitMapping)
 	endif
     endif
 
-    let b:IngoLibrary_scratch_converted = {
-    \   'originalBufNr': l:originalBufNr,
-    \   'originalBuffer': l:originalBuffer,
-    \   'originalDiff': l:originalDiff,
-    \   'isConverted': 1,
-    \   'isShowDiff': l:isShowDiff,
-    \   'ForwardConverter': a:ForwardConverter,
-    \   'BackwardConverter': a:BackwardConverter,
-    \}
+    let b:IngoLibrary_scratch_converted_record = l:record
     if exists('l:reservedMarksRecord')
-	let b:IngoLibrary_scratch_converted.reservedMarks = l:reservedMarks
+	let b:IngoLibrary_scratch_converted_record.reservedMarks = l:reservedMarks
     endif
 
     return l:status
@@ -162,15 +159,15 @@ function! ingo#buffer#scratch#converted#Creator() abort
     unlet g:ingo#buffer#scratch#converted#CreationContext
 endfunction
 function! ingo#buffer#scratch#converted#Toggle() abort
-    let l:isConverted = b:IngoLibrary_scratch_converted.isConverted
-    let l:Converter = get(b:IngoLibrary_scratch_converted, l:isConverted ? 'BackwardConverter' : 'ForwardConverter')
+    let l:isConverted = b:IngoLibrary_scratch_converted_record.isConverted
+    let l:Converter = get(b:IngoLibrary_scratch_converted_record, l:isConverted ? 'BackwardConverter' : 'ForwardConverter')
     let l:save_modified = &l:modified
     try
 	call s:ConvertEntireBuffer(l:Converter)
 	let &l:modified = l:save_modified
-	let b:IngoLibrary_scratch_converted.isConverted = ! l:isConverted
+	let b:IngoLibrary_scratch_converted_record.isConverted = ! l:isConverted
 
-	if b:IngoLibrary_scratch_converted.isShowDiff
+	if b:IngoLibrary_scratch_converted_record.isShowDiff
 	    if l:isConverted
 		diffthis
 	    else
@@ -185,7 +182,7 @@ function! ingo#buffer#scratch#converted#Toggle() abort
     endtry
 endfunction
 function! ingo#buffer#scratch#converted#Writer() abort
-    let l:record = b:IngoLibrary_scratch_converted  " Need to save this here as we're switching buffers.
+    let l:record = b:IngoLibrary_scratch_converted_record  " Need to save this here as we're switching buffers.
     let l:lines = getline(1, '$')   " Always write back the entire scratch buffer contents.
 
     let l:scratchTabNr = tabpagenr()
