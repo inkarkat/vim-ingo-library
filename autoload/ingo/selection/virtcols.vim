@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/cursor.vim autoload script
 "
-" Copyright: (C) 2018 Ingo Karkat
+" Copyright: (C) 2018-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -22,7 +22,9 @@ function! ingo#selection#virtcols#Get()
 "* RETURN VALUES:
 "   a:selection object
 "******************************************************************************
-    return {'mode': visualmode(), 'startLnum': line("'<"), 'startVirtCol': virtcol("'<"), 'endLnum': line("'>"), 'endVirtCol': virtcol("'>")}
+    let l:endVirtCol = virtcol("'>")
+    let l:effectiveEndVirtCol = l:endVirtCol - (&selection ==# 'exclusive' ? 1 : 0)
+    return {'mode': visualmode(), 'startLnum': line("'<"), 'startVirtCol': virtcol("'<"), 'endLnum': line("'>"), 'endVirtCol': l:endVirtCol, 'effectiveEndVirtCol': l:effectiveEndVirtCol }
 endfunction
 
 function! ingo#selection#virtcols#DefineAndExecute( selectionObject, command )

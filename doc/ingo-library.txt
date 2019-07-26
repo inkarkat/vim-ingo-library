@@ -174,6 +174,7 @@ HISTORY							*ingo-library-history*
   filetype plugins to edit one filetype in an intermediate different format.
 - ENH: Allow to preset reserved marks for ingo#plugin#marks#Reserve() via
   g:IngoLibrary_Marks.
+- ENH: ingo#selection#virtcols#Get() adds an effectiveEndVirtCol attribute.
 
 1.038	09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider <; in fact, it needs to escape
