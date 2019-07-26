@@ -65,12 +65,6 @@ function! ingo#selection#virtcols#Set( selectionObject )
     call ingo#selection#virtcols#DefineAndExecute(a:selectionObject, "normal! \<Esc>")
 endfunction
 
-function! s:Before( val ) abort
-    return a:val - 1
-endfunction
-function! s:After( val ) abort
-    return a:val + 1
-endfunction
 function! ingo#selection#virtcols#GetLimitingPatterns() abort
 "******************************************************************************
 "* PURPOSE:
@@ -90,21 +84,21 @@ function! ingo#selection#virtcols#GetLimitingPatterns() abort
 
     if l:sel.mode ==# 'v'
 	return [
-	\   '\%>' . s:Before(l:sel.startLnum) . 'l\%>' . s:Before(l:sel.startVirtCol) . 'v',
-	\   '\%<' . s:After(l:sel.endLnum)    . 'l\%<' . s:After(l:sel.effectiveEndVirtCol) . 'v'
+	\   ingo#regexp#virtcols#StartAnchorPattern(l:sel.startLnum, l:sel.startVirtCol),
+	\   ingo#regexp#virtcols#EndAnchorPattern(l:sel.endLnum, l:sel.effectiveEndVirtCol)
 	\]
     elseif l:sel.mode ==# 'V'
 	return [
-	\   '\%>' . s:Before(l:sel.startLnum) . 'l',
-	\   '\%<' . s:After(l:sel.endLnum)    . 'l'
+	\   ingo#regexp#virtcols#StartAnchorPattern(l:sel.startLnum),
+	\   ingo#regexp#virtcols#EndAnchorPattern(l:sel.endLnum)
 	\]
     else
 	" Because of the possibility of a jagged blockwise-to-end selection
 	" (which we could only detect by grabbing the current selected text),
 	" the end assertion can only limit to the last line, not more.
 	return [
-	\   '\%>' . s:Before(l:sel.startLnum) . 'l\%>' . s:Before(l:sel.startVirtCol) . 'v',
-	\   '\%<' . s:After(l:sel.endLnum)    . 'l'
+	\   ingo#regexp#virtcols#StartAnchorPattern(l:sel.startLnum, l:sel.startVirtCol),
+	\   ingo#regexp#virtcols#EndAnchorPattern(l:sel.endLnum)
 	\]
     endif
 endfunction

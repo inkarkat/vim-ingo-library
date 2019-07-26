@@ -176,6 +176,8 @@ HISTORY							*ingo-library-history*
   g:IngoLibrary_Marks.
 - ENH: ingo#selection#virtcols#Get() adds an effectiveEndVirtCol attribute.
 - Add ingo#selection#virtcols#GetLimitingPatterns().
+- Add ingo#regexp#virtcols#StartAnchorPattern() and
+  ingo#regexp#virtcols#EndAnchorPattern().
 
 1.038	09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider <; in fact, it needs to escape
