@@ -65,4 +65,48 @@ function! ingo#selection#virtcols#Set( selectionObject )
     call ingo#selection#virtcols#DefineAndExecute(a:selectionObject, "normal! \<Esc>")
 endfunction
 
+function! s:Before( val ) abort
+    return a:val - 1
+endfunction
+function! s:After( val ) abort
+    return a:val + 1
+endfunction
+function! ingo#selection#virtcols#GetLimitingPatterns() abort
+"******************************************************************************
+"* PURPOSE:
+"   Get regexp atoms that limit buffer searches to within the current selection
+"   (on a best-effort basis for blockwise selections).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   A previous selection exists.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   None.
+"* RETURN VALUES:
+"   [startPattern, endPattern]; these can be further combined with /\%V atoms to
+"   limit their applicability to the current selection.
+"******************************************************************************
+    let l:sel= ingo#selection#virtcols#Get()
+
+    if l:sel.mode ==# 'v'
+	return [
+	\   '\%>' . s:Before(l:sel.startLnum) . 'l\%>' . s:Before(l:sel.startVirtCol) . 'v',
+	\   '\%<' . s:After(l:sel.endLnum)    . 'l\%<' . s:After(l:sel.effectiveEndVirtCol) . 'v'
+	\]
+    elseif l:sel.mode ==# 'V'
+	return [
+	\   '\%>' . s:Before(l:sel.startLnum) . 'l',
+	\   '\%<' . s:After(l:sel.endLnum)    . 'l'
+	\]
+    else
+	" Because of the possibility of a jagged blockwise-to-end selection
+	" (which we could only detect by grabbing the current selected text),
+	" the end assertion can only limit to the last line, not more.
+	return [
+	\   '\%>' . s:Before(l:sel.startLnum) . 'l\%>' . s:Before(l:sel.startVirtCol) . 'v',
+	\   '\%<' . s:After(l:sel.endLnum)    . 'l'
+	\]
+    endif
+endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

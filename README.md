@@ -161,6 +161,7 @@ HISTORY
 - ENH: Allow to preset reserved marks for ingo#plugin#marks#Reserve() via
   g:IngoLibrary\_Marks.
 - ENH: ingo#selection#virtcols#Get() adds an effectiveEndVirtCol attribute.
+- Add ingo#selection#virtcols#GetLimitingPatterns().
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
