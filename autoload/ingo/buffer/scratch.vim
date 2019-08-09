@@ -138,7 +138,7 @@ function! ingo#buffer#scratch#CreateWithWriter( scratchFilename, Writer, scratch
 
 	if ! empty(a:Writer)
 	    augroup IngoLibraryScratchWriter
-		execute printf('autocmd! BufWriteCmd <buffer> call ingo#actions#ExecuteOrFunc(%s)', string(a:Writer))
+		execute printf('autocmd! BufWriteCmd <buffer> try | call ingo#actions#ExecuteOrFunc(%s) | catch | call ingo#msg#VimExceptionMsg() | endtry', string(a:Writer))
 	    augroup END
 	endif
     endif
