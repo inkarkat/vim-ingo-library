@@ -27,7 +27,7 @@ function! ingo#plugin#cmd#withpattern#CommandWithPattern( id, isQuery, isSelecti
 "   a:isSelection   Flag whether the command should be applied to the last
 "                   selected range.
 "   a:commandTemplate   Ex command that contains a %s for the queried / recalled
-"                       range to be inserted.
+"                       pattern to be inserted.
 "   a:defaultRange  Optional default range when count is 0. Defaults to the
 "                   current line ("."); pass "%" to default to the whole buffer
 "                   if no count is given (even though the command defaults to
