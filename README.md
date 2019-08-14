@@ -164,6 +164,8 @@ HISTORY
 - Add ingo#selection#virtcols#GetLimitingPatterns().
 - Add ingo#regexp#virtcols#StartAnchorPattern() and
   ingo#regexp#virtcols#EndAnchorPattern().
+- ENH: ingo#plugin#cmd#withpattern#CommandWithPattern(): Also support
+  a:CommandTemplate Funcref argument.
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
