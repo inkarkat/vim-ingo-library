@@ -180,6 +180,9 @@ HISTORY							*ingo-library-history*
   ingo#regexp#virtcols#EndAnchorPattern().
 - ENH: ingo#plugin#cmd#withpattern#CommandWithPattern(): Also support
   a:CommandTemplate Funcref argument.
+- Add ingo#actions#ExecuteWithValOrFunc() variant of
+  ingo#actions#EvaluateWithValOrFunc() that :executes the Action instead of
+  eval()ing it.
 
 1.038	09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider <; in fact, it needs to escape
