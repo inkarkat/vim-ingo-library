@@ -172,6 +172,8 @@ HISTORY
 - FIX: ingo#register#accumulate#ExecuteOrFunc(): Need to use
   ingo#actions#ExecuteWithValOrFunc(), not
   ingo#actions#EvaluateWithValOrFunc().
+- ENH: ingo#cmdrangeconverter#LineToBufferRange(): Also allow Funcref argument
+  for a function that takes the converted range.
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape

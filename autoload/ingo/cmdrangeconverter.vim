@@ -47,7 +47,7 @@ function! ingo#cmdrangeconverter#BufferToLineRange( cmd ) range
     endtry
 endfunction
 
-function! ingo#cmdrangeconverter#LineToBufferRange( cmd, ... )
+function! ingo#cmdrangeconverter#LineToBufferRange( Action, ... )
 "******************************************************************************
 "* MOTIVATION:
 "   You want to invoke a command that defaults to the current line (e.g. :s) in
@@ -65,15 +65,19 @@ function! ingo#cmdrangeconverter#LineToBufferRange( cmd, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:cmd   Ex command which has a default range=.
-"   a:count Optional [count], pass this when v:count has been clobbered.
+"   a:Action    Ex command which has a default range=. Or Funcref (to a
+"               :function-range function) that is invoked without any arguments
+"               once on the range.
+"   a:count     Optional [count], pass this when v:count has been clobbered.
 "* RETURN VALUES:
 "   True if successful; False when a Vim error or exception occurred.
 "   Get the error message via ingo#err#Get().
 "******************************************************************************
     call ingo#err#Clear()
     try
-	execute call('ingo#cmdrange#FromCount', ['%'] + a:000) . a:cmd
+	let l:range = call('ingo#cmdrange#FromCount', ['%'] + a:000)
+	let l:cmd = (type(a:Action) == type(function('tr')) ? 'call ' . ingo#funcref#ToString(a:Action) . '()' : a:Action)
+	execute l:range . l:cmd
 	return 1
     catch
 	call ingo#err#SetVimException()
