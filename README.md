@@ -169,6 +169,9 @@ HISTORY
 - Add ingo#actions#ExecuteWithValOrFunc() variant of
   ingo#actions#EvaluateWithValOrFunc() that :executes the Action instead of
   eval()ing it.
+- FIX: ingo#register#accumulate#ExecuteOrFunc(): Need to use
+  ingo#actions#ExecuteWithValOrFunc(), not
+  ingo#actions#EvaluateWithValOrFunc().
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape

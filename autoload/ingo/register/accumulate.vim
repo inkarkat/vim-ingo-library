@@ -42,7 +42,7 @@ function! ingo#register#accumulate#ExecuteOrFunc( register, Action, ... )
     endif
 
     try
-	return call('ingo#actions#EvaluateWithValOrFunc', [a:Action, toupper(l:accumulator)] + a:000)
+	return call('ingo#actions#ExecuteWithValOrFunc', [a:Action, toupper(l:accumulator)] + a:000)
     finally
 	if exists('l:save_reg')
 	    let l:accumulatedText = getreg(l:accumulator)
