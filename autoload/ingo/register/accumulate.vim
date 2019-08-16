@@ -30,6 +30,8 @@ function! ingo#register#accumulate#ExecuteOrFunc( register, Action, ... )
 "******************************************************************************
     if a:register =~# '^\a$'
 	let l:accumulator = a:register
+    elseif a:register ==# '_'
+	let l:accumulator = a:register
     else
 	let l:accumulator = 'z'
 	let l:save_reg = getreg(l:accumulator)
