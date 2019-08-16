@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/actions.vim autoload script
 "
-" Copyright: (C) 2017 Ingo Karkat
+" Copyright: (C) 2017-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -18,11 +18,13 @@ function! ingo#register#accumulate#ExecuteOrFunc( register, Action, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   Any text appended to the uppercase register will be placed into a:register.
 "* INPUTS:
-"   a:Action    Either a Funcref or Ex commands to be :executed.
+"   a:register  Register that will take the accumulated text.
+"   a:Action    Either a Funcref or Ex commands to be :executed. For Ex
+"               commands, each occurrence of "v:val" is replaced with the
+"               uppercase register.
 "   a:arguments Value(s) to be passed to the a:Action Funcref (but not the
 "		Ex commands); the actual uppercase register will be passed as an
-"		additional first argument. For Ex commands, each occurrence of
-"		"v:val" is replaced with the uppercase register.
+"		additional first argument.
 "* RETURN VALUES:
 "   Result of evaluating a:Action, for Ex commands you need to use :return.
 "******************************************************************************
