@@ -174,6 +174,7 @@ HISTORY
   ingo#actions#EvaluateWithValOrFunc().
 - ENH: ingo#cmdrangeconverter#LineToBufferRange(): Also allow Funcref argument
   for a function that takes the converted range.
+- Add ingo/options/listchars.vim module.
 
 ##### 1.038   09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider &lt;; in fact, it needs to escape
