@@ -63,11 +63,16 @@ function! ingo#option#listchars#Render( text, isTextAtEnd, ... ) abort
 "   a:options.listchars Dict with defined 'listchars' settings as keys and their
 "                       character(s) as values, to take instead of the
 "                       'listchars' values.
+"   a:options.fallback  Dict with defined 'listchars' settings as keys and their
+"                       character(s) as values, to take when 'listchars' /
+"                       a:options.listchars does not contain such key. No
+"                       further processing will be done on those.
 "* RETURN VALUES:
 "   a:text with special characters replaced.
 "******************************************************************************
     let l:options = (a:0 ? a:1 : {})
     let l:listcharValues = get(l:options, 'listchars', ingo#option#listchars#GetValues())
+    let l:fallbackValues = get(l:options, 'fallback', {})
     if has_key(l:listcharValues, 'tab')
 	let l:thirdTabValue = matchstr(l:listcharValues.tab, '^..\zs.')
 	let l:listcharValues.tab = matchstr(l:listcharValues.tab, '^.') . repeat(matchstr(l:listcharValues.tab, '^.\zs.'), &tabstop - 1 - (! empty(l:thirdTabValue))) . l:thirdTabValue
@@ -85,8 +90,13 @@ function! ingo#option#listchars#Render( text, isTextAtEnd, ... ) abort
     \   ] : []
     \)
 	if has_key(l:listcharValues, l:setting)
-	    let l:text = substitute(l:text, l:pattern, escape(l:listcharValues[l:setting], '\&'), 'g')
+	    let l:replacement = l:listcharValues[l:setting]
+	elseif has_key(l:fallbackValues, l:setting)
+	    let l:replacement = l:fallbackValues[l:setting]
+	else
+	    continue
 	endif
+	let l:text = substitute(l:text, l:pattern, escape(l:replacement, '\&'), 'g')
     endfor
 
     return l:text
