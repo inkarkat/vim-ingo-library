@@ -20,7 +20,7 @@ function! ingo#option#listchars#GetValues() abort
 "* INPUTS:
 "   None.
 "* RETURN VALUES:
-"   Map with defined 'listchars' settings as keys and their character(s) as
+"   Dict with defined 'listchars' settings as keys and their character(s) as
 "   values.
 "******************************************************************************
     let l:elements = split(&listchars, ',') " No need to escape, according to :help 'listchars', "The characters ':' and ',' should not be used."
@@ -44,7 +44,7 @@ function! ingo#option#listchars#GetValue( element ) abort
     return get(ingo#option#listchars#GetValues(), a:element, '')
 endfunction
 
-function! ingo#option#listchars#Render( text, isTextAtEnd ) abort
+function! ingo#option#listchars#Render( text, isTextAtEnd, ... ) abort
 "******************************************************************************
 "* PURPOSE:
 "   Render a:text by replacing any special characters with the settings from
@@ -60,13 +60,20 @@ function! ingo#option#listchars#Render( text, isTextAtEnd ) abort
 "   a:text          Input text to be rendered.
 "   a:isTextAtEnd   Flag whether the "eol" and "trail" settings should be
 "                   rendered.
+"   a:listcharsDict Dict with defined 'listchars' settings as keys and their
+"                   character(s) as values, to take instead of the 'listchars'
+"                   values. No further processing will be done on those.
 "* RETURN VALUES:
 "   a:text with special characters replaced.
 "******************************************************************************
-    let l:listcharValues = ingo#option#listchars#GetValues()
-    if has_key(l:listcharValues, 'tab')
-	let l:thirdTabValue = matchstr(l:listcharValues.tab, '^..\zs.')
-	let l:listcharValues.tab = matchstr(l:listcharValues.tab, '^.') . repeat(matchstr(l:listcharValues.tab, '^.\zs.'), &tabstop - 1 - (! empty(l:thirdTabValue))) . l:thirdTabValue
+    if a:0
+	let l:listcharValues = a:1
+    else
+	let l:listcharValues = ingo#option#listchars#GetValues()
+	if has_key(l:listcharValues, 'tab')
+	    let l:thirdTabValue = matchstr(l:listcharValues.tab, '^..\zs.')
+	    let l:listcharValues.tab = matchstr(l:listcharValues.tab, '^.') . repeat(matchstr(l:listcharValues.tab, '^.\zs.'), &tabstop - 1 - (! empty(l:thirdTabValue))) . l:thirdTabValue
+	endif
     endif
 
     let l:text = a:text
