@@ -60,20 +60,17 @@ function! ingo#option#listchars#Render( text, isTextAtEnd, ... ) abort
 "   a:text          Input text to be rendered.
 "   a:isTextAtEnd   Flag whether the "eol" and "trail" settings should be
 "                   rendered.
-"   a:listcharsDict Dict with defined 'listchars' settings as keys and their
-"                   character(s) as values, to take instead of the 'listchars'
-"                   values. No further processing will be done on those.
+"   a:options.listchars Dict with defined 'listchars' settings as keys and their
+"                       character(s) as values, to take instead of the
+"                       'listchars' values.
 "* RETURN VALUES:
 "   a:text with special characters replaced.
 "******************************************************************************
-    if a:0
-	let l:listcharValues = a:1
-    else
-	let l:listcharValues = ingo#option#listchars#GetValues()
-	if has_key(l:listcharValues, 'tab')
-	    let l:thirdTabValue = matchstr(l:listcharValues.tab, '^..\zs.')
-	    let l:listcharValues.tab = matchstr(l:listcharValues.tab, '^.') . repeat(matchstr(l:listcharValues.tab, '^.\zs.'), &tabstop - 1 - (! empty(l:thirdTabValue))) . l:thirdTabValue
-	endif
+    let l:options = (a:0 ? a:1 : {})
+    let l:listcharValues = get(l:options, 'listchars', ingo#option#listchars#GetValues())
+    if has_key(l:listcharValues, 'tab')
+	let l:thirdTabValue = matchstr(l:listcharValues.tab, '^..\zs.')
+	let l:listcharValues.tab = matchstr(l:listcharValues.tab, '^.') . repeat(matchstr(l:listcharValues.tab, '^.\zs.'), &tabstop - 1 - (! empty(l:thirdTabValue))) . l:thirdTabValue
     endif
 
     let l:text = a:text
