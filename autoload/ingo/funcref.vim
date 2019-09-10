@@ -2,10 +2,14 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2018 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
+
+function! ingo#funcref#UnaryIdentity( value ) abort
+    return a:value
+endfunction
 
 function! ingo#funcref#ToString( Funcref )
     let l:functionName = matchstr(string(a:Funcref), "^function('\\zs.*\\ze')$")

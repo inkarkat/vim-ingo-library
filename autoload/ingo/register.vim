@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/actions.vim autoload script
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -13,6 +13,9 @@ function! ingo#register#All()
 endfunction
 function! ingo#register#Writable()
     return '[-a-zA-Z0-9"*+_/]'
+endfunction
+function! ingo#register#IsWritable( register ) abort
+    return (a:register =~# '^' . ingo#register#Writable() . '$')
 endfunction
 
 function! ingo#register#Default()

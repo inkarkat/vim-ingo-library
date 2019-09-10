@@ -448,6 +448,12 @@ function! ingo#collections#SortOnOneListElement( index, l1, l2, ... )
     let l:i2 = get(a:l2, a:index, l:defaultValue)
     return (l:i1 ==# l:i2 ? 0 : l:i1 ># l:i2 ? 1 : -1)
 endfunction
+function! ingo#collections#SortOnFirstListElement( l1, l2 ) abort
+    return ingo#collections#SortOnOneListElement(0, a:l1, a:l2)
+endfunction
+function! ingo#collections#SortOnSecondListElement( l1, l2 ) abort
+    return ingo#collections#SortOnOneListElement(1, a:l1, a:l2)
+endfunction
 
 function! ingo#collections#Flatten1( list )
     let l:result = []

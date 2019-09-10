@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2017 Ingo Karkat
+" Copyright: (C) 2017-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -24,7 +24,6 @@ function! ingo#tabpage#IsBlank( ... )
     \   getbufvar(l:currentBufNr, '&modified') == 0 &&
     \   empty(getbufvar(l:currentBufNr, '&buftype'))
     \)
-return l:isEmptyTabPage
 endfunction
 
 let &cpo = s:save_cpo

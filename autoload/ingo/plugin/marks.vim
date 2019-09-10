@@ -92,7 +92,10 @@ function! ingo#plugin#marks#Reserve( number, ... )
 "   a:number	Number of marks to be reserved.
 "   a:marks	Optional string of concatenated marks. If passed, those marks
 "               will be taken (and current positions will be saved in the undo
-"               information). If empty or omitted, unused marks will be used.
+"               information). If empty or omitted, marks from
+"               g:IngoLibrary_Marks (if defined) will be used. If that also is
+"               empty or undefined, unused marks will be used (this is the
+"               default).
 "* RETURN VALUES:
 "   reservedMarksRecord. Use keys(reservedMarksRecord) to get the names of the
 "   reserved marks.  The records object must also be passed back to
@@ -101,7 +104,7 @@ function! ingo#plugin#marks#Reserve( number, ... )
 "******************************************************************************
     let l:marksRecord = {}
     for l:cnt in range(0, (a:number - 1))
-	let l:mark = strpart((a:0 ? a:1 : ''), l:cnt, 1)
+	let l:mark = strpart((a:0 ? a:1 : (exists('g:IngoLibrary_Marks') ? g:IngoLibrary_Marks : '')), l:cnt, 1)
 	if empty(l:mark)
 	    let l:unusedMark = ingo#plugin#marks#FindUnused()
 	    let l:marksRecord[l:unusedMark] = [0, 0, 0, 0]

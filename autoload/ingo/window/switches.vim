@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/msg.vim autoload script
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -58,41 +58,68 @@ function! ingo#window#switches#GotoPreviousWindow( ... )
     return (l:isReturnError ? '' : 1)
 endfunction
 
-" Record the current buffer's window and try to later return exactly to the same
-" window, even if in the meantime, windows have been added or removed. This is
-" an enhanced version of bufwinnr(), which will always yield the _first_ window
-" containing a buffer.
-function! ingo#window#switches#WinSaveCurrentBuffer()
+" Record the current buffer's window (and tabpage if a:isSaveTabPage is true)
+" and try to later return exactly to the same window (and tabpage if
+" a:isSearchTabPages is true), even if in the meantime, windows (and tabpages)
+" have been added or removed.
+" This is an enhanced version of bufwinnr(), which will always yield the _first_
+" window containing a buffer.
+function! ingo#window#switches#WinSaveCurrentBuffer( ... )
+    let l:isSaveTabPage = (a:0 && a:1)
     let l:buffersUpToCurrent = tabpagebuflist()[0 : winnr() - 1]
-    let l:occurrenceCnt= len(filter(l:buffersUpToCurrent, 'v:val == bufnr("")'))
-    return {'bufnr': bufnr(''), 'occurrenceCnt': l:occurrenceCnt}
+    let l:occurrenceCnt = len(filter(l:buffersUpToCurrent, 'v:val == bufnr("")'))
+    let l:record = {'bufnr': bufnr(''), 'occurrenceCnt': l:occurrenceCnt}
+    if l:isSaveTabPage
+	let l:record.tabnr = tabpagenr()
+    endif
+
+    return l:record
 endfunction
-function! ingo#window#switches#WinRestoreCurrentBuffer( dict )
+function! ingo#window#switches#WinRestoreCurrentBuffer( record, ... )
+    let l:isSearchTabPages = (a:0 && a:1)
+    let l:originalTabNr = tabpagenr()
     let l:targetWinNr = -1
 
-    if a:dict.occurrenceCnt == 1
+    if l:isSearchTabPages && has_key(a:record, 'tabnr') && l:originalTabNr != a:record.tabnr
+	execute a:record.tabnr . 'tabnext'
+    endif
+
+    if a:record.occurrenceCnt == 1
 	" We want the first occurrence of the buffer, bufwinnr() can do this for
 	" us.
-	let l:targetWinNr = bufwinnr(a:dict.bufnr)
+	let l:targetWinNr = bufwinnr(a:record.bufnr)
     else
 	" Go through all windows and find the N'th window containing our buffer.
 	let l:winNrs = []
 	for l:winNr in range(1, winnr('$'))
-	    if winbufnr(l:winNr) == a:dict.bufnr
+	    if winbufnr(l:winNr) == a:record.bufnr
 		call add(l:winNrs, l:winNr)
 	    endif
 	endfor
 
-	if len(l:winNrs) < a:dict.occurrenceCnt
+	if len(l:winNrs) < a:record.occurrenceCnt
 	    " There are less windows showing that buffer now; choose the last.
 	    let l:targetWinNr = l:winNrs[-1]
 	else
-	    let l:targetWinNr = l:winNrs[a:dict.occurrenceCnt - 1]
+	    let l:targetWinNr = l:winNrs[a:record.occurrenceCnt - 1]
 	endif
     endif
 
     if l:targetWinNr == -1
-	throw printf('WinRestoreCurrentBuffer: target buffer %d not found', a:dict.bufnr)
+	if l:isSearchTabPages
+	    let [l:targetTabNr, l:targetWinNr] = ingo#window#locate#NearestByPredicate(1, 'bufnr', 'v:val == ' . a:record.bufnr)
+	endif
+	if l:targetWinNr <= 0
+	    if tabpagenr() != l:originalTabNr
+		" We've searched other tabpages for the window, but couldn't
+		" find it. Go back to where we came from.
+		execute l:originalTabNr . 'tabnext'
+	    endif
+
+	    throw printf('WinRestoreCurrentBuffer: target buffer %d not found', a:record.bufnr)
+	elseif l:targetTabNr > 0 && l:targetTabNr != tabpagenr()
+	    execute l:targetTabNr . 'tabnext'
+	endif
     endif
 
     execute l:targetWinNr . 'wincmd w'

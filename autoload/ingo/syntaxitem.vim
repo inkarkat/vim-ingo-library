@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/compat.vim autoload script
 "
-" Copyright: (C) 2011-2017 Ingo Karkat
+" Copyright: (C) 2011-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -33,8 +33,8 @@ function! ingo#syntaxitem#IsOnSyntax( pos, syntaxItemPattern, ... )
 "   None.
 "* INPUTS:
 "   a:pos	        [bufnum, lnum, col, off] (as returned from |getpos()|)
-"   a:syntaxItemPattern Regular expresson for the syntax item name.
-"   a:stopItemPattern	Regular expresson for a syntax item name that stops
+"   a:syntaxItemPattern Regular expression for the syntax item name.
+"   a:stopItemPattern	Regular expression for a syntax item name that stops
 "			looking further down the syntax stack.
 "* RETURN VALUES:
 "   0 if no syntax name on the stack matches a:syntaxItemPattern, or a syntax

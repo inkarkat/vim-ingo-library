@@ -17,6 +17,8 @@ list/split/
 lists/
 lnum/
 matches/
+option/listchars/
+range/sort/
 regexp/
 regexp/capture/
 regexp/collection/

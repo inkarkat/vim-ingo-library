@@ -102,6 +102,11 @@ window is deemed special. >
     let g:IngoLibrary_SpecialWindowPredicates =
     \	['bufname(winbufnr(v:val)) =~# "^\\[\\%(Scratch\\|clipboard\\)\\]$"']
 <
+							 *g:IngoLibrary_Marks*
+ingo#plugin#marks#Reserve() by default uses any unused mark. You can instead
+assign a fixed set of marks that will be available for plugins via: >
+    let g:IngoLibrary_Marks = 'abcABC'
+<
 ==============================================================================
 INSTALLATION					   *ingo-library-installation*
 
@@ -139,6 +144,51 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 
 ==============================================================================
 HISTORY							*ingo-library-history*
+
+1.039	10-Sep-2019
+- Add ingo#date#format#Epoch().
+- Add ingo#collections#SortOnFirstListElement() and
+  ingo#collections#SortOnSecondListElement().
+- Add ingo#range#sort#AscendingByStartLnum().
+- Add ingo#buffer#scratch#CreateWithWriter().
+- Add ingo#register#IsWritable().
+- ingo/window/locate.vim: ENH: Support special a:winVarName of "bufnr" that
+  allows searching for bufnr instead of window-local variables.
+- ingo#window#switches#Win{Save,Restore}CurrentBuffer(): ENH: Also record /
+  search in other tabpages if the new a:isSaveTabPage / a:isSearchTabPages is
+  true.
+- Add ingo#window#special#HasDiffWindow().
+- Add ingo#funcref#UnaryIdentity().
+- Add ingo#pos#Sort().
+- Add ingo#area#frompattern#GetCurrent() and
+  ingo#text#frompattern#GetCurrent(), variants of ...#GetAroundHere().
+- Add ingo#selection#Get{Ex,In}clusiveEndPos().
+- Add ingo#text#Replace(), a more generic variant of ingo#text#Remove().
+- Add optional a:NextFilenameFuncref to
+  ingo#buffer#scratch#Create[WithWriter]().
+- ENH: Also support Funcref a:contentsCommand / a:scratchCommand for
+  ingo#buffer#generate#Create() and ingo#buffer#scratch#Create[WithWriter]().
+- Add ingo#buffer#scratch#converted#Create() to convert buffer contents to
+  a scratch buffer with the possibility to sync back and
+  ingo#ftplugin#converter#builder#EditAsFiletype() that can be used by
+  filetype plugins to edit one filetype in an intermediate different format.
+- ENH: Allow to preset reserved marks for ingo#plugin#marks#Reserve() via
+  g:IngoLibrary_Marks.
+- ENH: ingo#selection#virtcols#Get() adds an effectiveEndVirtCol attribute.
+- Add ingo#selection#virtcols#GetLimitingPatterns().
+- Add ingo#regexp#virtcols#StartAnchorPattern() and
+  ingo#regexp#virtcols#EndAnchorPattern().
+- ENH: ingo#plugin#cmd#withpattern#CommandWithPattern(): Also support
+  a:CommandTemplate Funcref argument.
+- Add ingo#actions#ExecuteWithValOrFunc() variant of
+  ingo#actions#EvaluateWithValOrFunc() that :executes the Action instead of
+  eval()ing it.
+- FIX: ingo#register#accumulate#ExecuteOrFunc(): Need to use
+  ingo#actions#ExecuteWithValOrFunc(), not
+  ingo#actions#EvaluateWithValOrFunc().
+- ENH: ingo#cmdrangeconverter#LineToBufferRange(): Also allow Funcref argument
+  for a function that takes the converted range.
+- Add ingo/options/listchars.vim module.
 
 1.038	09-Jun-2019
 - ingo#compat#maparg() escaping didn't consider <; in fact, it needs to escape

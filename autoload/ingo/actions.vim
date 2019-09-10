@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2014 Ingo Karkat
+" Copyright: (C) 2012-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -51,6 +51,36 @@ function! ingo#actions#ExecuteOrFunc( Action, ... )
     else
 	execute a:Action
 	return ''
+    endif
+endfunction
+function! ingo#actions#ExecuteWithValOrFunc( Action, ... ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Execute a:Action; a Funcref is passed all arguments, else each occurrence of
+"   "v:val" is replaced with the single argument / a List of the passed
+"   arguments.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:Action    Either a Funcref or an expression to be :execute'd.
+"   a:arguments Value(s) to be passed to the a:Action Funcref or used for
+"		occurrences of "v:val" inside the a:Action expression. The v:val
+"		is inserted literally (as a Number, String, List, Dict)!
+"* RETURN VALUES:
+"   Result of evaluating a:Action, for Ex commands you need to use :return.
+"******************************************************************************
+    if type(a:Action) == type(function('tr'))
+	return call(a:Action, a:000)
+    else
+	let l:val = (a:0 == 1 ? a:1 : a:000)
+	if type(l:val) == type([]) || type(l:val) == type({})
+	    " Avoid "E730: using List as a String" in the substitution.
+	    let l:val = string(l:val)
+	endif
+
+	execute substitute(a:Action, '\C' . ingo#actions#GetValExpr(), l:val, 'g')
     endif
 endfunction
 function! ingo#actions#EvaluateOrFunc( Action, ... )

@@ -9,25 +9,26 @@
 
 let s:lastCommandPatternForId = {}
 
-function! ingo#plugin#cmd#withpattern#CommandWithPattern( id, isQuery, isSelection, commandTemplate, ... )
+function! ingo#plugin#cmd#withpattern#CommandWithPattern( id, isQuery, isSelection, CommandTemplate, ... )
 "******************************************************************************
 "* PURPOSE:
-"   Build an Ex command from a:commandTemplate that is passed a queried /
-"   recalled pattern (stored under a:id) and apply this to the visual selection
-"   or the command-line range created from a:count, defaulting to the current
-"   line if no count is given.
+"   Build a command from a:CommandTemplate that is passed a queried / recalled
+"   pattern (stored under a:id) and apply this to the visual selection or the
+"   command-line range created from a:count, defaulting to the current line if
+"   no count is given.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
 "   - queries for input with a:isQuery
-"   - executes a:commandTemplate
+"   - executes a:CommandTemplate
 "* INPUTS:
 "   a:id    Identifier under which the queried pattern is stored and recalled.
 "   a:isQuery   Flag whether the pattern is queried from the user.
 "   a:isSelection   Flag whether the command should be applied to the last
 "                   selected range.
-"   a:commandTemplate   Ex command that contains a %s for the queried / recalled
-"                       range to be inserted.
+"   a:CommandTemplate   Ex command that contains a %s for the queried / recalled
+"                       pattern to be inserted. Or Funcref that takes a single
+"                       argument and is :call'ed on the range.
 "   a:defaultRange  Optional default range when count is 0. Defaults to the
 "                   current line ("."); pass "%" to default to the whole buffer
 "                   if no count is given (even though the command defaults to
@@ -47,7 +48,11 @@ function! ingo#plugin#cmd#withpattern#CommandWithPattern( id, isQuery, isSelecti
 	return 0
     endif
 
-    let l:command = printf(a:commandTemplate, escape(s:lastCommandPatternForId[a:id], '/'))
+    if type(a:CommandTemplate) == type(function('tr'))
+	let l:command = printf('call %s(%s)', a:CommandTemplate, string(s:lastCommandPatternForId[a:id]))
+    else
+	let l:command = printf(a:CommandTemplate, escape(s:lastCommandPatternForId[a:id], '/'))
+    endif
 
     try
 	execute (a:isSelection ? "'<,'>" : call('ingo#cmdrange#FromCount', a:000)) . l:command

@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -75,6 +75,33 @@ function! ingo#text#frompattern#GetAroundHere( pattern, ... )
 	return ''
     endif
     return ingo#text#Get(l:startPos, l:endPos)
+endfunction
+
+function! ingo#text#frompattern#GetCurrent( pattern, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Extract the match of a:pattern that includes the current cursor position
+"   inside. This is a stronger condition than
+"   ingo#text#frompattern#GetAroundHere(), which may include text that matches
+"   before and after the current position, but does not neccessarily include the
+"   cursor position itself. So this function can be used when it's difficult to
+"   include a cursor position assertion (\%#) inside a:pattern.
+"* SEE ALSO:
+"   - ingo#area#frompattern#GetAroundHere() returns the positions, not the match.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:pattern       Regular expression to search. 'ignorecase', 'smartcase' and
+"		    'magic' applies. When empty, the last search pattern |"/| is
+"		    used.
+"   a:currentPos    Optional base position.
+"* RETURN VALUES:
+"   Matched text, or empty string.
+"******************************************************************************
+    let [l:startPos, l:endPos] = call('ingo#area#frompattern#GetCurrent', [a:pattern] + (a:0 ? [[[0, 0], [0, 0]], a:1] : []))
+    return (l:startPos == [0, 0] ? '' : ingo#text#Get(l:startPos, l:endPos))
 endfunction
 
 

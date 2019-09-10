@@ -100,7 +100,7 @@ endfunction
 function! ingo#buffer#generate#BufType( isFile )
     return (a:isFile ? 'nowrite' : 'nofile')
 endfunction
-function! ingo#buffer#generate#Create( dirspec, filename, isFile, contentsCommand, windowOpenCommand, NextFilenameFuncref )
+function! ingo#buffer#generate#Create( dirspec, filename, isFile, ContentsCommand, windowOpenCommand, NextFilenameFuncref )
 "*******************************************************************************
 "* PURPOSE:
 "   Create (or re-use an existing) buffer (i.e. doesn't correspond to a file on
@@ -121,7 +121,7 @@ function! ingo#buffer#generate#Create( dirspec, filename, isFile, contentsComman
 "			:lcd. (Attention: ':set autochdir' will reset any CWD
 "			once the current window is left!)
 "			Pass the getcwd() output if maintaining the current CWD
-"			is important for a:contentsCommand.
+"			is important for a:ContentsCommand.
 "   a:filename	        The name for the buffer, so it can be saved via either
 "			:w! or :w <newname>.
 "   a:isFile	        Flag whether the buffer should behave like a file (i.e.
@@ -129,12 +129,13 @@ function! ingo#buffer#generate#Create( dirspec, filename, isFile, contentsComman
 "			and a:dirspec is empty, there will be only one buffer
 "			with the same a:filename, regardless of the buffer's
 "			directory path.
-"   a:contentsCommand	Ex command(s) to populate the buffer, e.g.
+"   a:ContentsCommand	Ex command(s) to populate the buffer, e.g.
 "			":1read myfile". Use ":1read" so that the first empty
 "			line will be kept (it is deleted automatically), and
 "			there will be no trailing empty line.
 "			Pass empty string if you want to populate the buffer
 "			yourself.
+"			Pass a Funcref to build the buffer contents with it.
 "			Pass a List of lines to set the buffer contents directly
 "			to the lines.
 "   a:windowOpenCommand	Ex command to open the window, e.g. ":vnew" or
@@ -150,8 +151,8 @@ function! ingo#buffer#generate#Create( dirspec, filename, isFile, contentsComman
 "   2	Jumped to open buffer window.
 "   3	Loaded existing buffer in new window.
 "   4	Created buffer in new window.
-"   Note: To handle errors caused by a:contentsCommand, you need to put this
-"   method call into a try..catch block and :close the buffer when an exception
+"   Note: To handle errors caused by a:ContentsCommand, you need to put this
+"   method call into a try..catch block and :bwipe the buffer when an exception
 "   is thrown.
 "*******************************************************************************
     let l:currentWinNr = winnr()
@@ -176,14 +177,14 @@ function! ingo#buffer#generate#Create( dirspec, filename, isFile, contentsComman
 	    " A buffer with the filespec is already loaded, but it contains an
 	    " existing file, not a generated file. As we don't want to jump to
 	    " this existing file, try again with the next filename.
-	    return ingo#buffer#generate#Create(a:dirspec, call(a:NextFilenameFuncref, [a:filename]), a:isFile, a:contentsCommand, a:windowOpenCommand, a:NextFilenameFuncref)
+	    return ingo#buffer#generate#Create(a:dirspec, call(a:NextFilenameFuncref, [a:filename]), a:isFile, a:ContentsCommand, a:windowOpenCommand, a:NextFilenameFuncref)
 	endif
     else
 	if getbufvar(l:bufnr, '&buftype') !=# ingo#buffer#generate#BufType(a:isFile)
 	    " A window with the filespec is already visible, but its buffer
 	    " contains an existing file, not a generated file. As we don't want
 	    " to jump to this existing file, try again with the next filename.
-	    return ingo#buffer#generate#Create(a:dirspec, call(a:NextFilenameFuncref, [a:filename]), a:isFile, a:contentsCommand, a:windowOpenCommand, a:NextFilenameFuncref)
+	    return ingo#buffer#generate#Create(a:dirspec, call(a:NextFilenameFuncref, [a:filename]), a:isFile, a:ContentsCommand, a:windowOpenCommand, a:NextFilenameFuncref)
 	elseif l:winnr == l:currentWinNr
 	    let l:status = 1
 	else
@@ -197,13 +198,15 @@ function! ingo#buffer#generate#Create( dirspec, filename, isFile, contentsComman
     silent %delete _
     " Note: ':silent' to suppress the "--No lines in buffer--" message.
 
-    if ! empty(a:contentsCommand)
-	if type(a:contentsCommand) == type([])
-	    call setline(1, a:contentsCommand)
+    if ! empty(a:ContentsCommand)
+	if type(a:ContentsCommand) == type([])
+	    call setline(1, a:ContentsCommand)
 	    call cursor(1, 1)
 	    call ingo#change#Set([1, 1], [line('$'), 1])
+	elseif type(a:ContentsCommand) == type(function('tr'))
+	    call call(a:ContentsCommand, [])
 	else
-	    execute a:contentsCommand
+	    execute a:ContentsCommand
 	    " ^ Keeps the existing line at the top of the buffer, if :1{cmd} is used.
 	    " v Deletes it.
 	    if empty(getline(1))
