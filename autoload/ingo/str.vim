@@ -10,6 +10,21 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
+function! ingo#str#TrimTrailing( string )
+"******************************************************************************
+"* PURPOSE:
+"   Remove trailing whitespace from a:string.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:string    Text.
+"* RETURN VALUES:
+"   a:string with trailing whitespace removed.
+"******************************************************************************
+    return substitute(a:string, '\_s\+$', '', '')
+endfunction
 function! ingo#str#Trim( string )
 "******************************************************************************
 "* PURPOSE:

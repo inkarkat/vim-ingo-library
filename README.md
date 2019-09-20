@@ -131,6 +131,9 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.040   RELEASEME
+- Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
+
 ##### 1.039   10-Sep-2019
 - Add ingo#date#format#Epoch().
 - Add ingo#collections#SortOnFirstListElement() and
