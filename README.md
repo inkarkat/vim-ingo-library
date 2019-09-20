@@ -133,6 +133,7 @@ HISTORY
 
 ##### 1.040   RELEASEME
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
+- Add ingo#date#format#FilesystemCompatibleTimestamp() variant.
 
 ##### 1.039   10-Sep-2019
 - Add ingo#date#format#Epoch().
