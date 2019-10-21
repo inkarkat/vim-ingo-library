@@ -41,19 +41,24 @@ function! ingo#window#quickfix#IsQuickfixList( ... )
     elseif a:0
 	" Try to determine the type.
 	" getloclist(0) inside a location list returns the displayed location
-	" list. A quickfix window cannot have a location list, so we can use
-	" that to determine that we're in a quickfix window.
+	" list. A quickfix window usually does not have a location list, so we
+	" can use that to determine that we're in a quickfix window, but set a
+	" buffer variable to have a consistent answer for subsequent queries.
+	if exists('b:IngoLibrary_QuickfixType')
+	    return b:IngoLibrary_QuickfixType
+	endif
 	if empty(getloclist(0))
 	    " Cornercase: We may be in an empty location list window; do not
 	    " fall back to the quickfix list, then.
 	    if line('$') == 1 && ! empty(getqflist())
-		return 2
+		let b:IngoLibrary_QuickfixType = 2
 	    else
-		return 1
+		let b:IngoLibrary_QuickfixType = 1
 	    endif
 	else
-	    return 2
+	    let b:IngoLibrary_QuickfixType = 2
 	endif
+	return b:IngoLibrary_QuickfixType
     else
 	return 1
     endif
