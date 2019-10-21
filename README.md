@@ -134,6 +134,9 @@ HISTORY
 ##### 1.040   RELEASEME
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
 - Add ingo#date#format#FilesystemCompatibleTimestamp() variant.
+- Add ingo#window#quickfix#SetOtherList() generalization of
+  ingo#window#quickfix#SetList().
+- Add ingo#window#quickfix#GetName() and ingo#window#quickfix#GetPrefix().
 
 ##### 1.039   10-Sep-2019
 - Add ingo#date#format#Epoch().

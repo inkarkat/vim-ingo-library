@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2010-2015 Ingo Karkat
+" Copyright: (C) 2010-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -112,6 +112,51 @@ function! ingo#window#quickfix#SetList( ... )
 	return call('setloclist', [0] + a:000)
     else
 	throw 'ASSERT: Invalid quickfix type: ' . l:quickfixType
+    endif
+endfunction
+function! ingo#window#quickfix#SetOtherList( quickfixType, ... ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Change or replace the quickfix / location list errors of the current window.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:quickfixType  1 for quickfix window, 2 for the current window's location
+"                   list. N + 2 for window N's location list
+"   a:list      Error list, like |setqflist()|.
+"   a:action    Optional action, like |setqflist()|.
+"* RETURN VALUES:
+"   Returns zero for success, -1 for failure.
+"******************************************************************************
+    if a:quickfixType == 1
+	return call('setqflist', a:000)
+    elseif a:quickfixType >= 2
+	return call('setloclist', [a:quickfixType - 2] + a:000)
+    else
+	throw 'ASSERT: Invalid quickfix type: ' . a:quickfixType
+    endif
+endfunction
+
+function! ingo#window#quickfix#GetName( quickfixType ) abort
+    if a:quickfixType == 1
+	return 'quickfix list'
+    elseif a:quickfixType == 2
+	return 'location list'
+    elseif a:quickfixType > 2
+	return 'location list for window ' . (a:quickfixType - 2)
+    else
+	throw 'ASSERT: Invalid quickfix type: ' . a:quickfixType
+    endif
+endfunction
+function! ingo#window#quickfix#GetPrefix( quickfixType ) abort
+    if a:quickfixType == 1
+	return 'c'
+    elseif a:quickfixType >= 2
+	return 'l'
+    else
+	throw 'ASSERT: Invalid quickfix type: ' . a:quickfixType
     endif
 endfunction
 
