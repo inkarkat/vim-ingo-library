@@ -55,7 +55,7 @@ function! ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc( argumentList, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Define a complete function for :command -complete=customlist that completes
-"   from a static list of possible arguments.
+"   from a static list of possible arguments (for any argument).
 "* USAGE:
 "   call ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc(
 "   \   ['foo', 'fox', 'bar'], 'FooCompleteFunc')
@@ -143,7 +143,7 @@ function! ingo#plugin#cmdcomplete#MakeListExprCompleteFunc( argumentExpr, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Define a complete function for :command -complete=customlist that completes
-"   from a (dynamically invoked) expression.
+"   from a (dynamically invoked) expression (for any argument).
 "* USAGE:
 "   call ingo#plugin#cmdcomplete#MakeListExprCompleteFunc(
 "   \   'map(copy(g:values), "v:val[0:3]")', 'FooCompleteFunc')
