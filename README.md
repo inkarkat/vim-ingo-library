@@ -137,6 +137,8 @@ HISTORY
 - Add ingo#window#quickfix#SetOtherList() generalization of
   ingo#window#quickfix#SetList().
 - Add ingo#window#quickfix#GetName() and ingo#window#quickfix#GetPrefix().
+- Add ingo#plugin#cmdcomplete#MakeFirstArgumentFixedListCompleteFunc() variant
+  of ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc().
 
 ##### 1.039   10-Sep-2019
 - Add ingo#date#format#Epoch().
