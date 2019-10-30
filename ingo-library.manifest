@@ -121,6 +121,7 @@ autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/compiler.vim
 autoload/ingo/plugin/marks.vim
 autoload/ingo/plugin/persistence.vim
+autoload/ingo/plugin/register.vim
 autoload/ingo/plugin/rendered.vim
 autoload/ingo/plugin/rendered/Confirmeach.vim
 autoload/ingo/plugin/rendered/Subset.vim

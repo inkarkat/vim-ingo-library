@@ -154,6 +154,7 @@ HISTORY							*ingo-library-history*
 - Add ingo#plugin#cmdcomplete#MakeFirstArgumentFixedListCompleteFunc() variant
   of ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc().
 - Add ingo#change#virtcols#Get(), a variant of ingo#selection#virtcols#Get().
+- Add ingo/plugin/register.vim module.
 
 1.039	10-Sep-2019
 - Add ingo#date#format#Epoch().
