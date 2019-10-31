@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -10,9 +10,9 @@
 " REVISION	DATE		REMARKS
 "   1.005.001	10-Apr-2013	file creation
 
-function! ingo#search#buffer#IsKeywordMatch( text, startVirtCol )
+function! ingo#search#buffer#IsKeywordMatch( pattern, startVirtCol )
     return search(
-    \   printf('\C\V\%%%dv\<%s\>', a:startVirtCol, escape(a:text, '\')),
+    \   printf('\%%%dv\<%s\>', a:startVirtCol, a:pattern),
     \	'cnW', line('.')
     \)
 endfunction

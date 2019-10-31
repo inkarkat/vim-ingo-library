@@ -27,6 +27,9 @@ endfunction
 function! ingo#date#format#SortableNumeric( ... )
     return call('strftime', ['%Y%m%d'] + a:000)
 endfunction
+function! ingo#date#format#FilesystemCompatibleTimestamp( ... )
+    return call('strftime', ['%Y%m%d-%H%M%S'] + a:000)
+endfunction
 function! ingo#date#format#InternetTimestamp( ... )
     " RFC 3339 Internet Date / Time "1996-12-19T16:39:57-08:00"
     if ingo#os#IsWindows()

@@ -131,6 +131,17 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.040   31-Oct-2019
+- Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
+- Add ingo#date#format#FilesystemCompatibleTimestamp() variant.
+- Add ingo#window#quickfix#SetOtherList() generalization of
+  ingo#window#quickfix#SetList().
+- Add ingo#window#quickfix#GetName() and ingo#window#quickfix#GetPrefix().
+- Add ingo#plugin#cmdcomplete#MakeFirstArgumentFixedListCompleteFunc() variant
+  of ingo#plugin#cmdcomplete#MakeFixedListCompleteFunc().
+- Add ingo#change#virtcols#Get(), a variant of ingo#selection#virtcols#Get().
+- Add ingo/plugin/register.vim module.
+
 ##### 1.039   10-Sep-2019
 - Add ingo#date#format#Epoch().
 - Add ingo#collections#SortOnFirstListElement() and

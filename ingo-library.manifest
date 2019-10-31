@@ -15,6 +15,7 @@ autoload/ingo/buffer/temp.vim
 autoload/ingo/buffer/temprange.vim
 autoload/ingo/buffer/visible.vim
 autoload/ingo/change.vim
+autoload/ingo/change/virtcols.vim
 autoload/ingo/cmdargs.vim
 autoload/ingo/cmdargs/command.vim
 autoload/ingo/cmdargs/commandcommands.vim
@@ -120,6 +121,7 @@ autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/compiler.vim
 autoload/ingo/plugin/marks.vim
 autoload/ingo/plugin/persistence.vim
+autoload/ingo/plugin/register.vim
 autoload/ingo/plugin/rendered.vim
 autoload/ingo/plugin/rendered/Confirmeach.vim
 autoload/ingo/plugin/rendered/Subset.vim
