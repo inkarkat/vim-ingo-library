@@ -158,6 +158,7 @@ autoload/ingo/regexp/split.vim
 autoload/ingo/regexp/virtcols.vim
 autoload/ingo/register.vim
 autoload/ingo/register/accumulate.vim
+autoload/ingo/register/pending.vim
 autoload/ingo/search/buffer.vim
 autoload/ingo/search/pattern.vim
 autoload/ingo/search/timelimited.vim

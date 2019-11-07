@@ -145,6 +145,9 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.041	RELEASEME
+- Add ingo/register/pending.vim module.
+
 1.040	31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
 - Add ingo#date#format#FilesystemCompatibleTimestamp() variant.
