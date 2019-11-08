@@ -41,7 +41,7 @@ function! ingo#register#pending#ExecuteOrFunc( Action, ... ) abort
     endtry
 endfunction
 
-function! ingo#register#pending#NormalBang( commands ) abort
+function! ingo#register#pending#Normal( commands ) abort
 "******************************************************************************
 "* PURPOSE:
 "   Commands in the executed normal mode a:commands do not clobber a pending
@@ -67,6 +67,11 @@ function! ingo#register#pending#NormalBang( commands ) abort
 "* RETURN VALUES:
 "   Result of evaluating a:Action, for Ex commands you need to use :return.
 "******************************************************************************
+    let l:save_register = v:register
+    execute 'normal' a:commands
+    execute 'normal! "' . l:save_register
+endfunction
+function! ingo#register#pending#NormalBang( commands ) abort
     let l:save_register = v:register
     execute 'normal!' a:commands
     execute 'normal! "' . l:save_register
