@@ -27,12 +27,7 @@
 "   ~/.vim/autoload).
 
 " DEPENDENCIES:
-"   - ingo/cmdargs/file.vim autoload script
-"   - ingo/compat.vim autoload script
-"   - ingo/err.vim autoload script
-"   - ingo/fs/path.vim autoload script
-"   - ingo/list.vim autoload script
-"   - ingo/msg.vim autoload script
+"   - ingo-library.vim plugin
 
 " Copyright: (C) 2009-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -40,6 +35,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	030	30-Jan-2020	Adapt: Need to check <count> == -1 instead of
+"				<line2> to support current line as well as a
+"				lnum of 0 (since Vim 8.1.1241).
 "	029	23-Aug-2017	ENH: Add a:options.isAllowOtherDirs to configure
 "				handling of absolute argleads or those moving
 "				outside the a:dirspecs. The completion so far
@@ -531,7 +529,7 @@ function! CommandCompleteDirForAction#setup( command, dirspecs, parameters )
     \   l:commandAttributes,
     \   a:command,
     \   (l:commandAttributes =~# '-range=-1' && l:Action =~# '^<line[12]>,\@!' ?
-    \       '(<line2> == 1 ? <line1> : <line2>) . ' . string(l:Action[7:]) :
+    \       '(<count> == -1 ? <line1> : <line2>) . ' . string(l:Action[7:]) :
     \	    string(l:Action)
     \   ),
     \   string(l:PostAction),
