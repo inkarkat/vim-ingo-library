@@ -433,7 +433,9 @@ function! CommandCompleteDirForAction#setup( command, dirspecs, parameters )
 "* INPUTS:
 "   a:command   Name of the custom command to be defined.
 "   a:dirspecs	Directory/ies (including trailing path separator!) from which
-"		files will be completed.
+"		files will be completed. If empty, any filespec will be
+"		accepted; this automatically sets a:parameters.isIncludeSubdirs
+"		and a:parameters.isAllowOtherDirs.
 "		Or Funcref to a function that takes no arguments and returns the
 "		dirspec(s).
 "
@@ -507,8 +509,9 @@ function! CommandCompleteDirForAction#setup( command, dirspecs, parameters )
     let l:PostAction = get(a:parameters, 'postAction', '')
     let l:browsefilter = get(a:parameters, 'browsefilter', '')
     let l:wildignore = get(a:parameters, 'wildignore', 0)
-    let l:isIncludeSubdirs = get(a:parameters, 'isIncludeSubdirs', 0)
-    let l:isAllowOtherDirs = get(a:parameters, 'isAllowOtherDirs', 0)
+    let l:isNoDirspec = empty(a:dirspecs)
+    let l:isIncludeSubdirs = get(a:parameters, 'isIncludeSubdirs', l:isNoDirspec)
+    let l:isAllowOtherDirs = get(a:parameters, 'isAllowOtherDirs', l:isNoDirspec)
     let l:DefaultFilename = get(a:parameters, 'defaultFilename', '')
     let l:FilenameProcessingFunction = get(a:parameters, 'FilenameProcessingFunction', '')
     let l:FilespecProcessingFunction = get(a:parameters, 'FilespecProcessingFunction', '')
