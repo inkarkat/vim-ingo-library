@@ -133,6 +133,8 @@ HISTORY
 
 ##### 1.041   RELEASEME
 - Add ingo/register/pending.vim module.
+- ingo#regexp#EscapeLiteralText(): Make second argument
+  (a:additionalEscapeCharacters) optional; many clients don't need this.
 
 ##### 1.040   31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
@@ -1059,7 +1061,7 @@ HISTORY
 - Started development of shared autoload functionality.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2009-2019 Ingo Karkat -
+Copyright: (C) 2009-2020 Ingo Karkat -
 Contains URL encoding / decoding algorithms written by Tim Pope. -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 

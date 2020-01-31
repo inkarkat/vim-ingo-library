@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2010-2019 Ingo Karkat
+" Copyright: (C) 2010-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -11,7 +11,7 @@ function! ingo#regexp#GetSpecialCharacters()
     " The set of characters that must be escaped depends on the 'magic' setting.
     return ['^$', '^$.*[~'][&magic]
 endfunction
-function! ingo#regexp#EscapeLiteralText( text, additionalEscapeCharacters )
+function! ingo#regexp#EscapeLiteralText( text, ... )
 "*******************************************************************************
 "* PURPOSE:
 "   Escape the literal a:text for use in search command.
@@ -39,11 +39,11 @@ function! ingo#regexp#EscapeLiteralText( text, additionalEscapeCharacters )
 "				    assignment to @/, always add '/', regardless
 "				    of the search direction; this is how Vim
 "				    escapes it, too. For use in search(), pass
-"				    nothing.
+"				    an empty String or omit the argument.
 "* RETURN VALUES:
 "   Regular expression for matching a:text.
 "*******************************************************************************
-    return substitute(escape(a:text, '\' . ingo#regexp#GetSpecialCharacters() . a:additionalEscapeCharacters), "\n", '\\n', 'g')
+    return substitute(escape(a:text, '\' . ingo#regexp#GetSpecialCharacters() . (a:0 ? a:1 : '')), "\n", '\\n', 'g')
 endfunction
 
 function! ingo#regexp#MakeWholeWordSearch( text, ... )
