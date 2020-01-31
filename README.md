@@ -135,6 +135,9 @@ HISTORY
 - Add ingo/register/pending.vim module.
 - ingo#regexp#EscapeLiteralText(): Make second argument
   (a:additionalEscapeCharacters) optional; many clients don't need this.
+- ingo#cmdargs#register#Parse{Ap,Pre}pendedWritableRegister(): ENH: Allow
+  using the a:directSeparator default while supplying a:isPreferText by
+  passing an empty List.
 
 ##### 1.040   31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
