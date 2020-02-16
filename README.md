@@ -99,6 +99,16 @@ assign a fixed set of marks that will be available for plugins via:
 
     let g:IngoLibrary_Marks = 'abcABC'
 
+Some special filenames are caught by BufNewFile|,|BufRead autocmds and
+translated into existing files. ingo#cmdargs#glob#Resolve() can be taught
+those patterns by configuring a List of Funcrefs or expressions in
+g:IngoLibrary\_SpecialFilePredicates that take a single filespec argument /
+v:val and return whether this is an existing file. This will then correct the
+statistics information returned by the function.
+By default, includes any filespec that starts with a "protocol:/" (e.g. scp://
+for netrw), and also file:lnum[:column] special filenames if
+https://github.com/bogado/file-line is installed.
+
 INSTALLATION
 ------------------------------------------------------------------------------
 
@@ -138,6 +148,8 @@ HISTORY
 - ingo#cmdargs#register#Parse{Ap,Pre}pendedWritableRegister(): ENH: Allow
   using the a:directSeparator default while supplying a:isPreferText by
   passing an empty List.
+- Introduce g:IngoLibrary\_SpecialFilePredicates customization for
+  ingo#cmdargs#glob#Resolve().
 
 ##### 1.040   31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
