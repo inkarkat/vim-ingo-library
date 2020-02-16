@@ -72,12 +72,16 @@ function! ingo#cmdargs#glob#Expand( fileglobs, ... )
     return l:filespecs
 endfunction
 
+function! s:FileLinePredicate( filespec ) abort
+    let l:names = matchlist(a:filespec, '\(.\{-1,}\):\%(\(\d\+\)\%(:\(\d*\):\?\)\?\)\?$')
+    return (! empty(l:names) && filereadable(l:names[1]))
+endfunction
 if ! exists('g:IngoLibrary_SpecialFilePredicates')
     let g:IngoLibrary_SpecialFilePredicates = []
     call add(g:IngoLibrary_SpecialFilePredicates, 'v:val =~# ''^\w\+:/''')  " Assume that files that start with "protocol:/" do exist (usually handled by the netrw plugin)
 
     if exists('g:loaded_file_line') && g:loaded_file_line
-	call add(g:IngoLibrary_SpecialFilePredicates, 'v:val =~# ''\(.\{-1,}\):\%(\(\d\+\)\%(:\(\d*\):\?\)\?\)\?$''')
+	call add(g:IngoLibrary_SpecialFilePredicates, function('s:FileLinePredicate'))
     endif
 endif
 function! ingo#cmdargs#glob#IsSpecialFile( filespec ) abort
