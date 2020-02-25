@@ -150,6 +150,9 @@ HISTORY
   passing an empty List.
 - Introduce g:IngoLibrary\_SpecialFilePredicates customization for
   ingo#cmdargs#glob#Resolve().
+- ingo#selection#Get{In,Ex}clusiveEndPos(): Prevent "E951: \\% value too large"
+  by checking line length. This condition typically happens with a linewise
+  selection (where the column is 2147483647).
 
 ##### 1.040   31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
