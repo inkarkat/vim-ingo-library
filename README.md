@@ -155,6 +155,7 @@ HISTORY
   selection (where the column is 2147483647).
 - Add ingo#window#quickfix#GetOtherList() variant of
   ingo#window#quickfix#GetList() that gets the quickfixType passed in.
+- Add ingo#window#quickfix#CmdPre() and ingo#window#quickfix#CmdPost().
 
 ##### 1.040   31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().

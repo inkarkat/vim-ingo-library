@@ -186,6 +186,15 @@ function! ingo#window#quickfix#GetPrefix( quickfixType ) abort
 	throw 'ASSERT: Invalid quickfix type: ' . a:quickfixType
     endif
 endfunction
+function! s:QuickfixCmd( what, quickfixType, actionName ) abort
+    silent call ingo#event#Trigger('QuickFixCmd' . a:what . ' ' . ingo#window#quickfix#GetPrefix(a:quickfixType) . a:actionName)  " Allow hooking into the quickfix update.
+endfunction
+function! ingo#window#quickfix#CmdPre( quickfixType, actionName ) abort
+    call s:QuickfixCmd('Pre', a:quickfixType, a:actionName)
+endfunction
+function! ingo#window#quickfix#CmdPost( quickfixType, actionName ) abort
+    call s:QuickfixCmd('Post', a:quickfixType, a:actionName)
+endfunction
 
 function! ingo#window#quickfix#TranslateVirtualColToByteCount( qfEntry )
     let l:bufNr = a:qfEntry.bufnr
