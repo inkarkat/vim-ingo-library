@@ -153,6 +153,8 @@ HISTORY
 - ingo#selection#Get{In,Ex}clusiveEndPos(): Prevent "E951: \\% value too large"
   by checking line length. This condition typically happens with a linewise
   selection (where the column is 2147483647).
+- Add ingo#window#quickfix#GetOtherList() variant of
+  ingo#window#quickfix#GetList() that gets the quickfixType passed in.
 
 ##### 1.040   31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().

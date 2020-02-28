@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2010-2019 Ingo Karkat
+" Copyright: (C) 2010-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -91,6 +91,28 @@ function! ingo#window#quickfix#GetList()
 	return getloclist(0)
     else
 	throw 'ASSERT: Invalid quickfix type: ' . l:quickfixType
+    endif
+endfunction
+function! ingo#window#quickfix#GetOtherList( quickfixType ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Return a list with all the quickfix / location list errors.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:quickfixType  1 for quickfix window, 2 for the current window's location
+"                   list. N + 2 for window N's location list
+"* RETURN VALUES:
+"   List.
+"******************************************************************************
+    if a:quickfixType == 1
+	return getqflist()
+    elseif a:quickfixType >= 2
+	return getloclist(a:quickfixType - 2)
+    else
+	throw 'ASSERT: Invalid quickfix type: ' . a:quickfixType
     endif
 endfunction
 function! ingo#window#quickfix#SetList( ... )
