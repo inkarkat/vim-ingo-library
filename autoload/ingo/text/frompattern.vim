@@ -105,11 +105,6 @@ function! ingo#text#frompattern#GetCurrent( pattern, ... )
 endfunction
 
 
-function! s:UniqueAdd( list, expr )
-    if index(a:list, a:expr) == -1
-	call add(a:list, a:expr)
-    endif
-endfunction
 function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, ... )
 "******************************************************************************
 "* PURPOSE:
@@ -165,10 +160,7 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, ... )
 	    let l:endPos = searchpos(a:pattern, 'ceW', a:lastLine)
 	    if l:endPos == [0, 0] | break | endif
 	    let l:match = ingo#text#Get(l:startPos, l:endPos)
-
-	    if ! empty(l:Predicate) && ! call(l:Predicate, [l:match])
-		continue
-	    endif
+	    let l:originalMatch = l:match
 
 	    if ! empty(l:replacement)
 		if type(l:replacement) == type([])
@@ -177,11 +169,13 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, ... )
 		    let l:match = substitute(l:match, (empty(a:pattern) ? @/ : a:pattern), l:replacement, '')
 		endif
 	    endif
-	    if l:isUnique
-		call s:UniqueAdd(l:matches, l:match)
-	    else
-		call add(l:matches, l:match)
+	    if l:isUnique && index(l:matches, l:match) != -1
+		continue
 	    endif
+	    if ! s:PredicateCheck(l:Predicate, l:originalMatch)
+		continue
+	    endif
+	    call add(l:matches, l:match)
 "****D echomsg '****' string(l:startPos) string(l:endPos) string(l:match)
 	    if l:isOnlyFirstMatch
 		normal! $
@@ -189,6 +183,9 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, ... )
 	endwhile
     call winrestview(l:save_view)
     return l:matches
+endfunction
+function! s:PredicateCheck( Predicate, match ) abort
+    return (empty(a:Predicate) || call(a:Predicate, [a:match]))
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
