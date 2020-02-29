@@ -151,12 +151,17 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, ... )
 "   a:isUnique          Optional flag whether duplicate matches are omitted from
 "                       the result. When set, the result will consist of areas
 "                       with unique content.
+"   a:Predicate	    Optional function reference that is called on each match;
+"		    takes the matched text as argument and returns whether the
+"		    match should be included. Or pass an empty value to accept
+"		    all locations.
 "* RETURN VALUES:
 "   [[[startLnum, startCol], [endLnum, endCol]], ...], or [].
 "   endCol points to the last character, not beyond it!
 "******************************************************************************
     let l:isOnlyFirstMatch = (a:0 >= 1 ? a:1 : 0)
     let l:isUnique = (a:0 >= 2 ? a:2 : 0)
+    let l:Predicate = (a:0 >= 3 ? a:3 : 0)
 
     let l:save_view = winsaveview()
 	let l:areas = []
@@ -171,10 +176,15 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, ... )
 	    if l:endPos == [0, 0] | break | endif
 	    if l:isUnique
 		let l:match = ingo#text#Get(l:startPos, l:endPos)
-		if has_key(l:matches, l:match)
+		if has_key(l:matches, l:match) || ! s:PredicateCheck(l:Predicate, l:match)
 		    continue
 		endif
 		let l:matches[l:match] = 1
+	    elseif ! empty(l:Predicate)
+		let l:match = ingo#text#Get(l:startPos, l:endPos)
+		if ! s:PredicateCheck(l:Predicate, l:match)
+		    continue
+		endif
 	    endif
 
 	    call add(l:areas, [l:startPos, l:endPos])
@@ -185,6 +195,9 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, ... )
 	endwhile
     call winrestview(l:save_view)
     return l:areas
+endfunction
+function! s:PredicateCheck( Predicate, match ) abort
+    return (empty(a:Predicate) || call(a:Predicate, [a:match]))
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

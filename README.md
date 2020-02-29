@@ -156,6 +156,9 @@ HISTORY
 - Add ingo#window#quickfix#GetOtherList() variant of
   ingo#window#quickfix#GetList() that gets the quickfixType passed in.
 - Add ingo#window#quickfix#CmdPre() and ingo#window#quickfix#CmdPost().
+- Add optional a:Predicate argument to ingo#area#frompattern#Get() and
+  ingo#text#frompattern#Get(). Additionally, the a:isOnlyFirstMatch and
+  a:isUnique arguments are optional now, too.
 
 ##### 1.040   31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().

@@ -142,12 +142,17 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, ... )
 "   a:isUnique          Optional flag whether duplicate matches are omitted from
 "                       the result. When set, the result will consist of unique
 "                       matches.
+"   a:Predicate	    Optional function reference that is called on each match;
+"		    takes the matched text as argument and returns whether the
+"		    match should be included. Or pass an empty value to accept
+"		    all locations.
 "* RETURN VALUES:
 "   List of (optionally replaced) matches, or empty List when no matches.
 "******************************************************************************
     let l:replacement = (a:0 >= 1 ? a:1 : '')
     let l:isOnlyFirstMatch = (a:0 >= 2 ? a:2 : 0)
     let l:isUnique = (a:0 >= 3 ? a:3 : 0)
+    let l:Predicate = (a:0 >= 4 ? a:4 : 0)
 
     let l:save_view = winsaveview()
 	let l:matches = []
@@ -160,6 +165,11 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, ... )
 	    let l:endPos = searchpos(a:pattern, 'ceW', a:lastLine)
 	    if l:endPos == [0, 0] | break | endif
 	    let l:match = ingo#text#Get(l:startPos, l:endPos)
+
+	    if ! empty(l:Predicate) && ! call(l:Predicate, [l:match])
+		continue
+	    endif
+
 	    if ! empty(l:replacement)
 		if type(l:replacement) == type([])
 		    let l:match = substitute(l:match, l:replacement[0], l:replacement[1], 'g')
