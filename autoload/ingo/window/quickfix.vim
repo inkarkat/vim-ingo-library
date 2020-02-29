@@ -187,9 +187,35 @@ function! ingo#window#quickfix#GetPrefix( quickfixType ) abort
     endif
 endfunction
 function! s:QuickfixCmd( what, quickfixType, actionName ) abort
-    silent call ingo#event#Trigger('QuickFixCmd' . a:what . ' ' . ingo#window#quickfix#GetPrefix(a:quickfixType) . a:actionName)  " Allow hooking into the quickfix update.
+    if a:actionName =~# '^\[[lL]\]'
+	let l:actionName = (ingo#window#quickfix#GetPrefix(a:quickfixType) == 1 ? '' : a:actionName[1]) . a:actionName[3:]
+    elseif a:actionName =~# '^\u'
+	let l:actionName = toupper(ingo#window#quickfix#GetPrefix(a:quickfixType)) . a:actionName
+    else
+	let l:actionName = ingo#window#quickfix#GetPrefix(a:quickfixType) . a:actionName
+    endif
+
+    silent call ingo#event#Trigger('QuickFixCmd' . a:what . ' ' . l:actionName)  " Allow hooking into the quickfix update.
 endfunction
 function! ingo#window#quickfix#CmdPre( quickfixType, actionName ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Allow hooking into the quickfix update via events.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Fires QuickFixCmdPre event with a subject based on a:actionName.
+"* INPUTS:
+"   a:quickfixType  1 for quickfix window, 2 for the current window's location
+"                   list.
+"   a:actionName:   The event gets the quickfix type prefix ("c" or "l")
+"                   prepended (in uppercase if a:actionName starts with an
+"                   uppercase letter). If a:actionName starts with "[l]" (or
+"                   "[L]"), only the "l" will be prepended for location lists,
+"                   nothing for quickfix.
+"* RETURN VALUES:
+"   None.
+"******************************************************************************
     call s:QuickfixCmd('Pre', a:quickfixType, a:actionName)
 endfunction
 function! ingo#window#quickfix#CmdPost( quickfixType, actionName ) abort
