@@ -1,8 +1,6 @@
 " ingo/area/frompattern.vim: Functions to determine an area in the current buffer.
 "
 " DEPENDENCIES:
-"   - ingo/text.vim autoload script
-"   - ingo/text/frompattern.vim autoload script
 "
 " Copyright: (C) 2017-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -155,6 +153,20 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, ... )
 "		    takes the matched text as argument and returns whether the
 "		    match should be included. Or pass an empty value to accept
 "		    all locations.
+"		    The context object has the following attributes:
+"			match:      current matched text
+"			matchStart: [lnum, col] of the match start
+"			matchEnd:   [lnum, col] of the match end (this is also
+"				    the cursor position)
+"			matchCount: number of current (unique) match of {pattern}
+"			acceptedCount:
+"				    number of matches already accepted by the
+"				    predicate
+"			n: number / flag (0 / false)
+"			m: number / flag (1 / true)
+"			l: empty List []
+"			d: empty Dictionary {}
+"			s: empty String ""
 "* RETURN VALUES:
 "   [[[startLnum, startCol], [endLnum, endCol]], ...], or [].
 "   endCol points to the last character, not beyond it!
@@ -162,6 +174,7 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, ... )
     let l:isOnlyFirstMatch = (a:0 >= 1 ? a:1 : 0)
     let l:isUnique = (a:0 >= 2 ? a:2 : 0)
     let l:Predicate = (a:0 >= 3 ? a:3 : 0)
+    let l:context = {'match': '', 'matchStart': [], 'matchEnd': [], 'acceptedCount': 0, 'n': 0, 'm': 1, 'l': [], 'd': {}, 's': ''}
 
     let l:save_view = winsaveview()
 	let l:areas = []
@@ -176,13 +189,13 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, ... )
 	    if l:endPos == [0, 0] | break | endif
 	    if l:isUnique
 		let l:match = ingo#text#Get(l:startPos, l:endPos)
-		if has_key(l:matches, l:match) || ! s:PredicateCheck(l:Predicate, l:match)
+		if has_key(l:matches, l:match) || ! s:PredicateCheck(l:Predicate, l:context, l:match, l:startPos, l:endPos)
 		    continue
 		endif
 		let l:matches[l:match] = 1
 	    elseif ! empty(l:Predicate)
 		let l:match = ingo#text#Get(l:startPos, l:endPos)
-		if ! s:PredicateCheck(l:Predicate, l:match)
+		if ! s:PredicateCheck(l:Predicate, l:context, l:match, l:startPos, l:endPos)
 		    continue
 		endif
 	    endif
@@ -196,8 +209,20 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, ... )
     call winrestview(l:save_view)
     return l:areas
 endfunction
-function! s:PredicateCheck( Predicate, match ) abort
-    return (empty(a:Predicate) || call(a:Predicate, [a:match]))
+function! s:PredicateCheck( Predicate, context, match, startPos, endPos ) abort
+    if empty(a:Predicate) | return 1 | endif
+
+    let a:context.match = a:match
+    let a:context.matchStart = a:startPos
+    let a:context.matchEnd = a:endPos
+    let a:context.matchCount += 1
+
+    let l:isAccepted = call(a:Predicate, [a:context])
+    if l:isAccepted
+	let a:context.acceptedCount += 1
+    endif
+
+    return l:isAccepted
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

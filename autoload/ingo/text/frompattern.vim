@@ -134,13 +134,29 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, ... )
 "		    globally applied to the match.
 "   a:isOnlyFirstMatch  Optional flag whether to include only the first match in
 "                       every line. By default, all matches are returned.
-"   a:isUnique          Optional flag whether duplicate matches are omitted from
-"                       the result. When set, the result will consist of unique
-"                       matches.
+"   a:isUnique          Optional flag whether duplicate matches (actually unique
+"                       replacements if given) are omitted from the result. When
+"                       set, the result will consist of unique matches.
 "   a:Predicate	    Optional function reference that is called on each match;
-"		    takes the matched text as argument and returns whether the
+"		    takes a context object as argument and returns whether the
 "		    match should be included. Or pass an empty value to accept
 "		    all locations.
+"		    The context object has the following attributes:
+"			match:      current matched text
+"			matchStart: [lnum, col] of the match start
+"			matchEnd:   [lnum, col] of the match end (this is also
+"				    the cursor position)
+"			replacement:current replacement text (if passed, else
+"				    equal to match)
+"			matchCount: number of current (unique) match of {pattern}
+"			acceptedCount:
+"				    number of matches already accepted by the
+"				    predicate
+"			n: number / flag (0 / false)
+"			m: number / flag (1 / true)
+"			l: empty List []
+"			d: empty Dictionary {}
+"			s: empty String ""
 "* RETURN VALUES:
 "   List of (optionally replaced) matches, or empty List when no matches.
 "******************************************************************************
@@ -148,6 +164,7 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, ... )
     let l:isOnlyFirstMatch = (a:0 >= 2 ? a:2 : 0)
     let l:isUnique = (a:0 >= 3 ? a:3 : 0)
     let l:Predicate = (a:0 >= 4 ? a:4 : 0)
+    let l:context = {'match': '', 'replacement': '', 'matchCount': 0, 'acceptedCount': 0, 'n': 0, 'm': 1, 'l': [], 'd': {}, 's': ''}
 
     let l:save_view = winsaveview()
 	let l:matches = []
@@ -172,7 +189,7 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, ... )
 	    if l:isUnique && index(l:matches, l:match) != -1
 		continue
 	    endif
-	    if ! s:PredicateCheck(l:Predicate, l:originalMatch)
+	    if ! s:PredicateCheck(l:Predicate, l:context, l:originalMatch, l:match, l:startPos, l:endPos)
 		continue
 	    endif
 	    call add(l:matches, l:match)
@@ -184,8 +201,21 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, ... )
     call winrestview(l:save_view)
     return l:matches
 endfunction
-function! s:PredicateCheck( Predicate, match ) abort
-    return (empty(a:Predicate) || call(a:Predicate, [a:match]))
+function! s:PredicateCheck( Predicate, context, match, replacement, startPos, endPos ) abort
+    if empty(a:Predicate) | return 1 | endif
+
+    let a:context.match = a:match
+    let a:context.matchStart = a:startPos
+    let a:context.matchEnd = a:endPos
+    let a:context.replacement = a:replacement
+    let a:context.matchCount += 1
+
+    let l:isAccepted = call(a:Predicate, [a:context])
+    if l:isAccepted
+	let a:context.acceptedCount += 1
+    endif
+
+    return l:isAccepted
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
