@@ -4,7 +4,7 @@
 "   - ingo/text.vim autoload script
 "   - ingo/text/frompattern.vim autoload script
 "
-" Copyright: (C) 2017-2019 Ingo Karkat
+" Copyright: (C) 2017-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -128,7 +128,7 @@ function! ingo#area#frompattern#GetCurrent( pattern, ... )
 endfunction
 
 
-function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, isOnlyFirstMatch, isUnique )
+function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Extract all non-overlapping positions of matches of a:pattern in the
@@ -145,15 +145,19 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, isOnlyFirstMa
 "   a:pattern       Regular expression to search. 'ignorecase', 'smartcase' and
 "		    'magic' applies. When empty, the last search pattern |"/| is
 "		    used.
-"   a:isOnlyFirstMatch  Flag whether to include only the first match in every
-"			line.
-"   a:isUnique          Flag whether duplicate matches are omitted from the
-"			result. When set, the result will consist of areas with
-"			unique content.
+"   a:isOnlyFirstMatch  Optional flag whether to include only the first match in
+"                       every line. By default, all matches' positions are
+"                       returned.
+"   a:isUnique          Optional flag whether duplicate matches are omitted from
+"                       the result. When set, the result will consist of areas
+"                       with unique content.
 "* RETURN VALUES:
 "   [[[startLnum, startCol], [endLnum, endCol]], ...], or [].
 "   endCol points to the last character, not beyond it!
 "******************************************************************************
+    let l:isOnlyFirstMatch = (a:0 >= 1 ? a:1 : 0)
+    let l:isUnique = (a:0 >= 2 ? a:2 : 0)
+
     let l:save_view = winsaveview()
 	let l:areas = []
 	let l:matches = {}
@@ -165,7 +169,7 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, isOnlyFirstMa
 	    if l:startPos == [0, 0] | break | endif
 	    let l:endPos = searchpos(a:pattern, 'ceW', a:lastLine)
 	    if l:endPos == [0, 0] | break | endif
-	    if a:isUnique
+	    if l:isUnique
 		let l:match = ingo#text#Get(l:startPos, l:endPos)
 		if has_key(l:matches, l:match)
 		    continue
@@ -175,7 +179,7 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, isOnlyFirstMa
 
 	    call add(l:areas, [l:startPos, l:endPos])
 "****D echomsg '****' string(l:startPos) string(l:endPos)
-	    if a:isOnlyFirstMatch
+	    if l:isOnlyFirstMatch
 		normal! $
 	    endif
 	endwhile
