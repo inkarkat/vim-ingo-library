@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2019 Ingo Karkat
+" Copyright: (C) 2013-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -110,7 +110,7 @@ function! s:UniqueAdd( list, expr )
 	call add(a:list, a:expr)
     endif
 endfunction
-function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, replacement, isOnlyFirstMatch, isUnique )
+function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Extract all non-overlapping matches of a:pattern in the a:firstLine,
@@ -137,14 +137,18 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, replacement, 
 "		    therefore doesn't work standalone), you can also pass a
 "		    [replPattern, replacement] tuple, which will then be
 "		    globally applied to the match.
-"   a:isOnlyFirstMatch  Flag whether to include only the first match in every
-"			line.
-"   a:isUnique          Flag whether duplicate matches are omitted from the
-"			result. When set, the result will consist of unique
-"			matches.
+"   a:isOnlyFirstMatch  Optional flag whether to include only the first match in
+"                       every line. By default, all matches are returned.
+"   a:isUnique          Optional flag whether duplicate matches are omitted from
+"                       the result. When set, the result will consist of unique
+"                       matches.
 "* RETURN VALUES:
 "   List of (optionally replaced) matches, or empty List when no matches.
 "******************************************************************************
+    let l:replacement = (a:0 >= 1 ? a:1 : '')
+    let l:isOnlyFirstMatch = (a:0 >= 2 ? a:2 : 0)
+    let l:isUnique = (a:0 >= 3 ? a:3 : 0)
+
     let l:save_view = winsaveview()
 	let l:matches = []
 	call cursor(a:firstLine, 1)
@@ -156,20 +160,20 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, replacement, 
 	    let l:endPos = searchpos(a:pattern, 'ceW', a:lastLine)
 	    if l:endPos == [0, 0] | break | endif
 	    let l:match = ingo#text#Get(l:startPos, l:endPos)
-	    if ! empty(a:replacement)
-		if type(a:replacement) == type([])
-		    let l:match = substitute(l:match, a:replacement[0], a:replacement[1], 'g')
+	    if ! empty(l:replacement)
+		if type(l:replacement) == type([])
+		    let l:match = substitute(l:match, l:replacement[0], l:replacement[1], 'g')
 		else
-		    let l:match = substitute(l:match, (empty(a:pattern) ? @/ : a:pattern), a:replacement, '')
+		    let l:match = substitute(l:match, (empty(a:pattern) ? @/ : a:pattern), l:replacement, '')
 		endif
 	    endif
-	    if a:isUnique
+	    if l:isUnique
 		call s:UniqueAdd(l:matches, l:match)
 	    else
 		call add(l:matches, l:match)
 	    endif
 "****D echomsg '****' string(l:startPos) string(l:endPos) string(l:match)
-	    if a:isOnlyFirstMatch
+	    if l:isOnlyFirstMatch
 		normal! $
 	    endif
 	endwhile
