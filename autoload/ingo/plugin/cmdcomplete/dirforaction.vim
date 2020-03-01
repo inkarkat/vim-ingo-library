@@ -1,4 +1,4 @@
-" CommandCompleteDirForAction.vim: Define custom command to complete files from a specified directory.
+" ingo/plugin/cmdcomplete/dirforaction.vim: Define custom command to complete files from a specified directory.
 "
 " DESCRIPTION:
 "   In GVIM, one can define a menu item which uses browse() in combination with
@@ -10,7 +10,7 @@
 " EXAMPLE:
 "   Define a command :BrowseTemp that edits a text file from the system TEMP
 "   directory. >
-"	call CommandCompleteDirForAction#setup(
+"	call ingo#plugin#cmdcomplete#dirforaction#setup(
 "	\   '',
 "	\   'BrowseTemp',
 "	\   'edit',
@@ -22,14 +22,7 @@
 "   You can then use the new command with file completion:
 "	:BrowseTemp f<Tab> -> :BrowseTemp foo.txt
 "
-" INSTALLATION:
-"   Put the script into your user or system Vim autoload directory (e.g.
-"   ~/.vim/autoload).
-
-" DEPENDENCIES:
-"   - ingo-library.vim plugin
-
-" Copyright: (C) 2009-2013 Ingo Karkat
+" Copyright: (C) 2009-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -412,7 +405,7 @@ function! s:Expand( expr, fileOptionsAndCommands, escapedFilespec, unescapedFile
 endfunction
 
 let s:count = 0
-function! CommandCompleteDirForAction#setup( command, dirspecs, parameters )
+function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, parameters )
 "*******************************************************************************
 "* PURPOSE:
 "   Define a custom a:command that takes an (potentially optional) single file
@@ -521,7 +514,7 @@ function! CommandCompleteDirForAction#setup( command, dirspecs, parameters )
     \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:generatedCompleteFunctionName) .
     \	printf("    return s:CompleteFiles(%s, %s, %s, %d, %d, a:ArgLead)\n",
     \	    string(a:dirspecs), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs, l:isAllowOtherDirs
-    \	) .    "endfunction"
+    \	) .    'endfunction'
 
     execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, ingo#compat#command#Mods(''<mods>''), %s, %s, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
     \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'),
