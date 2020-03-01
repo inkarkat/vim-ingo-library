@@ -160,6 +160,7 @@ HISTORY
   ingo#text#frompattern#Get(). Additionally, the a:isOnlyFirstMatch and
   a:isUnique arguments are optional now, too.
 - Add ingo#str#trcd() variant of ingo#str#trd().
+- Add ingo#plugin#cmdcomplete#dirforaction#setup().
 
 ##### 1.040   31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
