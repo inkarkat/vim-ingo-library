@@ -199,9 +199,9 @@ function! s:SuffixesSort( f1, f2 )
     endif
 endfunction
 
-function! s:Command( isBang, mods, Action, PostAction, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspecs, filename )
+function! s:Command( isBang, mods, Action, PostAction, isAllowOtherDirs, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspecs, filename )
     try
-"****Dechomsg '****' a:isBang a:mods string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspecs) string(a:filename)
+"****Dechomsg '****' a:isBang a:mods string(a:Action) string(a:PostAction) a:isAllowOtherDirs string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspecs) string(a:filename)
 
 	" Detach any file options or commands for assembling the filespec.
 	let [l:fileOptionsAndCommands, l:filename] = ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands(a:filename)
@@ -224,6 +224,15 @@ function! s:Command( isBang, mods, Action, PostAction, DefaultFilename, Filename
 	    endif
 	    let l:filename = ingo#compat#fnameescape(l:unescapedFilename)
 	endif
+
+	if (ingo#fs#path#IsAbsolute(l:filename) || ingo#fs#path#IsUpwards(l:filename)) && ! a:isAllowOtherDirs
+	    " The passed (must be typed, as the completion wouldn't offer these)
+	    " filename refers to files outside a:dirspecs, but this is not
+	    " allowed by the client.
+	    call ingo#err#Set(printf('Locations outside the base director%s are not allowed', len(a:dirspecs) == 1 ? 'y' : 'ies'))
+	    return 0
+	endif
+
 	let l:dirspec = s:ResolveDirspecs(a:dirspecs, ingo#escape#file#fnameunescape(l:filename))
 
 	if ! empty(a:FilenameProcessingFunction)
@@ -349,8 +358,9 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
 "	    Flag whether subdirectories will be included in the completion
 "	    matches. By default, only files in a:dirspecs itself will be offered.
 "   a:parameters.isAllowOtherDirs
-"	    Flag whether directories outside of a:dirspecs will be considered
-"	    for completion, too. By default not.
+"	    Flag whether directories outside of a:dirspecs (using ../ or an
+"	    absolute path) can be passed (and are offered by the completion),
+"	    too. Disallowed by default.
 "   a:parameters.defaultFilename
 "	    If specified, the command will not require the filename argument,
 "	    and default to this filename if none is specified.
@@ -403,7 +413,7 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
     \	    string(a:dirspecs), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs, l:isAllowOtherDirs
     \	) .    'endfunction'
 
-    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, ingo#compat#command#Mods(''<mods>''), %s, %s, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
+    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, ingo#compat#command#Mods(''<mods>''), %s, %s, %d, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
     \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'),
     \   l:completeFunctionName,
     \   l:commandAttributes,
@@ -413,6 +423,7 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
     \	    string(l:Action)
     \   ),
     \   string(l:PostAction),
+    \   l:isAllowOtherDirs,
     \   string(l:DefaultFilename),
     \	string(l:FilenameProcessingFunction),
     \	string(l:FilespecProcessingFunction),
