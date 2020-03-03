@@ -225,7 +225,8 @@ function! s:Command( isBang, mods, Action, PostAction, isAllowOtherDirs, Default
 	    let l:filename = ingo#compat#fnameescape(l:unescapedFilename)
 	endif
 
-	if (ingo#fs#path#IsAbsolute(l:filename) || ingo#fs#path#IsUpwards(l:filename)) && ! a:isAllowOtherDirs
+	let l:isAbsoluteFilename = ingo#fs#path#IsAbsolute(l:filename)
+	if (l:isAbsoluteFilename || ingo#fs#path#IsUpwards(l:filename)) && ! a:isAllowOtherDirs
 	    " The passed (must be typed, as the completion wouldn't offer these)
 	    " filename refers to files outside a:dirspecs, but this is not
 	    " allowed by the client.
@@ -233,7 +234,7 @@ function! s:Command( isBang, mods, Action, PostAction, isAllowOtherDirs, Default
 	    return 0
 	endif
 
-	let l:dirspec = s:ResolveDirspecs(a:dirspecs, ingo#escape#file#fnameunescape(l:filename))
+	let l:dirspec = (l:isAbsoluteFilename ? '' : s:ResolveDirspecs(a:dirspecs, ingo#escape#file#fnameunescape(l:filename)))
 
 	if ! empty(a:FilenameProcessingFunction)
 	    let l:processedFilename = call(a:FilenameProcessingFunction, [l:filename, l:fileOptionsAndCommands])
