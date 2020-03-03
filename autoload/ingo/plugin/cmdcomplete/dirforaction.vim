@@ -66,7 +66,7 @@ function! s:ResolveDirspecsToList( dirspecs ) abort
 	return []
     endtry
 endfunction
-function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs, isAllowOtherDirs, argLead )
+function! s:CompleteFiles( isReturnRawFilespecs, dirspecs, browsefilter, wildignore, isIncludeSubdirs, isAllowOtherDirs, argLead )
     let l:dirspecs = s:ResolveDirspecsToList(a:dirspecs)
     let l:browsefilter = (empty(a:browsefilter) ? ['*'] : ingo#list#Make(a:browsefilter))
     let l:save_wildignore = &wildignore
@@ -138,18 +138,15 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
 		call map(l:filespecs, 'isdirectory(v:val) ? v:val . ingo#fs#path#Separator() : v:val')
 	    endif
 
-	    call map(
-	    \   l:filespecs,
-	    \   'ingo#compat#fnameescape(s:RemoveDirspec(v:val, l:resolvedDirspecs))'
-	    \)
+	    if ! a:isReturnRawFilespecs
+		call map(l:filespecs, 'ingo#compat#fnameescape(s:RemoveDirspec(v:val, l:resolvedDirspecs))')
+	    endif
 	else
-	    call map(
-	    \   filter(
-	    \       l:filespecs,
-	    \       '! isdirectory(v:val)'
-	    \   ),
-	    \   'ingo#compat#fnameescape(fnamemodify(v:val, ":t"))'
-	    \)
+	    call filter(l:filespecs, '! isdirectory(v:val)')
+
+	    if ! a:isReturnRawFilespecs
+		call map(l:filespecs, 'ingo#compat#fnameescape(fnamemodify(v:val, ":t"))')
+	    endif
 	endif
 
 	if a:argLead =~# '^\.\{1,2}$' && ! a:isAllowOtherDirs
@@ -410,9 +407,10 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
     let s:count += 1
     let l:generatedCompleteFunctionName = 'IngoLibrary_CmdCompleteDirForAction' . s:count
     let l:completeFunctionName = get(a:parameters, 'overrideCompleteFunction', l:generatedCompleteFunctionName)
+    let l:completeStrategy = (l:Action ==# 'chdir' ? 's:CompleteDirectories' : 's:CompleteFiles')
     execute
     \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:generatedCompleteFunctionName) .
-    \	printf("    return s:CompleteFiles(%s, %s, %s, %d, %d, a:ArgLead)\n",
+    \	printf("    return s:CompleteFiles(0, %s, %s, %s, %d, %d, a:ArgLead)\n",
     \	    string(a:dirspecs), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs, l:isAllowOtherDirs
     \	) .    'endfunction'
 
