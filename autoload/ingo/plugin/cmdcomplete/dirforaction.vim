@@ -165,6 +165,21 @@ function! s:CompleteFiles( isReturnRawFilespecs, dirspecs, browsefilter, wildign
 	let &wildignore = l:save_wildignore
     endtry
 endfunction
+function! s:CompleteDirectories( isReturnRawFilespecs, dirspecs, browsefilter, wildignore, isIncludeSubdirs, isAllowOtherDirs, argLead )
+    if ! a:isIncludeSubdirs && ! a:isAllowOtherDirs
+	return []   " No completion possible; only files from a:dirspec itself.
+    endif
+
+    let l:filespecs = s:CompleteFiles(1, a:dirspecs, a:browsefilter, a:wildignore, a:isIncludeSubdirs, a:isAllowOtherDirs, a:argLead)
+    call filter(l:filespecs, 'isdirectory(v:val)')
+
+    if ! a:isReturnRawFilespecs
+	let l:dirspecs = s:ResolveDirspecsToList(a:dirspecs)
+	let l:resolvedDirspecs = ingo#collections#Flatten1(map(copy(l:dirspecs), 'ingo#compat#glob(v:val, 0, 1)'))
+	call map(l:filespecs, 'ingo#compat#fnameescape(s:RemoveDirspec(v:val, l:resolvedDirspecs))')
+    endif
+    return l:filespecs
+endfunction
 function! s:BuildSuffixesExpr()
     let s:suffixesExpr =
     \   '\V\%(' .
@@ -410,7 +425,8 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
     let l:completeStrategy = (l:Action ==# 'chdir' ? 's:CompleteDirectories' : 's:CompleteFiles')
     execute
     \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:generatedCompleteFunctionName) .
-    \	printf("    return s:CompleteFiles(0, %s, %s, %s, %d, %d, a:ArgLead)\n",
+    \	printf("    return %s(0, %s, %s, %s, %d, %d, a:ArgLead)\n",
+    \       l:completeStrategy,
     \	    string(a:dirspecs), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs, l:isAllowOtherDirs
     \	) .    'endfunction'
 
