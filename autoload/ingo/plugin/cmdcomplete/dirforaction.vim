@@ -75,8 +75,9 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
 	let l:filespecs = []
 	let l:resolvedDirspecs = []
 	let l:sourceCnt = 0
+	let l:hasAbsoluteArgLead = (! empty(a:argLead) && ingo#fs#path#IsAbsolute(a:argLead))
 
-	if ! empty(a:argLead) && ingo#fs#path#IsAbsolute(a:argLead)
+	if l:hasAbsoluteArgLead
 	    if a:isAllowOtherDirs
 		" As we have an absolute arglead, we do not need (in fact: must
 		" not use) the provided a:dirspecs. If we replace those with a
@@ -96,7 +97,7 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
 	endif
 
 	for l:dirspec in l:dirspecs
-	    if a:isIncludeSubdirs
+	    if a:isIncludeSubdirs || l:hasAbsoluteArgLead
 		" If the l:dirspec itself contains wildcards, there may be multiple
 		" matches.
 		let l:resolvedDirspecs += ingo#compat#glob(l:dirspec, 0, 1)
@@ -118,7 +119,7 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
 	    endfor
 	endfor
 
-	if a:isIncludeSubdirs
+	if a:isIncludeSubdirs || l:hasAbsoluteArgLead
 	    if empty(a:browsefilter)
 		" glob() doesn't add a trailing path separator on directories
 		" unless the glob pattern has one at the end. Append the path
