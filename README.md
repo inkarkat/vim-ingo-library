@@ -161,6 +161,7 @@ HISTORY
   a:isUnique arguments are optional now, too.
 - Add ingo#str#trcd() variant of ingo#str#trd().
 - Add ingo#plugin#cmdcomplete#dirforaction#setup().
+- Add ingo#fs#path#IsPath().
 
 ##### 1.040   31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
