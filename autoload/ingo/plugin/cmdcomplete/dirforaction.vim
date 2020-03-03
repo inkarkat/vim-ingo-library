@@ -87,11 +87,15 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
 	    else
 		return []
 	    endif
-	elseif ! empty(a:argLead) && ingo#fs#path#IsUpwards(a:argLead)
-	    if a:isAllowOtherDirs
-		" The upwards arglead will combine just fine with the a:dirspecs
-		" (which have a trailing path separator).
-	    else
+	elseif ! empty(a:argLead)
+	    if ingo#fs#path#IsUpwards(a:argLead)
+		if a:isAllowOtherDirs
+		    " The upwards arglead will combine just fine with the a:dirspecs
+		    " (which have a trailing path separator).
+		else
+		    return []
+		endif
+	    elseif ingo#fs#path#IsPath(a:argLead) && ! a:isIncludeSubdirs
 		return []
 	    endif
 	endif
