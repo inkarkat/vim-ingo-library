@@ -162,6 +162,8 @@ HISTORY
 - Add ingo#str#trcd() variant of ingo#str#trd().
 - Add ingo#plugin#cmdcomplete#dirforaction#setup().
 - Add ingo#fs#path#IsPath().
+- ingo#plugin#cmdcomplete#dirforaction#setup(): ENH: Use special completion
+  that only returns directories if a:parameters.action is "chdir".
 
 ##### 1.040   31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
