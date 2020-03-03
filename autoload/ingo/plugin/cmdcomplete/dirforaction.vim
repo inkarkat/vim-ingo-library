@@ -222,7 +222,7 @@ function! s:Command( isBang, mods, Action, PostAction, DefaultFilename, Filename
 	    endif
 	    let l:filename = ingo#compat#fnameescape(l:unescapedFilename)
 	endif
-	let l:dirspec = s:ResolveDirspecs(a:dirspecs, l:filename)
+	let l:dirspec = s:ResolveDirspecs(a:dirspecs, ingo#escape#file#fnameunescape(l:filename))
 
 	if ! empty(a:FilenameProcessingFunction)
 	    let l:processedFilename = call(a:FilenameProcessingFunction, [l:filename, l:fileOptionsAndCommands])
