@@ -201,7 +201,7 @@ function! s:Command( isBang, mods, Action, PostAction, DefaultFilename, Filename
 "****D echomsg '****' string(l:filename) string(l:fileOptionsAndCommands)
 	" Set up a context object so that Funcrefs can have access to the
 	" information whether <bang> was given.
-	let g:CommandCompleteDirForAction_Context = { 'bang': a:isBang, 'mods': a:mods }
+	let g:IngoLibrary_CmdCompleteDirForAction_Context = { 'bang': a:isBang, 'mods': a:mods }
 
 	" l:filename comes from the custom command, and must be taken as is (the
 	" custom completion will have already escaped the completion).
@@ -265,7 +265,7 @@ function! s:Command( isBang, mods, Action, PostAction, DefaultFilename, Filename
 	call ingo#err#Set(v:exception)
 	return 0
     finally
-	unlet! g:CommandCompleteDirForAction_Context
+	unlet! g:IngoLibrary_CmdCompleteDirForAction_Context
     endtry
 endfunction
 function! s:Expand( expr, fileOptionsAndCommands, escapedFilespec, unescapedFilespec )
@@ -313,7 +313,7 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
 "   a:parameters.commandAttributes
 "	    Optional :command {attr}, e.g. <buffer>, -bang, -range.
 "	    Funcrefs can access the <bang> via
-"	    g:CommandCompleteDirForAction_Context.bang.
+"	    g:IngoLibrary_CmdCompleteDirForAction_Context.bang.
 "   a:parameters.action
 "	    Ex command (e.g. 'edit', '<line1>read') to be invoked with the
 "	    completed filespec. Default is the :drop / :Drop command.
@@ -388,7 +388,7 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
     let l:FilespecProcessingFunction = get(a:parameters, 'FilespecProcessingFunction', '')
 
     let s:count += 1
-    let l:generatedCompleteFunctionName = 'CompleteDir' . s:count
+    let l:generatedCompleteFunctionName = 'IngoLibrary_CmdCompleteDirForAction' . s:count
     let l:completeFunctionName = get(a:parameters, 'overrideCompleteFunction', l:generatedCompleteFunctionName)
     execute
     \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:generatedCompleteFunctionName) .
