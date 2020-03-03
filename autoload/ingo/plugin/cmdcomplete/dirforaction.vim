@@ -53,9 +53,9 @@ function! s:ResolveDirspecs( dirspecs, ... )
 	return l:dirspecs
     endif
 endfunction
-function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs, isAllowOtherDirs, argLead )
+function! s:ResolveDirspecsToList( dirspecs ) abort
     try
-	let l:dirspecs = ingo#list#Make(s:ResolveDirspecs(a:dirspecs))
+	return ingo#list#Make(s:ResolveDirspecs(a:dirspecs))
     catch /^Vim\%((\a\+)\)\=:E/
 	throw ingo#msg#MsgFromVimException()   " Don't swallow Vimscript errors.
     catch /^Vim\%((\a\+)\)\=:/
@@ -65,7 +65,9 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
 	sleep 1 " Otherwise, the error isn't visible from inside the command-line completion function.
 	return []
     endtry
-
+endfunction
+function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs, isAllowOtherDirs, argLead )
+    let l:dirspecs = s:ResolveDirspecsToList(a:dirspecs)
     let l:browsefilter = (empty(a:browsefilter) ? ['*'] : ingo#list#Make(a:browsefilter))
     let l:save_wildignore = &wildignore
     if type(a:wildignore) == type('')
