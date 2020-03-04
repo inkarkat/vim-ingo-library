@@ -8,6 +8,7 @@ dict/
 digest/
 file/
 function/uniquify/
+fs/paths/
 fs/paths/split/
 join/
 list/

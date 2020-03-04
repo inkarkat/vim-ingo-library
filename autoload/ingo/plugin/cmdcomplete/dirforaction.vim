@@ -53,9 +53,9 @@ function! s:ResolveDirspecs( dirspecs, ... )
 	return l:dirspecs
     endif
 endfunction
-function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs, isAllowOtherDirs, argLead )
+function! s:ResolveDirspecsToList( dirspecs ) abort
     try
-	let l:dirspecs = ingo#list#Make(s:ResolveDirspecs(a:dirspecs))
+	return ingo#list#Make(s:ResolveDirspecs(a:dirspecs))
     catch /^Vim\%((\a\+)\)\=:E/
 	throw ingo#msg#MsgFromVimException()   " Don't swallow Vimscript errors.
     catch /^Vim\%((\a\+)\)\=:/
@@ -65,7 +65,9 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
 	sleep 1 " Otherwise, the error isn't visible from inside the command-line completion function.
 	return []
     endtry
-
+endfunction
+function! s:CompleteFiles( isReturnRawFilespecs, dirspecs, browsefilter, wildignore, isIncludeSubdirs, isAllowOtherDirs, argLead )
+    let l:dirspecs = s:ResolveDirspecsToList(a:dirspecs)
     let l:browsefilter = (empty(a:browsefilter) ? ['*'] : ingo#list#Make(a:browsefilter))
     let l:save_wildignore = &wildignore
     if type(a:wildignore) == type('')
@@ -75,8 +77,10 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
 	let l:filespecs = []
 	let l:resolvedDirspecs = []
 	let l:sourceCnt = 0
+	let l:hasAbsoluteArgLead = (! empty(a:argLead) && ingo#fs#path#IsAbsolute(a:argLead))
+	let l:isUpwards = 0
 
-	if ! empty(a:argLead) && ingo#fs#path#IsAbsolute(a:argLead)
+	if l:hasAbsoluteArgLead
 	    if a:isAllowOtherDirs
 		" As we have an absolute arglead, we do not need (in fact: must
 		" not use) the provided a:dirspecs. If we replace those with a
@@ -86,17 +90,22 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
 	    else
 		return []
 	    endif
-	elseif ! empty(a:argLead) && ingo#fs#path#IsUpwards(a:argLead)
-	    if a:isAllowOtherDirs
-		" The upwards arglead will combine just fine with the a:dirspecs
-		" (which have a trailing path separator).
-	    else
+	elseif ! empty(a:argLead)
+	    let l:isUpwards = ingo#fs#path#IsUpwards(a:argLead)
+	    if l:isUpwards
+		if a:isAllowOtherDirs
+		    " The upwards arglead will combine just fine with the a:dirspecs
+		    " (which have a trailing path separator).
+		else
+		    return []
+		endif
+	    elseif ingo#fs#path#IsPath(a:argLead) && ! a:isIncludeSubdirs
 		return []
 	    endif
 	endif
 
 	for l:dirspec in l:dirspecs
-	    if a:isIncludeSubdirs
+	    if a:isIncludeSubdirs || l:hasAbsoluteArgLead || l:isUpwards
 		" If the l:dirspec itself contains wildcards, there may be multiple
 		" matches.
 		let l:resolvedDirspecs += ingo#compat#glob(l:dirspec, 0, 1)
@@ -118,7 +127,7 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
 	    endfor
 	endfor
 
-	if a:isIncludeSubdirs
+	if a:isIncludeSubdirs || l:hasAbsoluteArgLead || l:isUpwards
 	    if empty(a:browsefilter)
 		" glob() doesn't add a trailing path separator on directories
 		" unless the glob pattern has one at the end. Append the path
@@ -129,18 +138,15 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
 		call map(l:filespecs, 'isdirectory(v:val) ? v:val . ingo#fs#path#Separator() : v:val')
 	    endif
 
-	    call map(
-	    \   l:filespecs,
-	    \   'ingo#compat#fnameescape(s:RemoveDirspec(v:val, l:resolvedDirspecs))'
-	    \)
+	    if ! a:isReturnRawFilespecs
+		call map(l:filespecs, 'ingo#compat#fnameescape(s:RemoveDirspec(v:val, l:resolvedDirspecs))')
+	    endif
 	else
-	    call map(
-	    \   filter(
-	    \       l:filespecs,
-	    \       '! isdirectory(v:val)'
-	    \   ),
-	    \   'ingo#compat#fnameescape(fnamemodify(v:val, ":t"))'
-	    \)
+	    call filter(l:filespecs, '! isdirectory(v:val)')
+
+	    if ! a:isReturnRawFilespecs
+		call map(l:filespecs, 'ingo#compat#fnameescape(fnamemodify(v:val, ":t"))')
+	    endif
 	endif
 
 	if a:argLead =~# '^\.\{1,2}$' && ! a:isAllowOtherDirs
@@ -158,6 +164,21 @@ function! s:CompleteFiles( dirspecs, browsefilter, wildignore, isIncludeSubdirs,
     finally
 	let &wildignore = l:save_wildignore
     endtry
+endfunction
+function! s:CompleteDirectories( isReturnRawFilespecs, dirspecs, browsefilter, wildignore, isIncludeSubdirs, isAllowOtherDirs, argLead )
+    if ! a:isIncludeSubdirs && ! a:isAllowOtherDirs
+	return []   " No completion possible; only files from a:dirspec itself.
+    endif
+
+    let l:filespecs = s:CompleteFiles(1, a:dirspecs, a:browsefilter, a:wildignore, a:isIncludeSubdirs, a:isAllowOtherDirs, a:argLead)
+    call filter(l:filespecs, 'isdirectory(v:val)')
+
+    if ! a:isReturnRawFilespecs
+	let l:dirspecs = s:ResolveDirspecsToList(a:dirspecs)
+	let l:resolvedDirspecs = ingo#collections#Flatten1(map(copy(l:dirspecs), 'ingo#compat#glob(v:val, 0, 1)'))
+	call map(l:filespecs, 'ingo#compat#fnameescape(s:RemoveDirspec(v:val, l:resolvedDirspecs))')
+    endif
+    return l:filespecs
 endfunction
 function! s:BuildSuffixesExpr()
     let s:suffixesExpr =
@@ -192,9 +213,9 @@ function! s:SuffixesSort( f1, f2 )
     endif
 endfunction
 
-function! s:Command( isBang, mods, Action, PostAction, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspecs, filename )
+function! s:Command( isBang, mods, Action, PostAction, isAllowOtherDirs, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspecs, filename )
     try
-"****Dechomsg '****' a:isBang a:mods string(a:Action) string(a:PostAction) string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspecs) string(a:filename)
+"****Dechomsg '****' a:isBang a:mods string(a:Action) string(a:PostAction) a:isAllowOtherDirs string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspecs) string(a:filename)
 
 	" Detach any file options or commands for assembling the filespec.
 	let [l:fileOptionsAndCommands, l:filename] = ingo#cmdargs#file#FilterEscapedFileOptionsAndCommands(a:filename)
@@ -217,7 +238,17 @@ function! s:Command( isBang, mods, Action, PostAction, DefaultFilename, Filename
 	    endif
 	    let l:filename = ingo#compat#fnameescape(l:unescapedFilename)
 	endif
-	let l:dirspec = s:ResolveDirspecs(a:dirspecs, l:filename)
+
+	let l:isAbsoluteFilename = ingo#fs#path#IsAbsolute(l:filename)
+	if (l:isAbsoluteFilename || ingo#fs#path#IsUpwards(l:filename)) && ! a:isAllowOtherDirs
+	    " The passed (must be typed, as the completion wouldn't offer these)
+	    " filename refers to files outside a:dirspecs, but this is not
+	    " allowed by the client.
+	    call ingo#err#Set(printf('Locations outside the base director%s are not allowed', len(a:dirspecs) == 1 ? 'y' : 'ies'))
+	    return 0
+	endif
+
+	let l:dirspec = (l:isAbsoluteFilename ? '' : s:ResolveDirspecs(a:dirspecs, ingo#escape#file#fnameunescape(l:filename)))
 
 	if ! empty(a:FilenameProcessingFunction)
 	    let l:processedFilename = call(a:FilenameProcessingFunction, [l:filename, l:fileOptionsAndCommands])
@@ -342,8 +373,9 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
 "	    Flag whether subdirectories will be included in the completion
 "	    matches. By default, only files in a:dirspecs itself will be offered.
 "   a:parameters.isAllowOtherDirs
-"	    Flag whether directories outside of a:dirspecs will be considered
-"	    for completion, too. By default not.
+"	    Flag whether directories outside of a:dirspecs (using ../ or an
+"	    absolute path) can be passed (and are offered by the completion),
+"	    too. Disallowed by default.
 "   a:parameters.defaultFilename
 "	    If specified, the command will not require the filename argument,
 "	    and default to this filename if none is specified.
@@ -390,13 +422,15 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
     let s:count += 1
     let l:generatedCompleteFunctionName = 'IngoLibrary_CmdCompleteDirForAction' . s:count
     let l:completeFunctionName = get(a:parameters, 'overrideCompleteFunction', l:generatedCompleteFunctionName)
+    let l:completeStrategy = (l:Action ==# 'chdir' ? 's:CompleteDirectories' : 's:CompleteFiles')
     execute
     \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:generatedCompleteFunctionName) .
-    \	printf("    return s:CompleteFiles(%s, %s, %s, %d, %d, a:ArgLead)\n",
+    \	printf("    return %s(0, %s, %s, %s, %d, %d, a:ArgLead)\n",
+    \       l:completeStrategy,
     \	    string(a:dirspecs), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs, l:isAllowOtherDirs
     \	) .    'endfunction'
 
-    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, ingo#compat#command#Mods(''<mods>''), %s, %s, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
+    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, ingo#compat#command#Mods(''<mods>''), %s, %s, %d, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
     \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'),
     \   l:completeFunctionName,
     \   l:commandAttributes,
@@ -406,6 +440,7 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
     \	    string(l:Action)
     \   ),
     \   string(l:PostAction),
+    \   l:isAllowOtherDirs,
     \   string(l:DefaultFilename),
     \	string(l:FilenameProcessingFunction),
     \	string(l:FilespecProcessingFunction),
