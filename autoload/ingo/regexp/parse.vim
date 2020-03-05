@@ -58,10 +58,46 @@ function! ingo#regexp#parse#NumberEscapesExpr() abort
     return '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%\%(d\%(\d\+\)\|o\%(\o\+\)\|x\%(\x\{1,2}\)\|u\%(\x\{1,4}\)\|U\%(\x\{1,8}\)\)'
 endfunction
 
-function! ingo#regexp#parse#BranchesExpr() abort
+function! ingo#regexp#parse#CharacterClassesExpr() abort
 "******************************************************************************
 "* PURPOSE:
-"   Return a regular expression that matches any branching element:
+"   Return a regular expression that matches any character class; i.e. \w; cp.
+"   |whitespace|.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   Does not consider "very magic" (/\v)-style syntax. If you may have this,
+"   convert via ingo#regexp#magic#Normalize() first.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   None.
+"* RETURN VALUES:
+"   Regular expression.
+"******************************************************************************
+    return '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\_\?\([iIkKfFpPsSdDxXoOwWhHaAlLuU]\)'
+endfunction
+
+function! ingo#regexp#parse#OptionalSequenceExpr() abort
+"******************************************************************************
+"* PURPOSE:
+"   Return a regular expression that matches an optional sequence |/\%[|,
+"   capturing the atoms inside [...].
+"* ASSUMPTIONS / PRECONDITIONS:
+"   Does not consider "very magic" (/\v)-style syntax. If you may have this,
+"   convert via ingo#regexp#magic#Normalize() first.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   None.
+"* RETURN VALUES:
+"   Regular expression.
+"******************************************************************************
+    return '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%\[\(\%(\[\[\]\|\[\]\]\|[^][]\|' . ingo#regexp#collection#Expr({'isBarePattern': 1}) . '\)\+\)\]'
+endfunction
+
+function! ingo#regexp#parse#GroupBranchExpr() abort
+"******************************************************************************
+"* PURPOSE:
+"   Return a regular expression that matches any grouping or branching element:
 "   \%(, \(, \|, \).
 "* ASSUMPTIONS / PRECONDITIONS:
 "   Does not consider "very magic" (/\v)-style syntax. If you may have this,
@@ -74,6 +110,10 @@ function! ingo#regexp#parse#BranchesExpr() abort
 "   Regular expression.
 "******************************************************************************
     return '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\%(%\?(\|[|)]\)'
+endfunction
+
+function! ingo#regexp#parse#SingleCharacterExpr() abort
+    return '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\%(\.\|\\_\.\)'
 endfunction
 
 function! ingo#regexp#parse#OtherAtomExpr() abort
@@ -92,7 +132,7 @@ function! ingo#regexp#parse#OtherAtomExpr() abort
 "* RETURN VALUES:
 "   Regular expression.
 "******************************************************************************
-    return '^\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%#=[012]\|\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\%(zs\|ze\|[&etrbn123456789cCzmMvV]\|\)'
+    return '^\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%#=[012]\|\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\%(zs\|ze\|[&etrbn123456789cCzmMvV]\)'
 endfunction
 
 function! ingo#regexp#parse#NonOrdinaryAtomExpr() abort
@@ -112,12 +152,15 @@ function! ingo#regexp#parse#NonOrdinaryAtomExpr() abort
 "   Regular expression.
 "******************************************************************************
     return join([
-    \   ingo#regexp#parse#BranchesExpr(),
-    \   ingo#regexp#parse#MultiExpr()(),
+    \   ingo#regexp#parse#GroupBranchExpr(),
+    \   ingo#regexp#parse#MultiExpr(),
+    \   ingo#regexp#parse#OtherAtomExpr(),
     \   ingo#regexp#parse#PositionAtomExpr(),
+    \   ingo#regexp#parse#SingleCharacterExpr(),
+    \   ingo#regexp#parse#OptionalSequenceExpr(),
     \   ingo#regexp#collection#Expr(),
-    \   ingo#regexp#parse#NumberEscapesExpr(),
-    \   ingo#regexp#parse#OtherAtomExpr()
+    \   ingo#regexp#parse#CharacterClassesExpr(),
+    \   ingo#regexp#parse#NumberEscapesExpr()
     \], '\|')
 endfunction
 

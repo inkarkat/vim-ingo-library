@@ -148,11 +148,11 @@ function! ingo#regexp#deconstruct#TranslateCharacterClasses( pattern, ... ) abor
     \   '[]': "\u2026",
     \})
 
-    let l:pattern = substitute(l:pattern, '\C\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\_\?\([iIkKfFpPsSdDxXoOwWhHaAlLuU]\)', '\=get(l:replacements, submatch(1), "")', 'g')
+    let l:pattern = substitute(l:pattern, '\C' . ingo#regexp#parse#CharacterClassesExpr(), '\=get(l:replacements, submatch(1), "")', 'g')
 
     " Optional sequence of atoms \%[]. Note: Because these can contain
     " collection-like stuff, it has to be processed before collections.
-    let l:pattern = substitute(l:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%\[\(\%(\[\[\]\|\[\]\]\|[^][]\|' . ingo#regexp#collection#Expr({'isBarePattern': 1}) . '\)\+\)\]', '\1', 'g')
+    let l:pattern = substitute(l:pattern, ingo#regexp#parse#OptionalSequenceExpr(), '\1', 'g')
 
     let l:pattern = substitute(l:pattern, ingo#regexp#collection#Expr({'isCapture': 1}), '\=s:TransformCollection(l:replacements, submatch(1))', 'g')
 
