@@ -26,6 +26,7 @@ regexp/capture/
 regexp/collection/
 regexp/deconstruct/
 regexp/length/
+regexp/parse/
 regexp/split/
 str/
 strdisplaywidth/
