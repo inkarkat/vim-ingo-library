@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2018-2019 Ingo Karkat
+" Copyright: (C) 2018-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -24,7 +24,7 @@ function! ingo#regexp#deconstruct#RemovePositionAtoms( pattern )
 "* RETURN VALUES:
 "   Modified a:pattern with position atoms removed.
 "******************************************************************************
-    return substitute(a:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\%(\\\%([\^<>]\|_\^\|_\$\|%[\^$V#]\|%[<>]\?''.\|%[<>]\?\d\+[lcv]\)\|[\^$]\)', '', 'g')
+    return substitute(a:pattern, ingo#regexp#parse#PositionAtomExpr(), '', 'g')
 endfunction
 
 function! ingo#regexp#deconstruct#RemoveMultis( pattern )
