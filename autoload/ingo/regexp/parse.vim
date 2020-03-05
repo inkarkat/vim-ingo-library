@@ -1,4 +1,4 @@
-" ingo/regexp/atoms.vim: Functions around parsing pattern atoms.
+" ingo/regexp/parse.vim: Functions around parsing patterns.
 "
 " DEPENDENCIES:
 "
@@ -7,7 +7,23 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
-function! ingo#regexp#atoms#PositionAtomExpr() abort
+function! ingo#regexp#parse#MultiExpr()
+"******************************************************************************
+"* PURPOSE:
+"   Return a regular expression that matches any multi.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   None.
+"* RETURN VALUES:
+"   Regular expression.
+"******************************************************************************
+    return '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\%(\*\|\\[+=?]\|\\{-\?\d*,\?\d*}\|\\@\%(>\|=\|!\|<=\|<!\)\)'
+endfunction
+
+function! ingo#regexp#parse#PositionAtomExpr() abort
 "******************************************************************************
 "* PURPOSE:
 "   Return a regular expression that matches any position atom.
@@ -24,7 +40,7 @@ function! ingo#regexp#atoms#PositionAtomExpr() abort
     return '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\%(\\\%([\^<>]\|_\^\|_\$\|%[\^$V#]\|%[<>]\?''.\|%[<>]\?\d\+[lcv]\)\|[\^$]\)'
 endfunction
 
-function! ingo#regexp#atoms#NumberEscapesExpr() abort
+function! ingo#regexp#parse#NumberEscapesExpr() abort
 "******************************************************************************
 "* PURPOSE:
 "   Return a regular expression that matches any numbered escape; i.e. \%d; cp.
@@ -42,10 +58,11 @@ function! ingo#regexp#atoms#NumberEscapesExpr() abort
     return '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%\%(d\%(\d\+\)\|o\%(\o\+\)\|x\%(\x\{1,2}\)\|u\%(\x\{1,4}\)\|U\%(\x\{1,8}\)\)'
 endfunction
 
-function! ingo#regexp#atoms#BranchesExpr() abort
+function! ingo#regexp#parse#BranchesExpr() abort
 "******************************************************************************
 "* PURPOSE:
-"   Return a regular expression that matches any branch atoms: \%(, \(, \|, \).
+"   Return a regular expression that matches any branching element:
+"   \%(, \(, \|, \).
 "* ASSUMPTIONS / PRECONDITIONS:
 "   Does not consider "very magic" (/\v)-style syntax. If you may have this,
 "   convert via ingo#regexp#magic#Normalize() first.
@@ -59,7 +76,7 @@ function! ingo#regexp#atoms#BranchesExpr() abort
     return '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\%(%\?(\|[|)]\)'
 endfunction
 
-function! ingo#regexp#atoms#OtherAtomExpr() abort
+function! ingo#regexp#parse#OtherAtomExpr() abort
 "******************************************************************************
 "* PURPOSE:
 "   Return a regular expression that matches any non-ordinary (i.e. not a
@@ -78,7 +95,7 @@ function! ingo#regexp#atoms#OtherAtomExpr() abort
     return '^\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%#=[012]\|\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\%(zs\|ze\|[&etrbn123456789cCzmMvV]\|\)'
 endfunction
 
-function! ingo#regexp#atoms#NonOrdinaryAtomExpr() abort
+function! ingo#regexp#parse#NonOrdinaryAtomExpr() abort
 "******************************************************************************
 "* PURPOSE:
 "   Return a regular expression that matches any non-ordinary (i.e. not a
@@ -95,12 +112,12 @@ function! ingo#regexp#atoms#NonOrdinaryAtomExpr() abort
 "   Regular expression.
 "******************************************************************************
     return join([
-    \   ingo#regexp#atoms#BranchesExpr(),
-    \   ingo#regexp#multi#Expr(),
-    \   ingo#regexp#atoms#PositionAtomExpr(),
+    \   ingo#regexp#parse#BranchesExpr(),
+    \   ingo#regexp#parse#MultiExpr()(),
+    \   ingo#regexp#parse#PositionAtomExpr(),
     \   ingo#regexp#collection#Expr(),
-    \   ingo#regexp#atoms#NumberEscapesExpr(),
-    \   ingo#regexp#atoms#OtherAtomExpr()
+    \   ingo#regexp#parse#NumberEscapesExpr(),
+    \   ingo#regexp#parse#OtherAtomExpr()
     \], '\|')
 endfunction
 

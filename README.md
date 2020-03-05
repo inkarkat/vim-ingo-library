@@ -164,7 +164,8 @@ HISTORY
 - Add ingo#fs#path#IsPath().
 - ingo#plugin#cmdcomplete#dirforaction#setup(): ENH: Use special completion
   that only returns directories if a:parameters.action is "chdir".
-- Add ingo/regexp/atoms.vim module.
+- Add ingo/regexp/parse.vim module.
+- CHG: Move ingo#regexp#multi#Expr() to ingo#regexp#parse#MultiExpr().
 
 ##### 1.040   31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
