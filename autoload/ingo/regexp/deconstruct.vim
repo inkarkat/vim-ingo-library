@@ -74,6 +74,24 @@ function! ingo#regexp#deconstruct#UnescapeSpecialCharacters( pattern )
     return l:result
 endfunction
 
+function! ingo#regexp#deconstruct#TranslateSingleCharacterAtoms( pattern ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Return a regular expression that matches any unspecific single character,
+"   i.e. . or \_..
+"* ASSUMPTIONS / PRECONDITIONS:
+"   Does not consider "very magic" (/\v)-style syntax. If you may have this,
+"   convert via ingo#regexp#magic#Normalize() first.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   None.
+"* RETURN VALUES:
+"   Regular expression.
+"******************************************************************************
+    return substitute(a:pattern, ingo#regexp#parse#SingleCharacterExpr(), "\u2022", 'g')
+endfunction
+
 function! ingo#regexp#deconstruct#TranslateCharacterClasses( pattern, ... ) abort
 "******************************************************************************
 "* PURPOSE:
@@ -242,12 +260,30 @@ function! ingo#regexp#deconstruct#TranslateBranches( pattern ) abort
     return l:pattern
 endfunction
 
+function! ingo#regexp#deconstruct#RemoveOtherAtoms( pattern ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Remove any non-ordinary (i.e. not a literal or escaped character) atom that
+"   isn't already removed or translated by one of the other functions here.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   Does not consider "very magic" (/\v)-style syntax. If you may have this,
+"   convert via ingo#regexp#magic#Normalize() first.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   None.
+"* RETURN VALUES:
+"   Regular expression.
+"******************************************************************************
+    return substitute(a:pattern, ingo#regexp#parse#OtherAtomExpr(), '', 'g')
+endfunction
+
 function! ingo#regexp#deconstruct#ToQuasiLiteral( pattern )
 "******************************************************************************
 "* PURPOSE:
 "   Turn a:pattern into something resembling a literal match of it by removing
-"   position atoms, multis, translating character classes / collections and
-"   branches, and unescaping.
+"   any non-ordinary atoms, multis, translating character classes / collections
+"   and branches, and unescaping.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   Does not consider "very magic" (/\v)-style syntax. If you may have this,
 "   convert via ingo#regexp#magic#Normalize() first.
@@ -259,8 +295,10 @@ function! ingo#regexp#deconstruct#ToQuasiLiteral( pattern )
 "   Modified a:pattern that resembles a literal match.
 "******************************************************************************
     let l:result = a:pattern
+    let l:result = ingo#regexp#deconstruct#RemoveOtherAtoms(l:result)
     let l:result = ingo#regexp#deconstruct#RemovePositionAtoms(l:result)
     let l:result = ingo#regexp#deconstruct#RemoveMultis(l:result)
+    let l:result = ingo#regexp#deconstruct#TranslateSingleCharacterAtoms(l:result)
     let l:result = ingo#regexp#deconstruct#TranslateCharacterClasses(l:result)
     let l:result = ingo#regexp#deconstruct#TranslateNumberEscapes(l:result)
     let l:result = ingo#regexp#deconstruct#TranslateBranches(l:result)

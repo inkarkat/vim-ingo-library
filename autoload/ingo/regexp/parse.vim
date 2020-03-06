@@ -113,6 +113,20 @@ function! ingo#regexp#parse#GroupBranchExpr() abort
 endfunction
 
 function! ingo#regexp#parse#SingleCharacterExpr() abort
+"******************************************************************************
+"* PURPOSE:
+"   Return a regular expression that matches any unspecific single character,
+"   i.e. . or \_..
+"* ASSUMPTIONS / PRECONDITIONS:
+"   Does not consider "very magic" (/\v)-style syntax. If you may have this,
+"   convert via ingo#regexp#magic#Normalize() first.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   None.
+"* RETURN VALUES:
+"   Regular expression.
+"******************************************************************************
     return '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\%(\.\|\\_\.\)'
 endfunction
 
