@@ -13,6 +13,7 @@ fs/paths/split/
 join/
 list/
 list/lcs/
+list/merge/
 list/pattern/
 list/sequence/
 list/split/

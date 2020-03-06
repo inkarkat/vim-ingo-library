@@ -169,6 +169,7 @@ HISTORY
 - ingo#regexp#deconstruct#ToQuasiLiteral() also covers new
   ingo#regexp#deconstruct#TranslateSingleCharacterAtoms() and
   ingo#regexp#deconstruct#RemoveOtherAtoms().
+- Add ingo/list/merge.vim module.
 
 ##### 1.040   31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().

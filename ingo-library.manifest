@@ -97,6 +97,7 @@ autoload/ingo/lines/replace.vim
 autoload/ingo/list.vim
 autoload/ingo/list/find.vim
 autoload/ingo/list/lcs.vim
+autoload/ingo/list/merge.vim
 autoload/ingo/list/pattern.vim
 autoload/ingo/list/sequence.vim
 autoload/ingo/list/split.vim
