@@ -1,12 +1,6 @@
 " ingo/collections.vim: Functions to operate on collections.
 "
 " DEPENDENCIES:
-"   - ingo/actions.vim autoload script
-"   - ingo/compat.vim autoload script
-"   - ingo/dict.vim autoload script
-"   - ingo/dict/count.vim autoload script
-"   - ingo/list.vim autoload script
-"   - ingocollections.vim autoload script
 "
 " Copyright: (C) 2011-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
