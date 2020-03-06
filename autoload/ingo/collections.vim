@@ -8,7 +8,7 @@
 "   - ingo/list.vim autoload script
 "   - ingocollections.vim autoload script
 "
-" Copyright: (C) 2011-2019 Ingo Karkat
+" Copyright: (C) 2011-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -200,6 +200,8 @@ function! ingo#collections#SeparateItemsAndSeparators( expr, pattern, ... )
 "* PURPOSE:
 "   Like the built-in |split()|, but return both items and the separators
 "   matched by a:pattern as two separate Lists.
+"* SEE ALSO:
+"   Use join(ingo#list#Join(items, separators), '') to recombine.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
