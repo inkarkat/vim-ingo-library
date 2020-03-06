@@ -170,6 +170,7 @@ HISTORY
   ingo#regexp#deconstruct#TranslateSingleCharacterAtoms() and
   ingo#regexp#deconstruct#RemoveOtherAtoms().
 - Add ingo/list/merge.vim module.
+- Add ingo#collections#{CharacterCount,StringDisplayWidth}{Asc,Desc}Sort().
 
 ##### 1.040   31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().

@@ -374,6 +374,115 @@ function! ingo#collections#FileModificationTimeSort( i1, i2 )
     return -1 * ingo#collections#memoized#Mapsort('getftime(v:val)', a:i1, a:i2, {'cacheTimeInSeconds': 10})
 endfunction
 
+function! ingo#collections#CharacterCountAscSort( i1, i2 )
+"******************************************************************************
+"* PURPOSE:
+"   Sort function for strings by number of characters (|strchars()|); shorter
+"   comes before longer; same length sorts alphabetically ascending.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   i1, i2  Strings.
+"* RETURN VALUES:
+"   -1, 0 or 1, as specified by the sort() function.
+"******************************************************************************
+    if a:i1 ==# a:i2
+	return 0
+    endif
+    let [l:len1, l:len2] = [ingo#compat#strchars(a:i1), ingo#compat#strchars(a:i2)]
+
+    if l:len1 == l:len2
+	" No difference in length, sort alphabetically ascending.
+	return a:i1 ># a:i2 ? 1 : -1
+    else
+	" Shorter before longer.
+	return l:len1 > l:len2 ? 1 : -1
+    endif
+endfunction
+function! ingo#collections#CharacterCountDescSort( i1, i2 )
+"******************************************************************************
+"* PURPOSE:
+"   Sort function for strings by number of characters (|strchars()|); longer
+"   comes before shorter; same length sorts alphabetically ascending.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   i1, i2  Strings.
+"* RETURN VALUES:
+"   -1, 0 or 1, as specified by the sort() function.
+"******************************************************************************
+    if a:i1 ==# a:i2
+	return 0
+    endif
+    let [l:len1, l:len2] = [ingo#compat#strchars(a:i1), ingo#compat#strchars(a:i2)]
+
+    if l:len1 == l:len2
+	" No difference in length, sort alphabetically ascending.
+	return a:i1 ># a:i2 ? 1 : -1
+    else
+	" Longer before shorter.
+	return l:len1 < l:len2 ? 1 : -1
+    endif
+endfunction
+function! ingo#collections#StringDisplayWidthAscSort( i1, i2 )
+"******************************************************************************
+"* PURPOSE:
+"   Sort function for strings by display width (|strdisplaywidth()|); smaller
+"   comes before wider; same width sorts alphabetically ascending.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   i1, i2  Strings.
+"* RETURN VALUES:
+"   -1, 0 or 1, as specified by the sort() function.
+"******************************************************************************
+    if a:i1 ==# a:i2
+	return 0
+    endif
+    let [l:len1, l:len2] = [ingo#compat#strdisplaywidth(a:i1), ingo#compat#strdisplaywidth(a:i2)]
+
+    if l:len1 == l:len2
+	" No difference in width, sort alphabetically ascending.
+	return a:i1 ># a:i2 ? 1 : -1
+    else
+	" Smaller before wider.
+	return l:len1 > l:len2 ? 1 : -1
+    endif
+endfunction
+function! ingo#collections#StringDisplayWidthDescSort( i1, i2 )
+"******************************************************************************
+"* PURPOSE:
+"   Sort function for strings by display width (|strdisplaywidth()|); wider
+"   comes before smaller; same width sorts alphabetically ascending.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   i1, i2  Strings.
+"* RETURN VALUES:
+"   -1, 0 or 1, as specified by the sort() function.
+"******************************************************************************
+    if a:i1 ==# a:i2
+	return 0
+    endif
+    let [l:len1, l:len2] = [ingo#compat#strdisplaywidth(a:i1), ingo#compat#strdisplaywidth(a:i2)]
+
+    if l:len1 == l:len2
+	" No difference in width, sort alphabetically ascending.
+	return a:i1 ># a:i2 ? 1 : -1
+    else
+	" Wider before smaller.
+	return l:len1 < l:len2 ? 1 : -1
+    endif
+endfunction
+
 function! ingo#collections#mapsort( string, i1, i2 )
 "******************************************************************************
 "* PURPOSE:
