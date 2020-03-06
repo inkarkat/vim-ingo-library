@@ -69,7 +69,7 @@ function! ingo#regexp#deconstruct#UnescapeSpecialCharacters( pattern )
 "   Modified a:pattern with special characters turned into literal ones.
 "******************************************************************************
     let l:result = a:pattern
-    let l:result = substitute(l:result, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\([etrbn]\)', '\=s:specialLookup[submatch(1)]', 'g')
+    let l:result = substitute(l:result, ingo#regexp#parse#EscapedCharacterExpr(), '\=s:specialLookup[submatch(1)]', 'g')
     let l:result = ingo#escape#Unescape(l:result, '\^$.*~[]')
     return l:result
 endfunction

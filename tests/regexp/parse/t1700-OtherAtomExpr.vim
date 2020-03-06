@@ -8,7 +8,7 @@ call vimtap#Is(substitute('^\<fo[ox]\%(bar\|hos\)\>', ingo#regexp#parse#OtherAto
 call vimtap#Is(substitute('\%#=1foobar', ingo#regexp#parse#OtherAtomExpr(), '', 'g'), 'foobar', 'regexp engine atom')
 call vimtap#Is(substitute('bad\%#=1foobar', ingo#regexp#parse#OtherAtomExpr(), '', 'g'), 'bad\%#=1foobar', 'regexp engine atom not in front')
 call vimtap#Is(substitute('foo\zsb\zear', ingo#regexp#parse#OtherAtomExpr(), '', 'g'), 'foobar', '\zs and \ze')
-call vimtap#Is(substitute('foo\nbar', ingo#regexp#parse#OtherAtomExpr(), '', 'g'), 'foobar', '\n')
+call vimtap#Is(substitute('foo\nbar', ingo#regexp#parse#OtherAtomExpr(), '', 'g'), 'foo\nbar', '\n')
 call vimtap#Is(substitute('f\(o\+\)b\1r', ingo#regexp#parse#OtherAtomExpr(), '', 'g'), 'f\(o\+\)br', '\1')
 call vimtap#Is(substitute('\cfoobar', ingo#regexp#parse#OtherAtomExpr(), '', 'g'), 'foobar', '\c')
 call vimtap#Is(substitute('\C\V', ingo#regexp#parse#OtherAtomExpr(), '', 'g'), '', '\C\V')

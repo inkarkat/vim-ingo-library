@@ -116,12 +116,11 @@ function! ingo#regexp#parse#SingleCharacterExpr() abort
     return '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\%(\.\|\\_\.\)'
 endfunction
 
-function! ingo#regexp#parse#OtherAtomExpr() abort
+function! ingo#regexp#parse#EscapedCharacterExpr() abort
 "******************************************************************************
 "* PURPOSE:
-"   Return a regular expression that matches any non-ordinary (i.e. not a
-"   literal character) atom that isn't already matched by one of the other atom
-"   expressions here.
+"   Return a regular expression that matches any escaped characters: \e, \n,
+"   etc.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   Does not consider "very magic" (/\v)-style syntax. If you may have this,
 "   convert via ingo#regexp#magic#Normalize() first.
@@ -132,7 +131,26 @@ function! ingo#regexp#parse#OtherAtomExpr() abort
 "* RETURN VALUES:
 "   Regular expression.
 "******************************************************************************
-    return '^\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%#=[012]\|\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\%(zs\|ze\|[&etrbn123456789cCzmMvV]\)'
+    return '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\([etrbn]\)'
+endfunction
+
+function! ingo#regexp#parse#OtherAtomExpr() abort
+"******************************************************************************
+"* PURPOSE:
+"   Return a regular expression that matches any non-ordinary (i.e. not a
+"   literal or escaped character) atom that isn't already matched by one of the
+"   other atom expressions here.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   Does not consider "very magic" (/\v)-style syntax. If you may have this,
+"   convert via ingo#regexp#magic#Normalize() first.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   None.
+"* RETURN VALUES:
+"   Regular expression.
+"******************************************************************************
+    return '^\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\%#=[012]\|\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\%(zs\|ze\|[&123456789cCzmMvV]\)'
 endfunction
 
 function! ingo#regexp#parse#NonOrdinaryAtomExpr() abort
@@ -154,6 +172,7 @@ function! ingo#regexp#parse#NonOrdinaryAtomExpr() abort
     return join([
     \   ingo#regexp#parse#GroupBranchExpr(),
     \   ingo#regexp#parse#MultiExpr(),
+    \   ingo#regexp#parse#EscapedCharacterExpr(),
     \   ingo#regexp#parse#OtherAtomExpr(),
     \   ingo#regexp#parse#PositionAtomExpr(),
     \   ingo#regexp#parse#SingleCharacterExpr(),
