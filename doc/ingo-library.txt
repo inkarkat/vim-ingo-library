@@ -181,6 +181,9 @@ HISTORY							*ingo-library-history*
   that only returns directories if a:parameters.action is "chdir".
 - Add ingo/regexp/parse.vim module.
 - CHG: Move ingo#regexp#multi#Expr() to ingo#regexp#parse#MultiExpr().
+- ingo#regexp#deconstruct#ToQuasiLiteral() also covers new
+  ingo#regexp#deconstruct#TranslateSingleCharacterAtoms() and
+  ingo#regexp#deconstruct#RemoveOtherAtoms().
 
 1.040	31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
