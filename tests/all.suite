@@ -29,6 +29,7 @@ regexp/deconstruct/
 regexp/length/
 regexp/parse/
 regexp/split/
+smartcase/
 str/
 strdisplaywidth/
 strdisplaywidth/pad/
