@@ -186,6 +186,9 @@ HISTORY							*ingo-library-history*
   ingo#regexp#deconstruct#RemoveOtherAtoms().
 - Add ingo/list/merge.vim module.
 - Add ingo#collections#{CharacterCount,StringDisplayWidth}{Asc,Desc}Sort().
+- FIX: ingo#smartcase#IsSmartCasePattern() and ingo#smartcase#Undo() now also
+  handle the smartcased single all-lower or -uppercase alphabetic word special
+  case.
 
 1.040	31-Oct-2019
 - Add ingo#str#TrimTrailing() variant of ingo#str#Trim().
