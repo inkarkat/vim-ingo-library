@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/cmdargs/range.vim autoload script
 "
-" Copyright: (C) 2012-2019 Ingo Karkat
+" Copyright: (C) 2012-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -32,13 +32,13 @@ set cpo&vim
 " Note: We use branches, not a (better performing?) single /[...]/ atom, because
 " of the uncertainties of escaping these characters.
 function! s:IsCmdDelimiter(char)
-    " Note: <Space> must not be included in the set of delimiters; otherwise, the
-    " detection of commands that take other commands
+    " Note: <Space> and <Tab> must not be included in the set of delimiters;
+    " otherwise, the detection of commands that take other commands
     " (ingo#cmdargs#commandcommands#GetExpr()) won't work any more (because the
     " combination of "command<Space>alias" is matched as commandUnderCursor).
     " There's no need to include <Space> anyway; since this is our mapped trigger
     " key, any alias expansion should already have happened earlier.
-    return (len(a:char) == 1 && a:char =~# '\p' && a:char !~# '[ [:alpha:][:digit:]\\"|]')
+    return (len(a:char) == 1 && a:char !~# '[[:space:][:alpha:][:digit:]\\"|]')
 endfunction
 let s:cmdDelimiterExpr = '\V\C\%(' .
 \ join(
