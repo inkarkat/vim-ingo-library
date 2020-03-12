@@ -141,7 +141,7 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
-##### 1.041   RELEASEME
+##### 1.041   12-Mar-2020
 - Add ingo/register/pending.vim module.
 - ingo#regexp#EscapeLiteralText(): Make second argument
   (a:additionalEscapeCharacters) optional; many clients don't need this.
