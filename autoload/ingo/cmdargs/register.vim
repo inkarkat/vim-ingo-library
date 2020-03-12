@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2014-2019 Ingo Karkat
+" Copyright: (C) 2014-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -11,7 +11,7 @@ set cpo&vim
 
 let s:writableRegisterExpr = '\([-a-zA-Z0-9"*+_/]\)'
 function! s:GetDirectSeparator( optionalArguments )
-    return (len(a:optionalArguments) > 0 ?
+    return (len(a:optionalArguments) > 0 && a:optionalArguments[0] isnot [] ?
     \   (empty(a:optionalArguments[0]) ?
     \       '\%$\%^' :
     \       a:optionalArguments[0]
@@ -36,8 +36,9 @@ function! ingo#cmdargs#register#ParseAppendedWritableRegister( arguments, ... )
 "			into text) between the text and register (with optional
 "			whitespace in between; mandatory whitespace is always an
 "			alternative). Defaults to any non-alphanumeric
-"			character. If empty: there must be whitespace between
-"			text and register.
+"			character (also when an empty List is passed). If the
+"			empty String: There must be whitespace between text and
+"			register.
 "   a:isPreferText      Optional flag that if the arguments consist solely of a
 "                       register, whether this is counted as text (1, default)
 "                       or as a sole register (0).
@@ -70,8 +71,9 @@ function! ingo#cmdargs#register#ParsePrependedWritableRegister( arguments, ... )
 "			into text) between the text and register (with optional
 "			whitespace in between; mandatory whitespace is always an
 "			alternative). Defaults to any non-alphanumeric
-"			character. If empty: there must be whitespace between
-"			text and register.
+"			character (also when an empty List is passed). If the
+"			empty String: There must be whitespace between text and
+"			register.
 "   a:isPreferText      Optional flag that if the arguments consist solely of a
 "                       register, whether this is counted as text (1, default)
 "                       or as a sole register (0).

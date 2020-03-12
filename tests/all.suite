@@ -1,4 +1,5 @@
 cmdargs/file/
+cmdargs/register/
 collections/
 collections/recursive/
 compat/
@@ -7,10 +8,12 @@ dict/
 digest/
 file/
 function/uniquify/
+fs/paths/
 fs/paths/split/
 join/
 list/
 list/lcs/
+list/merge/
 list/pattern/
 list/sequence/
 list/split/
@@ -24,7 +27,9 @@ regexp/capture/
 regexp/collection/
 regexp/deconstruct/
 regexp/length/
+regexp/parse/
 regexp/split/
+smartcase/
 str/
 strdisplaywidth/
 strdisplaywidth/pad/
