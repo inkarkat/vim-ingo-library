@@ -144,6 +144,9 @@ HISTORY
 ##### 1.042   RELEASEME
 - BUG: ingo#join#Lines() inserts the separator before the line's last
   character when joining with a following empty line and ! a:isKeepSpace.
+- Support List of precisions in ingo#units#Format() and default to not showing
+  a fraction for bytes in ingo#units#FormatBytesDecimal() and
+  ingo#units#FormatBytesBinary() (as there are no fractional bytes).
 
 ##### 1.041   12-Mar-2020
 - Add ingo/register/pending.vim module.
