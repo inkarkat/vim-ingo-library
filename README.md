@@ -148,6 +148,7 @@ HISTORY
   a fraction for bytes in ingo#units#FormatBytesDecimal() and
   ingo#units#FormatBytesBinary() (as there are no fractional bytes).
 - Add ingo#regexp#collection#LargeRange().
+- Add ingo#text#InsertHere().
 
 ##### 1.041   12-Mar-2020
 - Add ingo/register/pending.vim module.
