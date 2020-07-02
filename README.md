@@ -149,6 +149,8 @@ HISTORY
   ingo#units#FormatBytesBinary() (as there are no fractional bytes).
 - Add ingo#regexp#collection#LargeRange().
 - Add ingo#text#InsertHere().
+- Expose ingo#mapmaker#OpfuncExpression(); it can avoid duplication of
+  ...#Expression() functions in many plugins.
 
 ##### 1.041   12-Mar-2020
 - Add ingo/register/pending.vim module.
