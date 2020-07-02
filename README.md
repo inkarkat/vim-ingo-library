@@ -151,6 +151,7 @@ HISTORY
 - Add ingo#text#InsertHere().
 - Expose ingo#mapmaker#OpfuncExpression(); it can avoid duplication of
   ...#Expression() functions in many plugins.
+- Add ingo/change/processed.vim module.
 
 ##### 1.041   12-Mar-2020
 - Add ingo/register/pending.vim module.
