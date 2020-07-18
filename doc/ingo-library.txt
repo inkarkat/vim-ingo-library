@@ -167,6 +167,8 @@ HISTORY							*ingo-library-history*
 - Expose ingo#mapmaker#OpfuncExpression(); it can avoid duplication of
   ...#Expression() functions in many plugins.
 - Add ingo/change/processed.vim module.
+- CHG: ingo#area#frompattern#GetCurrent() now takes optional arguments as
+  Dictionary and adds a:options.firstLnum and a:options.lastLnum.
 
 1.041	12-Mar-2020
 - Add ingo/register/pending.vim module.

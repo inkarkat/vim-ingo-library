@@ -94,10 +94,16 @@ function! ingo#area#frompattern#GetCurrent( pattern, ... )
 "		    'magic' applies. When empty, the last search pattern |"/| is
 "		    used.
 "   a:options.returnValueOnNoSelection
-"		    Optional return value if there's no match. If omitted, [[0,
-"		    0], [0, 0]] will be returned.
+"		    Optional return value if there's no match. If omitted,
+"		    [[0, 0], [0, 0]] will be returned.
 "   a:options.currentPos
 "		    Optional base position.
+"   a:options.firstLnum
+"		    Optional first line number to search for the start of the
+"		    pattern. Defaults to the current line.
+"   a:options.lastLnum
+"		    Optional end line number to search for the start of the
+"		    pattern. Defaults to the current line.
 "* RETURN VALUES:
 "   [[startLnum, startCol], [endLnum, endCol]], or
 "   a:option.returnValueOnNoSelection. endCol points to the last character, not
@@ -113,14 +119,14 @@ function! ingo#area#frompattern#GetCurrent( pattern, ... )
 	let l:here = getpos('.')[1:2]
     endif
 
-    let l:startPos = searchpos(a:pattern, 'bcnW', line('.'))
+    let l:startPos = searchpos(a:pattern, 'bcnW', get(l:options, 'firstLnum', line('.')))
     if l:startPos == [0, 0]
 	return l:returnValueOnNoSelection
     endif
 
     try
 	call setpos('.', ingo#pos#Make4(l:startPos))
-	let l:endPos = searchpos(a:pattern, 'cenW', line('.'))
+	let l:endPos = searchpos(a:pattern, 'cenW', get(l:options, 'lastLnum', line('.')))
 	if l:endPos == [0, 0] || ingo#pos#IsBefore(l:endPos, l:here)
 	    return l:returnValueOnNoSelection
 	endif
