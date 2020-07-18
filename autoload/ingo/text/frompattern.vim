@@ -96,11 +96,18 @@ function! ingo#text#frompattern#GetCurrent( pattern, ... )
 "   a:pattern       Regular expression to search. 'ignorecase', 'smartcase' and
 "		    'magic' applies. When empty, the last search pattern |"/| is
 "		    used.
-"   a:currentPos    Optional base position.
+"   a:options.currentPos
+"		    Optional base position.
+"   a:options.firstLnum
+"		    Optional first line number to search for the start of the
+"		    pattern. Defaults to the current line.
+"   a:options.lastLnum
+"		    Optional end line number to search for the start of the
+"		    pattern. Defaults to the current line.
 "* RETURN VALUES:
 "   Matched text, or empty string.
 "******************************************************************************
-    let [l:startPos, l:endPos] = call('ingo#area#frompattern#GetCurrent', [a:pattern] + (a:0 ? [[[0, 0], [0, 0]], a:1] : []))
+    let [l:startPos, l:endPos] = call('ingo#area#frompattern#GetCurrent', [a:pattern] + a:000)
     return (l:startPos == [0, 0] ? '' : ingo#text#Get(l:startPos, l:endPos))
 endfunction
 
