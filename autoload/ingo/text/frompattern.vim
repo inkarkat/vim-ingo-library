@@ -96,6 +96,9 @@ function! ingo#text#frompattern#GetCurrent( pattern, ... )
 "   a:pattern       Regular expression to search. 'ignorecase', 'smartcase' and
 "		    'magic' applies. When empty, the last search pattern |"/| is
 "		    used.
+"   a:options.returnValueOnNoSelection
+"		    Optional return value if there's no match. If omitted, the
+"		    empty string will be returned.
 "   a:options.currentPos
 "		    Optional base position.
 "   a:options.firstLnum
@@ -107,8 +110,19 @@ function! ingo#text#frompattern#GetCurrent( pattern, ... )
 "* RETURN VALUES:
 "   Matched text, or empty string.
 "******************************************************************************
-    let [l:startPos, l:endPos] = call('ingo#area#frompattern#GetCurrent', [a:pattern] + a:000)
-    return (l:startPos == [0, 0] ? '' : ingo#text#Get(l:startPos, l:endPos))
+    let l:arguments = [a:pattern]
+    let l:returnValueOnNoSelection = ''
+    if a:0 >= 1
+	let l:options = copy(a:1)
+	if has_key(l:options, 'returnValueOnNoSelection')
+	    let l:returnValueOnNoSelection = l:options.returnValueOnNoSelection
+	    unlet l:options.returnValueOnNoSelection
+	endif
+	call add(l:arguments, l:options)
+    endif
+
+    let [l:startPos, l:endPos] = call('ingo#area#frompattern#GetCurrent', l:arguments)
+    return (l:startPos == [0, 0] ? l:returnValueOnNoSelection : ingo#text#Get(l:startPos, l:endPos))
 endfunction
 
 

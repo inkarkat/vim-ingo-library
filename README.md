@@ -154,6 +154,9 @@ HISTORY
 - Add ingo/change/processed.vim module.
 - CHG: ingo#area#frompattern#GetCurrent() now takes optional arguments as
   Dictionary and adds a:options.firstLnum and a:options.lastLnum.
+- CHG: ingo#text#frompattern#GetCurrent() now take the optional a:currentPos
+  as Dictionary and adds a:options.firstLnum, a:options.lastLnum, and
+  a:options.returnValueOnNoSelection.
 
 ##### 1.041   12-Mar-2020
 - Add ingo/register/pending.vim module.
