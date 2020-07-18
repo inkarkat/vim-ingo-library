@@ -87,7 +87,7 @@ function! ingo#text#frompattern#GetCurrent( pattern, ... )
 "   cursor position itself. So this function can be used when it's difficult to
 "   include a cursor position assertion (\%#) inside a:pattern.
 "* SEE ALSO:
-"   - ingo#area#frompattern#GetAroundHere() returns the positions, not the match.
+"   - ingo#area#frompattern#GetCurrent() returns the positions, not the match.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
