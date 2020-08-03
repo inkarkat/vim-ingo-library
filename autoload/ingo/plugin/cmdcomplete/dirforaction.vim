@@ -422,7 +422,7 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
     let s:count += 1
     let l:generatedCompleteFunctionName = 'IngoLibrary_CmdCompleteDirForAction' . s:count
     let l:completeFunctionName = get(a:parameters, 'overrideCompleteFunction', l:generatedCompleteFunctionName)
-    let l:completeStrategy = (l:Action ==# 'chdir' ? 's:CompleteDirectories' : 's:CompleteFiles')
+    let l:completeStrategy = (type(l:Action) == type('') && l:Action ==# 'chdir' ? 's:CompleteDirectories' : 's:CompleteFiles')
     execute
     \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:generatedCompleteFunctionName) .
     \	printf("    return %s(0, %s, %s, %s, %d, %d, a:ArgLead)\n",

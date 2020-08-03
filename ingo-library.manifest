@@ -15,6 +15,7 @@ autoload/ingo/buffer/temp.vim
 autoload/ingo/buffer/temprange.vim
 autoload/ingo/buffer/visible.vim
 autoload/ingo/change.vim
+autoload/ingo/change/processed.vim
 autoload/ingo/change/virtcols.vim
 autoload/ingo/cmdargs.vim
 autoload/ingo/cmdargs/command.vim

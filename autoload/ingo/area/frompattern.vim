@@ -93,31 +93,42 @@ function! ingo#area#frompattern#GetCurrent( pattern, ... )
 "   a:pattern       Regular expression to search. 'ignorecase', 'smartcase' and
 "		    'magic' applies. When empty, the last search pattern |"/| is
 "		    used.
-"   a:returnValueOnNoSelection  Optional return value if there's no match. If
-"				omitted, [[0, 0], [0, 0]] will be returned.
-"   a:currentPos                Optional base position.
+"   a:options.returnValueOnNoSelection
+"		    Optional return value if there's no match. If omitted,
+"		    [[0, 0], [0, 0]] will be returned.
+"   a:options.currentPos
+"		    Optional base position.
+"   a:options.firstLnum
+"		    Optional first line number to search for the start of the
+"		    pattern. Defaults to the current line.
+"   a:options.lastLnum
+"		    Optional end line number to search for the start of the
+"		    pattern. Defaults to the current line.
 "* RETURN VALUES:
-"   [[startLnum, startCol], [endLnum, endCol]], or a:returnValueOnNoSelection.
-"   endCol points to the last character, not beyond it!
+"   [[startLnum, startCol], [endLnum, endCol]], or
+"   a:option.returnValueOnNoSelection. endCol points to the last character, not
+"   beyond it!
 "******************************************************************************
+    let l:options = (a:0 ? a:1 : {})
+    let l:returnValueOnNoSelection = get(l:options, 'returnValueOnNoSelection', [[0, 0], [0, 0]])
     let l:save_view = winsaveview()
-    if a:0 >= 2
-	let l:here = a:2
-	call setpos('.', ingo#pos#Make4(a:2))
+    if has_key(l:options, 'currentPos')
+	let l:here = l:options.currentPos
+	call setpos('.', ingo#pos#Make4(l:here))
     else
 	let l:here = getpos('.')[1:2]
     endif
 
-    let l:startPos = searchpos(a:pattern, 'bcnW', line('.'))
+    let l:startPos = searchpos(a:pattern, 'bcnW', get(l:options, 'firstLnum', line('.')))
     if l:startPos == [0, 0]
-	return (a:0 ? a:1 : [[0, 0], [0, 0]])
+	return l:returnValueOnNoSelection
     endif
 
     try
 	call setpos('.', ingo#pos#Make4(l:startPos))
-	let l:endPos = searchpos(a:pattern, 'cenW', line('.'))
+	let l:endPos = searchpos(a:pattern, 'cenW', get(l:options, 'lastLnum', line('.')))
 	if l:endPos == [0, 0] || ingo#pos#IsBefore(l:endPos, l:here)
-	    return (a:0 ? a:1 : [[0, 0], [0, 0]])
+	    return l:returnValueOnNoSelection
 	endif
 	return [l:startPos, l:endPos]
     finally
