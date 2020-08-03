@@ -141,7 +141,7 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
-##### 1.042   RELEASEME
+##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last
   character when joining with a following empty line and ! a:isKeepSpace.
 - Support List of precisions in ingo#units#Format() and default to not showing
