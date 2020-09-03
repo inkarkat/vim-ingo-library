@@ -141,6 +141,11 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.043   RELEASEME
+- Minor: Actually support no-argument form of
+  ingo#query#get#[Writable]Register(), the documentation already states that
+  the a:errorRegister defaults to the empty string.
+
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last
   character when joining with a following empty line and ! a:isKeepSpace.
