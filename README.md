@@ -145,6 +145,7 @@ HISTORY
 - Minor: Actually support no-argument form of
   ingo#query#get#[Writable]Register(), the documentation already states that
   the a:errorRegister defaults to the empty string.
+- Add ingo/subs/apply.vim module.
 
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last
