@@ -61,7 +61,10 @@ function! ingo#subs#apply#FlexibleExpression( text, textMode, expression ) abort
 "   a:expression    The expression; typically queried from the user.
 "
 "* RETURN VALUES:
-"   Transformed a:text.
+"   Transformed a:text. Note: If a passed a:expression returns a List, this will
+"   be joined appropriately if the expression is applied to matches, splits, or
+"   lines. The List is returned as-is in case of a single expression (or
+"   function) application, and it's up to the client to join this as desired.
 "******************************************************************************
     if ingo#str#StartsWith(a:expression, '.')
 	return join(ingo#collections#Flatten1(
