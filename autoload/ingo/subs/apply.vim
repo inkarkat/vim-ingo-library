@@ -6,6 +6,8 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! ingo#subs#apply#FlexibleExpression( text, textMode, expression ) abort
 "******************************************************************************
@@ -30,12 +32,18 @@ function! ingo#subs#apply#FlexibleExpression( text, textMode, expression ) abort
 "			  following expression / function name / external
 "			  command / Ex command, then re-joined with the
 "			  separating non-matches in between.
+"			  When an expression returns a List, all elements are
+"			  joined with the first occurring separator in the input
+"			  text.
 "			- If the expression begins with ^{pattern}^, the text
 "			  is split on {pattern} (last search pattern if
 "			  empty), and each item is individually passed through
 "			  the following expression / function name / external
 "			  command / Ex command, then re-joined with the
 "			  separators in between.
+"			  When an expression returns a List, all elements are
+"			  joined with the first separator match of {pattern} in
+"			  the input text.
 "			- If the expression begins with ".", each individual
 "			  line is passed through the following expression /
 "			  function name / external command / Ex command.
@@ -75,10 +83,19 @@ function! ingo#subs#apply#FlexibleExpression( text, textMode, expression ) abort
 	    let l:pattern = ingo#escape#Unescape(l:escapedPattern, l:separator)
 	endif
 
+	let l:isProcessMatches = (l:separator ==# '/')
+	if l:isProcessMatches
+	    let l:newElementJoiner = get(split(a:text, l:pattern), 0, '')
+	else
+	    let l:newElementJoiner = matchstr(a:text, l:pattern)
+	endif
+
 	return join(
 	\   ingo#collections#fromsplit#MapOne(
-	\       (l:separator !=# '/'), a:text, l:pattern,
-	\       printf('ingo#subs#apply#FlexibleExpression(v:val, (ingo#str#EndsWith(v:val, "\n") ? "V" : "v"), %s)', string(l:rest[1:]))
+	\       ! l:isProcessMatches, a:text, l:pattern,
+	\       printf('ingo#subs#apply#Flatten(%s, ingo#subs#apply#FlexibleExpression(v:val, (ingo#str#EndsWith(v:val, "\n") ? "V" : "v"), %s))',
+	\           string(l:newElementJoiner), string(l:rest[1:])
+	\       )
 	\   ), ''
 	\)
     endif
@@ -106,5 +123,13 @@ function! ingo#subs#apply#FlexibleExpression( text, textMode, expression ) abort
 
     return l:result
 endfunction
+function! ingo#subs#apply#Flatten( joiner, result ) abort
+    return (type(a:result) == type([]) ?
+    \   join(a:result, a:joiner) :
+    \   a:result
+    \)
+endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
