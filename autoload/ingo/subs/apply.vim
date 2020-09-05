@@ -40,6 +40,9 @@ function! ingo#subs#apply#FlexibleExpression( text, textMode, expression ) abort
 "			  line is passed through the following expression /
 "			  function name / external command / Ex command.
 "			  separators in between.
+"			  To omit a line through an expression, return an empty
+"			  List ([]). To expand a line into several, return a
+"			  List of lines.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -53,11 +56,11 @@ function! ingo#subs#apply#FlexibleExpression( text, textMode, expression ) abort
 "   Transformed a:text.
 "******************************************************************************
     if ingo#str#StartsWith(a:expression, '.')
-	return join(
+	return join(ingo#collections#Flatten1(
 	\   map(
 	\       split(substitute(a:text, '\n$', '', ''), '\n', 1),
 	\       printf('ingo#subs#apply#FlexibleExpression(v:val, "v", %s)', string(a:expression[1:]))
-	\   ), "\n"
+	\   )), "\n"
 	\)
     endif
 
