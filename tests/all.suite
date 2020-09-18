@@ -7,6 +7,7 @@ compat/
 date/
 dict/
 digest/
+escape/
 file/
 function/uniquify/
 fs/paths/
