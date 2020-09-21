@@ -11,9 +11,11 @@
 "* PURPOSE:
 "   After fixing https://github.com/vim/vim/issues/6163 (In the GUI can't
 "   distinguish "<M-v>" from "ö" in a mapping), mappings that use a combination
-"   of Alt and Shift (e.g. Alt + Shift + /) have to be defined as <A-S-?>
-"   instead of <A-?>. Unfortunately, adding the modifier makes these mappings
-"   incompatible with older GVIM versions, so we need a conditional.
+"   of Alt and Shift and a non-alphabetic character (e.g. Alt + Shift + /) have
+"   to be defined as <A-S-?> instead of <A-?>.
+"   Unfortunately, adding the modifier makes these mappings incompatible with
+"   non-GTK (e.g. Windows) and older GVIM versions (so this might actually be an
+"   accidental regression), therefore we need a conditional.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -25,7 +27,7 @@
 "   printf()):
 "       execute printf('nmap <A-%s?> <Plug>(Foo)', ingo#compat#mapping#MetaShift())
 "******************************************************************************
-if v:version == 802 && has('patch851') || v:version > 802
+if has('gui_gtk') && (v:version == 802 && has('patch851') || v:version > 802)
     function! ingo#compat#mapping#MetaShift() abort
 	return 'S-'
     endfunction
