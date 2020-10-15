@@ -7,7 +7,7 @@
 "   - ingo/os.vim autoload script
 "   - ingo/strdisplaywidth.vim autoload script
 "
-" Copyright: (C) 2013-2019 Ingo Karkat
+" Copyright: (C) 2013-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -355,6 +355,12 @@ if (v:version == 703 && has('patch32') || v:version > 703) && ! has_key(s:compat
 	    let l:args[2] = a:2
 	endif
 	let l:mapInfo = call('maparg', l:args)
+
+	if type(l:mapInfo) != type({}) || ! has_key(l:mapInfo, 'rhs')
+	    " Avoid "E121: Undefined variable: rhs" / "E716: Key not present in
+	    " Dictionary: rhs" in case empty / non-existing a:name is passed.
+	    return ''
+	endif
 
 	" Contrary to the old maparg(), <SID> doesn't get automatically
 	" translated into <SNR>NNN_ here.
