@@ -163,6 +163,9 @@ HISTORY							*ingo-library-history*
 - Add ingo/subs/apply.vim module.
 - Add ingo#escape#file#CmdlineSpecialEscape().
 - Add ingo#buffer#IsWritable().
+- Deprecated: ingo#subst#expr#emulation#Substitute() is now available as a
+  compat function ingo#compat#substitution#RecursiveSubstitutionExpression()
+  because since Vim 8.0.20, the regexp engine is reentrant.
 
 1.042	03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last

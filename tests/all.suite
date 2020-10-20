@@ -4,6 +4,7 @@ cmdargs/register/
 collections/
 collections/recursive/
 compat/
+compat/substitution/
 date/
 dict/
 digest/
