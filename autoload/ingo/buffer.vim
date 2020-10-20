@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -40,6 +40,24 @@ endfunction
 function! ingo#buffer#IsPersisted( ... )
     let l:bufType = (a:0 ? getbufvar(a:1, '&buftype') : &l:buftype)
     return (empty(l:bufType) || l:bufType ==# 'acwrite')
+endfunction
+
+function! ingo#buffer#IsWritable( ... )
+    if ! call('ingo#buffer#IsPersisted', a:000)
+	return 0
+    endif
+
+    let l:readonly = (a:0 ? getbufvar(a:1, '&readonly') : &l:readonly)
+    if l:readonly
+	return 0
+    endif
+
+    let l:modifiable = (a:0 ? getbufvar(a:1, '&modifiable') : &l:modifiable)
+    if ! l:modifiable
+	return 0
+    endif
+
+    return 1
 endfunction
 
 function! ingo#buffer#ExistOtherBuffers( targetBufNr )
