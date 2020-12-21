@@ -166,6 +166,7 @@ HISTORY							*ingo-library-history*
 - Deprecated: ingo#subst#expr#emulation#Substitute() is now available as a
   compat function ingo#compat#substitution#RecursiveSubstitutionExpression()
   because since Vim 8.0.20, the regexp engine is reentrant.
+- Add ingo#hlgroup#Get{Foreground,Background,}Color().
 
 1.042	03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last
