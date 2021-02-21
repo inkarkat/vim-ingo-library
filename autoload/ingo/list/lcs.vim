@@ -64,7 +64,8 @@ function! ingo#list#lcs#FindAllCommon( strings, ... )
 "* INPUTS:
 "   a:strings                   List of strings.
 "   a:minimumCommonLength       Minimum substring length; default 1.
-"   a:minimumDifferingLength    Minimum length; default 0.
+"   a:minimumDifferingLength    Minimum length or [minimumPrefixDifferingLength,
+"                               minimumSuffixDifferingLength]; default 0.
 "* RETURN VALUES:
 "   [distinctLists, commons], as in:
 "   [
