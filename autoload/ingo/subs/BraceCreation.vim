@@ -62,7 +62,8 @@ function! ingo#subs#BraceCreation#FromList( list, ... )
 "		opportunities to extract multiple substrings are not taken.
 "   a:options.short
 "		Flag to enable all optimizations, i.e.
-"		optionalElementInSquareBraces and uniqueElements.
+"		optionalElementInSquareBraces and uniqueElements and
+"		isIgnoreCase.
 "   a:options.optionalElementInSquareBraces
 "		Flag whether a single optional element is denoted as [elem]
 "		instead of {elem,} (or {,elem}, or even {,,elem,}; i.e. the
@@ -83,6 +84,7 @@ function! ingo#subs#BraceCreation#FromList( list, ... )
     if has_key(l:options, 'short')
 	let l:options.optionalElementInSquareBraces = 1
 	let l:options.uniqueElements = 1
+	let l:options.isIgnoreCase = 1
     endif
 
     let [l:distinctLists, l:commons] = ingo#list#lcs#FindAllCommon(a:list, get(l:options, 'minimumCommonLength', 1), get(l:options, 'minimumDifferingLength', 0), get(l:options, 'isIgnoreCase', 0))

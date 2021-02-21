@@ -15,9 +15,10 @@ call vimtap#Is(s:Call('FooHasBoo FooBoo FooBox', {}), 'Foo{Has,,}Bo{o,o,x}', 'op
 call vimtap#Is(s:Call('FooHasBoo FooBoo FooBox', {'optionalElementInSquareBraces': 1}), 'Foo[Has]Bo{o,o,x}', 'optional inner in square braces')
 call vimtap#Is(s:Call('FooHasBoo FooBoo FooBox', {'uniqueElements': 1}), 'Foo{Has,}Bo{o,x}', 'unique')
 call vimtap#Is(s:Call('FooHasBoo FooBoo FooBox', {'uniqueElements': 1, 'optionalElementInSquareBraces': 1}), 'Foo[Has]Bo{o,x}', 'unique and square braces')
-call vimtap#Is(s:Call('FooHasBoo FooBoo FooBox', {'short': 1}), 'Foo[Has]Bo{o,x}', 'short = unique and square braces')
 
 call vimtap#Is(s:Call('fooHasBoo FOOBoo FooBox', {'optionalElementInSquareBraces': 1, 'isIgnoreCase': 1}), 'foo[Has]Bo{o,o,x}', 'case-insensitive optional inner in square braces')
 call vimtap#Is(s:Call('addField field', {'optionalElementInSquareBraces': 1, 'isIgnoreCase': 1}), '[add]Field', 'case-insensitive optional end in square braces')
+
+call vimtap#Is(s:Call('FooHasBoo FOOBoo FoOBox', {'short': 1}), 'Foo[Has]Bo{o,x}', 'short = unique and square braces and ignore-case')
 
 call vimtest#Quit()
