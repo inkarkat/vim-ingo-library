@@ -82,9 +82,9 @@ function! ingo#subs#BraceCreation#FromList( list, ... )
 "******************************************************************************
     let l:options = (a:0 ? a:1 : {})
     if has_key(l:options, 'short')
-	let l:options.optionalElementInSquareBraces = 1
-	let l:options.uniqueElements = 1
-	let l:options.isIgnoreCase = 1
+	if ! has_key(l:options, 'optionalElementInSquareBraces')    | let l:options.optionalElementInSquareBraces = 1 | endif
+	if ! has_key(l:options, 'uniqueElements')                   | let l:options.uniqueElements = 1 | endif
+	if ! has_key(l:options, 'isIgnoreCase')                     | let l:options.isIgnoreCase = 1 | endif
     endif
 
     let [l:distinctLists, l:commons] = ingo#list#lcs#FindAllCommon(a:list, get(l:options, 'minimumCommonLength', 1), get(l:options, 'minimumDifferingLength', 0), get(l:options, 'isIgnoreCase', 0))
