@@ -152,6 +152,9 @@ HISTORY
   compat function ingo#compat#substitution#RecursiveSubstitutionExpression()
   because since Vim 8.0.20, the regexp engine is reentrant.
 - Add ingo#hlgroup#Get{Foreground,Background,}Color().
+- ingo#list#lcs#Find{All,Longest}Common(), ingo#subs#BraceCreation#FromList():
+  Add optional a:isIgnoreCase argument to ignore case differences when
+  searching for common substrings.
 
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last
@@ -1129,7 +1132,7 @@ HISTORY
 - Started development of shared autoload functionality.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2009-2020 Ingo Karkat -
+Copyright: (C) 2009-2021 Ingo Karkat -
 Contains URL encoding / decoding algorithms written by Tim Pope. -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 

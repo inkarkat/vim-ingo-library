@@ -7,7 +7,7 @@
 "   - ingo/list/lcs.vim autoload script
 "   - ingo/list/sequence.vim autoload script
 "
-" Copyright: (C) 2017-2018 Ingo Karkat
+" Copyright: (C) 2017-2021 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -73,6 +73,8 @@ function! ingo#subs#BraceCreation#FromList( list, ... )
 "		strings are contained in there.
 "   a:options.minimumCommonLength       Minimum substring length; default 1.
 "   a:options.minimumDifferingLength    Minimum length; default 0.
+"   a:options.isIgnoreCase              Flag whether the search is done without
+"                                       considering case (default: 0).
 "* RETURN VALUES:
 "   Brace Expression. Returns braced and comma-separated original items if no
 "   common substrings could be extracted (or a:options.returnValueOnFailure).
@@ -83,7 +85,7 @@ function! ingo#subs#BraceCreation#FromList( list, ... )
 	let l:options.uniqueElements = 1
     endif
 
-    let [l:distinctLists, l:commons] = ingo#list#lcs#FindAllCommon(a:list, get(l:options, 'minimumCommonLength', 1), get(l:options, 'minimumDifferingLength', 0))
+    let [l:distinctLists, l:commons] = ingo#list#lcs#FindAllCommon(a:list, get(l:options, 'minimumCommonLength', 1), get(l:options, 'minimumDifferingLength', 0), get(l:options, 'isIgnoreCase', 0))
     let l:isFailure = empty(l:commons)
 
     if ! l:isFailure && get(l:options, 'strict', 0)
