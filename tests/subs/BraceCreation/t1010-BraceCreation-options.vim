@@ -1,7 +1,7 @@
 " Test brace creation with options.
 
 call vimtest#StartTap()
-call vimtap#Plan(9)
+call vimtap#Plan(10)
 
 function! s:Call( text, options )
     return ingo#subs#BraceCreation#FromSplitString(a:text, '', a:options)
@@ -9,6 +9,7 @@ endfunction
 
 call vimtap#Is(s:Call('abc def zyz', {}), '{abc,def,zyz}', 'no common substrings')
 call vimtap#Is(s:Call('abc def zyz', {'returnValueOnFailure' : ''}), '', 'no common substrings')
+call vimtap#Is(s:Call('abc def zyz', {'returnValueOnFailure' : 'NO'}), 'NO', 'no common substrings')
 
 call vimtap#Is(s:Call('FooHasBoo FooBoo FooBox', {}), 'Foo{Has,,}Bo{o,o,x}', 'optional inner default')
 call vimtap#Is(s:Call('FooHasBoo FooBoo FooBox', {'optionalElementInSquareBraces': 1}), 'Foo[Has]Bo{o,o,x}', 'optional inner in square braces')

@@ -93,7 +93,7 @@ function! ingo#subs#BraceCreation#FromList( list, ... )
     endif
 
     if l:isFailure && has_key(l:options, 'returnValueOnFailure')
-	return a:options.returnValueOnFailure
+	return l:options.returnValueOnFailure
     endif
 
     return s:Join(l:distinctLists, l:commons, (a:0 ? a:1 : {}))
