@@ -155,6 +155,8 @@ HISTORY
 - ingo#list#lcs#Find{All,Longest}Common(), ingo#subs#BraceCreation#FromList():
   Add optional a:isIgnoreCase argument to ignore case differences when
   searching for common substrings.
+- Add ingo#window#special#HasOtherDiffWindow() variant of
+  ingo#window#special#HasDiffWindow().
 
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last
