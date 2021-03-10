@@ -22,7 +22,7 @@
 "   You can then use the new command with file completion:
 "	:BrowseTemp f<Tab> -> :BrowseTemp foo.txt
 "
-" Copyright: (C) 2009-2020 Ingo Karkat
+" Copyright: (C) 2009-2021 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -237,6 +237,8 @@ function! s:Command( isBang, mods, Action, PostAction, isAllowOtherDirs, Default
 		let l:unescapedFilename = a:DefaultFilename
 	    endif
 	    let l:filename = ingo#compat#fnameescape(l:unescapedFilename)
+	else
+	    let l:unescapedFilename = ingo#escape#file#fnameunescape(l:filename)
 	endif
 
 	let l:isAbsoluteFilename = ingo#fs#path#IsAbsolute(l:filename)
@@ -248,7 +250,7 @@ function! s:Command( isBang, mods, Action, PostAction, isAllowOtherDirs, Default
 	    return 0
 	endif
 
-	let l:dirspec = (l:isAbsoluteFilename ? '' : s:ResolveDirspecs(a:dirspecs, ingo#escape#file#fnameunescape(l:filename)))
+	let l:dirspec = (l:isAbsoluteFilename ? '' : s:ResolveDirspecs(a:dirspecs, l:unescapedFilename))
 
 	if ! empty(a:FilenameProcessingFunction)
 	    let l:processedFilename = call(a:FilenameProcessingFunction, [l:filename, l:fileOptionsAndCommands])
