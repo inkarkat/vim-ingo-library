@@ -157,6 +157,9 @@ HISTORY
   searching for common substrings.
 - Add ingo#window#special#HasOtherDiffWindow() variant of
   ingo#window#special#HasDiffWindow().
+- dirforaction: BUG: Passed filenames with escaped glob characters not handled
+  correctly; need to use the unescaped filename for l:isAbsoluteFilename
+  check.
 
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last

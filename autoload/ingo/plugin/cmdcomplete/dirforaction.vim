@@ -241,7 +241,7 @@ function! s:Command( isBang, mods, Action, PostAction, isAllowOtherDirs, Default
 	    let l:unescapedFilename = ingo#escape#file#fnameunescape(l:filename)
 	endif
 
-	let l:isAbsoluteFilename = ingo#fs#path#IsAbsolute(l:filename)
+	let l:isAbsoluteFilename = ingo#fs#path#IsAbsolute(l:unescapedFilename)
 	if (l:isAbsoluteFilename || ingo#fs#path#IsUpwards(l:filename)) && ! a:isAllowOtherDirs
 	    " The passed (must be typed, as the completion wouldn't offer these)
 	    " filename refers to files outside a:dirspecs, but this is not
