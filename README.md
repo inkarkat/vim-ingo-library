@@ -160,6 +160,7 @@ HISTORY
 - dirforaction: BUG: Passed filenames with escaped glob characters not handled
   correctly; need to use the unescaped filename for l:isAbsoluteFilename
   check.
+- dirforaction: ENH: Add a:parameters.completeFunctionHook.
 
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last
