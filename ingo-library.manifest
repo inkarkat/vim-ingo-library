@@ -64,6 +64,7 @@ autoload/ingo/err.vim
 autoload/ingo/escape.vim
 autoload/ingo/escape/command.vim
 autoload/ingo/escape/file.vim
+autoload/ingo/escape/mapping.vim
 autoload/ingo/escape/shellcommand.vim
 autoload/ingo/event.vim
 autoload/ingo/external.vim
