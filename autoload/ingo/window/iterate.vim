@@ -22,6 +22,16 @@ function! ingo#window#iterate#All( Action, ... ) abort
 "* RETURN VALUES:
 "   None.
 "******************************************************************************
+    if winnr('$') == 1
+	if type(a:Action) == type(function('tr'))
+	    noautocmd keepjumps call call(a:Action, a:000)
+	else
+	    noautocmd keepjumps execute a:Action
+	endif
+
+	return
+    endif
+
     " By entering a window, its height is potentially increased from 0 to 1 (the
     " minimum for the current window). To avoid any modification, save the window
     " sizes and restore them after visiting all windows.
