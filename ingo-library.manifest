@@ -205,6 +205,7 @@ autoload/ingo/window.vim
 autoload/ingo/window/adjacent.vim
 autoload/ingo/window/cmdwin.vim
 autoload/ingo/window/dimensions.vim
+autoload/ingo/window/iterate.vim
 autoload/ingo/window/locate.vim
 autoload/ingo/window/preview.vim
 autoload/ingo/window/quickfix.vim
