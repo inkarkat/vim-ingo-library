@@ -105,6 +105,68 @@ else
     endfunction
 endif
 
+function! ingo#window#iterate#ActionWithCatch( Action, ... ) abort
+    let l:isFuncref = (type(a:Action) == type(function('tr')))
+
+    if ! l:isFuncref
+	let l:val = (a:0 == 1 ? a:1 : a:000)
+	if type(l:val) == type([]) || type(l:val) == type({})
+	    " Avoid "E730: using List as a String" in the substitution.
+	    let l:val = string(l:val)
+	endif
+
+	let l:command = substitute(a:Action, '\C' . ingo#actions#GetValExpr(), l:val, 'g')
+    endif
+
+    try
+	if l:isFuncref
+	    call call(a:Action, a:000)
+	else
+	    execute l:command
+	endif
+    catch /^Vim\%((\a\+)\)\=:/
+	let l:bufName = bufname('')
+	call add(s:errors, printf('%s: %s', (empty(l:bufName) ? '[No Name]' : l:bufName), ingo#msg#MsgFromVimException()))
+    endtry
+endfunction
+
+function! ingo#window#iterate#AllWithErrorsEchoed( Action, ... ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Execute a:Action in all windows in the current tab page. Errors / exceptions
+"   do not abort the iteration, but instead :echomsg the error messages (with
+"   the affected buffer name prepended).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:Action    Either a Funcref or an expression to be :execute'd.
+"   a:arguments Value(s) to be passed to the a:Action Funcref or used for
+"               occurrences of "v:val" inside the a:Action expression. The
+"               v:val is inserted literally (as a Number, String, List,
+"               Dict)!
+"* RETURN VALUES:
+"   0 if an error / exception occurred; 1 if all iterations succeeded.
+"   1 if complete success, 0 if error(s) / exception(s) occurred. An error
+"   message is then available from ingo#err#Get().
+"******************************************************************************
+    call ingo#err#Clear()
+    let s:errors = []
+
+    call call('ingo#window#iterate#All', [function('ingo#window#iterate#ActionWithCatch'), a:Action] + a:000)
+
+    if empty(s:errors)
+	let l:isSuccess = 1
+    else
+	call ingo#err#Set(join(s:errors))
+	let l:isSuccess = 0
+    endif
+
+    unlet! s:errors
+    return l:isSuccess
+endfunction
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
