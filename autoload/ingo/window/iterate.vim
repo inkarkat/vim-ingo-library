@@ -85,17 +85,23 @@ else
 	" By entering a window, its height is potentially increased from 0 to 1 (the
 	" minimum for the current window). To avoid any modification, save the window
 	" sizes and restore them after visiting all windows.
-	let l:originalWindowLayout = winrestcmd()
-	    let l:originalWinNr = winnr()
-	    let l:previousWinNr = winnr('#') ? winnr('#') : 1
-		if l:isFuncref
-		    noautocmd keepjumps windo call call(a:Action, a:000)
-		else
-		    noautocmd keepjumps windo execute l:command
-		endif
-	    noautocmd execute l:previousWinNr . 'wincmd w'
-	    noautocmd execute l:originalWinNr . 'wincmd w'
-	silent! execute l:originalWindowLayout
+	    let l:save_eventignore = &eventignore
+		let l:originalWindowLayout = winrestcmd()
+		    let l:originalWinNr = winnr()
+		    let l:previousWinNr = winnr('#') ? winnr('#') : 1
+	set eventignore+=BufEnter,BufLeave,WinEnter,WinLeave,CmdwinEnter,CmdwinLeave
+	try
+	    if l:isFuncref
+		keepjumps windo call call(a:Action, a:000)
+	    else
+		keepjumps windo execute l:command
+	    endif
+	finally
+		    noautocmd execute l:previousWinNr . 'wincmd w'
+		    noautocmd execute l:originalWinNr . 'wincmd w'
+		silent! execute l:originalWindowLayout
+	    let &eventignore = l:save_eventignore
+	endtry
     endfunction
 endif
 
