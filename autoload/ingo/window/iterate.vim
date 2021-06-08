@@ -19,19 +19,31 @@ if exists('*win_execute')
     "* EFFECTS / POSTCONDITIONS:
     "   None.
     "* INPUTS:
-    "   a:Action    Either a Funcref (that gets passed all following arguments), or
-    "               an Ex command that is :execute'd (ignoring any additional
-    "               arguments).
+    "   a:Action    Either a Funcref or an expression to be :execute'd.
+    "   a:arguments Value(s) to be passed to the a:Action Funcref or used for
+    "               occurrences of "v:val" inside the a:Action expression. The
+    "               v:val is inserted literally (as a Number, String, List,
+    "               Dict)!
     "* RETURN VALUES:
     "   None.
     "******************************************************************************
 	let l:isFuncref = (type(a:Action) == type(function('tr')))
 
+	if ! l:isFuncref
+	    let l:val = (a:0 == 1 ? a:1 : a:000)
+	    if type(l:val) == type([]) || type(l:val) == type({})
+		" Avoid "E730: using List as a String" in the substitution.
+		let l:val = string(l:val)
+	    endif
+
+	    let l:command = substitute(a:Action, '\C' . ingo#actions#GetValExpr(), l:val, 'g')
+	endif
+
 	if winnr('$') == 1
 	    if l:isFuncref
 		noautocmd keepjumps call call(a:Action, a:000)
 	    else
-		noautocmd keepjumps execute a:Action
+		noautocmd keepjumps execute l:command
 	    endif
 
 	    return
@@ -39,7 +51,7 @@ if exists('*win_execute')
 
 	let l:command = ((l:isFuncref) ?
 	\   'call call(a:Action, a:000)' :
-	\   'execute ' . string(a:Action)
+	\   'execute ' . string(l:command)
 	\)
 
 	for l:winNr in range(1, winnr('$'))
@@ -50,11 +62,21 @@ else
     function! ingo#window#iterate#All( Action, ... ) abort
 	let l:isFuncref = (type(a:Action) == type(function('tr')))
 
+	if ! l:isFuncref
+	    let l:val = (a:0 == 1 ? a:1 : a:000)
+	    if type(l:val) == type([]) || type(l:val) == type({})
+		" Avoid "E730: using List as a String" in the substitution.
+		let l:val = string(l:val)
+	    endif
+
+	    let l:command = substitute(a:Action, '\C' . ingo#actions#GetValExpr(), l:val, 'g')
+	endif
+
 	if winnr('$') == 1
 	    if l:isFuncref
 		noautocmd keepjumps call call(a:Action, a:000)
 	    else
-		noautocmd keepjumps execute a:Action
+		noautocmd keepjumps execute l:command
 	    endif
 
 	    return
@@ -69,7 +91,7 @@ else
 		if l:isFuncref
 		    noautocmd keepjumps windo call call(a:Action, a:000)
 		else
-		    noautocmd keepjumps windo execute a:Action
+		    noautocmd keepjumps windo execute l:command
 		endif
 	    noautocmd execute l:previousWinNr . 'wincmd w'
 	    noautocmd execute l:originalWinNr . 'wincmd w'
