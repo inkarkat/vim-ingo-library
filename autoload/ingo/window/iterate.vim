@@ -9,6 +9,16 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+function! s:RenderExCommandWithVal( Action, arguments ) abort
+    let l:val = (len(a:arguments) == 1 ? a:arguments[0] : a:arguments)
+    if type(l:val) == type([]) || type(l:val) == type({})
+	" Avoid "E730: using List as a String" in the substitution.
+	let l:val = string(l:val)
+    endif
+
+    return substitute(a:Action, '\C' . ingo#actions#GetValExpr(), l:val, 'g')
+endfunction
+
 if exists('*win_execute')
     function! ingo#window#iterate#All( Action, ... ) abort
     "******************************************************************************
@@ -30,13 +40,7 @@ if exists('*win_execute')
 	let l:isFuncref = (type(a:Action) == type(function('tr')))
 
 	if ! l:isFuncref
-	    let l:val = (a:0 == 1 ? a:1 : a:000)
-	    if type(l:val) == type([]) || type(l:val) == type({})
-		" Avoid "E730: using List as a String" in the substitution.
-		let l:val = string(l:val)
-	    endif
-
-	    let l:command = substitute(a:Action, '\C' . ingo#actions#GetValExpr(), l:val, 'g')
+	    let l:command = s:RenderExCommandWithVal(a:Action, a:000)
 	endif
 
 	if winnr('$') == 1
@@ -63,13 +67,7 @@ else
 	let l:isFuncref = (type(a:Action) == type(function('tr')))
 
 	if ! l:isFuncref
-	    let l:val = (a:0 == 1 ? a:1 : a:000)
-	    if type(l:val) == type([]) || type(l:val) == type({})
-		" Avoid "E730: using List as a String" in the substitution.
-		let l:val = string(l:val)
-	    endif
-
-	    let l:command = substitute(a:Action, '\C' . ingo#actions#GetValExpr(), l:val, 'g')
+	    let l:command = s:RenderExCommandWithVal(a:Action, a:000)
 	endif
 
 	if winnr('$') == 1
@@ -109,13 +107,7 @@ function! ingo#window#iterate#ActionWithCatch( Action, ... ) abort
     let l:isFuncref = (type(a:Action) == type(function('tr')))
 
     if ! l:isFuncref
-	let l:val = (a:0 == 1 ? a:1 : a:000)
-	if type(l:val) == type([]) || type(l:val) == type({})
-	    " Avoid "E730: using List as a String" in the substitution.
-	    let l:val = string(l:val)
-	endif
-
-	let l:command = substitute(a:Action, '\C' . ingo#actions#GetValExpr(), l:val, 'g')
+	let l:command = s:RenderExCommandWithVal(a:Action, a:000)
     endif
 
     try
