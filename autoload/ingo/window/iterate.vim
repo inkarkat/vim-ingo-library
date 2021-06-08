@@ -41,9 +41,9 @@ if exists('*win_execute')
 
 	if winnr('$') == 1
 	    if l:isFuncref
-		noautocmd keepjumps call call(a:Action, a:000)
+		call call(a:Action, a:000)
 	    else
-		noautocmd keepjumps execute l:command
+		execute l:command
 	    endif
 
 	    return
@@ -55,7 +55,7 @@ if exists('*win_execute')
 	\)
 
 	for l:winNr in range(1, winnr('$'))
-	    call win_execute(win_getid(l:winNr), 'noautocmd keepjumps ' . l:command)
+	    call win_execute(win_getid(l:winNr), l:command)
 	endfor
     endfunction
 else
@@ -74,9 +74,9 @@ else
 
 	if winnr('$') == 1
 	    if l:isFuncref
-		noautocmd keepjumps call call(a:Action, a:000)
+		call call(a:Action, a:000)
 	    else
-		noautocmd keepjumps execute l:command
+		execute l:command
 	    endif
 
 	    return
