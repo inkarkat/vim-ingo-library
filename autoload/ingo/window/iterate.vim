@@ -39,7 +39,7 @@ if exists('*win_execute')
 
 	let l:command = ((l:isFuncref) ?
 	\   'call call(a:Action, a:000)' :
-	\   'execute a:Action'
+	\   'execute ' . string(a:Action)
 	\)
 
 	for l:winNr in range(1, winnr('$'))
