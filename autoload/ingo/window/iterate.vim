@@ -25,8 +25,10 @@ if exists('*win_execute')
     "* RETURN VALUES:
     "   None.
     "******************************************************************************
+	let l:isFuncref = (type(a:Action) == type(function('tr')))
+
 	if winnr('$') == 1
-	    if type(a:Action) == type(function('tr'))
+	    if l:isFuncref
 		noautocmd keepjumps call call(a:Action, a:000)
 	    else
 		noautocmd keepjumps execute a:Action
@@ -35,7 +37,7 @@ if exists('*win_execute')
 	    return
 	endif
 
-	let l:command = (type(a:Action) == type(function('tr')) ?
+	let l:command = ((l:isFuncref) ?
 	\   'call call(a:Action, a:000)' :
 	\   'execute a:Action'
 	\)
@@ -46,8 +48,10 @@ if exists('*win_execute')
     endfunction
 else
     function! ingo#window#iterate#All( Action, ... ) abort
+	let l:isFuncref = (type(a:Action) == type(function('tr')))
+
 	if winnr('$') == 1
-	    if type(a:Action) == type(function('tr'))
+	    if l:isFuncref
 		noautocmd keepjumps call call(a:Action, a:000)
 	    else
 		noautocmd keepjumps execute a:Action
@@ -62,7 +66,7 @@ else
 	let l:originalWindowLayout = winrestcmd()
 	    let l:originalWinNr = winnr()
 	    let l:previousWinNr = winnr('#') ? winnr('#') : 1
-		if type(a:Action) == type(function('tr'))
+		if l:isFuncref
 		    noautocmd keepjumps windo call call(a:Action, a:000)
 		else
 		    noautocmd keepjumps windo execute a:Action
