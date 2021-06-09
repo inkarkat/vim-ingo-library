@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2017-2020 Ingo Karkat
+" Copyright: (C) 2017-2021 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -39,6 +39,33 @@ function! ingo#hlgroup#GetForegroundColor( syntaxId, ... ) abort
 endfunction
 function! ingo#hlgroup#GetBackgroundColor( syntaxId, ... ) abort
     return call('ingo#hlgroup#GetColor', [1, a:syntaxId] + a:000)
+endfunction
+
+function! ingo#hlgroup#GetApplicableColorModes() abort
+"******************************************************************************
+"* PURPOSE:
+"   Get UI color modes that are applicable to the current Vim session.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   None.
+"* RETURN VALUES:
+"   List of mode(s) (gui, cterm) that apply to the current session.
+"******************************************************************************
+    if has('gui_running')
+	" Can't get back from GUI to terminal.
+	return ['gui']
+    elseif has('gui') || has('nvim')
+	" This terminal may be upgraded to the GUI via :gui.
+	" Neovim uses cterm or gui depending on &termguicolors, and can be
+	" changed whenever the user wishes to.
+	return ['cterm', 'gui']
+    else
+	" This terminal doesn't have GUI capabilities built in.
+	return ['cterm']
+    endif
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
