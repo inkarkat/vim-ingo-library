@@ -10,8 +10,8 @@
 function! ingo#buffers#Delete( buffersToDelete, isForce ) abort
 "******************************************************************************
 "* PURPOSE:
-"   Delete (:bdelete) all buffers in a:buffersToDelete, and collect any
-"   encountered errors.
+"   Delete (:bdelete) all buffers in a:buffersToDelete, and report any
+"   encountered errors (with the affected buffer name prepended).
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -20,25 +20,24 @@ function! ingo#buffers#Delete( buffersToDelete, isForce ) abort
 "   a:buffersToDelete   List of buffer numbers.
 "   a:isForce           Force flag; uses :bdelete! if true.
 "* RETURN VALUES:
-"   1 if complete success, 0 if error(s) / exception(s) occurred. An error
-"   message is then available from ingo#err#Get().
+"   1 if complete success, 0 if error(s) / exception(s) occurred. The last error
+"   message is then available from ingo#err#Get(); previous errors have already
+"   been echoed.
 "******************************************************************************
     call ingo#err#Clear()
-    let l:errors = []
+    let l:isSuccess = 1
     for l:bufNr in a:buffersToDelete
 	try
 	    execute l:bufNr . 'bdelete' . (a:isForce ? '!' : '')
 	catch /^Vim\%((\a\+)\)\=:/
-	    call add(l:errors, printf('%s: %s', ingo#buffer#NameOrDefault(bufname(l:bufNr)), ingo#msg#MsgFromVimException()))
+	    let l:isSuccess = 0
+
+	    if ingo#err#IsSet()
+		call ingo#msg#ErrorMsg(ingo#err#Get())
+	    endif
+	    call ingo#err#Set(printf('%s: %s', ingo#buffer#NameOrDefault(bufname(l:bufNr)), ingo#msg#MsgFromVimException()))
 	endtry
     endfor
-
-    if empty(l:errors)
-	let l:isSuccess = 1
-    else
-	call ingo#err#Set(join(l:errors))
-	let l:isSuccess = 0
-    endif
 
     return l:isSuccess
 endfunction

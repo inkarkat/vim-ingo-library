@@ -118,7 +118,12 @@ function! ingo#window#iterate#ActionWithCatch( Action, ... ) abort
 	    execute l:command
 	endif
     catch /^Vim\%((\a\+)\)\=:/
-	call add(s:errors, printf('%s: %s', ingo#buffer#NameOrDefault(bufname('')), ingo#msg#MsgFromVimException()))
+	let s:isSuccess = 0
+
+	if ingo#err#IsSet()
+	    call ingo#msg#ErrorMsg(ingo#err#Get())
+	endif
+	call ingo#err#Set(printf('%s: %s', ingo#buffer#NameOrDefault(bufname('')), ingo#msg#MsgFromVimException()))
     endtry
 endfunction
 
@@ -126,8 +131,8 @@ function! ingo#window#iterate#AllWithErrorsEchoed( Action, ... ) abort
 "******************************************************************************
 "* PURPOSE:
 "   Execute a:Action in all windows in the current tab page. Errors / exceptions
-"   do not abort the iteration, but instead :echomsg the error messages (with
-"   the affected buffer name prepended).
+"   do not abort the iteration, but are reported (with the affected buffer name
+"   prepended).
 "* ASSUMPTIONS / PRECONDITIONS:
 "   - a:Action must not remove or add windows, as that will mess with iteration.
 "* EFFECTS / POSTCONDITIONS:
@@ -139,23 +144,14 @@ function! ingo#window#iterate#AllWithErrorsEchoed( Action, ... ) abort
 "               v:val is inserted literally (as a Number, String, List,
 "               Dict)!
 "* RETURN VALUES:
-"   1 if complete success, 0 if error(s) / exception(s) occurred. An error
-"   message is then available from ingo#err#Get().
+"   1 if complete success, 0 if error(s) / exception(s) occurred. The last error
+"   message is then available from ingo#err#Get(); previous errors have already
+"   been echoed.
 "******************************************************************************
     call ingo#err#Clear()
-    let s:errors = []
-
-    call call('ingo#window#iterate#All', [function('ingo#window#iterate#ActionWithCatch'), a:Action] + a:000)
-
-    if empty(s:errors)
-	let l:isSuccess = 1
-    else
-	call ingo#err#Set(join(s:errors))
-	let l:isSuccess = 0
-    endif
-
-    unlet! s:errors
-    return l:isSuccess
+    let s:isSuccess = 1
+	call call('ingo#window#iterate#All', [function('ingo#window#iterate#ActionWithCatch'), a:Action] + a:000)
+    return s:isSuccess
 endfunction
 
 let &cpo = s:save_cpo
