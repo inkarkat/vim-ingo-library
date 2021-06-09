@@ -95,6 +95,10 @@ function! ingo#buffer#VisibleList( ... )
     return l:buflist
 endfunction
 
+function! ingo#buffer#NameOrDefault( bufName ) abort
+    return (empty(a:bufName) ? '[No Name]' : a:bufName)
+endfunction
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

@@ -167,6 +167,7 @@ HISTORY
 - ingo#buffer#VisibleList(): ENH: Allow passing range of tab pages to be
   considered.
 - Add ingo/list/transform.vim module.
+- Add ingo#buffer#NameOrDefault().
 
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last

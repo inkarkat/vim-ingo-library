@@ -118,8 +118,7 @@ function! ingo#window#iterate#ActionWithCatch( Action, ... ) abort
 	    execute l:command
 	endif
     catch /^Vim\%((\a\+)\)\=:/
-	let l:bufName = bufname('')
-	call add(s:errors, printf('%s: %s', (empty(l:bufName) ? '[No Name]' : l:bufName), ingo#msg#MsgFromVimException()))
+	call add(s:errors, printf('%s: %s', ingo#buffer#NameOrDefault(bufname('')), ingo#msg#MsgFromVimException()))
     endtry
 endfunction
 
