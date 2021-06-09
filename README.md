@@ -166,6 +166,7 @@ HISTORY
 - Add ingo#hlgroup#GetApplicableColorModes().
 - ingo#buffer#VisibleList(): ENH: Allow passing range of tab pages to be
   considered.
+- Add ingo/list/transform.vim module.
 
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last

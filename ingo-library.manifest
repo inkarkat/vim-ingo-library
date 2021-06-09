@@ -104,6 +104,7 @@ autoload/ingo/list/merge.vim
 autoload/ingo/list/pattern.vim
 autoload/ingo/list/sequence.vim
 autoload/ingo/list/split.vim
+autoload/ingo/list/transform.vim
 autoload/ingo/lists.vim
 autoload/ingo/lists/find.vim
 autoload/ingo/lnum.vim
