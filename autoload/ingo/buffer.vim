@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2020 Ingo Karkat
+" Copyright: (C) 2013-2021 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -72,24 +72,25 @@ function! ingo#buffer#IsEmptyVim()
     return ingo#buffer#IsBlank(l:currentBufNr) && ! ingo#buffer#ExistOtherBuffers(l:currentBufNr)
 endfunction
 
-function! ingo#buffer#VisibleList()
+function! ingo#buffer#VisibleList( ... )
 "******************************************************************************
 "* PURPOSE:
 "   The result is a List, where each item is the number of the buffer associated
-"   with each window in all tab pages. Like |tabpagebuflist()|, but for all tab
-"   pages.
+"   with each window in all tab pages / the passed a:range of tab pages. Like
+"   |tabpagebuflist()|, but for all / multiple tab pages.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   None.
+"   a:range Optional range of tab pages to consider. To exclude the current tab
+"           page, pass filter(range(tabpagenr('$')), 'v:val != tabpagenr()')
 "* RETURN VALUES:
 "   List of buffer numbers; may contain duplicates.
 "******************************************************************************
     let l:buflist = []
-    for l:i in range(tabpagenr('$'))
-	call extend(l:buflist, tabpagebuflist(l:i + 1))
+    for l:i in (a:0 ? a:1 : range(1, tabpagenr('$')))
+	call extend(l:buflist, tabpagebuflist(l:i))
     endfor
     return l:buflist
 endfunction

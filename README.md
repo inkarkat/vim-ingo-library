@@ -164,6 +164,8 @@ HISTORY
 - Add ingo/escape/mapping.vim module.
 - Add ingo/window/iterate.vim module.
 - Add ingo#hlgroup#GetApplicableColorModes().
+- ingo#buffer#VisibleList(): ENH: Allow passing range of tab pages to be
+  considered.
 
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last
