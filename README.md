@@ -168,6 +168,7 @@ HISTORY
   considered.
 - Add ingo/list/transform.vim module.
 - Add ingo#buffer#NameOrDefault().
+- Add ingo/buffers.vim module.
 
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last

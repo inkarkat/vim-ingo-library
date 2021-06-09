@@ -139,7 +139,6 @@ function! ingo#window#iterate#AllWithErrorsEchoed( Action, ... ) abort
 "               v:val is inserted literally (as a Number, String, List,
 "               Dict)!
 "* RETURN VALUES:
-"   0 if an error / exception occurred; 1 if all iterations succeeded.
 "   1 if complete success, 0 if error(s) / exception(s) occurred. An error
 "   message is then available from ingo#err#Get().
 "******************************************************************************

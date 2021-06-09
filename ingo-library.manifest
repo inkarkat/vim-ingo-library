@@ -14,6 +14,7 @@ autoload/ingo/buffer/scratch/converted.vim
 autoload/ingo/buffer/temp.vim
 autoload/ingo/buffer/temprange.vim
 autoload/ingo/buffer/visible.vim
+autoload/ingo/buffers.vim
 autoload/ingo/change.vim
 autoload/ingo/change/processed.vim
 autoload/ingo/change/virtcols.vim
