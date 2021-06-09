@@ -25,7 +25,8 @@ if exists('*win_execute')
     "* PURPOSE:
     "   Execute a:Action in all windows in the current tab page.
     "* ASSUMPTIONS / PRECONDITIONS:
-    "   None.
+    "   - a:Action must not remove or add windows, as that will mess with
+    "     iteration.
     "* EFFECTS / POSTCONDITIONS:
     "   None.
     "* INPUTS:
@@ -129,7 +130,7 @@ function! ingo#window#iterate#AllWithErrorsEchoed( Action, ... ) abort
 "   do not abort the iteration, but instead :echomsg the error messages (with
 "   the affected buffer name prepended).
 "* ASSUMPTIONS / PRECONDITIONS:
-"   None.
+"   - a:Action must not remove or add windows, as that will mess with iteration.
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
