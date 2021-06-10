@@ -28,7 +28,8 @@ if exists('*win_execute')
     "   - a:Action must not remove or add windows, as that will mess with
     "     iteration.
     "* EFFECTS / POSTCONDITIONS:
-    "   None.
+    "   - Window sizes may be restored after iteration (in the legacy
+    "     non-win_execute() version). Any window resizing would then be lost.
     "* INPUTS:
     "   a:Action    Either a Funcref or an expression to be :execute'd.
     "   a:arguments Value(s) to be passed to the a:Action Funcref or used for
@@ -136,7 +137,8 @@ function! ingo#window#iterate#AllWithErrorsEchoed( Action, ... ) abort
 "* ASSUMPTIONS / PRECONDITIONS:
 "   - a:Action must not remove or add windows, as that will mess with iteration.
 "* EFFECTS / POSTCONDITIONS:
-"   None.
+"   - Window sizes may be restored after iteration (in the legacy
+"     non-win_execute() version). Any window resizing would then be lost.
 "* INPUTS:
 "   a:Action    Either a Funcref or an expression to be :execute'd.
 "   a:arguments Value(s) to be passed to the a:Action Funcref or used for
