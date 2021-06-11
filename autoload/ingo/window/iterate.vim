@@ -10,10 +10,10 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 if exists('*win_execute')
-    function! ingo#window#iterate#All( Action, ... ) abort
+    function! ingo#window#iterate#WinRange( winRange, Action, ... ) abort
     "******************************************************************************
     "* PURPOSE:
-    "   Execute a:Action in all windows in the current tab page.
+    "   Execute a:Action in the a:winRange windows in the current tab page.
     "* ASSUMPTIONS / PRECONDITIONS:
     "   - a:Action must not remove or add windows, as that will mess with
     "     iteration.
@@ -21,6 +21,8 @@ if exists('*win_execute')
     "   - Window sizes may be restored after iteration (in the legacy
     "     non-win_execute() version). Any window resizing would then be lost.
     "* INPUTS:
+    "   a:winRange  List of window numbers that should be visited (in no
+    "               guaranteed order).
     "   a:Action    Either a Funcref or an expression to be :execute'd.
     "   a:arguments Value(s) to be passed to the a:Action Funcref or used for
     "               occurrences of "v:val" inside the a:Action expression. The
@@ -35,7 +37,7 @@ if exists('*win_execute')
 	    let l:command = ingo#actions#RenderExCommandWithVal(a:Action, a:000)
 	endif
 
-	if winnr('$') == 1
+	if len(a:winRange) == 1 && a:winRange[0] == winnr()
 	    if l:isFuncref
 		call call(a:Action, a:000)
 	    else
@@ -50,19 +52,19 @@ if exists('*win_execute')
 	\   'execute ' . string(l:command)
 	\)
 
-	for l:winNr in range(1, winnr('$'))
+	for l:winNr in a:winRange
 	    call win_execute(win_getid(l:winNr), l:command)
 	endfor
     endfunction
 else
-    function! ingo#window#iterate#All( Action, ... ) abort
+    function! ingo#window#iterate#WinRange( winRange, Action, ... ) abort
 	let l:isFuncref = (type(a:Action) == type(function('tr')))
 
 	if ! l:isFuncref
 	    let l:command = ingo#actions#RenderExCommandWithVal(a:Action, a:000)
 	endif
 
-	if winnr('$') == 1
+	if len(a:winRange) == 1 && a:winRange[0] == winnr()
 	    if l:isFuncref
 		call call(a:Action, a:000)
 	    else
@@ -81,10 +83,18 @@ else
 		    let l:previousWinNr = winnr('#') ? winnr('#') : 1
 	set eventignore+=BufEnter,BufLeave,WinEnter,WinLeave,CmdwinEnter,CmdwinLeave
 	try
-	    if l:isFuncref
-		keepjumps windo call call(a:Action, a:000)
+	    if a:winRange == range(1, winnr('$'))
+		if l:isFuncref
+		    keepjumps windo call call(a:Action, a:000)
+		else
+		    keepjumps windo execute l:command
+		endif
 	    else
-		keepjumps windo execute l:command
+		if l:isFuncref
+		    keepjumps windo if index(a:winRange, winnr()) | call call(a:Action, a:000) | endif
+		else
+		    keepjumps windo if index(a:winRange, winnr()) | execute l:command | endif
+		endif
 	    endif
 	finally
 		    noautocmd execute l:previousWinNr . 'wincmd w'
@@ -94,6 +104,28 @@ else
 	endtry
     endfunction
 endif
+
+function! ingo#window#iterate#All( Action, ... ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Execute a:Action in all windows in the current tab page.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   - a:Action must not remove or add windows, as that will mess with
+"     iteration.
+"* EFFECTS / POSTCONDITIONS:
+"   - Window sizes may be restored after iteration (in the legacy
+"     non-win_execute() version). Any window resizing would then be lost.
+"* INPUTS:
+"   a:Action    Either a Funcref or an expression to be :execute'd.
+"   a:arguments Value(s) to be passed to the a:Action Funcref or used for
+"               occurrences of "v:val" inside the a:Action expression. The
+"               v:val is inserted literally (as a Number, String, List,
+"               Dict)!
+"* RETURN VALUES:
+"   None.
+"******************************************************************************
+    call call('ingo#window#iterate#WinRange', [range(1, winnr('$')), a:Action] + a:000)
+endfunction
 
 function! ingo#window#iterate#ActionWithCatch( Action, ... ) abort
     let l:isFuncref = (type(a:Action) == type(function('tr')))
