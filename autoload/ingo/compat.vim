@@ -7,7 +7,7 @@
 "   - ingo/os.vim autoload script
 "   - ingo/strdisplaywidth.vim autoload script
 "
-" Copyright: (C) 2013-2020 Ingo Karkat
+" Copyright: (C) 2013-2021 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -506,6 +506,38 @@ else
 	    let l:str = call('matchstr', a:000)
 	    let l:end = call('matchend', a:000)
 	    return [l:str, l:start, l:end]
+	endif
+    endfunction
+endif
+
+if exists('*getenv') && ! has_key(s:compatFor, 'getenv')
+    function! ingo#compat#getenv( name )
+	let l:val = getenv(a:name)
+
+	if l:val is# v:null
+	    " XXX: getenv() returns v:null even though the environment variable is defined.
+	    return (exists('$' . a:name) ? '' : l:val)
+	else
+	    return l:val
+	endif
+    endfunction
+else
+    function! ingo#compat#getenv( name )
+	let l:ev = '$' . a:name
+	return (exists(l:ev) ? eval(l:ev) : [])
+    endfunction
+endif
+if exists('*setenv') && ! has_key(s:compatFor, 'setenv')
+    function! ingo#compat#setenv( name, val )
+	return setenv(a:name, (type(a:val) == type([]) ? v:null : a:val))
+    endfunction
+else
+    function! ingo#compat#setenv( name, val )
+	let l:ev = '$' . a:name
+	if type(a:val) == type([])
+	    execute 'unlet!' l:ev
+	else
+	    execute 'let' l:ev '= a:val'
 	endif
     endfunction
 endif
