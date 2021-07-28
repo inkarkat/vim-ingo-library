@@ -171,6 +171,7 @@ HISTORY
 - Add ingo/buffers.vim module.
 - Add ingo/list/reduce.vim module.
 - Add ingo#compat#getenv() and ingo#compat#setenv().
+- Add ingo#buffer#IsScratch().
 
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last
