@@ -2,15 +2,20 @@
 "
 " DEPENDENCIES:
 "   - surroundings/Lines.vim autoload script
+"   - ingo/err.vim autoload script
 "   - ingo/mapmaker.vim autoload script
 "   - repeatableMapping.vim autoload script (optional)
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	007	12-May-2014	Abort on error of created surround command.
+"				CHG: Last a:Transformer argument to
+"				surroundings#Lines#Creator#MakeCommand() is now
+"				optional and takes a:options Dictionary.
 "	006	06-Jul-2013	BUG: Visual mode mappings also apply to the
 "				wrong range. Must apply the wrapping in :execute
 "				for the visual mode mapping, too.
@@ -34,15 +39,16 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 ":{range}Command	Insert ??? around {range}.
-":Command	        Insert ??? around the last changed text.
-":Command {cmd}	        Execute {cmd} (e.g. :read) and insert ???
+":Command		Insert ??? around the last changed text.
+":Command {cmd}		Execute {cmd} (e.g. :read) and insert ???
 "			around the changed text.
-function! surroundings#Lines#Creator#MakeCommand( commandArgs, commandName, beforeLines, afterLines, Transformer )
+function! surroundings#Lines#Creator#MakeCommand( commandArgs, commandName, beforeLines, afterLines, ... )
+    let l:options = (a:0 ? a:1 : {})
     " Note: No -bar; can take a sequence of Vim commands.
     execute printf('command! %s -range=-1 -nargs=* -complete=command %s call setline(<line1>, getline(<line1>)) |' .
-    \	'call surroundings#Lines#SurroundCommand(%s, %s, %s, <count>, <line1>, <line2>, <q-args>)',
+    \	'if ! surroundings#Lines#SurroundCommand(%s, %s, %s, <count>, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif',
     \   a:commandArgs, a:commandName,
-    \	string(a:beforeLines), string(a:afterLines), string(a:Transformer)
+    \	string(a:beforeLines), string(a:afterLines), string(l:options)
     \)
 endfunction
 
