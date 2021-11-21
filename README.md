@@ -174,6 +174,7 @@ HISTORY
 - Add ingo#buffer#IsScratch().
 - Add ingo#encoding#IsUnicode().
 - Add ingo/buffer/network.vim module.
+- Add ingo/ranges.vim module (originally from AdvancedSorters.vim).
 
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last
