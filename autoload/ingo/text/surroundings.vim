@@ -1,16 +1,15 @@
 " surroundings.vim: Generic functions to surround text with something.
 "
 " DEPENDENCIES:
-"   - ingo/cursor/move.vim autoload script
-"   - ingo/msg.vim autoload script
-"   - ingo/register.vim autoload script
+"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2008-2014 Ingo Karkat
+" Copyright: (C) 2008-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	017	03-Apr-2019	Refactoring: Use ingo#change#Set().
 "	016	26-May-2014	Use cursor() instead of setpos('.') to set the
 "				curswant column for subsequent vertical movement.
 "	015	18-Nov-2013	Use ingo#register#KeepRegisterExecuteOrFunc().
@@ -170,8 +169,7 @@ function! surroundings#RemoveSingleCharDelimiters( count, delimiterChar )
 	    normal! "_x
 
 	    " Mark the changed area.
-	    call setpos("'[", getpos('.'))
-	    call setpos("']", l:end_pos)
+	    call ingo#change#Set(getpos('.'), l:end_pos)
 	else
 	    call ingo#msg#WarningMsg('Trailing ' . a:delimiterChar . ' not found')
 	endif
@@ -229,8 +227,7 @@ function! surroundings#RemoveDelimiters( count, leadingDelimiterPattern, trailin
 		endif
 
 		" Mark the changed area.
-		call setpos("'[", getpos('.'))
-		call setpos("']", l:end_pos)
+		call ingo#change#Set(getpos('.'), l:end_pos)
 	    else
 		throw "ASSERT: Trailing delimiter shouldn't vanish. "
 	    endif
@@ -310,8 +307,7 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 	call cursor(l:save_cursor[1:2]) " Use cursor() instead of setpos('.') to set the curswant column for subsequent vertical movement.
 
 	" Mark the changed area.
-	call setpos("'[", l:begin_pos)
-	call setpos("']", l:end_pos)
+	call ingo#change#Set(l:begin_pos, l:end_pos)
     endif
 endfunction
 
