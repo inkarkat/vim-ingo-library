@@ -1,16 +1,15 @@
 " surroundings/Lines.vim: Generic functions to surround whole lines with something.
 "
 " DEPENDENCIES:
-"   - ingo/err.vim autoload script
-"   - ingo/funcref.vim autoload script
-"   - ingo/lines.vim autoload script
+"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2013-2018 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	009	01-Apr-2019	Refactoring: Use ingo#change#Set().
 "	008	02-Oct-2018	ENH: Allow passing of additional OPTIONs to
 "                               :Command {cmd} by configuring an
 "                               a:options.CommandParser hook that extracts
@@ -180,8 +179,7 @@ function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, options, 
 
     " The entire block is the last changed text, not just the start marker that
     " was added last.
-    call setpos("'[", [0, l:startLnum, 1, 0])
-    call setpos("']", [0, l:endLnum, 1, 0])
+    call ingo#change#Set([l:startLnum, 1], [l:endLnum, 1])
 
     unlet! g:surroundingsContext    " Sloppily clean this up only on the happy path, but it's really not that important.
 
