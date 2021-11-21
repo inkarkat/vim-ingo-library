@@ -18,6 +18,7 @@
 "   - ingo/avoidprompt.vim autoload script
 "   - ingo/compat.vim autoload script
 "   - ingo/mbyte/virtcol.vim autoload script
+"   - ingo/tabstops.vim autoload script
 "
 " CONFIGURATION:
 " INTEGRATION:
@@ -38,6 +39,8 @@
 "	007	07-Jun-2013	Move EchoWithoutScrolling#DetermineVirtColNum()
 "				into ingo-library compat module.
 "   			    	Move EchoWithoutScrolling.vim into ingo-library.
+"   			    	Move EchoWithoutScrolling#RenderTabs() into
+"   			    	ingo-library tabstops module.
 "	006	05-Jun-2013	Additional arguments to
 "				EchoWithoutScrolling#RenderTabs() are now
 "				optional.
@@ -249,7 +252,7 @@ function! EchoLine#EchoLine( lineNum, centerCol, prefix, additionalHighlighting 
     " The a:centerCol is specified in buffer columns, but the l:maxLength is in
     " screen space. To (more or less) bridge this mismatch, a constant factor of
     " 0 < (# of chars / bytes) <= 100 is assumed.
-    let l:numOfChars = strlen(substitute(EchoWithoutScrolling#RenderTabs(l:line), '.', 'x', 'g'))
+    let l:numOfChars = strlen(substitute(ingo#tabstops#Render(l:line), '.', 'x', 'g'))
     let l:lengthToColFactor = 100 * l:numOfChars / strlen(l:line)
 "****D echomsg '****' l:lengthToColFactor
 
