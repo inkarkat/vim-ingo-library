@@ -177,6 +177,7 @@ HISTORY
 - Add ingo/ranges.vim module (originally from AdvancedSorters.vim).
 - ingo#file#GetLines(): Robustness: Empty a:filespec throws E17
 - Add ingo#subst#Recurringly().
+- Add ingo#text#Append() variant of ingo#text#Insert().
 
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last
