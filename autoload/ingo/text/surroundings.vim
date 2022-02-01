@@ -1,78 +1,11 @@
-" surroundings.vim: Generic functions to surround text with something.
+" ingo/text/surroundings.vim: Generic functions to surround text with something.
 "
 " DEPENDENCIES:
-"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2008-2019 Ingo Karkat
+" Copyright: (C) 2008-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"	017	03-Apr-2019	Refactoring: Use ingo#change#Set().
-"	016	26-May-2014	Use cursor() instead of setpos('.') to set the
-"				curswant column for subsequent vertical movement.
-"	015	18-Nov-2013	Use ingo#register#KeepRegisterExecuteOrFunc().
-"	014	03-Jul-2013	Move ingocursormove.vim into ingo-library.
-"	013	08-May-2013	Use ingo-library for warning messages.
-"				FIX: Used :normal clobbers used [count];
-"				instead, pass it into
-"				surroundings#ChangeEnclosedText(),
-"				surroundings#RemoveSingleCharDelimiters(),
-"				surroundings#RemoveDelimiters().
-"				ENH: Mark the changed area where the delimiters
-"				were removed. This makes it easier to further
-"				work with it (e.g. to re-surround with a
-"				different delimiter).
-"				ENH: Mark the changed area where delimiters
-"				where added (including the delimiters).
-"				ENH: For v_<Leader>i, show the original text
-"				surrounded by $, not just a simple $
-"				replacement, while querying for the surrounding
-"				character.
-"	012	21-Mar-2013	Avoid changing the jumplist.
-"	011	07-Jan-2013	Factor out s:CursorLeft() and s:CursorRight() to
-"				autoload/ingocursormove.vim for re-use.
-"	010	11-Sep-2012	ENH: Support use of surroundings#SurroundWith()
-"				in custom operator via g@.
-"	009	28-Aug-2012	I18N: FIX: s:CursorLeft() and s:CursorRight()
-"				didn't consider multi-byte characters. Use h / l
-"				commands instead of de-/incrementing cursor
-"				column; we've already determined that it's
-"				possible to move there.
-"	008	20-Aug-2012	Do not clobber the default register in
-"				surroundings#RemoveSingleCharDelimiters().
-"				(Using v:register would be inconsistent with
-"				surroundings#RemoveDelimiters() and probably
-"				seldom DWIM.)
-"				Use :normal! everywhere.
-"	007	21-Jan-2012	Move functions from textobjects.vim (renamed to
-"				ingounsurround.vim) here.
-"	006	19-Jan-2011	BUG: Visual surround broken by previous change,
-"				need to explicitly specify the unnamed register,
-"				or it'll be just aliased to the small delete
-"				register, and then the setreg() will unalias,
-"				and the register contents suddenly are
-"				different!
-"				FIX: Still clobbering of unnamed register for
-"				selectionType = 'z'; now using the black hole
-"				register.
-"	005	14-Jan-2011	FIX: Visual surround clobbered the unnamed
-"				register; now using the unnamed register and
-"				also saving the register mode.
-"	004	24-Feb-2010	ENH: Supporting multi-word surrounding via
-"				supplied [count]. Evaluating v:count1 for
-"				selectionType 'w' and 'W'.
-"	003	08-Sep-2009	BF: Replaced mark " and g` command with
-"				getpos() / setpos() because m" didn't work on
-"				Vim 7.0/7.1, and caused the entire insertion to
-"				be aborted. This change also simplifies the
-"				logic to correct the saved cursor position,
-"				which can now be done with byte offsets instead
-"				of character offsets.
-"	002	18-Jun-2009	Replaced temporary mark z with mark " and using
-"				g` command to avoid clobbering jumplist.
-"	001	24-Sep-2008	file creation from ingotextobjects.vim
 
 " Helper: Make a:string a literal search expression.
 function! s:Literal( string )
@@ -97,7 +30,7 @@ endfunction
 " be across multiple lines or empty. If the cursor rests already ON a
 " delimiter, this one is taken as the first delimiter.
 " The flag 'isInner' determines whether the selection includes the delimiters.
-function! surroundings#ChangeEnclosedText( count, delimiterChar, isInner )
+function! ingo#text#surroundings#ChangeEnclosedText( count, delimiterChar, isInner )
     let l:save_cursor = getpos('.')
     let l:literalDelimiterExpr = s:Literal(a:delimiterChar)
 
@@ -142,7 +75,7 @@ endfunction
 " left and right. Text between delimiters can be across multiple lines or
 " empty and will not be touched. If the cursor rests already ON a delimiter,
 " this one is taken as the first delimiter.
-function! surroundings#RemoveSingleCharDelimiters( count, delimiterChar )
+function! ingo#text#surroundings#RemoveSingleCharDelimiters( count, delimiterChar )
     " This is the simplest algorithm; first search left for the leading delimiter,
     " then (from the original cursor position) in the other direction for the
     " trailing one. If both are found, remove the trailing and then the
@@ -192,7 +125,7 @@ endfunction
 " left and right. Delimiters can be single chars or patterns. Text between
 " delimiters can be across multiple lines or empty and will not be touched.
 " The cursor must rest before the trailing delimiter.
-function! surroundings#RemoveDelimiters( count, leadingDelimiterPattern, trailingDelimiterPattern, ... )
+function! ingo#text#surroundings#RemoveDelimiters( count, leadingDelimiterPattern, trailingDelimiterPattern, ... )
     " To cope with different delimiters, we first do a forward search for the
     " trailing delimiter, then go the other direction to the leading one.
     " Memorizing its position, it's back to the trailing one, which is
@@ -242,7 +175,7 @@ endfunction
 
 
 
-function! surroundings#DoSurround( textBefore, textAfter )
+function! ingo#text#surroundings#DoSurround( textBefore, textAfter )
     normal! gv""s$
 
     " Set paste type to characterwise; otherwise, linewise selections would be
@@ -250,7 +183,7 @@ function! surroundings#DoSurround( textBefore, textAfter )
     call setreg('"', '', 'av')
     execute 'normal! "_s' . a:textBefore . "\<C-R>\<C-O>\"" . a:textAfter . "\<Esc>"
 endfunction
-function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
+function! ingo#text#surroundings#SurroundWith( selectionType, textBefore, textAfter )
     if a:selectionType ==# 'z'
 	" This special selection type assumes that the surrounded text has
 	" already been captured in register z and replaced with a single
@@ -277,7 +210,7 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
 	    silent! execute "normal! g`[\<C-V>g`]". (&selection ==# 'exclusive' ? 'l' : '') . "\<Esc>"
 	endif
 
-	call ingo#register#KeepRegisterExecuteOrFunc(function('surroundings#DoSurround'), a:textBefore, a:textAfter)
+	call ingo#register#KeepRegisterExecuteOrFunc(function('ingo#text#surroundings#DoSurround'), a:textBefore, a:textAfter)
 
 	" Mark the changed area.
 	" The start of the change is already right, but the end is one after the
@@ -311,8 +244,8 @@ function! surroundings#SurroundWith( selectionType, textBefore, textAfter )
     endif
 endfunction
 
-function! surroundings#SurroundWithSingleChar( selectionType, char )
-    call surroundings#SurroundWith( a:selectionType, a:char, a:char )
+function! ingo#text#surroundings#SurroundWithSingleChar( selectionType, char )
+    call ingo#text#surroundings#SurroundWith( a:selectionType, a:char, a:char )
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

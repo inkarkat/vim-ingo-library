@@ -1,49 +1,11 @@
-" surroundings/Lines.vim: Generic functions to surround whole lines with something.
+" ingo/text/surroundings/Lines.vim: Generic functions to surround whole lines with something.
 "
 " DEPENDENCIES:
-"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2013-2019 Ingo Karkat
+" Copyright: (C) 2013-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"	009	01-Apr-2019	Refactoring: Use ingo#change#Set().
-"	008	02-Oct-2018	ENH: Allow passing of additional OPTIONs to
-"                               :Command {cmd} by configuring an
-"                               a:options.CommandParser hook that extracts
-"                               a:Command and puts additional stuff into
-"                               g:surroundingsContext.
-"	007	10-Mar-2015	Handle custom exceptions / user aborts thrown by
-"				a:Command.
-"	006	12-May-2014	Enable aborting on error by returning the status
-"				from surroundings#Lines#SurroundCommand() and
-"				using ingo/err.vim.
-"				CHG: Also allow transforming after the before-
-"				and after-lines have been added. Restructure
-"				a:Transformer argument into generic a:options,
-"				with keys for the old
-"				a:options.TransformerBefore and the new
-"				a:options.TransformerAfter.
-"				ENH: The Transformer(s) can now change the
-"				amount of lines; the algorithm now deals with
-"				that by calculating the offset.
-"	005	17-Apr-2014	ENH: Allow to pass a Funcref as a:Command, too.
-"	004	06-Nov-2013	FIX: Uninitialized l:beforeLines l:afterLines.
-"	003	05-Nov-2013	ENH: Support dynamic a:beforeLines and
-"				a:afterLines.
-"				Do not invoke the a:Transformer once per line if
-"				the underlying function has been defined with
-"				the "range" attribute.
-"	002	21-Apr-2013	Change -range=-1 default check to use <count>
-"				(now passed in separately), which maintains the
-"				actual -1 default, and therefore also delivers
-"				correct results when on line 1.
-"				Make the error message on invalid last modified
-"				range more telling than "E16: Invalid range:
-"				3,7call call(a:Transformer, [])"
-"	001	04-Apr-2013	file creation from ftplugin/mail_ingomappings.vim
 
 function! s:Transform( startLnum, endLnum, Transformer )
     try
@@ -72,7 +34,7 @@ function! s:Transform( startLnum, endLnum, Transformer )
 	return [0, 0]
     endtry
 endfunction
-function! surroundings#Lines#SurroundCommand( beforeLines, afterLines, options, count, startLnum, endLnum, Command )
+function! ingo#text#surroundings#Lines#SurroundCommand( beforeLines, afterLines, options, count, startLnum, endLnum, Command )
 "******************************************************************************
 "* PURPOSE:
 "   Surround the lines between a:startLnum and a:endLnum with added
