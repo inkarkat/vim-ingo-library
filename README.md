@@ -178,6 +178,7 @@ HISTORY
 - ingo#file#GetLines(): Robustness: Empty a:filespec throws E17
 - Add ingo#subst#Recurringly().
 - Add ingo#text#Append() variant of ingo#text#Insert().
+- Add ingo/text/surroundings.vim modules.
 
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last
