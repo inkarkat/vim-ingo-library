@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2020 Ingo Karkat
+" Copyright: (C) 2011-2021 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -60,8 +60,8 @@ function! ingo#collections#Unique( list, ... )
 "* RETURN VALUES:
 "   Return the string representation of the unique elements of a:list. The order
 "   of returned elements is undetermined. To maintain the original order, use
-"   ingo#collections#UniqueStable(). To keep the original elements, use
-"   ingo#collections#UniqueSorted(). But this is the fastest function.
+"   ingo#collections#UniqueStable(). (But this function is likely faster!)
+"   If a:list is already sorted, use ingo#compat#uniq() instead.
 "******************************************************************************
     let l:emptyValue = (a:0 ? a:1 : "\<Nul>")
     return map(keys(ingo#collections#ToDict(a:list, l:emptyValue)), 'v:val == l:emptyValue ? "" : v:val')

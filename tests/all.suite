@@ -4,9 +4,11 @@ cmdargs/register/
 collections/
 collections/recursive/
 compat/
+compat/substitution/
 date/
 dict/
 digest/
+escape/
 file/
 function/uniquify/
 fs/paths/

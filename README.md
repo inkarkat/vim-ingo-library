@@ -141,6 +141,46 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.043   04-Feb-2022
+- Minor: Actually support no-argument form of
+  ingo#query#get#[Writable]Register(), the documentation already states that
+  the a:errorRegister defaults to the empty string.
+- Add ingo/subs/apply.vim module.
+- Add ingo#escape#file#CmdlineSpecialEscape().
+- Add ingo#buffer#IsWritable().
+- Deprecated: ingo#subst#expr#emulation#Substitute() is now available as a
+  compat function ingo#compat#substitution#RecursiveSubstitutionExpression()
+  because since Vim 8.0.20, the regexp engine is reentrant.
+- Add ingo#hlgroup#Get{Foreground,Background,}Color().
+- ingo#list#lcs#Find{All,Longest}Common(), ingo#subs#BraceCreation#FromList():
+  Add optional a:isIgnoreCase argument to ignore case differences when
+  searching for common substrings.
+- Add ingo#window#special#HasOtherDiffWindow() variant of
+  ingo#window#special#HasDiffWindow().
+- dirforaction: BUG: Passed filenames with escaped glob characters not handled
+  correctly; need to use the unescaped filename for l:isAbsoluteFilename
+  check.
+- dirforaction: ENH: Add a:parameters.completeFunctionHook.
+- Add ingo/escape/mapping.vim module.
+- Add ingo/window/iterate.vim module.
+- Add ingo#hlgroup#GetApplicableColorModes().
+- ingo#buffer#VisibleList(): ENH: Allow passing range of tab pages to be
+  considered.
+- Add ingo/list/transform.vim module.
+- Add ingo#buffer#NameOrDefault().
+- Add ingo/buffers.vim module.
+- Add ingo/list/reduce.vim module.
+- Add ingo#compat#getenv() and ingo#compat#setenv().
+- Add ingo#buffer#IsScratch().
+- Add ingo#encoding#IsUnicode().
+- Add ingo/buffer/network.vim module.
+- Add ingo/ranges.vim module (originally from AdvancedSorters.vim).
+- ingo#file#GetLines(): Robustness: Empty a:filespec throws E17
+- Add ingo#subst#Recurringly().
+- Add ingo#text#Append() variant of ingo#text#Insert().
+- Add ingo/text/surroundings.vim modules.
+- Add ingo#regexp#EscapeLiteralReplacement().
+
 ##### 1.042   03-Aug-2020
 - BUG: ingo#join#Lines() inserts the separator before the line's last
   character when joining with a following empty line and ! a:isKeepSpace.
@@ -1117,7 +1157,7 @@ HISTORY
 - Started development of shared autoload functionality.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2009-2020 Ingo Karkat -
+Copyright: (C) 2009-2022 Ingo Karkat -
 Contains URL encoding / decoding algorithms written by Tim Pope. -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 

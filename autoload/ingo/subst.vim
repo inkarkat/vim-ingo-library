@@ -4,7 +4,7 @@
 "   - ingo/format.vim autoload script
 "   - ingo/subst/replacement.vim autoload script
 "
-" Copyright: (C) 2013-2018 Ingo Karkat
+" Copyright: (C) 2013-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -165,6 +165,36 @@ function! s:IndexReplacer( context )
     let a:context.matchCnt += 1
     execute 'let l:isSelected = index(a:context.indices, a:context.matchCnt - 1)' (a:context.isInvert ? '==' : '!=') '-1'
     return ingo#subst#replacement#DefaultReplacementOnPredicate(l:isSelected, a:context)
+endfunction
+
+function! ingo#subst#Recurringly( expr, pat, sub, flags, ... ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Apply the substitution for as long as the result is still changing.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:expr  Text to be transformed.
+"   a:pat   Pattern to be substituted.
+"   a:sub   Replacement text.
+"   a:flags Substitution flags.
+"   a:maxCount  If given, abort after this many substitutions instead of
+"               potentially never halting.
+"* RETURN VALUES:
+"   Transformed a:expr.
+"******************************************************************************
+    let l:count = 0
+    let l:previousResult = a:expr
+    while 1
+	let l:result = substitute(l:previousResult, a:pat, a:sub, a:flags)
+	let l:count += 1
+	if l:result ==# l:previousResult || (a:0 && l:count >= a:1)
+	    return l:result
+	endif
+	let l:previousResult = l:result
+    endwhile
 endfunction
 
 let &cpo = s:save_cpo

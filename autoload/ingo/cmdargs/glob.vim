@@ -89,6 +89,7 @@ function! ingo#cmdargs#glob#IsSpecialFile( filespec ) abort
 	if ingo#actions#EvaluateWithValOrFunc(l:SpecialFileReadablePredicate, a:filespec)
 	    return 1
 	endif
+	unlet! l:SpecialFileReadablePredicate
     endfor
     return 0
 endfunction
