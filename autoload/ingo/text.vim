@@ -208,11 +208,22 @@ function! ingo#text#Append( pos, text )
     let l:currentCharLength = len(matchstr(l:line, '\%' . l:col . 'c' . '.'))
     return (setline(l:lnum, strpart(l:line, 0, l:col + l:currentCharLength - 1) . a:text . strpart(l:line, l:col + l:currentCharLength - 1)) == 0 ? l:col + l:currentCharLength - 1 : 0)
 endfunction
+if ! exists('g:IngoLibrary_InsertHereStrategy')
+    let g:IngoLibrary_InsertHereStrategy = 'insert1'
+endif
 function! ingo#text#InsertHere( text ) abort
 "******************************************************************************
 "* PURPOSE:
-"   Insert a:text at the cursor position; at the beginning of the line if the
-"   cursor is in column 1, else appending after the character the cursor is on.
+"   Insert a:text at the cursor position; where exactly is determined by
+"   g:IngoLibrary_InsertHereStrategy:
+"   - insert1:  at the beginning of the line if the cursor is in column 1, else
+"               appending after the character the cursor is on.
+"   - append$:  appending after the character if the cursor is at the end of the
+"               line (with 'virtualedit' having "onemore": one beyond the end,
+"               with "all": always insert before the cursor), else inserting
+"               before the character the cursor is on.
+"   - insert:   always inserting before the character the cursor is on
+"   - append:   always appending after the character the cursor is on
 "* ASSUMPTIONS / PRECONDITIONS:
 "   Buffer is modifiable.
 "* EFFECTS / POSTCONDITIONS:
@@ -223,7 +234,20 @@ function! ingo#text#InsertHere( text ) abort
 "* RETURN VALUES:
 "   None.
 "******************************************************************************
-    execute 'normal!' (col('.') == 1 ? 'i' : 'a') . a:text . "\<C-\>\<C-n>"
+    if g:IngoLibrary_InsertHereStrategy ==# 'insert1'
+	let l:insertCommand = (col('.') == 1 ? 'i' : 'a')
+    elseif g:IngoLibrary_InsertHereStrategy ==# 'append$'
+	if ingo#option#Contains(&virtualedit, 'all')
+	    let l:insertCommand = 'i'
+	else
+	    let l:insertCommand = ((ingo#option#Contains(&virtualedit, 'onemore') ? ingo#cursor#IsBeyondEndOfLine() : ingo#cursor#IsAtEndOfLine()) ? 'a' : 'i')
+	endif
+    elseif g:IngoLibrary_InsertHereStrategy ==# 'insert'
+	let l:insertCommand = 'i'
+    elseif g:IngoLibrary_InsertHereStrategy ==# 'append'
+	let l:insertCommand = 'a'
+    endif
+    execute 'normal!' l:insertCommand . a:text . "\<C-\>\<C-n>"
 endfunction
 
 function! ingo#text#Replace( pos, len, replacement, ... )

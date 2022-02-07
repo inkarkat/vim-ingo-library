@@ -118,6 +118,20 @@ By default, includes any filespec that starts with a "protocol:/" (e.g. scp://
 for |netrw|), and also file:lnum[:column] special filenames if
 https://github.com/bogado/file-line is installed.
 
+					    *g:IngoLibrary_InsertHereStrategy*
+The ingo#text#InsertHere() function is often used to insert text at the cursor
+position by plugins that don't want to offer separate insert / append mappings
+(comparable to |p|/|P| pasting). The function tries to find a meaningful
+insertion point. Its strategy can be tweaked via the following values:
+- insert1:  at the beginning of the line if the cursor is in column 1, else
+            appending after the character the cursor is on.
+- append$:  appending after the character if the cursor is at the end of the
+            line (with 'virtualedit' having "onemore": one beyond the end,
+            with "all": always insert before the cursor), else inserting
+            before the character the cursor is on.
+- insert:   always inserting before the character the cursor is on
+- append:   always appending after the character the cursor is on
+
 ==============================================================================
 INSTALLATION					   *ingo-library-installation*
 
@@ -158,6 +172,8 @@ HISTORY							*ingo-library-history*
 
 1.044	RELEASEME
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
+- ENH: Allow to customize the insertion point of ingo#text#InsertHere() via
+  g:IngoLibrary_InsertHereStrategy.
 
 1.043	04-Feb-2022
 - Minor: Actually support no-argument form of
