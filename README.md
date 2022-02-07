@@ -141,6 +141,9 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.044   RELEASEME
+- Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
+
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of
   ingo#query#get#[Writable]Register(), the documentation already states that

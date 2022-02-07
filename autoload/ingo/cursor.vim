@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2019 Ingo Karkat
+" Copyright: (C) 2013-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -58,6 +58,24 @@ function! ingo#cursor#IsAtEndOfLine( ... )
     " This won't work with :set virtualedit=all, when the cursor is after the
     " physical end of the line.
     "return (search('\%#.$', 'cn', line('.')) > 0)
+endfunction
+function! ingo#cursor#IsBeyondEndOfLine( ... )
+"******************************************************************************
+"* PURPOSE:
+"   Tests whether the cursor is behind (possible with 'virtualedit') the last
+"   character of the current line.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:mark  Optional mark containing the current position; this should be
+"	    located in the current line to make sense!
+"* RETURN VALUES:
+"   1 if beyond the end of the current line, 0 otherwise.
+"******************************************************************************
+    let l:mark = (a:0 ? a:1 : '.')
+    return (col(l:mark) + len(matchstr(getline(l:mark), '.$')) > col('$'))    " I18N: Cannot just add 1; need to consider the byte length of the last character in the line.
 endfunction
 
 
