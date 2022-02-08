@@ -38,11 +38,11 @@ function! ingo#subst#MultiGsub( expr, substitutions )
     return l:expr
 endfunction
 
-function! ingo#subst#FirstSubstitution( expr, flags, ... )
+function! ingo#subst#FirstMatchingSubstitution( expr, flags, ... )
 "******************************************************************************
 "* PURPOSE:
-"   Perform a substitution with the first matching [a:pattern, a:replacement]
-"   substitution.
+"   Perform a substitution with the first [a:pattern, a:replacement]
+"   substitution where a:pattern matches (but not necessarily changes a:expr).
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -58,6 +58,33 @@ function! ingo#subst#FirstSubstitution( expr, flags, ... )
 	let [l:pattern, l:replacement] = a:000[l:patternIndex]
 	if a:expr =~ l:pattern
 	    return [l:patternIndex, substitute(a:expr, l:pattern, l:replacement, a:flags)]
+	endif
+    endfor
+    return [-1, a:expr]
+endfunction
+
+function! ingo#subst#FirstChangingSubstitution( expr, flags, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Perform a substitution with the first [a:pattern, a:replacement]
+"   substitution that changes a:expr.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:expr  Text to be transformed.
+"   [a:pattern0, a:replacement0], ...   List of [pattern, substitution] tuples.
+"* RETURN VALUES:
+"   [patternIndex, replacement]; if no supplied substitution changed a:expr,
+"   returns [-1, a:expr].
+"******************************************************************************
+    let l:originalExpr = a:expr
+    for l:patternIndex in range(len(a:000))
+	let [l:pattern, l:replacement] = a:000[l:patternIndex]
+	let l:result = substitute(a:expr, l:pattern, l:replacement, a:flags)
+	if (l:result !=# l:originalExpr)
+	    return [l:patternIndex, l:result]
 	endif
     endfor
     return [-1, a:expr]

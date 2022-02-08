@@ -158,6 +158,9 @@ HISTORY
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
 - ENH: Allow to customize the insertion point of ingo#text#InsertHere() via
   g:IngoLibrary\_InsertHereStrategy.
+- CHG: Split ingo#subst#FirstSubstitution() into
+  ingo#subst#FirstMatchingSubstitution() and
+  ingo#subst#FirstChangingSubstitution().
 
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of
