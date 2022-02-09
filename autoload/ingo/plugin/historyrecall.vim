@@ -20,6 +20,8 @@ function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, 
     let s:namedSources[a:what] = a:namedSource
     let s:recallsSources[a:what] = a:recallsSource
     let s:Callbacks[a:what] = a:Callback
+    let s:recalledIdentities[a:what] = ''
+    let s:lastHistories[a:what] = ''
     let s:whatPlurals[a:what] = (a:0 ? a:1 : a:what . 's')
 endfunction
 
@@ -112,7 +114,7 @@ function! s:Recall( what, recallIdentity, repeatCount, register, multiplier )
 	let s:recalledIdentities[a:what] = a:recallIdentity
     endif
 
-    call call(s:Callbacks[a:what], [s:lastHistories[a:what], a:multiplier, a:repeatCount, a:register])
+    call call(s:Callbacks[a:what], [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier])
 endfunction
 function! ingo#plugin#historyrecall#List( what, multiplier, register )
     let l:validNames = filter(
