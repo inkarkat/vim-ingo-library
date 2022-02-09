@@ -13,12 +13,14 @@ let s:recallsSources = {}
 let s:Callbacks = {}
 let s:recalledIdentities = {}
 let s:lastHistories = {}
+let s:whatPlurals = {}
 
-function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, recallsSource, Callback ) abort
+function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, recallsSource, Callback, ... ) abort
     let s:historySources[a:what] = a:historySource
     let s:namedSources[a:what] = a:namedSource
     let s:recallsSources[a:what] = a:recallsSource
     let s:Callbacks[a:what] = a:Callback
+    let s:whatPlurals[a:what] = (a:0 ? a:1 : a:what . 's')
 endfunction
 
 function! s:HasName( register ) abort
@@ -44,14 +46,13 @@ endfunction
 function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register )
     if ! s:HasName(a:register)
 	if len(s:historySources[a:what]) == 0
-	    call ingo#err#Set(printf('No %ss yet', a:what))
+	    call ingo#err#Set(printf('No %s yet', s:whatPlurals[a:what]))
 	    return 0
 	elseif len(s:historySources[a:what]) < a:count
-	    call ingo#err#Set(printf('There %s only %d %s%s in the history',
+	    call ingo#err#Set(printf('There %s only %d %s in the history',
 	    \   len(s:historySources[a:what]) == 1 ? 'is' : 'are',
 	    \   len(s:historySources[a:what]),
-	    \   a:what,
-	    \   len(s:historySources[a:what]) == 1 ? '' : 's'
+	    \   len(s:historySources[a:what]) == 1 ? a:what : s:whatPlurals[a:what]
 	    \))
 	    return 0
 	endif
@@ -62,14 +63,13 @@ function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register )
     elseif a:register =~# '[1-9]'
 	let l:index = str2nr(a:register) - 1
 	if len(s:recallsSources[a:what]) == 0
-	    call ingo#err#Set(printf('No recalled %ss yet', a:what))
+	    call ingo#err#Set(printf('No recalled %s yet', s:whatPlurals[a:what]))
 	    return 0
 	elseif len(s:recallsSources[a:what]) <= l:index
-	    call ingo#err#Set(printf('There %s only %d recalled %s%s',
+	    call ingo#err#Set(printf('There %s only %d recalled %s',
 	    \   len(s:recallsSources[a:what]) == 1 ? 'is' : 'are',
 	    \   len(s:recallsSources[a:what]),
-	    \   a:what,
-	    \   len(s:recallsSources[a:what]) == 1 ? '' : 's'
+	    \   len(s:recallsSources[a:what]) == 1 ? a:what : s:whatPlurals[a:what]
 	    \))
 	    return 0
 	endif
@@ -122,7 +122,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register )
     let l:recalledNum = len(s:recallsSources[a:what])
 
     if len(s:historySources[a:what]) + len(l:validNames) + l:recalledNum == 0
-	call ingo#err#Set(printf('No %ss yet', a:what))
+	call ingo#err#Set(printf('No %s yet', s:whatPlurals[a:what]))
 	return 0
     endif
 
