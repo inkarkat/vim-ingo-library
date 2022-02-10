@@ -15,14 +15,15 @@ let s:recalledIdentities = {}
 let s:lastHistories = {}
 let s:whatPlurals = {}
 
-function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, recallsSource, Callback, ... ) abort
-    let s:historySources[a:what] = a:historySource
-    let s:namedSources[a:what] = a:namedSource
-    let s:recallsSources[a:what] = a:recallsSource
-    let s:Callbacks[a:what] = a:Callback
-    let s:recalledIdentities[a:what] = ''
-    let s:lastHistories[a:what] = ''
-    let s:whatPlurals[a:what] = (a:0 ? a:1 : a:what . 's')
+function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, recallsSource, Callback ) abort
+    let [l:what, l:whatPlural] = (type(a:what) == type([]) ? a:what : [a:what, a:what . 's'])
+    let s:historySources[l:what] = a:historySource
+    let s:namedSources[l:what] = a:namedSource
+    let s:recallsSources[l:what] = a:recallsSource
+    let s:Callbacks[l:what] = a:Callback
+    let s:recalledIdentities[l:what] = ''
+    let s:lastHistories[l:what] = ''
+    let s:whatPlurals[l:what] = l:whatPlural
 endfunction
 
 function! s:HasName( register ) abort
