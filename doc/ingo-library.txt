@@ -177,6 +177,7 @@ HISTORY							*ingo-library-history*
 - CHG: Split ingo#subst#FirstSubstitution() into
   ingo#subst#FirstMatchingSubstitution() and
   ingo#subst#FirstChangingSubstitution().
+- Add ingo/plugin/historyrecall.vim module.
 
 1.043	04-Feb-2022
 - Minor: Actually support no-argument form of

@@ -21,6 +21,35 @@ function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, 
 "* PURPOSE:
 "   Register a history type of a:what with source data and the a:Callback to
 "   invoke on recall.
+"* USAGE:
+"   call ingo#plugin#historyrecall#Register('what',
+"   \   function('What#GetHistory'), {}, [],
+"   \   function('What#Recall')
+"   \)
+"
+"   function! What#GetHistory() abort
+"       return ['foo', 'bar', 'baz']
+"   endfunction
+"   function! What#Recall( what, repeatCount, register, multiplier  ) abort
+"       echomsg printf('I got %s %d times.', a:what, a:multiplier)
+"	silent! call repeat#set("\<Plug>(HistoryRecallWhatRepeat)", a:repeatCount)
+"	silent! call repeat#setreg("\<Plug>(HistoryRecallWhatRepeat)", a:register)
+"	return 1
+"   endfunction
+"
+"   nnoremap <silent> <Plug>(HistoryRecallWhat)
+"   \ :<C-u>if ! ingo#plugin#historyrecall#Recall('what', v:count1, v:count, v:register)<Bar>echoerr ingo#err#Get()<Bar>endif<CR>
+"   if ! hasmapto('<Plug>(HistoryRecallWhat)', 'n')
+"       nmap qX <Plug>(HistoryRecallWhat)
+"   endif
+"   nnoremap <silent> <Plug>(HistoryRecallListWhat)
+"   \ :<C-u>if ! ingo#plugin#historyrecall#List('what', v:count1, v:register)<Bar>echoerr ingo#err#Get()<Bar>endif<CR>
+"   if ! hasmapto('<Plug>(HistoryRecallListWhat)', 'n')
+"       nmap qx <Plug>(HistoryRecallListWhat)
+"   endif
+"   nnoremap <silent> <Plug>(HistoryRecallWhatRepeat)
+"   \ :<C-u>if ! ingo#plugin#historyrecall#RecallRepeat('what', v:count1, v:count, v:register)<Bar>echoerr ingo#err#Get()<Bar>endif<CR>
+"
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
