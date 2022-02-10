@@ -109,7 +109,7 @@ function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register )
 
 	let l:multiplier = 1
 	let s:lastHistories[a:what] = l:history[a:count - 1]
-	let l:recallIdentity = (a:count - 1) . "\n" . s:lastHistories[a:what]
+	let l:recallIdentity = a:count . "\n" . s:lastHistories[a:what]
     elseif a:register =~# '[1-9]'
 	let l:recalls = s:GetSource(s:recallsSources, a:what)
 	let l:index = str2nr(a:register) - 1
