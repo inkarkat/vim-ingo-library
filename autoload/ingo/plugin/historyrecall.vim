@@ -248,6 +248,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register )
 
     if l:hasName
 	let s:namedSources[a:what][a:register] = s:lastHistories[a:what]
+	let l:recallIdentity = '"' . a:register . "\n" . s:lastHistories[a:what]
     endif
 
     return s:Recall(a:what, l:recallIdentity, l:repeatCount, l:repeatRegister, a:multiplier)
