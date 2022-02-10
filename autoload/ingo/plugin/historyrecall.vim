@@ -163,7 +163,16 @@ function! s:Recall( what, recallIdentity, repeatCount, register, multiplier )
 	if len(l:recalls) > 9
 	    call remove(l:recalls, 9, -1)
 	endif
-	let s:recalledIdentities[a:what] = a:recallIdentity
+	if a:recallIdentity =~# '^"\d\n'
+	    " The recalled thing has been moved to the top position again; adapt
+	    " the position, so that a repeat with the same number will continue
+	    " cycling (by putting the thing to the top even though it's
+	    " identical); only a recall with the top position ("1) should leave
+	    " it as-is.
+	    let s:recalledIdentities[a:what] = '"1' . a:recallIdentity[2:]
+	else
+	    let s:recalledIdentities[a:what] = a:recallIdentity
+	endif
     endif
 
     return call(s:Callbacks[a:what], [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier])
