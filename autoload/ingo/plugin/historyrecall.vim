@@ -16,6 +16,40 @@ let s:lastHistories = {}
 let s:whatPlurals = {}
 
 function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, recallsSource, Callback ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Register a history type of a:what with source data and the a:Callback to
+"   invoke on recall.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:what  Name of the type of history; this will be used in messages like "No
+"           recalled {what} yet." If the plural form is irregular, can also be a
+"           List of [{what}, {whatPlural}}.
+"   a:historySource List of history items, from newest to oldest. The first 9
+"                   will be offered to the user in the interactive list, all can
+"                   be recalled via a [count]. Can be a List or Funcref that is
+"                   invoked without arguments and returns a List. If the former,
+"                   ensure to keep the original List; i.e. only add() (/
+"                   extend()) / remove(), but do not assign a new List after
+"                   registration!
+"   a:namedSource   Dictionary of letter to history items. If you don't need
+"                   access to these yourself (e.g. for persistence), just pass
+"                   {}. Else, the same options as for a:historySource apply.
+"   a:recallsSource List of history items. If you don't need access to these
+"                   yourself (e.g. for persistence), just pass []. Else, the
+"                   same options as for a:historySource apply.
+"   a:Callback      Funcref that gets invoked if the user recalled this with the
+"                   chosen history item, repeatCount (to be forwarded to
+"                   repeat#set()), register (to be forwarded to
+"                   repeat#setreg()), multiplier (from a passed [count]). The
+"                   return value (signifying success or failure) is passed back
+"                   to the client.
+"* RETURN VALUES:
+"   None.
+"******************************************************************************
     let [l:what, l:whatPlural] = (type(a:what) == type([]) ? a:what : [a:what, a:what . 's'])
     let s:historySources[l:what] = a:historySource
     let s:namedSources[l:what] = a:namedSource
@@ -110,8 +144,7 @@ function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register )
 	return 0
     endif
 
-    call s:Recall(a:what, l:recallIdentity, a:repeatCount, a:register, l:multiplier)
-    return 1
+    return s:Recall(a:what, l:recallIdentity, a:repeatCount, a:register, l:multiplier)
 endfunction
 function! s:Recall( what, recallIdentity, repeatCount, register, multiplier )
     if ! empty(a:recallIdentity) && a:recallIdentity !=# s:recalledIdentities[a:what]
@@ -125,7 +158,7 @@ function! s:Recall( what, recallIdentity, repeatCount, register, multiplier )
 	let s:recalledIdentities[a:what] = a:recallIdentity
     endif
 
-    call call(s:Callbacks[a:what], [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier])
+    return call(s:Callbacks[a:what], [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier])
 endfunction
 function! ingo#plugin#historyrecall#List( what, multiplier, register )
     let l:validNames = filter(
@@ -209,8 +242,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register )
 	let s:namedSources[a:what][a:register] = s:lastHistories[a:what]
     endif
 
-    call s:Recall(a:what, l:recallIdentity, l:repeatCount, l:repeatRegister, a:multiplier)
-    return 1
+    return s:Recall(a:what, l:recallIdentity, l:repeatCount, l:repeatRegister, a:multiplier)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
