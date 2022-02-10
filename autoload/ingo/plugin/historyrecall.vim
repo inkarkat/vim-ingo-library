@@ -14,8 +14,9 @@ let s:Callbacks = {}
 let s:recalledIdentities = {}
 let s:lastHistories = {}
 let s:whatPlurals = {}
+let s:options = {}
 
-function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, recallsSource, Callback ) abort
+function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, recallsSource, Callback, ... ) abort
 "******************************************************************************
 "* PURPOSE:
 "   Register a history type of a:what with source data and the a:Callback to
@@ -47,6 +48,9 @@ function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, 
 "                   repeat#setreg()), multiplier (from a passed [count]). The
 "                   return value (signifying success or failure) is passed back
 "                   to the client.
+"   a:options.isUniqueRecalls
+"                   Flag whether a recall will remove identical recalls from
+"                   a:recallsSource; by default true.
 "* RETURN VALUES:
 "   None.
 "******************************************************************************
@@ -58,6 +62,7 @@ function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, 
     let s:recalledIdentities[l:what] = ''
     let s:lastHistories[l:what] = ''
     let s:whatPlurals[l:what] = l:whatPlural
+    let s:options[l:what] = (a:0 ? a:1 : {})
 endfunction
 
 function! s:GetSource( source, what ) abort
@@ -151,6 +156,9 @@ function! s:Recall( what, recallIdentity, repeatCount, register, multiplier )
 	" It's not a repeat of the last recalled thing; put it at the first
 	" position of the recall stack.
 	let l:recalls = s:GetSource(s:recallsSources, a:what)
+	if get(s:options[a:what], 'isUniqueRecalls', 1)
+	    call filter(l:recalls, 'v:val !=# s:lastHistories[a:what]')
+	endif
 	call insert(l:recalls, s:lastHistories[a:what])
 	if len(l:recalls) > 9
 	    call remove(l:recalls, 9, -1)
