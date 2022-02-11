@@ -6,6 +6,8 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
+let s:save_cpo = &cpo
+set cpo&vim
 
 let s:historySources = {}
 let s:namedSources = {}
@@ -292,4 +294,6 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register )
     return s:Recall(a:what, l:recallIdentity, l:repeatCount, l:repeatRegister, a:multiplier)
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
