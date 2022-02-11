@@ -247,7 +247,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register )
 	let l:choice = ingo#query#get#ValidChar({'validExpr': "[\<CR>" . l:validNamesAndRecalls . ']'})
 	if empty(l:choice) || l:choice ==# "\<CR>"
 	    return 1
-	elseif l:choice =~# '\d'
+	elseif l:choice =~# '[1-9]'
 	    let s:lastHistories[a:what] = l:recalls[str2nr(l:choice) - 1]
 	    let l:repeatCount = str2nr(l:choice)    " Counting last added to history here.
 	    let l:repeatRegister = l:choice
@@ -265,7 +265,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register )
 	else
 	    throw 'ASSERT: Unexpected l:choice: ' . l:choice
 	endif
-    elseif l:choice =~# '\d'
+    elseif l:choice =~# '[1-9]'
 	if ! l:hasName
 	    " Use the index for repeating the recall, unless this is being
 	    " assigned a name; then, the count specifies the multiplier.
