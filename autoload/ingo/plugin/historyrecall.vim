@@ -237,11 +237,30 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register )
     endfor
 
     let l:validNamesAndRecalls = join(l:validNames, '') . join(range(1, l:recallNum), '')
-    echo printf('Type number%s (<Enter> cancels) to insert%s: ', (empty(l:validNamesAndRecalls) ? '' : ' or "{name}'), (l:hasName ? ' and assign to "' . a:register : ''))
-    let l:choice = ingo#query#get#ValidChar({'validExpr': "[123456789\<CR>" . (empty(l:validNamesAndRecalls) ? '' : '"' . l:validNamesAndRecalls) . ']'})
+    echo printf('Type number%s (<Enter> cancels%s) to insert%s: ',
+    \   (empty(l:validNamesAndRecalls) ? '' : ' or "{name}'),
+    \   (l:hasName && ! empty(l:validNamesAndRecalls) ? '; <Del> unassigns from "' . a:register : ''),
+    \   (l:hasName ? ' and assign to "' . a:register : '')
+    \)
+    let l:choice = ingo#query#get#ValidChar({
+    \   'validExpr': "[123456789\<CR>" .
+    \       (l:hasName ? "\<Del>" : '') .
+    \       (empty(l:validNamesAndRecalls) ? '' : '"' . l:validNamesAndRecalls) .
+    \       ']'
+    \})
     let l:recallIdentity = ''
     let l:repeatCount = a:multiplier
     if empty(l:choice) || l:choice ==# "\<CR>"
+	return 1
+    elseif l:choice ==# "\<Del>"
+	if a:register =~# '[1-9]'
+	    let l:recalls = s:GetSource(s:recallsSources, a:what)
+	    let l:index = str2nr(a:register) - 1
+	    call remove(l:recalls, l:index)
+	elseif a:register =~# '\a'
+	    let l:named = s:GetSource(s:namedSources, a:what)
+	    unlet! l:named[a:register]
+	endif
 	return 1
     elseif l:choice ==# '"'
 	let l:choice = ingo#query#get#ValidChar({'validExpr': "[\<CR>" . l:validNamesAndRecalls . ']'})
