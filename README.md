@@ -161,6 +161,7 @@ HISTORY
 - CHG: Split ingo#subst#FirstSubstitution() into
   ingo#subst#FirstMatchingSubstitution() and
   ingo#subst#FirstChangingSubstitution().
+- Add ingo#text#IsInsert().
 
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of
