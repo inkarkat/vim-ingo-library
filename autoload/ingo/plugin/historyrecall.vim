@@ -238,13 +238,15 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register )
 
     let l:validNamesAndRecalls = join(l:validNames, '') . join(range(1, l:recallNum), '')
     echo printf('Type number%s (<Enter> cancels%s) to insert%s: ',
-    \   (empty(l:validNamesAndRecalls) ? '' : ' or "{name}'),
-    \   (l:hasName && ! empty(l:validNamesAndRecalls) ? '; <Del> unassigns from "' . a:register : ''),
+    \   (empty(l:validNamesAndRecalls) ? '' : ' or "{a-Z}'),
+    \   (l:hasName ?
+    \       (empty(l:validNamesAndRecalls) ? '' : '; <Del> or <BS> unassigns from "' . a:register) :
+    \       (len(l:validNames) > 0 ? '; <Del> removes all named' : '') . (l:recallNum > 0 ? '; <BS> removes all recalled' : '')
+    \   ),
     \   (l:hasName ? ' and assign to "' . a:register : '')
     \)
     let l:choice = ingo#query#get#ValidChar({
-    \   'validExpr': "[123456789\<CR>" .
-    \       (l:hasName ? "\<Del>" : '') .
+    \   'validExpr': "[123456789\<CR>\<Del>\<BS>" .
     \       (empty(l:validNamesAndRecalls) ? '' : '"' . l:validNamesAndRecalls) .
     \       ']'
     \})
@@ -252,7 +254,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register )
     let l:repeatCount = a:multiplier
     if empty(l:choice) || l:choice ==# "\<CR>"
 	return 1
-    elseif l:choice ==# "\<Del>"
+    elseif l:hasName && (l:choice ==# "\<Del>" || l:choice ==# "\<BS>")
 	if a:register =~# '[1-9]'
 	    let l:recalls = s:GetSource(s:recallsSources, a:what)
 	    let l:index = str2nr(a:register) - 1
@@ -261,6 +263,16 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register )
 	    let l:named = s:GetSource(s:namedSources, a:what)
 	    unlet! l:named[a:register]
 	endif
+	return 1
+    elseif ! l:hasName && l:choice ==# "\<Del>"
+	let l:named = s:GetSource(s:namedSources, a:what)
+	for l:name in keys(l:named)
+	    unlet! l:named[l:name]
+	endfor
+	return 1
+    elseif ! l:hasName && l:choice ==# "\<BS>"
+	let l:recalls = s:GetSource(s:recallsSources, a:what)
+	call remove(l:recalls, 0, len(l:recalls) - 1)
 	return 1
     elseif l:choice ==# '"'
 	let l:choice = ingo#query#get#ValidChar({'validExpr': "[\<CR>" . l:validNamesAndRecalls . ']'})
