@@ -185,6 +185,7 @@ autoload/ingo/str/frompattern.vim
 autoload/ingo/str/fromrange.vim
 autoload/ingo/str/join.vim
 autoload/ingo/str/list.vim
+autoload/ingo/str/remove.vim
 autoload/ingo/str/restricted.vim
 autoload/ingo/str/split.vim
 autoload/ingo/strdisplaywidth.vim

@@ -165,6 +165,7 @@ HISTORY
 - ingo#cmdargs#range#Parse(): BUG: Return [] as documented instead of ['', '',
   '', '', ''] on empty a:commandLine.
 - Add ingo/plugin/historyrecall.vim module.
+- Add ingo/str/remove.vim module.
 
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of
