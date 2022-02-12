@@ -63,16 +63,20 @@ function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, 
 "   a:historySource List of history items, from newest to oldest. The first 9
 "                   will be offered to the user in the interactive list, all can
 "                   be recalled via a [count]. Can be a List or Funcref that is
-"                   invoked without arguments and returns a List. If the former,
-"                   ensure to keep the original List; i.e. only add() (/
-"                   extend()) / remove(), but do not assign a new List after
-"                   registration!
+"                   invoked a maxItemNum argument and returns a List (that only
+"                   needs to include maxItemNum elements, as no more will be
+"                   accessed). If the former, ensure to keep the original List;
+"                   i.e. only add() (/ extend()) / remove(), but do not assign a
+"                   new List after registration!
 "   a:namedSource   Dictionary of letter to history items. If you don't need
 "                   access to these yourself (e.g. for persistence), just pass
-"                   {}. Else, the same options as for a:historySource apply.
+"                   {}. Can be a Dictionary or Funcref that is invoked without
+"                   arguments and returns a Dict. If the former, ensure to keep
+"                   the original Dict.
 "   a:recallsSource List of history items. If you don't need access to these
-"                   yourself (e.g. for persistence), just pass []. Else, the
-"                   same options as for a:historySource apply.
+"                   yourself (e.g. for persistence), just pass []. Can be a List
+"                   or Funcref that is invoked without arguments and returns a
+"                   List. If the former, ensure to keep the original List.
 "   a:Callback      Funcref that gets invoked if the user recalled this with the
 "                   chosen history item, repeatCount (to be forwarded to
 "                   repeat#set()), register (to be forwarded to
@@ -96,9 +100,9 @@ function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, 
     let s:options[l:what] = (a:0 ? a:1 : {})
 endfunction
 
-function! s:GetSource( source, what ) abort
+function! s:GetSource( source, what, ... ) abort
     return (type(a:source[a:what]) == type(function('tr')) ?
-    \   call(a:source[a:what], []) :
+    \   call(a:source[a:what], a:000) :
     \   a:source[a:what]
     \)
 endfunction
@@ -125,7 +129,7 @@ function! ingo#plugin#historyrecall#RecallRepeat( what, count, repeatCount, regi
 endfunction
 function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register )
     if ! s:HasRegister(a:register)
-	let l:history = s:GetSource(s:historySources, a:what)
+	let l:history = s:GetSource(s:historySources, a:what, a:count)
 	if len(l:history) == 0
 	    call ingo#err#Set(printf('No %s yet', s:whatPlurals[a:what]))
 	    return 0
@@ -213,7 +217,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register )
     \   split('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '\zs'),
     \   'has_key(s:namedSources[a:what], v:val)'
     \)
-    let l:history = s:GetSource(s:historySources, a:what)
+    let l:history = s:GetSource(s:historySources, a:what, 9)
     let l:recalls = s:GetSource(s:recallsSources, a:what)
     let l:recallNum = len(l:recalls)
 
