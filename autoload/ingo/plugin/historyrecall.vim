@@ -326,6 +326,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register )
 	let l:recallIdentity = '"' . a:register . "\n" . s:lastHistories[a:what]
     endif
 
+    redraw  " Clear the query.
     return s:Recall(a:what, l:recallIdentity, l:repeatCount, l:repeatRegister, a:multiplier)
 endfunction
 
