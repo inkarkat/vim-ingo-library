@@ -162,6 +162,8 @@ HISTORY
   ingo#subst#FirstMatchingSubstitution() and
   ingo#subst#FirstChangingSubstitution().
 - Add ingo#text#IsInsert().
+- ingo#cmdargs#range#Parse(): BUG: Return [] as documented instead of ['', '',
+  '', '', ''] on empty a:commandLine.
 
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of
