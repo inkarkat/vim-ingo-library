@@ -80,9 +80,12 @@ function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, 
 "   a:Callback      Funcref that gets invoked if the user recalled this with the
 "                   chosen history item, repeatCount (to be forwarded to
 "                   repeat#set()), register (to be forwarded to
-"                   repeat#setreg()), multiplier (from a passed [count]). The
-"                   return value (signifying success or failure) is passed back
-"                   to the client.
+"                   repeat#setreg()), multiplier (from a passed [count]), and
+"                   any additional arguments that clients pass to
+"                   ingo#plugin#historyrecall#Recall() and
+"                   ingo#plugin#historyrecall#List(). The return value
+"                   (signifying success or failure) is passed back to the
+"                   client.
 "   a:options.isUniqueRecalls
 "                   Flag whether a recall will remove identical recalls from
 "                   a:recallsSource; by default true.
@@ -127,7 +130,7 @@ function! ingo#plugin#historyrecall#RecallRepeat( what, count, repeatCount, regi
 	return ingo#plugin#historyrecall#Recall(a:what, a:count, a:repeatCount, a:register)
     endif
 endfunction
-function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register )
+function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register, ... )
     if ! s:HasRegister(a:register)
 	let l:history = s:GetSource(s:historySources, a:what, a:count)
 	if len(l:history) == 0
@@ -184,9 +187,9 @@ function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register )
 	return 0
     endif
 
-    return s:Recall(a:what, l:recallIdentity, a:repeatCount, a:register, l:multiplier)
+    return s:Recall(a:what, l:recallIdentity, a:repeatCount, a:register, l:multiplier, a:000)
 endfunction
-function! s:Recall( what, recallIdentity, repeatCount, register, multiplier )
+function! s:Recall( what, recallIdentity, repeatCount, register, multiplier, clientArguments )
     if ! empty(a:recallIdentity) && a:recallIdentity !=# s:recalledIdentities[a:what]
 	" It's not a repeat of the last recalled thing; put it at the first
 	" position of the recall stack.
@@ -210,9 +213,9 @@ function! s:Recall( what, recallIdentity, repeatCount, register, multiplier )
 	endif
     endif
 
-    return call(s:Callbacks[a:what], [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier])
+    return call(s:Callbacks[a:what], [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier] + a:clientArguments)
 endfunction
-function! ingo#plugin#historyrecall#List( what, multiplier, register )
+function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
     let l:validNames = filter(
     \   split('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '\zs'),
     \   'has_key(s:namedSources[a:what], v:val)'
@@ -327,7 +330,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register )
     endif
 
     redraw  " Clear the query.
-    return s:Recall(a:what, l:recallIdentity, l:repeatCount, l:repeatRegister, a:multiplier)
+    return s:Recall(a:what, l:recallIdentity, l:repeatCount, l:repeatRegister, a:multiplier, a:000)
 endfunction
 
 let &cpo = s:save_cpo
