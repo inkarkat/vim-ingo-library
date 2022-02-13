@@ -89,6 +89,13 @@ function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, 
 "   a:options.isUniqueRecalls
 "                   Flag whether a recall will remove identical recalls from
 "                   a:recallsSource; by default true.
+"   a:options.additionalListCommands
+"                   List of objects with the following properties:
+"                   key:    single non-alphanumeric character (other than <CR>,
+"                           <Del>, and <BS>) that triggers the command
+"                   help:   appended to the prompt (e.g. "e to edit")
+"                   Callback:   Funcref that is invoked instead of a:Callback
+"                               after a history item has been selected
 "* RETURN VALUES:
 "   None.
 "******************************************************************************
@@ -263,7 +270,6 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
 	return 1
     elseif l:hasRegister && (l:choice ==# "\<Del>" || l:choice ==# "\<BS>")
 	if a:register =~# '[1-9]'
-	    let l:recalls = s:GetSource(s:recallsSources, a:what)
 	    let l:index = str2nr(a:register) - 1
 	    call remove(l:recalls, l:index)
 	elseif a:register =~# '\a'
@@ -278,7 +284,6 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
 	endfor
 	return 1
     elseif ! l:hasRegister && l:choice ==# "\<BS>"
-	let l:recalls = s:GetSource(s:recallsSources, a:what)
 	call remove(l:recalls, 0, len(l:recalls) - 1)
 	return 1
     elseif l:choice ==# '"'
