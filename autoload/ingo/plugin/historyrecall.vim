@@ -93,6 +93,9 @@ function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, 
 "                   "status" key that evaluates to numeric 0) is passed back to
 "                   the client. On failure, the history item will not be put
 "                   onto the top of the list of recalls.
+"                   If the return value is a Dict that has a "historyItem" key,
+"                   that is added to the recall list instead of the original
+"                   recalled history item.
 "   a:options.isUniqueRecalls
 "                   Flag whether a recall will remove identical recalls from
 "                   a:recallsSource; by default true.
@@ -216,7 +219,18 @@ function! s:Recall( what, Callback, recallIdentity, repeatCount, register, multi
 	return l:returnValue
     endif
 
-    if ! empty(a:recallIdentity) && a:recallIdentity !=# s:recalledIdentities[a:what]
+    let l:recallIdentity = a:recallIdentity
+    if type(l:returnValue) == type({}) && has_key(l:returnValue, 'historyItem')
+	" Callback overrode what gets put into the recall list.
+	let l:historyItem = l:returnValue.historyItem
+
+	" Also need to recalculate the recall identity.
+	if ! empty(l:recallIdentity)
+	    let l:recallIdentity = matchstr(l:recallIdentity, '^[^\n]*\n') . l:historyItem
+	endif
+    endi
+
+    if ! empty(l:recallIdentity) && l:recallIdentity !=# s:recalledIdentities[a:what]
 	" It's not a repeat of the last recalled thing; put it at the first
 	" position of the recall stack.
 	let l:recalls = s:GetSource(s:recallsSources, a:what)
@@ -227,15 +241,15 @@ function! s:Recall( what, Callback, recallIdentity, repeatCount, register, multi
 	if len(l:recalls) > 9
 	    call remove(l:recalls, 9, -1)
 	endif
-	if a:recallIdentity =~# '^"\d\n'
+	if l:recallIdentity =~# '^"\d\n'
 	    " The recalled thing has been moved to the top position again; adapt
 	    " the position, so that a repeat with the same number will continue
 	    " cycling (by putting the thing to the top even though it's
 	    " identical); only a recall with the top position ("1) should leave
 	    " it as-is.
-	    let s:recalledIdentities[a:what] = '"1' . a:recallIdentity[2:]
+	    let s:recalledIdentities[a:what] = '"1' . l:recallIdentity[2:]
 	else
-	    let s:recalledIdentities[a:what] = a:recallIdentity
+	    let s:recalledIdentities[a:what] = l:recallIdentity
 	endif
     endif
 
