@@ -89,6 +89,14 @@ function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, 
 "   a:options.isUniqueRecalls
 "                   Flag whether a recall will remove identical recalls from
 "                   a:recallsSource; by default true.
+"   a:options.additionalListCommands
+"                   List of objects with the following properties:
+"                   key:    single non-alphanumeric character (other than <CR>,
+"                           <Del>, and <BS>) that triggers the command
+"                   hint:   appended to the prompt (e.g. "e to edit"); can be
+"                           omitted or empty (but not recommended for usability)
+"                   Callback:   Funcref that is invoked instead of a:Callback
+"                               after a history item has been selected
 "* RETURN VALUES:
 "   None.
 "******************************************************************************
@@ -175,21 +183,24 @@ function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register, 
 	    " 3-2-1-3-2-1-...
 	    let s:recalledIdentities[a:what] = ''
 	endif
-    elseif has_key(s:namedSources[a:what], a:register)
-	let l:multiplier = a:count
-	let s:lastHistories[a:what] = s:namedSources[a:what][a:register]
-	let l:recallIdentity = '"' . a:register . "\n" . s:lastHistories[a:what]
     else
-	call ingo#err#Set(a:register =~# '[a-zA-Z]' ?
-	\   printf('Nothing named "%s yet', a:register) :
-	\   printf('Not a valid name: "%s; must be {a-zA-Z} or {1-9}', a:register)
-	\)
-	return 0
+	let l:named = s:GetSource(s:namedSources, a:what)
+	if has_key(l:named, a:register)
+	    let l:multiplier = a:count
+	    let s:lastHistories[a:what] = l:named[a:register]
+	    let l:recallIdentity = '"' . a:register . "\n" . s:lastHistories[a:what]
+	else
+	    call ingo#err#Set(a:register =~# '[a-zA-Z]' ?
+	    \   printf('Nothing named "%s yet', a:register) :
+	    \   printf('Not a valid name: "%s; must be {a-zA-Z} or {1-9}', a:register)
+	    \)
+	    return 0
+	endif
     endif
 
-    return s:Recall(a:what, l:recallIdentity, a:repeatCount, a:register, l:multiplier, a:000)
+    return s:Recall(a:what, s:Callbacks[a:what], l:recallIdentity, a:repeatCount, a:register, l:multiplier, a:000)
 endfunction
-function! s:Recall( what, recallIdentity, repeatCount, register, multiplier, clientArguments )
+function! s:Recall( what, Callback, recallIdentity, repeatCount, register, multiplier, clientArguments )
     if ! empty(a:recallIdentity) && a:recallIdentity !=# s:recalledIdentities[a:what]
 	" It's not a repeat of the last recalled thing; put it at the first
 	" position of the recall stack.
@@ -213,14 +224,15 @@ function! s:Recall( what, recallIdentity, repeatCount, register, multiplier, cli
 	endif
     endif
 
-    return call(s:Callbacks[a:what], [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier] + a:clientArguments)
+    return call(a:Callback, [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier] + a:clientArguments)
 endfunction
 function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
+    let l:history = s:GetSource(s:historySources, a:what, 9)
+    let l:named = s:GetSource(s:namedSources, a:what)
     let l:validNames = filter(
     \   split('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '\zs'),
-    \   'has_key(s:namedSources[a:what], v:val)'
+    \   'has_key(l:named, v:val)'
     \)
-    let l:history = s:GetSource(s:historySources, a:what, 9)
     let l:recalls = s:GetSource(s:recallsSources, a:what)
     let l:recallNum = len(l:recalls)
 
@@ -229,108 +241,130 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
 	return 0
     endif
 
-    let l:hasRegister = s:HasRegister(a:register)
     echohl Title
     echo ' #  ' . a:what
     echohl None
     for l:i in range(1, l:recallNum)
 	echo '"' . l:i . '  ' . ingo#avoidprompt#TranslateLineBreaks(l:recalls[l:i - 1])
     endfor
-    for l:i in l:validNames
-	echo '"' . l:i . '  ' . ingo#avoidprompt#TranslateLineBreaks(s:namedSources[a:what][l:i])
+    for l:n in l:validNames
+	echo '"' . l:n . '  ' . ingo#avoidprompt#TranslateLineBreaks(l:named[l:n])
     endfor
     for l:i in range(min([9, len(l:history)]), 1, -1)
 	echo ' ' . l:i . '  ' . ingo#avoidprompt#TranslateLineBreaks(l:history[l:i - 1])
     endfor
 
+    let l:hasRegister = s:HasRegister(a:register)
     let l:validNamesAndRecalls = join(l:validNames, '') . join(range(1, l:recallNum), '')
+    let l:additionalListCommands = get(s:options[a:what], 'additionalListCommands', [])
+    let l:additionalKeys = join(map(copy(l:additionalListCommands), 'v:val.key'), '')
+    let l:additionalKeyHints = ingo#list#NonEmpty(map(copy(l:additionalListCommands), 'get(v:val, "hint", "")'))
+    if l:hasRegister
+	if ! empty(l:validNamesAndRecalls)
+	    call add(l:additionalKeyHints, '<Del> or <BS> unassigns from "' . a:register)
+	endif
+    else
+	if len(l:validNames) > 0
+	    call add(l:additionalKeyHints, '<Del> removes all named')
+	endif
+	if l:recallNum > 0
+	    call add(l:additionalKeyHints, '<BS> removes all recalled')
+	endif
+    endif
+
     echo printf('Type number%s (<Enter> cancels%s) to insert%s: ',
     \   (empty(l:validNamesAndRecalls) ? '' : ' or "{a-Z}'),
-    \   (l:hasRegister ?
-    \       (empty(l:validNamesAndRecalls) ? '' : '; <Del> or <BS> unassigns from "' . a:register) :
-    \       (len(l:validNames) > 0 ? '; <Del> removes all named' : '') . (l:recallNum > 0 ? '; <BS> removes all recalled' : '')
-    \   ),
+    \   (empty(l:additionalKeyHints) ? '' : join([''] + l:additionalKeyHints, '; ')),
     \   (l:hasRegister ? ' and assign to "' . a:register : '')
     \)
-    let l:choice = ingo#query#get#ValidChar({
-    \   'validExpr': "[123456789\<CR>\<Del>\<BS>" .
-    \       (empty(l:validNamesAndRecalls) ? '' : '"' . l:validNamesAndRecalls) .
-    \       ']'
-    \})
+    let l:Callback = s:Callbacks[a:what]
     let l:recallIdentity = ''
     let l:repeatCount = a:multiplier
-    if empty(l:choice) || l:choice ==# "\<CR>"
-	return 1
-    elseif l:hasRegister && (l:choice ==# "\<Del>" || l:choice ==# "\<BS>")
-	if a:register =~# '[1-9]'
-	    let l:recalls = s:GetSource(s:recallsSources, a:what)
-	    let l:index = str2nr(a:register) - 1
-	    call remove(l:recalls, l:index)
-	elseif a:register =~# '\a'
-	    let l:named = s:GetSource(s:namedSources, a:what)
-	    unlet! l:named[a:register]
-	endif
-	return 1
-    elseif ! l:hasRegister && l:choice ==# "\<Del>"
-	let l:named = s:GetSource(s:namedSources, a:what)
-	for l:name in keys(l:named)
-	    unlet! l:named[l:name]
-	endfor
-	return 1
-    elseif ! l:hasRegister && l:choice ==# "\<BS>"
-	let l:recalls = s:GetSource(s:recallsSources, a:what)
-	call remove(l:recalls, 0, len(l:recalls) - 1)
-	return 1
-    elseif l:choice ==# '"'
-	let l:choice = ingo#query#get#ValidChar({'validExpr': "[\<CR>" . l:validNamesAndRecalls . ']'})
+
+    while 1
+	let l:choice = ingo#query#get#ValidChar({
+	\   'validExpr': "[123456789\<CR>\<Del>\<BS>" .
+	\       (empty(l:validNamesAndRecalls) ? '' : '"' . l:validNamesAndRecalls) .
+	\       l:additionalKeys .
+	\       ']'
+	\})
 	if empty(l:choice) || l:choice ==# "\<CR>"
 	    return 1
-	elseif l:choice =~# '[1-9]'
-	    let s:lastHistories[a:what] = l:recalls[str2nr(l:choice) - 1]
-	    let l:repeatCount = str2nr(l:choice)    " Counting last added to history here.
-	    let l:repeatRegister = l:choice
-	    if l:choice !=# '1'
-		" Put any recalled history other that the last recall itself
-		" back at the top.
-		let l:recallIdentity = '"' . l:choice . "\n" . s:lastHistories[a:what]
+	elseif l:hasRegister && (l:choice ==# "\<Del>" || l:choice ==# "\<BS>")
+	    if a:register =~# '[1-9]'
+		let l:index = str2nr(a:register) - 1
+		call remove(l:recalls, l:index)
+	    elseif a:register =~# '\a'
+		unlet! l:named[a:register]
 	    endif
-	elseif l:choice =~# '\a'
-	    let s:lastHistories[a:what] = s:namedSources[a:what][l:choice]
+	    return 1
+	elseif ! l:hasRegister && l:choice ==# "\<Del>"
+	    for l:name in keys(l:named)
+		unlet! l:named[l:name]
+	    endfor
+	    return 1
+	elseif ! l:hasRegister && l:choice ==# "\<BS>"
+	    call remove(l:recalls, 0, len(l:recalls) - 1)
+	    return 1
+	elseif l:choice ==# '"'
+	    echon l:choice
+	    let l:choice = ingo#query#get#ValidChar({'validExpr': "[\<CR>" . l:validNamesAndRecalls . ']'})
+	    if empty(l:choice) || l:choice ==# "\<CR>"
+		return 1
+	    elseif l:choice =~# '[1-9]'
+		let s:lastHistories[a:what] = l:recalls[str2nr(l:choice) - 1]
+		let l:repeatCount = str2nr(l:choice)    " Counting last added to history here.
+		let l:repeatRegister = l:choice
+		if l:choice !=# '1'
+		    " Put any recalled history other that the last recall itself
+		    " back at the top.
+		    let l:recallIdentity = '"' . l:choice . "\n" . s:lastHistories[a:what]
+		endif
+	    elseif l:choice =~# '\a'
+		let s:lastHistories[a:what] = l:named[l:choice]
+		let l:repeatRegister = l:choice
+		" Don't put the same name and identical contents at the top again if
+		" it's already there.
+		let l:recallIdentity = '"' . l:choice . "\n" . s:lastHistories[a:what]
+	    else
+		throw 'ASSERT: Unexpected l:choice: ' . l:choice
+	    endif
+	elseif l:choice =~# '[1-9]'
+	    if ! l:hasRegister
+		" Use the index for repeating the recall, unless this is being
+		" assigned a name; then, the count specifies the multiplier.
+		let l:repeatCount = str2nr(l:choice)
+	    endif
+	    let l:repeatRegister = a:register   " Use the named register this is being assigned to, or the default register.
+	    let s:lastHistories[a:what] = l:history[str2nr(l:choice) - 1]
+	    " Don't put the same count and identical contents at the top again if
+	    " it's already there.
+	    let l:recallIdentity = l:choice . "\n" . s:lastHistories[a:what]
+	elseif stridx(l:additionalKeys, l:choice) != -1
+	    echon l:choice
+	    let l:additionalKeys = ''
+	    let l:Callback = map(filter(copy(l:additionalListCommands), 'v:val.key ==# l:choice'), 'v:val.Callback')[0]
+	    continue
+	elseif l:choice =~# '\a'  | " Take {a-zA-Z} as a shortcut for "{a-zA-z} (unless an additionalListCommands uses that key) ; unlike with the {1-9} recalls, there's no clash here.
 	    let l:repeatRegister = l:choice
+	    let s:lastHistories[a:what] = l:named[l:choice]
 	    " Don't put the same name and identical contents at the top again if
 	    " it's already there.
 	    let l:recallIdentity = '"' . l:choice . "\n" . s:lastHistories[a:what]
 	else
 	    throw 'ASSERT: Unexpected l:choice: ' . l:choice
 	endif
-    elseif l:choice =~# '[1-9]'
-	if ! l:hasRegister
-	    " Use the index for repeating the recall, unless this is being
-	    " assigned a name; then, the count specifies the multiplier.
-	    let l:repeatCount = str2nr(l:choice)
-	endif
-	let l:repeatRegister = a:register   " Use the named register this is being assigned to, or the default register.
-	let s:lastHistories[a:what] = l:history[str2nr(l:choice) - 1]
-	" Don't put the same count and identical contents at the top again if
-	" it's already there.
-	let l:recallIdentity = l:choice . "\n" . s:lastHistories[a:what]
-    elseif l:choice =~# '\a'  | " Take {a-zA-Z} as a shortcut for "{a-zA-z}; unlike with the {1-9} recalls, there's no clash here.
-	let l:repeatRegister = l:choice
-	let s:lastHistories[a:what] = s:namedSources[a:what][l:choice]
-	" Don't put the same name and identical contents at the top again if
-	" it's already there.
-	let l:recallIdentity = '"' . l:choice . "\n" . s:lastHistories[a:what]
-    else
-	throw 'ASSERT: Unexpected l:choice: ' . l:choice
-    endif
+
+	break
+    endwhile
 
     if l:hasRegister
-	let s:namedSources[a:what][a:register] = s:lastHistories[a:what]
+	let l:named[a:register] = s:lastHistories[a:what]
 	let l:recallIdentity = '"' . a:register . "\n" . s:lastHistories[a:what]
     endif
 
     redraw  " Clear the query.
-    return s:Recall(a:what, l:recallIdentity, l:repeatCount, l:repeatRegister, a:multiplier, a:000)
+    return s:Recall(a:what, l:Callback, l:recallIdentity, l:repeatCount, l:repeatRegister, a:multiplier, a:000)
 endfunction
 
 let &cpo = s:save_cpo
