@@ -197,9 +197,9 @@ function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register, 
 	endif
     endif
 
-    return s:Recall(a:what, l:recallIdentity, a:repeatCount, a:register, l:multiplier, a:000)
+    return s:Recall(a:what, s:Callbacks[a:what], l:recallIdentity, a:repeatCount, a:register, l:multiplier, a:000)
 endfunction
-function! s:Recall( what, recallIdentity, repeatCount, register, multiplier, clientArguments )
+function! s:Recall( what, Callback, recallIdentity, repeatCount, register, multiplier, clientArguments )
     if ! empty(a:recallIdentity) && a:recallIdentity !=# s:recalledIdentities[a:what]
 	" It's not a repeat of the last recalled thing; put it at the first
 	" position of the recall stack.
@@ -223,7 +223,7 @@ function! s:Recall( what, recallIdentity, repeatCount, register, multiplier, cli
 	endif
     endif
 
-    return call(s:Callbacks[a:what], [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier] + a:clientArguments)
+    return call(a:Callback, [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier] + a:clientArguments)
 endfunction
 function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
     let l:history = s:GetSource(s:historySources, a:what, 9)
@@ -338,7 +338,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
     endif
 
     redraw  " Clear the query.
-    return s:Recall(a:what, l:recallIdentity, l:repeatCount, l:repeatRegister, a:multiplier, a:000)
+    return s:Recall(a:what, s:Callbacks[a:what], l:recallIdentity, l:repeatCount, l:repeatRegister, a:multiplier, a:000)
 endfunction
 
 let &cpo = s:save_cpo
