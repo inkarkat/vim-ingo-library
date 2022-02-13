@@ -182,16 +182,19 @@ function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register, 
 	    " 3-2-1-3-2-1-...
 	    let s:recalledIdentities[a:what] = ''
 	endif
-    elseif has_key(s:namedSources[a:what], a:register)
-	let l:multiplier = a:count
-	let s:lastHistories[a:what] = s:namedSources[a:what][a:register]
-	let l:recallIdentity = '"' . a:register . "\n" . s:lastHistories[a:what]
     else
-	call ingo#err#Set(a:register =~# '[a-zA-Z]' ?
-	\   printf('Nothing named "%s yet', a:register) :
-	\   printf('Not a valid name: "%s; must be {a-zA-Z} or {1-9}', a:register)
-	\)
-	return 0
+	let l:named = s:GetSource(s:namedSources, a:what)
+	if has_key(l:named, a:register)
+	    let l:multiplier = a:count
+	    let s:lastHistories[a:what] = l:named[a:register]
+	    let l:recallIdentity = '"' . a:register . "\n" . s:lastHistories[a:what]
+	else
+	    call ingo#err#Set(a:register =~# '[a-zA-Z]' ?
+	    \   printf('Nothing named "%s yet', a:register) :
+	    \   printf('Not a valid name: "%s; must be {a-zA-Z} or {1-9}', a:register)
+	    \)
+	    return 0
+	endif
     endif
 
     return s:Recall(a:what, l:recallIdentity, a:repeatCount, a:register, l:multiplier, a:000)
@@ -223,11 +226,12 @@ function! s:Recall( what, recallIdentity, repeatCount, register, multiplier, cli
     return call(s:Callbacks[a:what], [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier] + a:clientArguments)
 endfunction
 function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
+    let l:history = s:GetSource(s:historySources, a:what, 9)
+    let l:named = s:GetSource(s:namedSources, a:what)
     let l:validNames = filter(
     \   split('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '\zs'),
-    \   'has_key(s:namedSources[a:what], v:val)'
+    \   'has_key(l:named, v:val)'
     \)
-    let l:history = s:GetSource(s:historySources, a:what, 9)
     let l:recalls = s:GetSource(s:recallsSources, a:what)
     let l:recallNum = len(l:recalls)
 
@@ -243,8 +247,8 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
     for l:i in range(1, l:recallNum)
 	echo '"' . l:i . '  ' . ingo#avoidprompt#TranslateLineBreaks(l:recalls[l:i - 1])
     endfor
-    for l:i in l:validNames
-	echo '"' . l:i . '  ' . ingo#avoidprompt#TranslateLineBreaks(s:namedSources[a:what][l:i])
+    for l:n in l:validNames
+	echo '"' . l:n . '  ' . ingo#avoidprompt#TranslateLineBreaks(l:named[l:n])
     endfor
     for l:i in range(min([9, len(l:history)]), 1, -1)
 	echo ' ' . l:i . '  ' . ingo#avoidprompt#TranslateLineBreaks(l:history[l:i - 1])
@@ -273,12 +277,10 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
 	    let l:index = str2nr(a:register) - 1
 	    call remove(l:recalls, l:index)
 	elseif a:register =~# '\a'
-	    let l:named = s:GetSource(s:namedSources, a:what)
 	    unlet! l:named[a:register]
 	endif
 	return 1
     elseif ! l:hasRegister && l:choice ==# "\<Del>"
-	let l:named = s:GetSource(s:namedSources, a:what)
 	for l:name in keys(l:named)
 	    unlet! l:named[l:name]
 	endfor
@@ -300,7 +302,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
 		let l:recallIdentity = '"' . l:choice . "\n" . s:lastHistories[a:what]
 	    endif
 	elseif l:choice =~# '\a'
-	    let s:lastHistories[a:what] = s:namedSources[a:what][l:choice]
+	    let s:lastHistories[a:what] = l:named[l:choice]
 	    let l:repeatRegister = l:choice
 	    " Don't put the same name and identical contents at the top again if
 	    " it's already there.
@@ -321,7 +323,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
 	let l:recallIdentity = l:choice . "\n" . s:lastHistories[a:what]
     elseif l:choice =~# '\a'  | " Take {a-zA-Z} as a shortcut for "{a-zA-z}; unlike with the {1-9} recalls, there's no clash here.
 	let l:repeatRegister = l:choice
-	let s:lastHistories[a:what] = s:namedSources[a:what][l:choice]
+	let s:lastHistories[a:what] = l:named[l:choice]
 	" Don't put the same name and identical contents at the top again if
 	" it's already there.
 	let l:recallIdentity = '"' . l:choice . "\n" . s:lastHistories[a:what]
@@ -330,7 +332,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
     endif
 
     if l:hasRegister
-	let s:namedSources[a:what][a:register] = s:lastHistories[a:what]
+	let l:named[a:register] = s:lastHistories[a:what]
 	let l:recallIdentity = '"' . a:register . "\n" . s:lastHistories[a:what]
     endif
 
