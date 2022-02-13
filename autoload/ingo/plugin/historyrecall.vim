@@ -240,7 +240,6 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
 	return 0
     endif
 
-    let l:hasRegister = s:HasRegister(a:register)
     echohl Title
     echo ' #  ' . a:what
     echohl None
@@ -254,6 +253,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
 	echo ' ' . l:i . '  ' . ingo#avoidprompt#TranslateLineBreaks(l:history[l:i - 1])
     endfor
 
+    let l:hasRegister = s:HasRegister(a:register)
     let l:validNamesAndRecalls = join(l:validNames, '') . join(range(1, l:recallNum), '')
     echo printf('Type number%s (<Enter> cancels%s) to insert%s: ',
     \   (empty(l:validNamesAndRecalls) ? '' : ' or "{a-Z}'),
@@ -263,13 +263,14 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
     \   ),
     \   (l:hasRegister ? ' and assign to "' . a:register : '')
     \)
+    let l:recallIdentity = ''
+    let l:repeatCount = a:multiplier
+
     let l:choice = ingo#query#get#ValidChar({
     \   'validExpr': "[123456789\<CR>\<Del>\<BS>" .
     \       (empty(l:validNamesAndRecalls) ? '' : '"' . l:validNamesAndRecalls) .
     \       ']'
     \})
-    let l:recallIdentity = ''
-    let l:repeatCount = a:multiplier
     if empty(l:choice) || l:choice ==# "\<CR>"
 	return 1
     elseif l:hasRegister && (l:choice ==# "\<Del>" || l:choice ==# "\<BS>")
