@@ -307,6 +307,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
 	    call remove(l:recalls, 0, len(l:recalls) - 1)
 	    return 1
 	elseif l:choice ==# '"'
+	    echon l:choice
 	    let l:choice = ingo#query#get#ValidChar({'validExpr': "[\<CR>" . l:validNamesAndRecalls . ']'})
 	    if empty(l:choice) || l:choice ==# "\<CR>"
 		return 1
@@ -340,6 +341,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
 	    " it's already there.
 	    let l:recallIdentity = l:choice . "\n" . s:lastHistories[a:what]
 	elseif stridx(l:additionalKeys, l:choice) != -1
+	    echon l:choice
 	    let l:additionalKeys = ''
 	    let l:Callback = map(filter(copy(l:additionalListCommands), 'v:val.key ==# l:choice'), 'v:val.Callback')[0]
 	    continue
