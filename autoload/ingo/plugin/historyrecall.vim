@@ -60,22 +60,26 @@ function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, 
 "   a:what  Name of the type of history; this will be used in messages like "No
 "           recalled {what} yet." If the plural form is irregular, can also be a
 "           List of [{what}, {whatPlural}}.
-"   a:historySource List of history items, from newest to oldest. The first 9
-"                   will be offered to the user in the interactive list, all can
-"                   be recalled via a [count]. Can be a List or Funcref that is
-"                   invoked a maxItemNum argument and returns a List (that only
-"                   needs to include maxItemNum elements, as no more will be
-"                   accessed). If the former, ensure to keep the original List;
-"                   i.e. only add() (/ extend()) / remove(), but do not assign a
-"                   new List after registration!
-"   a:namedSource   Dictionary of letter to history items. If you don't need
-"                   access to these yourself (e.g. for persistence), just pass
-"                   {}. Can be a Dictionary or Funcref that is invoked without
-"                   arguments and returns a Dict. If the former, ensure to keep
-"                   the original Dict.
-"   a:recallsSource List of history items. If you don't need access to these
-"                   yourself (e.g. for persistence), just pass []. Can be a List
-"                   or Funcref that is invoked without arguments and returns a
+"   a:historySource List of history items, from newest to oldest; is consumed
+"                   by this module and needs to be supplied by the client. The
+"                   first 9 will be offered to the user in the interactive list,
+"                   all can be recalled via a [count]. Can be a List or Funcref
+"                   that is invoked a maxItemNum argument and returns a List
+"                   (that only needs to include maxItemNum elements, as no more
+"                   will be accessed). If the former, ensure to keep the
+"                   original List; i.e. only add() (/ extend()) / remove(), but
+"                   do not assign a new List after registration!
+"   a:namedSource   Dictionary of letter to history items, maintained by this
+"                   module when the user names a history item via a passed
+"                   alphabetic register. If you don't need access to these
+"                   yourself (e.g. for persistence), just pass {}. Can be a
+"                   Dictionary or Funcref that is invoked without arguments and
+"                   returns a Dict. If the former, ensure to keep the original
+"                   Dict.
+"   a:recallsSource List of history items that have been recalled, maintained by
+"                   this module. If you don't need access to these yourself
+"                   (e.g. for persistence), just pass []. Can be a List or
+"                   Funcref that is invoked without arguments and returns a
 "                   List. If the former, ensure to keep the original List.
 "   a:Callback      Funcref that gets invoked if the user recalled this with the
 "                   chosen history item, repeatCount (to be forwarded to
@@ -84,8 +88,14 @@ function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, 
 "                   any additional arguments that clients pass to
 "                   ingo#plugin#historyrecall#Recall() and
 "                   ingo#plugin#historyrecall#List(). The return value
-"                   (signifying success or failure) is passed back to the
-"                   client.
+"                   (signifying success or failure (either as something that
+"                   evaluates to numeric 0, or an empty List, or a Dict with a
+"                   "status" key that evaluates to numeric 0) is passed back to
+"                   the client. On failure, the history item will not be put
+"                   onto the top of the list of recalls.
+"                   If the return value is a Dict that has a "historyItem" key,
+"                   that is added to the recall list instead of the original
+"                   recalled history item.
 "   a:options.isUniqueRecalls
 "                   Flag whether a recall will remove identical recalls from
 "                   a:recallsSource; by default true.
@@ -201,30 +211,49 @@ function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register, 
     return s:Recall(a:what, s:Callbacks[a:what], l:recallIdentity, a:repeatCount, a:register, l:multiplier, a:000)
 endfunction
 function! s:Recall( what, Callback, recallIdentity, repeatCount, register, multiplier, clientArguments )
-    if ! empty(a:recallIdentity) && a:recallIdentity !=# s:recalledIdentities[a:what]
+    let l:historyItem = s:lastHistories[a:what]
+    let l:returnValue = call(a:Callback, [l:historyItem, a:repeatCount, a:register, a:multiplier] + a:clientArguments)
+    if (type(l:returnValue) == type({}) && ! get(l:returnValue, 'status', 1)) ||
+    \   (type(l:returnValue) == type([]) && empty(l:returnValue)) ||
+    \   (type(l:returnValue) == type(0) && ! l:returnValue)
+	return l:returnValue
+    endif
+
+    let l:recallIdentity = a:recallIdentity
+    if type(l:returnValue) == type({}) && has_key(l:returnValue, 'historyItem')
+	" Callback overrode what gets put into the recall list.
+	let l:historyItem = l:returnValue.historyItem
+
+	" Also need to recalculate the recall identity.
+	if ! empty(l:recallIdentity)
+	    let l:recallIdentity = matchstr(l:recallIdentity, '^[^\n]*\n') . l:historyItem
+	endif
+    endi
+
+    if ! empty(l:recallIdentity) && l:recallIdentity !=# s:recalledIdentities[a:what]
 	" It's not a repeat of the last recalled thing; put it at the first
 	" position of the recall stack.
 	let l:recalls = s:GetSource(s:recallsSources, a:what)
 	if get(s:options[a:what], 'isUniqueRecalls', 1)
-	    call filter(l:recalls, 'v:val !=# s:lastHistories[a:what]')
+	    call filter(l:recalls, 'v:val !=# l:historyItem')
 	endif
-	call insert(l:recalls, s:lastHistories[a:what])
+	call insert(l:recalls, l:historyItem)
 	if len(l:recalls) > 9
 	    call remove(l:recalls, 9, -1)
 	endif
-	if a:recallIdentity =~# '^"\d\n'
+	if l:recallIdentity =~# '^"\d\n'
 	    " The recalled thing has been moved to the top position again; adapt
 	    " the position, so that a repeat with the same number will continue
 	    " cycling (by putting the thing to the top even though it's
 	    " identical); only a recall with the top position ("1) should leave
 	    " it as-is.
-	    let s:recalledIdentities[a:what] = '"1' . a:recallIdentity[2:]
+	    let s:recalledIdentities[a:what] = '"1' . l:recallIdentity[2:]
 	else
-	    let s:recalledIdentities[a:what] = a:recallIdentity
+	    let s:recalledIdentities[a:what] = l:recallIdentity
 	endif
     endif
 
-    return call(a:Callback, [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier] + a:clientArguments)
+    return l:returnValue
 endfunction
 function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
     let l:history = s:GetSource(s:historySources, a:what, 9)
