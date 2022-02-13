@@ -84,8 +84,11 @@ function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, 
 "                   any additional arguments that clients pass to
 "                   ingo#plugin#historyrecall#Recall() and
 "                   ingo#plugin#historyrecall#List(). The return value
-"                   (signifying success or failure) is passed back to the
-"                   client.
+"                   (signifying success or failure (either as something that
+"                   evaluates to numeric 0, or an empty List, or a Dict with a
+"                   "status" key that evaluates to numeric 0) is passed back to
+"                   the client. On failure, the history item will not be put
+"                   onto the top of the list of recalls.
 "   a:options.isUniqueRecalls
 "                   Flag whether a recall will remove identical recalls from
 "                   a:recallsSource; by default true.
@@ -201,6 +204,13 @@ function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register, 
     return s:Recall(a:what, s:Callbacks[a:what], l:recallIdentity, a:repeatCount, a:register, l:multiplier, a:000)
 endfunction
 function! s:Recall( what, Callback, recallIdentity, repeatCount, register, multiplier, clientArguments )
+    let l:returnValue = call(a:Callback, [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier] + a:clientArguments)
+    if (type(l:returnValue) == type({}) && ! get(l:returnValue, 'status', 1)) ||
+    \   (type(l:returnValue) == type([]) && empty(l:returnValue)) ||
+    \   (type(l:returnValue) == type(0) && ! l:returnValue)
+	return l:returnValue
+    endif
+
     if ! empty(a:recallIdentity) && a:recallIdentity !=# s:recalledIdentities[a:what]
 	" It's not a repeat of the last recalled thing; put it at the first
 	" position of the recall stack.
@@ -224,7 +234,7 @@ function! s:Recall( what, Callback, recallIdentity, repeatCount, register, multi
 	endif
     endif
 
-    return call(a:Callback, [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier] + a:clientArguments)
+    return l:returnValue
 endfunction
 function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
     let l:history = s:GetSource(s:historySources, a:what, 9)
