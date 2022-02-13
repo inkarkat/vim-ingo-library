@@ -204,7 +204,8 @@ function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register, 
     return s:Recall(a:what, s:Callbacks[a:what], l:recallIdentity, a:repeatCount, a:register, l:multiplier, a:000)
 endfunction
 function! s:Recall( what, Callback, recallIdentity, repeatCount, register, multiplier, clientArguments )
-    let l:returnValue = call(a:Callback, [s:lastHistories[a:what], a:repeatCount, a:register, a:multiplier] + a:clientArguments)
+    let l:historyItem = s:lastHistories[a:what]
+    let l:returnValue = call(a:Callback, [l:historyItem, a:repeatCount, a:register, a:multiplier] + a:clientArguments)
     if (type(l:returnValue) == type({}) && ! get(l:returnValue, 'status', 1)) ||
     \   (type(l:returnValue) == type([]) && empty(l:returnValue)) ||
     \   (type(l:returnValue) == type(0) && ! l:returnValue)
@@ -216,9 +217,9 @@ function! s:Recall( what, Callback, recallIdentity, repeatCount, register, multi
 	" position of the recall stack.
 	let l:recalls = s:GetSource(s:recallsSources, a:what)
 	if get(s:options[a:what], 'isUniqueRecalls', 1)
-	    call filter(l:recalls, 'v:val !=# s:lastHistories[a:what]')
+	    call filter(l:recalls, 'v:val !=# l:historyItem')
 	endif
-	call insert(l:recalls, s:lastHistories[a:what])
+	call insert(l:recalls, l:historyItem)
 	if len(l:recalls) > 9
 	    call remove(l:recalls, 9, -1)
 	endif
