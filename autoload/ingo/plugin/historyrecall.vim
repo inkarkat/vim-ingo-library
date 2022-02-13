@@ -60,22 +60,26 @@ function! ingo#plugin#historyrecall#Register( what, historySource, namedSource, 
 "   a:what  Name of the type of history; this will be used in messages like "No
 "           recalled {what} yet." If the plural form is irregular, can also be a
 "           List of [{what}, {whatPlural}}.
-"   a:historySource List of history items, from newest to oldest. The first 9
-"                   will be offered to the user in the interactive list, all can
-"                   be recalled via a [count]. Can be a List or Funcref that is
-"                   invoked a maxItemNum argument and returns a List (that only
-"                   needs to include maxItemNum elements, as no more will be
-"                   accessed). If the former, ensure to keep the original List;
-"                   i.e. only add() (/ extend()) / remove(), but do not assign a
-"                   new List after registration!
-"   a:namedSource   Dictionary of letter to history items. If you don't need
-"                   access to these yourself (e.g. for persistence), just pass
-"                   {}. Can be a Dictionary or Funcref that is invoked without
-"                   arguments and returns a Dict. If the former, ensure to keep
-"                   the original Dict.
-"   a:recallsSource List of history items. If you don't need access to these
-"                   yourself (e.g. for persistence), just pass []. Can be a List
-"                   or Funcref that is invoked without arguments and returns a
+"   a:historySource List of history items, from newest to oldest; is consumed
+"                   by this module and needs to be supplied by the client. The
+"                   first 9 will be offered to the user in the interactive list,
+"                   all can be recalled via a [count]. Can be a List or Funcref
+"                   that is invoked a maxItemNum argument and returns a List
+"                   (that only needs to include maxItemNum elements, as no more
+"                   will be accessed). If the former, ensure to keep the
+"                   original List; i.e. only add() (/ extend()) / remove(), but
+"                   do not assign a new List after registration!
+"   a:namedSource   Dictionary of letter to history items, maintained by this
+"                   module when the user names a history item via a passed
+"                   alphabetic register. If you don't need access to these
+"                   yourself (e.g. for persistence), just pass {}. Can be a
+"                   Dictionary or Funcref that is invoked without arguments and
+"                   returns a Dict. If the former, ensure to keep the original
+"                   Dict.
+"   a:recallsSource List of history items that have been recalled, maintained by
+"                   this module. If you don't need access to these yourself
+"                   (e.g. for persistence), just pass []. Can be a List or
+"                   Funcref that is invoked without arguments and returns a
 "                   List. If the former, ensure to keep the original List.
 "   a:Callback      Funcref that gets invoked if the user recalled this with the
 "                   chosen history item, repeatCount (to be forwarded to
