@@ -166,6 +166,7 @@ HISTORY
   '', '', ''] on empty a:commandLine.
 - Add ingo/plugin/historyrecall.vim module.
 - Add ingo/str/remove.vim module.
+- Add ingo#lines#Delete() variant of ingo#lines#Replace().
 
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of
