@@ -1,9 +1,8 @@
 " ingo/lines.vim: Functions for line manipulation.
 "
 " DEPENDENCIES:
-"   - ingo/range.vim autoload script
 "
-" Copyright: (C) 2012-2019 Ingo Karkat
+" Copyright: (C) 2012-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -75,7 +74,7 @@ function! ingo#lines#Replace( startLnum, endLnum, lines, ... )
 "   None.
 "******************************************************************************
     let l:isEntireBuffer = ingo#range#IsEntireBuffer(a:startLnum, a:endLnum)
-    silent execute printf('%s,%sdelete %s', a:startLnum, a:endLnum, (a:0 ? a:1 : '_'))
+    silent execute printf('keepjumps %s,%sdelete %s', a:startLnum, a:endLnum, (a:0 ? a:1 : '_'))
     if ! empty(a:lines)
 	silent call ingo#lines#PutBefore(a:startLnum, a:lines)
 	if l:isEntireBuffer
