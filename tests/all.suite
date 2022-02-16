@@ -24,6 +24,7 @@ lists/
 lnum/
 matches/
 option/listchars/
+range/merge/
 range/sort/
 regexp/
 regexp/capture/
