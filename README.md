@@ -142,6 +142,11 @@ complete).
 
     let g:IngoLibrary_QueryMotionCustomMotions = {'key': 'patter\(n\)'}
 
+Motions can be forced to be character- / line- / blockwise (forced-motion).
+If you have mapped alternatives for v / V / CTRL-V, define them as keys in:
+
+    let g:IngoLibrary_QueryMotionCustomMotionModifiers = {"\<C-q>": 1}
+
 INSTALLATION
 ------------------------------------------------------------------------------
 

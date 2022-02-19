@@ -151,6 +151,11 @@ until the first capture group is non-empty (the motion then is deemed
 complete). >
     let g:IngoLibrary_QueryMotionCustomMotions = {'key': 'patter\(n\)'}
 <
+			      *g:IngoLibrary_QueryMotionCustomMotionModifiers*
+Motions can be forced to be character- / line- / blockwise (|forced-motion|).
+If you have mapped alternatives for v / V / CTRL-V, define them as keys in: >
+    let g:IngoLibrary_QueryMotionCustomMotionModifiers = {"\<C-q>": 1}
+<
 ==============================================================================
 INSTALLATION					   *ingo-library-installation*
 

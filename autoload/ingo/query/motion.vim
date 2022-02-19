@@ -13,9 +13,15 @@ endif
 if ! exists('g:IngoLibrary_QueryMotionCustomMotions')
     let g:IngoLibrary_QueryMotionCustomMotions = {}
 endif
+if ! exists('g:IngoLibrary_QueryMotionCustomMotionModifiers')
+    let g:IngoLibrary_QueryMotionCustomMotionModifiers = 'default value'
+endif
+
 let s:builtInMotions = ingo#dict#FromKeys(['h', "\<Left>", "\<C-h>", "\<BS>", 'l', "\<Right>", ' ', '0', "\<Home>", '^', '$', "\<End>", 'g_', 'g0', "g\<Home>", 'g^', 'gm', 'gM', 'g$', "g\<End>", '|', ';', ',', 'k', "\<Up>", "\<C-p>", 'j', "\<Down>", "\<C-j>", "\<C-n>", 'gk', "g\<Up>", 'gj', "g\<Down>", '-', '+', "\<C-m>", "\<CR>", '_', 'G', "\<C-End>", "\<C-Home>", 'gg', 'go', "\<S-Right>", 'w', "\<C-Right>", 'W', 'e', 'E', "\<S-Left>", 'b', "\<C-Left>", 'B', 'ge', 'gE', '(', ')', '{', '}', ']]', '][', '[[', '[]', 'aw', 'iw', 'aW', 'iW', 'as', 'is', 'ap', 'ip', 'a]', 'a[', 'i]', 'i[', 'a)', 'a(', 'ab', 'i)', 'i(', 'ib', 'a>', 'a<', 'i>', 'i<', 'at', 'it', 'a}', 'a{', 'aB', 'i}', 'i{', 'iB', 'a"', "a'", 'a`', 'i"', "i'", 'i`', "\<C-o>", "\t", "\<C-i>", 'g;', 'g,', '%', '[(', '[{', '])', ']}', ']m', ']M', '[m', '[M', '[#', ']#', '[*', '[/', ']*', ']/', 'H', 'M', 'L', 'n', 'N', '*', '#', 'g*', 'g#', 'gd', 'gD'], '')
 call extend(s:builtInMotions, {'f': '\(.\)', 'F': '\(.\)', 't': '\(.\)' , 'T': '\(.\)', ':': '[^\r]*\(\r\)\?', "'": '\([a-zA-Z0-9''`"[\]<>^.(){}]\)', '`': '\([a-zA-Z0-9''`"[\]<>^.(){}])', "g'": '\([a-zA-Z0-9''`"[\]<>^.(){}]\)', 'g`': '\([a-zA-Z0-9''`"[\]<>^.(){}]\)', '/': '[^\r]*\(\r\)\?', '?': '[^\r]*\(\r\)\?'})
 call extend(s:builtInMotions, g:IngoLibrary_QueryMotionCustomMotions, 'force')
+let s:builtInMotionModifiers = ingo#collections#ToDict(['v', 'V', "\<C-v>"])
+call extend(s:builtInMotionModifiers, g:IngoLibrary_QueryMotionCustomMotionModifiers, 'force')
 
 function! ingo#query#motion#Get() abort
 "******************************************************************************
@@ -42,6 +48,7 @@ function! ingo#query#motion#Get() abort
 "******************************************************************************
     let l:count = ''
     let l:register = ''
+    let l:motionModifier = ''
     let l:motion = ''
     let l:appendagePattern = ''
     let l:motionAppendage = ''
@@ -61,6 +68,11 @@ function! ingo#query#motion#Get() abort
 		continue
 	    elseif l:key =~# '^\d$' && ! empty(l:count)
 		let l:count .= l:key    " More count
+		continue
+	    elseif has_key(s:builtInMotionModifiers, l:key)
+		" Forcing a motion (:help forced-motion) to be character- /
+		" line- / blockwise. Last one wins here.
+		let l:motionModifier = l:key
 		continue
 	    endif
 	endif
@@ -102,7 +114,7 @@ function! ingo#query#motion#Get() abort
 	endif
     endwhile
 
-    return l:count . l:register . l:motion . l:motionAppendage
+    return l:count . l:register . l:motionModifier . l:motion . l:motionAppendage
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
