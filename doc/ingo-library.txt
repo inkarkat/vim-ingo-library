@@ -205,6 +205,7 @@ HISTORY							*ingo-library-history*
 - ingo#plugin#register#{Set,PutContents}(): ENH: Also add the register
   contents to the search history when the target register is "/".
 - Add ingo#query#get#Motion().
+- Add ingo#compat#getcharstr().
 
 1.043	04-Feb-2022
 - Minor: Actually support no-argument form of
