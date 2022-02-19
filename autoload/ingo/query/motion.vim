@@ -93,7 +93,7 @@ function! ingo#query#motion#Get( ... ) abort
 		else
 		    break   " A complete custom mapping has been input.
 		endif
-	    elseif has_key(s:builtInMotions, l:motion)
+	    elseif has_key(s:builtInMotions, l:motion) && (empty(mapcheck(l:motion, 'o')) || has_key(g:IngoLibrary_QueryMotionIgnoredMotions, l:motion))
 		let l:appendagePattern = s:builtInMotions[l:motion]
 		if empty(l:appendagePattern)
 		    break   " Plain built-in motion; we're done.
