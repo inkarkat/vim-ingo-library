@@ -23,7 +23,7 @@ call extend(s:builtInMotions, g:IngoLibrary_QueryMotionCustomMotions, 'force')
 let s:builtInMotionModifiers = ingo#collections#ToDict(['v', 'V', "\<C-v>"])
 call extend(s:builtInMotionModifiers, g:IngoLibrary_QueryMotionCustomMotionModifiers, 'force')
 
-function! ingo#query#motion#Get() abort
+function! ingo#query#motion#Get( ... ) abort
 "******************************************************************************
 "* PURPOSE:
 "   Obtain a Vim motion / text object from the user. Includes any counts and
@@ -41,11 +41,16 @@ function! ingo#query#motion#Get() abort
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   None.
+"   a:options.isAllowRegister   Flag that allows capture of "{register} before
+"                               or after a count. Off by default, as
+"                               operator-pending motions cannot take a register;
+"                               it has to be specified before the operation.
 "* RETURN VALUES:
 "   A motion that can then be appended to an operator command to apply the
 "   operator to the text. Or empty String if the motion was aborted (via <Esc>).
 "******************************************************************************
+    let l:options = (a:0 ? a:1 : {})
+    let l:isAllowRegister = get(l:options, 'isAllowRegister', 0)
     let l:count = ''
     let l:register = ''
     let l:motionModifier = ''
@@ -57,7 +62,7 @@ function! ingo#query#motion#Get() abort
 	if l:key ==# "\<Esc>"
 	    return ''
 	elseif empty(l:motion)
-	    if l:key ==# '"' && empty(l:register)
+	    if l:isAllowRegister && l:key ==# '"' && empty(l:register)
 		let l:register = l:key  " Start of register
 		continue
 	    elseif l:key =~# '^[1-9]$' && empty(l:count)
