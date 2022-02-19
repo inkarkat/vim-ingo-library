@@ -19,7 +19,6 @@ endif
 
 let s:builtInMotions = ingo#dict#FromKeys(['h', "\<Left>", "\<C-h>", "\<BS>", 'l', "\<Right>", ' ', '0', "\<Home>", '^', '$', "\<End>", 'g_', 'g0', "g\<Home>", 'g^', 'gm', 'gM', 'g$', "g\<End>", '|', ';', ',', 'k', "\<Up>", "\<C-p>", 'j', "\<Down>", "\<C-j>", "\<C-n>", 'gk', "g\<Up>", 'gj', "g\<Down>", '-', '+', "\<C-m>", "\<CR>", '_', 'G', "\<C-End>", "\<C-Home>", 'gg', 'go', "\<S-Right>", 'w', "\<C-Right>", 'W', 'e', 'E', "\<S-Left>", 'b', "\<C-Left>", 'B', 'ge', 'gE', '(', ')', '{', '}', ']]', '][', '[[', '[]', 'aw', 'iw', 'aW', 'iW', 'as', 'is', 'ap', 'ip', 'a]', 'a[', 'i]', 'i[', 'a)', 'a(', 'ab', 'i)', 'i(', 'ib', 'a>', 'a<', 'i>', 'i<', 'at', 'it', 'a}', 'a{', 'aB', 'i}', 'i{', 'iB', 'a"', "a'", 'a`', 'i"', "i'", 'i`', "\<C-o>", "\t", "\<C-i>", 'g;', 'g,', '%', '[(', '[{', '])', ']}', ']m', ']M', '[m', '[M', '[#', ']#', '[*', '[/', ']*', ']/', 'H', 'M', 'L', 'n', 'N', '*', '#', 'g*', 'g#', 'gd', 'gD'], '')
 call extend(s:builtInMotions, {'f': '\(.\)', 'F': '\(.\)', 't': '\(.\)' , 'T': '\(.\)', ':': '[^\r]*\(\r\)\?', "'": '\([a-zA-Z0-9''`"[\]<>^.(){}]\)', '`': '\([a-zA-Z0-9''`"[\]<>^.(){}])', "g'": '\([a-zA-Z0-9''`"[\]<>^.(){}]\)', 'g`': '\([a-zA-Z0-9''`"[\]<>^.(){}]\)', '/': '[^\r]*\(\r\)\?', '?': '[^\r]*\(\r\)\?'})
-call extend(s:builtInMotions, g:IngoLibrary_QueryMotionCustomMotions, 'force')
 let s:builtInMotionModifiers = ingo#collections#ToDict(['v', 'V', "\<C-v>"])
 call extend(s:builtInMotionModifiers, g:IngoLibrary_QueryMotionCustomMotionModifiers, 'force')
 
@@ -86,7 +85,14 @@ function! ingo#query#motion#Get( ... ) abort
 	    let l:motion .= l:key
 
 	    if ! empty(maparg(l:motion, 'o')) && ! has_key(g:IngoLibrary_QueryMotionIgnoredMotions, l:motion)
-		break   " A complete custom mapping has been input.
+		if has_key(g:IngoLibrary_QueryMotionCustomMotions, l:motion)
+		    let l:appendagePattern = g:IngoLibrary_QueryMotionCustomMotions[l:motion]
+		    if empty(l:appendagePattern)
+			break   " Plain custom motion; we're done.
+		    endif
+		else
+		    break   " A complete custom mapping has been input.
+		endif
 	    elseif has_key(s:builtInMotions, l:motion)
 		let l:appendagePattern = s:builtInMotions[l:motion]
 		if empty(l:appendagePattern)
