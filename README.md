@@ -122,6 +122,26 @@ insertion point. Its strategy can be tweaked via the following values:
 - insert:   always inserting before the character the cursor is on
 - append:   always appending after the character the cursor is on
 
+If you use some operator-pending mappings as hooks into default motions (e.g.
+: or /) that still maintain the original functionality,
+ingo#query#get#Motion() can be instructed to ignore those mappings and instead
+treat them as the built-in motions (i.e. still query the command-line or
+search pattern). Define those keys you want ignored as keys in a Dict (values
+don't matter):
+
+    let g:IngoLibrary_QueryMotionIgnoredMotions = {':': 1, '/': 1, '?': 1}
+
+If you have custom operator-pending mappings that do some tricks like
+obtaining additional characters until they're done and moving the cursor,
+define those keys as keys, and an appendage pattern as value (or the empty
+String if there're no additional keys).
+The appendage patterns will capture additional keys until either the pattern
+does not match any longer (the motion then is deemed invalid and aborts), or
+until the first capture group is non-empty (the motion then is deemed
+complete).
+
+    let g:IngoLibrary_QueryMotionCustomMotions = {'key': 'patter\(n\)'}
+
 INSTALLATION
 ------------------------------------------------------------------------------
 
@@ -169,6 +189,7 @@ HISTORY
 - Add ingo#lines#Delete() variant of ingo#lines#Replace().
 - ingo#plugin#register#{Set,PutContents}(): ENH: Also add the register
   contents to the search history when the target register is "/".
+- Add ingo#query#get#Motion().
 
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of
