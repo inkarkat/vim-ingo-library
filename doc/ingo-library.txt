@@ -204,7 +204,7 @@ HISTORY							*ingo-library-history*
 - Add ingo#lines#Delete() variant of ingo#lines#Replace().
 - ingo#plugin#register#{Set,PutContents}(): ENH: Also add the register
   contents to the search history when the target register is "/".
-- Add ingo#query#get#Motion().
+- Add ingo#query#motion#Get().
 - Add ingo#compat#getcharstr().
 
 1.043	04-Feb-2022
