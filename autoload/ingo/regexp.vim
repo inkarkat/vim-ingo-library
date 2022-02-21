@@ -273,4 +273,8 @@ function! ingo#regexp#IsValid( expr, ... )
     endtry
 endfunction
 
+function! ingo#regexp#Anchored( expr ) abort
+    return '^\%(' . a:expr . '\)$'
+endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
