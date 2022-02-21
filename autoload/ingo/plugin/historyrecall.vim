@@ -315,7 +315,8 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
 	\   'validExpr': "[123456789\<CR>\<Del>\<BS>" .
 	\       (empty(l:validNamesAndRecalls) ? '' : '"' . l:validNamesAndRecalls) .
 	\       l:additionalKeys .
-	\       ']'
+	\       ']',
+	\   'isAllowDigraphs': 0,
 	\})
 	if empty(l:choice) || l:choice ==# "\<CR>"
 	    return 1
@@ -337,7 +338,10 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
 	    return 1
 	elseif l:choice ==# '"'
 	    echon l:choice
-	    let l:choice = ingo#query#get#ValidChar({'validExpr': "[\<CR>" . l:validNamesAndRecalls . ']'})
+	    let l:choice = ingo#query#get#ValidChar({
+	    \   'validExpr': "[\<CR>" . l:validNamesAndRecalls . ']'
+	    \   'isAllowDigraphs': 0,
+	    \})
 	    if empty(l:choice) || l:choice ==# "\<CR>"
 		return 1
 	    elseif l:choice =~# '[1-9]'
