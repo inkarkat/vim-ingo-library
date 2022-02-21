@@ -53,6 +53,42 @@ function! ingo#query#get#Number( maxNum, ... )
     endwhile
 endfunction
 
+if ! exists('g:IngoLibrary_DigraphTriggerKey')
+    let g:IngoLibrary_DigraphTriggerKey = "\<C-k>"
+endif
+function! ingo#query#get#CharOrDigraph( ... )
+"******************************************************************************
+"* PURPOSE:
+"   A drop-in replacement for getcharstr() that also handles digraphs; i.e. a
+"   combination of CTRL-K + char1 + char2. Only supports real two-char digraphs,
+"   not the CTRL-K + {special-key} form.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:expr  Same as for |getcharstr()|.
+"* RETURN VALUES:
+"   Same as for |getcharstr()|.
+"******************************************************************************
+    let l:char = call('ingo#compat#getcharstr', a:000)
+    if empty(l:char) || empty(g:IngoLibrary_DigraphTriggerKey) || l:char !=# g:IngoLibrary_DigraphTriggerKey
+	return l:char
+    endif
+
+    let l:firstDigraphChar = call('ingo#compat#getcharstr', a:000)
+    if empty(l:firstDigraphChar)
+	return l:char
+    endif
+
+    let l:secondDigraphChar = call('ingo#compat#getcharstr', a:000)
+    if empty(l:secondDigraphChar)
+	return l:char . l:firstDigraphChar
+    endif
+
+    return ingo#digraph#Get(l:firstDigraphChar, l:secondDigraphChar)
+endfunction
+
 function! ingo#query#get#Char( ... )
 "******************************************************************************
 "* PURPOSE:

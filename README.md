@@ -147,6 +147,12 @@ If you have mapped alternatives for v / V / CTRL-V, define them as keys in:
 
     let g:IngoLibrary_QueryMotionCustomMotionModifiers = {"\<C-q>": 1}
 
+If you've remapped the c\_CTRL-K trigger key for digraphs, you can adapt the
+digraph detection by ingo#query#get#CharOrDigraph() and
+ingo#query#get#[Valid]Char() to the changed mapping via:
+
+    let g:IngoLibrary_DigraphTriggerKey = "\<C-k>"
+
 INSTALLATION
 ------------------------------------------------------------------------------
 
@@ -201,6 +207,7 @@ HISTORY
   a:invalidRegisterExpr into option Dict values and add
   a:options.additionalValidExpr
 - Add ingo/digraph.vim module.
+- Add ingo#query#get#CharOrDigraph().
 
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of
