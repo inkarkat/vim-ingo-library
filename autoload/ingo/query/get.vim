@@ -143,17 +143,26 @@ function! ingo#query#get#Register( ... )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:errorRegister     Register name to be returned when aborted or invalid
-"			register. Defaults to the empty string. Use '\' to yield
-"			an empty string (from getreg()) when passing the
-"			function's results directly to getreg().
-"   a:invalidRegisterExpr   Optional pattern for invalid registers.
+"   a:options.errorRegister Optional register name to be returned when aborted
+"                           or invalid register. Defaults to the empty string.
+"                           Use '\' to yield an empty string (from getreg())
+"                           when passing the function's results directly to
+"                           getreg().
+"   a:options.additionalValidExpr   Unanchored pattern for additional valid
+"                                   characters.
+"   a:options.invalidRegisterExpr   Optional pattern for invalid registers.
 "* RETURN VALUES:
-"   Either the register, or an a:errorRegister when aborted or invalid register.
+"   Either the register, an additional allowed character, or an
+"   a:options.errorRegister when aborted or invalid register.
 "******************************************************************************
-    let l:errorRegister = (a:0 ? a:1 : '')
+    let l:options = (a:0 ? a:1 : {})
+    let l:errorRegister = get(l:options, 'errorRegister', '')
+    let l:additionalValidExpr = get(l:options, 'additionalValidExpr', '')
     try
-	let l:register = ingo#query#get#Char({'validExpr': ingo#register#All(), 'invalidExpr': (a:0 >= 2 ? a:2 : '')})
+	let l:register = ingo#query#get#Char({
+	\   'validExpr': ingo#register#All() . (empty(l:additionalValidExpr) ? '' : '\|' . l:additionalValidExpr),
+	\   'invalidExpr': get(l:options, 'invalidRegisterExpr', '')
+	\})
 	return (empty(l:register) ? l:errorRegister : l:register)
     catch /^Vim\%((\a\+)\)\=:E523:/ " E523: Not allowed here
 	return l:errorRegister
@@ -168,18 +177,26 @@ function! ingo#query#get#WritableRegister( ... )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:errorRegister     Register name to be returned when aborted or invalid
-"			register. Defaults to the empty string. Use '\' to yield
-"			an empty string (from getreg()) when passing the
-"			function's results directly to getreg().
-"   a:invalidRegisterExpr   Optional pattern for invalid registers.
+"   a:options.errorRegister Optional register name to be returned when aborted
+"                           or invalid register. Defaults to the empty string.
+"                           Use '\' to yield an empty string (from getreg())
+"                           when passing the function's results directly to
+"                           getreg().
+"   a:options.additionalValidExpr   Unanchored pattern for additional valid
+"                                   characters.
+"   a:options.invalidRegisterExpr   Optional pattern for invalid registers.
 "* RETURN VALUES:
-"   Either the writable register, or an a:errorRegister when aborted or invalid
-"   register.
+"   Either the writable, an additional allowed character, or an
+"   a:options.errorRegister when aborted or invalid register.
 "******************************************************************************
-    let l:errorRegister = (a:0 ? a:1 : '')
+    let l:options = (a:0 ? a:1 : {})
+    let l:errorRegister = get(l:options, 'errorRegister', '')
+    let l:additionalValidExpr = get(l:options, 'additionalValidExpr', '')
     try
-	let l:register = ingo#query#get#Char({'validExpr': ingo#register#Writable(), 'invalidExpr': (a:0 >= 2 ? a:2 : '')})
+	let l:register = ingo#query#get#Char({
+	\   'validExpr': ingo#register#Writable() . (empty(l:additionalValidExpr) ? '' : '\|' . l:additionalValidExpr),
+	\   'invalidExpr': get(l:options, 'invalidRegisterExpr', '')
+	\})
 	return (empty(l:register) ? l:errorRegister : l:register)
     catch /^Vim\%((\a\+)\)\=:E523:/ " E523: Not allowed here
 	return l:errorRegister

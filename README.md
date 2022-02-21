@@ -197,6 +197,9 @@ HISTORY
 - Add ingo#query#motion#Get().
 - Add ingo#compat#getcharstr().
 - Add ingo#regexp#Anchored().
+- CHG: ingo#query#get#[Writable]Register(): Turn a:errorRegister and
+  a:invalidRegisterExpr into option Dict values and add
+  a:options.additionalValidExpr
 
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of

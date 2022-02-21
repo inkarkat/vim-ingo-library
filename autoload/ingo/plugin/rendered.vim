@@ -241,8 +241,8 @@ function! ingo#plugin#rendered#ListJoinedOrBraceExpression( what, braceOptions, 
     if l:command ==# 'Quit'
 	return [l:command, '']
     elseif l:command ==# 'Yank'
-	call ingo#msg#HighlightMsg('Register ([a-zA-Z0-9"*+] <Enter> for default): ', 'Question')
-	let l:register = ingo#query#get#Char({'validExpr': ingo#register#Writable() . '\|\r'})
+	call ingo#msg#HighlightMsg('Register ([a-zA-Z0-9"*+-] <Enter> for default): ', 'Question')
+	let l:register = ingo#query#get#WritableRegister({'additionalValidExpr': '\r', 'invalidRegisterExpr': '_'})
 	if empty(l:register) | return ['Quit', ''] | endif
 	let l:register = (l:register ==# "\<C-m>" ? '' : l:register)
 	let [l:command, l:result] = ingo#plugin#rendered#List('yanked ' . a:what, l:renderer, [], l:result)
