@@ -273,8 +273,22 @@ function! ingo#regexp#IsValid( expr, ... )
     endtry
 endfunction
 
-function! ingo#regexp#Anchored( expr ) abort
-    return '^\%(' . a:expr . '\)$'
+function! ingo#regexp#Anchored( expr, ... ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Anchor the passed a:expr to beginning and end (by wrapping with ^ and $).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:expr  Regular expression in normal magic format.
+"   a:emptyExpr Return value if a:expr is empty; by default, matches an empty
+"               String / line (^$).
+"* RETURN VALUES:
+"   Embellished a:expr.
+"******************************************************************************
+    return (empty(a:expr) ? (a:0 ? a:1 : '^$') : '^\%(' . a:expr . '\)$')
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
