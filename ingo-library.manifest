@@ -61,6 +61,7 @@ autoload/ingo/dict.vim
 autoload/ingo/dict/count.vim
 autoload/ingo/dict/find.vim
 autoload/ingo/digest.vim
+autoload/ingo/digraph.vim
 autoload/ingo/encoding.vim
 autoload/ingo/err.vim
 autoload/ingo/escape.vim

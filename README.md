@@ -200,6 +200,7 @@ HISTORY
 - CHG: ingo#query#get#[Writable]Register(): Turn a:errorRegister and
   a:invalidRegisterExpr into option Dict values and add
   a:options.additionalValidExpr
+- Add ingo/digraph.vim module.
 
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of
