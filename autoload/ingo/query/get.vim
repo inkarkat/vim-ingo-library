@@ -30,11 +30,11 @@ function! ingo#query#get#Number( maxNum, ... )
     let l:nr = 0
     let l:leadingZeroCnt = 0
     while 1
-	let l:char = nr2char(getchar())
+	let l:char = ingo#compat#getcharstr()
 
 	if l:char ==# "\<CR>"
 	    return (l:nr == 0 ? (a:0 ? a:1 : -1) : l:nr)
-	elseif l:char !~# '\d'
+	elseif l:char !~# ingo#regexp#Anchored('\d')
 	    return -1
 	endif
 	echon l:char
