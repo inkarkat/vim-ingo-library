@@ -243,7 +243,7 @@ function! ingo#plugin#rendered#ListJoinedOrBraceExpression( what, braceOptions, 
     elseif l:command ==# 'Yank'
 	call ingo#msg#HighlightMsg('Register ([a-zA-Z0-9"*+] <Enter> for default): ', 'Question')
 	let l:register = ingo#query#get#Char({'validExpr': ingo#register#Writable() . '\|\r'})
-	if empty(l:register) | continue | endif
+	if empty(l:register) | return ['Quit', ''] | endif
 	let l:register = (l:register ==# "\<C-m>" ? '' : l:register)
 	let [l:command, l:result] = ingo#plugin#rendered#List('yanked ' . a:what, l:renderer, [], l:result)
 	if empty(l:command)
