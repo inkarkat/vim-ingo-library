@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2020 Ingo Karkat
+" Copyright: (C) 2012-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -53,14 +53,6 @@ function! ingo#query#get#Number( maxNum, ... )
     endwhile
 endfunction
 
-function! s:GetChar()
-    " TODO: Handle digraphs via <C-K>.
-    let l:char = getchar()
-    if type(l:char) == type(0)
-	let l:char = nr2char(l:char)
-    endif
-    return l:char
-endfunction
 function! ingo#query#get#Char( ... )
 "******************************************************************************
 "* PURPOSE:
@@ -86,7 +78,7 @@ function! ingo#query#get#Char( ... )
     let l:validExpr = get(l:options, 'validExpr', '')
     let l:invalidExpr = get(l:options, 'invalidExpr', '')
 
-    let l:char = s:GetChar()
+    let l:char = ingo#compat#getcharstr()
     if l:char ==# "\<Esc>" && (empty(l:validExpr) || l:char !~ l:validExpr)
 	return ''
     elseif (! empty(l:validExpr) && l:char !~ l:validExpr) ||
@@ -125,7 +117,7 @@ function! ingo#query#get#ValidChar( ... )
     let l:invalidExpr = get(l:options, 'invalidExpr', '')
 
     while 1
-	let l:char = s:GetChar()
+	let l:char = ingo#compat#getcharstr()
 
 	if l:char ==# "\<Esc>" && (empty(l:validExpr) || l:char !~ l:validExpr)
 	    return ''
