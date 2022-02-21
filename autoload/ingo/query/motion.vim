@@ -101,7 +101,7 @@ function! ingo#query#motion#Get( ... ) abort
 	    endif
 	else
 	    let l:motionAppendage .= l:key
-	    let l:appendageMatches = matchlist(l:motionAppendage, '^\%(' . l:appendagePattern . '\)$')
+	    let l:appendageMatches = matchlist(l:motionAppendage, ingo#regexp#Anchored(l:appendagePattern))
 	    if empty(l:appendageMatches)
 		return ''   " Invalid appendage.
 	    elseif ! empty(l:appendageMatches[1])   " Something is in the first capture group.

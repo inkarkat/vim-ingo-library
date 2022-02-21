@@ -30,11 +30,11 @@ function! ingo#query#get#Number( maxNum, ... )
     let l:nr = 0
     let l:leadingZeroCnt = 0
     while 1
-	let l:char = nr2char(getchar())
+	let l:char = ingo#compat#getcharstr()
 
 	if l:char ==# "\<CR>"
 	    return (l:nr == 0 ? (a:0 ? a:1 : -1) : l:nr)
-	elseif l:char !~# '\d'
+	elseif l:char !~# ingo#regexp#Anchored('\d')
 	    return -1
 	endif
 	echon l:char
@@ -64,11 +64,11 @@ function! ingo#query#get#Char( ... )
 "* INPUTS:
 "   a:options.isBeepOnInvalid   Flag whether to beep on invalid pattern (but not
 "				when aborting with <Esc>). Default on.
-"   a:options.validExpr         Pattern for valid characters. Aborting with
-"				<Esc> is always possible, but if you add \e, it
-"				will be returned as ^[.
-"   a:options.invalidExpr       Pattern for invalid characters. Takes precedence
-"				over a:options.validExpr.
+"   a:options.validExpr         Unanchored pattern for valid characters.
+"                               Aborting with <Esc> is always possible, but if
+"                               you add \e, it will be returned as ^[.
+"   a:options.invalidExpr       Unanchored pattern for invalid characters.
+"                               Takes precedence over a:options.validExpr.
 "* RETURN VALUES:
 "   Either the valid character, or an empty string when aborted or invalid
 "   character.
@@ -79,10 +79,10 @@ function! ingo#query#get#Char( ... )
     let l:invalidExpr = get(l:options, 'invalidExpr', '')
 
     let l:char = ingo#compat#getcharstr()
-    if l:char ==# "\<Esc>" && (empty(l:validExpr) || l:char !~ l:validExpr)
+    if l:char ==# "\<Esc>" && (empty(l:validExpr) || l:char !~ ingo#regexp#Anchored(l:validExpr))
 	return ''
-    elseif (! empty(l:validExpr) && l:char !~ l:validExpr) ||
-    \   (! empty(l:invalidExpr) && l:char =~ l:invalidExpr)
+    elseif (! empty(l:validExpr) && l:char !~ ingo#regexp#Anchored(l:validExpr)) ||
+    \   (! empty(l:invalidExpr) && l:char =~ ingo#regexp#Anchored(l:invalidExpr))
 	if l:isBeepOnInvalid
 	    execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
 	endif
@@ -103,11 +103,11 @@ function! ingo#query#get#ValidChar( ... )
 "* INPUTS:
 "   a:options.isBeepOnInvalid   Flag whether to beep on invalid pattern (but not
 "				when aborting with <Esc>). Default on.
-"   a:options.validExpr         Pattern for valid characters. Aborting with
-"				<Esc> is always possible, but if you add \e, it
-"				will be returned as ^[.
-"   a:options.invalidExpr       Pattern for invalid characters. Takes precedence
-"				over a:options.validExpr.
+"   a:options.validExpr         Unanchored pattern for valid characters.
+"                               Aborting with <Esc> is always possible, but if
+"                               you add \e, it will be returned as ^[.
+"   a:options.invalidExpr       Unanchored pattern for invalid characters. Takes
+"                               precedence over a:options.validExpr.
 "* RETURN VALUES:
 "   Either the valid character, or an empty string when aborted.
 "******************************************************************************
@@ -119,10 +119,10 @@ function! ingo#query#get#ValidChar( ... )
     while 1
 	let l:char = ingo#compat#getcharstr()
 
-	if l:char ==# "\<Esc>" && (empty(l:validExpr) || l:char !~ l:validExpr)
+	if l:char ==# "\<Esc>" && (empty(l:validExpr) || l:char !~ ingo#regexp#Anchored(l:validExpr))
 	    return ''
-	elseif (! empty(l:validExpr) && l:char !~ l:validExpr) ||
-	\   (! empty(l:invalidExpr) && l:char =~ l:invalidExpr)
+	elseif (! empty(l:validExpr) && l:char !~ ingo#regexp#Anchored(l:validExpr)) ||
+	\   (! empty(l:invalidExpr) && l:char =~ ingo#regexp#Anchored(l:invalidExpr))
 	    if l:isBeepOnInvalid
 		execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
 	    endif

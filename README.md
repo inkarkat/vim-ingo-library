@@ -196,6 +196,7 @@ HISTORY
   contents to the search history when the target register is "/".
 - Add ingo#query#motion#Get().
 - Add ingo#compat#getcharstr().
+- Add ingo#regexp#Anchored().
 
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of
