@@ -105,6 +105,8 @@ function! ingo#query#get#Char( ... )
 "                               you add \e, it will be returned as ^[.
 "   a:options.invalidExpr       Unanchored pattern for invalid characters.
 "                               Takes precedence over a:options.validExpr.
+"   a:options.isAllowDigraphs   Flag (default true) whether digraphs (CTRL-K +
+"                               char1 + char2) can be entered as well.
 "* RETURN VALUES:
 "   Either the valid character, or an empty string when aborted or invalid
 "   character.
@@ -113,8 +115,9 @@ function! ingo#query#get#Char( ... )
     let l:isBeepOnInvalid = get(l:options, 'isBeepOnInvalid', 1)
     let l:validExpr = get(l:options, 'validExpr', '')
     let l:invalidExpr = get(l:options, 'invalidExpr', '')
+    let l:GetChar = (get(l:options, 'isAllowDigraphs', 1) ? function('ingo#query#get#CharOrDigraph') : function('ingo#compat#getcharstr'))
 
-    let l:char = ingo#compat#getcharstr()
+    let l:char = call(l:GetChar, [])
     if l:char ==# "\<Esc>" && (empty(l:validExpr) || l:char !~ ingo#regexp#Anchored(l:validExpr))
 	return ''
     elseif (! empty(l:validExpr) && l:char !~ ingo#regexp#Anchored(l:validExpr)) ||
@@ -144,6 +147,8 @@ function! ingo#query#get#ValidChar( ... )
 "                               you add \e, it will be returned as ^[.
 "   a:options.invalidExpr       Unanchored pattern for invalid characters. Takes
 "                               precedence over a:options.validExpr.
+"   a:options.isAllowDigraphs   Flag (default true) whether digraphs (CTRL-K +
+"                               char1 + char2) can be entered as well.
 "* RETURN VALUES:
 "   Either the valid character, or an empty string when aborted.
 "******************************************************************************
@@ -151,9 +156,10 @@ function! ingo#query#get#ValidChar( ... )
     let l:isBeepOnInvalid = get(l:options, 'isBeepOnInvalid', 1)
     let l:validExpr = get(l:options, 'validExpr', '')
     let l:invalidExpr = get(l:options, 'invalidExpr', '')
+    let l:GetChar = (get(l:options, 'isAllowDigraphs', 1) ? function('ingo#query#get#CharOrDigraph') : function('ingo#compat#getcharstr'))
 
     while 1
-	let l:char = ingo#compat#getcharstr()
+	let l:char = call(l:GetChar, [])
 
 	if l:char ==# "\<Esc>" && (empty(l:validExpr) || l:char !~ ingo#regexp#Anchored(l:validExpr))
 	    return ''
@@ -197,7 +203,8 @@ function! ingo#query#get#Register( ... )
     try
 	let l:register = ingo#query#get#Char({
 	\   'validExpr': ingo#register#All() . (empty(l:additionalValidExpr) ? '' : '\|' . l:additionalValidExpr),
-	\   'invalidExpr': get(l:options, 'invalidRegisterExpr', '')
+	\   'invalidExpr': get(l:options, 'invalidRegisterExpr', ''),
+	\   'isAllowDigraphs': 0,
 	\})
 	return (empty(l:register) ? l:errorRegister : l:register)
     catch /^Vim\%((\a\+)\)\=:E523:/ " E523: Not allowed here
@@ -231,7 +238,8 @@ function! ingo#query#get#WritableRegister( ... )
     try
 	let l:register = ingo#query#get#Char({
 	\   'validExpr': ingo#register#Writable() . (empty(l:additionalValidExpr) ? '' : '\|' . l:additionalValidExpr),
-	\   'invalidExpr': get(l:options, 'invalidRegisterExpr', '')
+	\   'invalidExpr': get(l:options, 'invalidRegisterExpr', ''),
+	\   'isAllowDigraphs': 0,
 	\})
 	return (empty(l:register) ? l:errorRegister : l:register)
     catch /^Vim\%((\a\+)\)\=:E523:/ " E523: Not allowed here
@@ -257,7 +265,8 @@ function! ingo#query#get#Mark( ... )
     try
 	return ingo#query#get#Char({
 	\   'validExpr': '[a-zA-Z0-9''`"[\]<>^.(){}]',
-	\   'invalidExpr': (a:0 ? (a:1 is# 1 ? '[0-9^.(){}]' : a:1) : '')
+	\   'invalidExpr': (a:0 ? (a:1 is# 1 ? '[0-9^.(){}]' : a:1) : ''),
+	\   'isAllowDigraphs': 0,
 	\})
     catch /^Vim\%((\a\+)\)\=:E523:/ " E523: Not allowed here
 	return ''
