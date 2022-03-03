@@ -210,6 +210,7 @@ HISTORY
 - Add ingo#query#get#CharOrDigraph().
 - ENH: ingo#query#get#[Valid]Char() takes digraphs by default; can be disabled
   via a:options.isAllowDigraphs = 0.
+- Add ingo#syntaxitem#HasHighlighting() from SameSyntaxMotion.vim.
 
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of
