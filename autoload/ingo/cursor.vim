@@ -6,12 +6,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.030.003	10-Feb-2017	Add ingo#cursor#StartInsert() and
-"				ingo#cursor#StartAppend().
-"   1.018.002	10-Apr-2014	Add ingo#cursor#IsAtEndOfLine().
-"   1.016.001	11-Dec-2013	file creation
 
 function! ingo#cursor#Set( lnum, virtcol )
 "******************************************************************************
@@ -76,6 +70,13 @@ function! ingo#cursor#IsBeyondEndOfLine( ... )
 "******************************************************************************
     let l:mark = (a:0 ? a:1 : '.')
     return (col(l:mark) + len(matchstr(getline(l:mark), '.$')) > col('$'))    " I18N: Cannot just add 1; need to consider the byte length of the last character in the line.
+endfunction
+
+function! ingo#cursor#IsOnWhitespace() abort
+    return search('\%#\s', 'cnW', line('.')) != 0
+endfunction
+function! ingo#cursor#IsOnEmptyLine() abort
+    return empty(getline('.'))
 endfunction
 
 
