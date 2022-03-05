@@ -227,6 +227,9 @@ HISTORY							*ingo-library-history*
   via a:options.isAllowDigraphs = 0.
 - Add ingo#syntaxitem#HasHighlighting() from SameSyntaxMotion.vim.
 - Add ingo#cursor#IsOnWhitespace() and ingo#cursor#IsOnEmptyLine().
+- ingo#{area,text}#frompattern#Get(): ENH: Add cursorPos and additional
+  arguments to context object, allow Predicate to influence returned result.
+- ingo#area#frompattern#Get(): BUG: a:matchCount uninitialized
 
 1.043	04-Feb-2022
 - Minor: Actually support no-argument form of
