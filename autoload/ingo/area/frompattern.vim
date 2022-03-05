@@ -190,7 +190,7 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, ... )
     let l:isOnlyFirstMatch = (a:0 >= 1 ? a:1 : 0)
     let l:isUnique = (a:0 >= 2 ? a:2 : 0)
     let l:Predicate = (a:0 >= 3 ? a:3 : 0)
-    let l:context = {'cursorPos': getpos('.')[1:2], 'match': '', 'matchStart': [], 'matchEnd': [], 'matchArea': [], 'acceptedCount': 0, 'a': a:000[4:], 'n': 0, 'm': 1, 'l': [], 'd': {}, 's': ''}
+    let l:context = {'cursorPos': getpos('.')[1:2], 'match': '', 'matchStart': [], 'matchEnd': [], 'matchArea': [], 'matchCount': 0, 'acceptedCount': 0, 'a': a:000[4:], 'n': 0, 'm': 1, 'l': [], 'd': {}, 's': ''}
 
     let l:save_view = winsaveview()
 	let l:areas = []
