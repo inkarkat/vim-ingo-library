@@ -159,7 +159,9 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, ... )
 "			matchEnd:   [lnum, col] of the match end (this is also
 "				    the cursor position)
 "			replacement:current replacement text (if passed, else
-"				    equal to match)
+"				    equal to match); this will be added to the
+"				    returned List, so the predicate can modify
+"				    it
 "			matchCount: number of current (unique) match of {pattern}
 "			acceptedCount:
 "				    number of matches already accepted by the
@@ -205,7 +207,7 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, ... )
 	    if ! s:PredicateCheck(l:Predicate, l:context, l:originalMatch, l:match, l:startPos, l:endPos)
 		continue
 	    endif
-	    call add(l:matches, l:match)
+	    call add(l:matches, l:context.replacement)
 "****D echomsg '****' string(l:startPos) string(l:endPos) string(l:match)
 	    if l:isOnlyFirstMatch
 		normal! $
@@ -215,12 +217,12 @@ function! ingo#text#frompattern#Get( firstLine, lastLine, pattern, ... )
     return l:matches
 endfunction
 function! s:PredicateCheck( Predicate, context, match, replacement, startPos, endPos ) abort
+    let a:context.replacement = a:replacement
     if empty(a:Predicate) | return 1 | endif
 
     let a:context.match = a:match
     let a:context.matchStart = a:startPos
     let a:context.matchEnd = a:endPos
-    let a:context.replacement = a:replacement
     let a:context.matchCount += 1
 
     let l:isAccepted = call(a:Predicate, [a:context])

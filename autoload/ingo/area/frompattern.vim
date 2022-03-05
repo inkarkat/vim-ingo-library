@@ -170,6 +170,9 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, ... )
 "			matchStart: [lnum, col] of the match start
 "			matchEnd:   [lnum, col] of the match end (this is also
 "				    the cursor position)
+"			matchArea:  [[startLnum, startCol], [endLnum, endCol]];
+"				    this will be added to the returned List, so
+"				    the predicate can modify it
 "			matchCount: number of current (unique) match of {pattern}
 "			acceptedCount:
 "				    number of matches already accepted by the
@@ -187,7 +190,7 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, ... )
     let l:isOnlyFirstMatch = (a:0 >= 1 ? a:1 : 0)
     let l:isUnique = (a:0 >= 2 ? a:2 : 0)
     let l:Predicate = (a:0 >= 3 ? a:3 : 0)
-    let l:context = {'cursorPos': getpos('.')[1:2], 'match': '', 'matchStart': [], 'matchEnd': [], 'acceptedCount': 0, 'a': a:000[4:], 'n': 0, 'm': 1, 'l': [], 'd': {}, 's': ''}
+    let l:context = {'cursorPos': getpos('.')[1:2], 'match': '', 'matchStart': [], 'matchEnd': [], 'matchArea': [], 'acceptedCount': 0, 'a': a:000[4:], 'n': 0, 'm': 1, 'l': [], 'd': {}, 's': ''}
 
     let l:save_view = winsaveview()
 	let l:areas = []
@@ -211,9 +214,11 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, ... )
 		if ! s:PredicateCheck(l:Predicate, l:context, l:match, l:startPos, l:endPos)
 		    continue
 		endif
+	    else
+		let l:context.matchArea = [l:startPos, l:endPos]
 	    endif
 
-	    call add(l:areas, [l:startPos, l:endPos])
+	    call add(l:areas, l:context.matchArea)
 "****D echomsg '****' string(l:startPos) string(l:endPos)
 	    if l:isOnlyFirstMatch
 		normal! $
@@ -223,6 +228,7 @@ function! ingo#area#frompattern#Get( firstLine, lastLine, pattern, ... )
     return l:areas
 endfunction
 function! s:PredicateCheck( Predicate, context, match, startPos, endPos ) abort
+    let a:context.matchArea = [a:startPos, a:endPos]
     if empty(a:Predicate) | return 1 | endif
 
     let a:context.match = a:match
