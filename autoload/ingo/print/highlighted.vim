@@ -22,7 +22,7 @@ function! s:GetCharacter( line, column )
 "* RETURN VALUES:
 "   Character, or empty string if the position is invalid.
 "*******************************************************************************
-    return matchstr( a:line, '\%' . a:column . 'c.' )
+    return matchstr(a:line, '\%' . a:column . 'c.')
 endfunction
 
 function! s:GetTabReplacement( column, tabstop )
@@ -40,28 +40,25 @@ function! s:IsMoreToRead( column )
     " The end column has not been reached yet, but a maximum length has been
     " set. We need to determine whether the next character would still fit.
     let l:isMore =  (ingo#mbyte#virtcol#GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1 <= s:maxLength)
-
 "****D echomsg 'at column' a:column strpart(getline(s:lineNum), a:column - 1, 1) 'will have length' (ingo#mbyte#virtcol#GetVirtColOfCurrentCharacter(s:lineNum, a:column) - s:virtStartCol + 1) (l:isMore ? 'do it' : 'stop')
-
     return l:isMore
 endfunction
 function! s:IsInside( startCol, endCol, column )
-    return a:column >= a:startCol && a:column <= a:endCol
+    return (a:column >= a:startCol && a:column <= a:endCol)
 endfunction
 function! s:GetAdditionalHighlightGroup( column )
-    for h in s:additionalHighlighting
-	if s:IsInside( h[0], h[1], a:column )
-	    return h[2]
+    for l:h in s:additionalHighlighting
+	if s:IsInside(l:h[0], l:h[1], a:column)
+	    return l:h[2]
 	endif
     endfor
+    return ''
 endfunction
 function! s:GetHighlighting( line, column )
-    let l:group = s:GetAdditionalHighlightGroup( a:column )
-    if empty(l:group)
-	let l:group = synIDattr(synID(a:line, a:column, 1), 'name')
-    endif
-    return l:group
+    let l:group = s:GetAdditionalHighlightGroup(a:column)
+    return (empty(l:group) ? synIDattr(synID(a:line, a:column, 1), 'name') : l:group)
 endfunction
+
 function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength, additionalHighlighting )
 "*******************************************************************************
 "* PURPOSE:
@@ -110,7 +107,7 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
 	let l:char = s:GetCharacter(l:line, l:column)
 	let l:group = s:GetHighlighting(a:lineNum, l:column)
 
-	if l:char =~ '\%(\p\@![\x00-\xFF]\)'
+	if l:char =~# '\%(\p\@![\x00-\xFF]\)'
 	    " Emulate the built-in highlighting of translated unprintable
 	    " characters here. The regexp also matches <CR> and <LF>, but no
 	    " non-ASCII multi-byte characters; the 'isprint' option is not
@@ -133,12 +130,12 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
 	" The :echo command observes embedded line breaks (in contrast to
 	" :echomsg), which would mess up a single-line message that contains
 	" embedded \n = <CR> = ^M or <LF> = ^@.
-	if l:char == "\t"
+	if l:char ==# "\t"
 	    let l:width = s:GetTabReplacement(ingo#mbyte#virtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
 	    let l:cmd .= repeat('.', l:width)
-	elseif l:char == "\<CR>"
+	elseif l:char ==# "\<CR>"
 	    let l:cmd .= '^M'
-	elseif l:char == "\<LF>"
+	elseif l:char ==# "\<LF>"
 	    let l:cmd .= '^@'
 	else
 	    let l:cmd .= escape(l:char, '"\')
@@ -147,7 +144,7 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
     endwhile
 "****D echomsg '**** from' s:virtStartCol 'last col added' l:column - 1 | echomsg ''
 
-    if a:maxLength > 0 && s:GetCharacter(l:line, l:column) == "\t"
+    if a:maxLength > 0 && s:GetCharacter(l:line, l:column) ==# "\t"
 	" The line has been truncated before a <Tab> character, so the maximum
 	" length has not been used up. As there may be a highlighting prolonged
 	" by the <Tab>, we still want to fill up the maximum length.
@@ -159,8 +156,8 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
     endif
 
     let l:cmd .= '"|echohl None'
-    "DEBUG call input('CMD='.l:cmd)
-    exe l:cmd
+"****D call input('CMD='.l:cmd)
+    execute l:cmd
 endfunction
 
 function! ingo#print#highlighted#Line( lineNum, centerCol, prefix, additionalHighlighting )
@@ -191,7 +188,6 @@ function! ingo#print#highlighted#Line( lineNum, centerCol, prefix, additionalHig
 "* RETURN VALUES:
 "   none
 "*******************************************************************************
-
     let l:maxLength = ingo#avoidprompt#MaxLength() - ingo#compat#strdisplaywidth(a:prefix)
     let l:line = getline(line('.'))
 
@@ -201,12 +197,11 @@ function! ingo#print#highlighted#Line( lineNum, centerCol, prefix, additionalHig
     let l:numOfChars = strlen(substitute(ingo#tabstops#Render(l:line), '.', 'x', 'g'))
     let l:lengthToColFactor = 100 * l:numOfChars / strlen(l:line)
 "****D echomsg '****' l:lengthToColFactor
-
     " Attention: columns start with 1, byteidx() starts with 0!
     let l:startCol = byteidx( l:line, max([1, (a:centerCol * l:lengthToColFactor / 100) - (l:maxLength / 2)]) - 1 ) + 1
 
     echon a:prefix
-    call ingo#print#highlighted#LinePart( a:lineNum, l:startCol, 0, l:maxLength, a:additionalHighlighting )
+    call ingo#print#highlighted#LinePart(a:lineNum, l:startCol, 0, l:maxLength, a:additionalHighlighting)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
