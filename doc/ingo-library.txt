@@ -235,6 +235,7 @@ HISTORY							*ingo-library-history*
 - ingo#area#frompattern#Get(): BUG: a:matchCount uninitialized
 - Add ingo/print/highlighted.vim module (formerly unpublished separate
   EchoLine.vim autoload script).
+- ingo#option#listchars#Render(): ENH: Add a:options.tabWidth.
 
 1.043	04-Feb-2022
 - Minor: Actually support no-argument form of
