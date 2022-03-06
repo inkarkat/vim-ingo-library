@@ -1,66 +1,14 @@
-" EchoLine.vim: :echo a line from the buffer with the original syntax
-" highlighting.
+" ingo/print/highlighted.vim: :echo a line from the buffer with the original syntax highlighting.
 "
-" DESCRIPTION:
-"   Display the given line from the current buffer in the command line (i.e. via
-"   :echo), using that line's syntax highlighting (i.e. as it is highlighted in
-"   the buffer itself).
-"   If the line is longer than the available width in the command line, the
-"   output is truncated so that no hit-enter prompt appears.
-"
-" USAGE:
-" INSTALLATION:
-"   Put the script into your user or system Vim autoload directory (e.g.
-"   ~/.vim/autoload).
-
 " DEPENDENCIES:
-"   - Requires Vim 7.0 or higher.
-"   - ingo/avoidprompt.vim autoload script
-"   - ingo/compat.vim autoload script
-"   - ingo/mbyte/virtcol.vim autoload script
-"   - ingo/tabstops.vim autoload script
-"
-" CONFIGURATION:
-" INTEGRATION:
-" LIMITATIONS:
-" ASSUMPTIONS:
-" KNOWN PROBLEMS:
 " TODO:
 "   - <Tab> are currently always rendered as ......; maybe use the settings from
 "     'listchars'.
-"
-" Copyright: (C) 2008-2013 Ingo Karkat
+" Copyright: (C) 2008-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 " Source: Based on ShowLine.vim (vimscript #381) by Gary Holloway
-"
-" REVISION	DATE		REMARKS
-"	007	07-Jun-2013	Move EchoWithoutScrolling#DetermineVirtColNum()
-"				into ingo-library compat module.
-"   			    	Move EchoWithoutScrolling.vim into ingo-library.
-"   			    	Move EchoWithoutScrolling#RenderTabs() into
-"   			    	ingo-library tabstops module.
-"	006	05-Jun-2013	Additional arguments to
-"				EchoWithoutScrolling#RenderTabs() are now
-"				optional.
-"	005	08-Apr-2013	Move MultibyteVirtcol.vim functions into
-"				ingo-library.
-"	004	02-Jul-2009	Factored out s:GetVirt...Character() functions
-"				into MultibyteVirtcol.vim autoload script.
-"	003	15-May-2009	Cleanup.
-"				BF: Now translating <CR> and <LF> characters
-"				into printable characters instead of letting
-"				:echo break the line.
-"				BF: Using the correct 'SpecialKey' highlighting
-"				for unprintable characters like Vim does. This
-"				highlighting is not reported by synID(), and
-"				thus must be taken care of separately. As a nice
-"				side effect, the rendering of <Tab> characters
-"				uses this highlighting, too.
-"	002	04-Aug-2008	Added s:GetCharacter().
-"				Finished implementation.
-"	001	23-Jul-2008	file creation
 
 function! s:GetCharacter( line, column )
 "*******************************************************************************
@@ -116,7 +64,7 @@ function! s:GetHighlighting( line, column )
     endif
     return l:group
 endfunction
-function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additionalHighlighting )
+function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength, additionalHighlighting )
 "*******************************************************************************
 "* PURPOSE:
 "   Display the current buffer's a:lineNum in the command line, using that
@@ -217,7 +165,7 @@ function! EchoLine#EchoLinePart( lineNum, startCol, endCol, maxLength, additiona
     exe l:cmd
 endfunction
 
-function! EchoLine#EchoLine( lineNum, centerCol, prefix, additionalHighlighting )
+function! ingo#print#highlighted#Line( lineNum, centerCol, prefix, additionalHighlighting )
 "*******************************************************************************
 "* PURPOSE:
 "   Display (part of) the current buffer's a:lineNum in the command line without
@@ -260,7 +208,7 @@ function! EchoLine#EchoLine( lineNum, centerCol, prefix, additionalHighlighting 
     let l:startCol = byteidx( l:line, max([1, (a:centerCol * l:lengthToColFactor / 100) - (l:maxLength / 2)]) - 1 ) + 1
 
     echon a:prefix
-    call EchoLine#EchoLinePart( a:lineNum, l:startCol, 0, l:maxLength, a:additionalHighlighting )
+    call ingo#print#highlighted#LinePart( a:lineNum, l:startCol, 0, l:maxLength, a:additionalHighlighting )
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
