@@ -44,7 +44,7 @@ function! ingo#option#listchars#GetValue( element ) abort
     return get(ingo#option#listchars#GetValues(), a:element, '')
 endfunction
 
-function! ingo#option#listchars#Render( text, isTextAtEnd, ... ) abort
+function! ingo#option#listchars#Render( text, ... ) abort
 "******************************************************************************
 "* PURPOSE:
 "   Render a:text by replacing any special characters with the settings from
@@ -57,9 +57,10 @@ function! ingo#option#listchars#Render( text, isTextAtEnd, ... ) abort
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:text          Input text to be rendered.
-"   a:isTextAtEnd   Flag whether the "eol" and "trail" settings should be
-"                   rendered.
+"   a:text              Input text to be rendered.
+"   a:options.isTextAtEnd
+"                       Flag whether the "eol" and "trail" settings should be
+"                       rendered. Off by default.
 "   a:options.listchars Dict with defined 'listchars' settings as keys and their
 "                       character(s) as values, to take instead of the
 "                       'listchars' values.
@@ -71,7 +72,16 @@ function! ingo#option#listchars#Render( text, isTextAtEnd, ... ) abort
 "* RETURN VALUES:
 "   a:text with special characters replaced.
 "******************************************************************************
-    let l:options = (a:0 ? a:1 : {})
+    if a:0 == 0
+	let l:isTextAtEnd = 0
+	let l:options = {}
+    elseif a:0 == 1 && type(a:1) == type({})
+	let l:options = a:1
+	let l:isTextAtEnd = get(l:options, 'isTextAtEnd', 0)
+    else    " Deprecated: a:isTextAtEnd argument
+	let l:isTextAtEnd = a:1
+	let l:options = (a:0 >= 2 ? a:2 : {})
+    endif
     let l:listcharValues = get(l:options, 'listchars', ingo#option#listchars#GetValues())
     let l:fallbackValues = get(l:options, 'fallback', {})
     if has_key(l:listcharValues, 'tab')
@@ -88,7 +98,7 @@ function! ingo#option#listchars#Render( text, isTextAtEnd, ... ) abort
     \   ['tab', '\t'],
     \   ['space', ' '],
     \   ['nbsp', '\%xa0\|\%u202f']
-    \] + (a:isTextAtEnd ? [
+    \] + (l:isTextAtEnd ? [
     \       ['trail', ' \( *$\)\@='],
     \       ['eol', '$']
     \   ] : []

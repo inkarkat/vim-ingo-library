@@ -236,6 +236,8 @@ HISTORY							*ingo-library-history*
 - Add ingo/print/highlighted.vim module (formerly unpublished separate
   EchoLine.vim autoload script).
 - ingo#option#listchars#Render(): ENH: Add a:options.tabWidth.
+- ingo#option#listchars#Render(): CHG: Deprecate a:isTextAtEnd argument, use
+  a:options.isTextAtEnd now.
 
 1.043	04-Feb-2022
 - Minor: Actually support no-argument form of
