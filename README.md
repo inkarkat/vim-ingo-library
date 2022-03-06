@@ -176,8 +176,13 @@ To uninstall, use the :RmVimball command.
 
 - Requires Vim 7.0 or higher.
 
-CONTRIBUTING
+IDEAS
 ------------------------------------------------------------------------------
+
+- ingo#print#highlighted#Line(): &lt;Tab&gt; are currently always rendered as
+  ......; maybe use the settings from 'listchars'.
+
+### CONTRIBUTING
 
 Report any bugs, send patches, or suggest features via the issue tracker at
 https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
@@ -215,6 +220,8 @@ HISTORY
 - ingo#{area,text}#frompattern#Get(): ENH: Add cursorPos and additional
   arguments to context object, allow Predicate to influence returned result.
 - ingo#area#frompattern#Get(): BUG: a:matchCount uninitialized
+- Add ingo/print/highlighted.vim module (formerly unpublished separate
+  EchoLine.vim autoload script).
 
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of

@@ -139,6 +139,7 @@ autoload/ingo/plugin/rendered/Subset.vim
 autoload/ingo/plugin/setting.vim
 autoload/ingo/pos.vim
 autoload/ingo/print.vim
+autoload/ingo/print/highlighted.vim
 autoload/ingo/query.vim
 autoload/ingo/query/confirm.vim
 autoload/ingo/query/file.vim

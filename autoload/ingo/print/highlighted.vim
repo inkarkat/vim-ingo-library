@@ -1,9 +1,7 @@
 " ingo/print/highlighted.vim: :echo a line from the buffer with the original syntax highlighting.
 "
 " DEPENDENCIES:
-" TODO:
-"   - <Tab> are currently always rendered as ......; maybe use the settings from
-"     'listchars'.
+"
 " Copyright: (C) 2008-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
