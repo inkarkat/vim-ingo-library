@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2019 Ingo Karkat
+" Copyright: (C) 2019-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -75,7 +75,9 @@ function! ingo#option#listchars#Render( text, isTextAtEnd, ... ) abort
     let l:fallbackValues = get(l:options, 'fallback', {})
     if has_key(l:listcharValues, 'tab')
 	let l:thirdTabValue = matchstr(l:listcharValues.tab, '^..\zs.')
-	let l:listcharValues.tab = matchstr(l:listcharValues.tab, '^.') . repeat(matchstr(l:listcharValues.tab, '^.\zs.'), &tabstop - 1 - (! empty(l:thirdTabValue))) . l:thirdTabValue
+	let l:listcharValues.tab = matchstr(l:listcharValues.tab, '^.') .
+	\   repeat(matchstr(l:listcharValues.tab, '^.\zs.'), &tabstop - 1 - (! empty(l:thirdTabValue))) .
+	\   l:thirdTabValue
     endif
 
     let l:text = a:text

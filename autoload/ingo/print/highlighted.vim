@@ -7,6 +7,8 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 " Source: Based on ShowLine.vim (vimscript #381) by Gary Holloway
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! s:GetCharacter( line, column )
 "*******************************************************************************
@@ -56,7 +58,10 @@ function! s:GetAdditionalHighlightGroup( column )
 endfunction
 function! s:GetHighlighting( line, column )
     let l:group = s:GetAdditionalHighlightGroup(a:column)
-    return (empty(l:group) ? synIDattr(synID(a:line, a:column, 1), 'name') : l:group)
+    return (empty(l:group) ?
+    \	synIDattr(synID(a:line, a:column, 1), 'name') :
+    \	l:group
+    \)
 endfunction
 
 function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength, additionalHighlighting )
@@ -204,4 +209,6 @@ function! ingo#print#highlighted#Line( lineNum, centerCol, prefix, additionalHig
     call ingo#print#highlighted#LinePart(a:lineNum, l:startCol, 0, l:maxLength, a:additionalHighlighting)
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
