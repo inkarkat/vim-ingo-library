@@ -96,13 +96,13 @@ function! ingo#option#listchars#Render( text, ... ) abort
 
     for [l:setting, l:pattern] in [
     \   ['tab', '\t'],
-    \   ['space', ' '],
     \   ['nbsp', '\%xa0\|\%u202f']
     \] + (l:isTextAtEnd ? [
     \       ['trail', ' \( *$\)\@='],
     \       ['eol', '$']
     \   ] : []
-    \)
+    \) +
+    \   [['space', ' ']]
 	if has_key(l:listcharValues, l:setting)
 	    let l:replacement = l:listcharValues[l:setting]
 	elseif has_key(l:fallbackValues, l:setting)

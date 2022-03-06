@@ -238,6 +238,7 @@ HISTORY							*ingo-library-history*
 - ingo#option#listchars#Render(): ENH: Add a:options.tabWidth.
 - ingo#option#listchars#Render(): CHG: Deprecate a:isTextAtEnd argument, use
   a:options.isTextAtEnd now.
+- ingo#option#listchars#Render(): FIX: space rendering eclipses trail
 
 1.043	04-Feb-2022
 - Minor: Actually support no-argument form of
