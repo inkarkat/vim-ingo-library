@@ -58,6 +58,9 @@ function! ingo#option#listchars#Render( text, ... ) abort
 "   None.
 "* INPUTS:
 "   a:text              Input text to be rendered.
+"   a:options.isTextAtStart
+"                       Flag whether the "lead" setting should be rendered. Off
+"                       by default.
 "   a:options.isTextAtEnd
 "                       Flag whether the "eol" and "trail" settings should be
 "                       rendered. Off by default.
@@ -84,6 +87,7 @@ function! ingo#option#listchars#Render( text, ... ) abort
     endif
     let l:listcharValues = get(l:options, 'listchars', ingo#option#listchars#GetValues())
     let l:fallbackValues = get(l:options, 'fallback', {})
+    let l:isTextAtStart = get(l:options, 'isTextAtStart', 0)
     if has_key(l:listcharValues, 'tab')
 	let l:tabWidth = get(l:options, 'tabWidth', &tabstop)
 	let l:thirdTabValue = matchstr(l:listcharValues.tab, '^..\zs.')
@@ -100,6 +104,9 @@ function! ingo#option#listchars#Render( text, ... ) abort
     \] + (l:isTextAtEnd ? [
     \       ['trail', ' \( *$\)\@='],
     \       ['eol', '$']
+    \   ] : []
+    \) + (l:isTextAtStart ? [
+    \       ['lead', '\(^ *\)\@<= '],
     \   ] : []
     \) +
     \   [['space', ' ']]
