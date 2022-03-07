@@ -127,17 +127,19 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
 	    let l:prev_group = l:group
 	endif
 
-	" <Tab> characters are rendered so that:
-	" 1. The tab width is the same as in the buffer (even when the echoed
-	" position is shifted due to scrolling or a echo prefix).
-	" 2. It can be differentiated from a sequence of spaces.
+	" <Tab> characters are rendered so that the tab width is the same as in
+	" the buffer (even when the echoed position is shifted due to scrolling
+	" or a echo prefix).
 	"
 	" The :echo command observes embedded line breaks (in contrast to
 	" :echomsg), which would mess up a single-line message that contains
 	" embedded \n = <CR> = ^M or <LF> = ^@.
 	if l:char ==# "\t"
 	    let l:width = s:GetTabReplacement(ingo#mbyte#virtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
-	    let l:cmd .= repeat('.', l:width)
+	    let l:cmd .= (&list ?
+	    \   ingo#option#listchars#Render(l:char, 0, {'tabWidth': l:width, 'fallback': {'tab': '^I', 'space': '.'}}) :
+	    \   repeat(' ', l:width)
+	    \)
 	elseif l:char ==# "\<CR>"
 	    let l:cmd .= '^M'
 	elseif l:char ==# "\<LF>"
