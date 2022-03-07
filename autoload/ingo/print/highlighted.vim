@@ -96,6 +96,7 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
     let l:line = getline(a:lineNum)
 
     let l:column = (a:startCol == 0 ? 1 : a:startCol)
+    let l:additionalSpecialCharacterExpr = (&list ? '^\%( \|\%xa0\|\%u202f\)' : '')
 
     let s:virtStartCol = ingo#mbyte#virtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
     let s:endCol = (a:endCol == 0 ? strlen(l:line) : a:endCol)
@@ -112,7 +113,7 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
 	let l:char = s:GetCharacter(l:line, l:column)
 	let l:group = s:GetHighlighting(a:lineNum, l:column)
 
-	if l:char =~# '\%(\p\@![\x00-\xFF]\)'
+	if l:char =~# '\%(\p\@![\x00-\xFF]\)' || (! empty(l:additionalSpecialCharacterExpr) && l:char =~# l:additionalSpecialCharacterExpr)
 	    " Emulate the built-in highlighting of translated unprintable
 	    " characters here. The regexp also matches <CR> and <LF>, but no
 	    " non-ASCII multi-byte characters; the 'isprint' option is not
@@ -134,10 +135,10 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
 	" The :echo command observes embedded line breaks (in contrast to
 	" :echomsg), which would mess up a single-line message that contains
 	" embedded \n = <CR> = ^M or <LF> = ^@.
-	if l:char ==# "\t"
+	if l:char ==# "\t" || (! empty(l:additionalSpecialCharacterExpr) && l:char =~# l:additionalSpecialCharacterExpr)
 	    let l:width = s:GetTabReplacement(ingo#mbyte#virtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
 	    let l:cmd .= (&list ?
-	    \   ingo#option#listchars#Render(l:char, 0, {'tabWidth': l:width, 'fallback': {'tab': '^I', 'space': '.'}}) :
+	    \   ingo#option#listchars#Render(l:char, {'tabWidth': l:width, 'fallback': {'tab': '^I'}}) :
 	    \   repeat(' ', l:width)
 	    \)
 	elseif l:char ==# "\<CR>"
