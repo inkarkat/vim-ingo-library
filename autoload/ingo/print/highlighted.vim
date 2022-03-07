@@ -164,7 +164,10 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
 	if empty(l:cmd)
 	    let l:cmd .= 'echon "'
 	endif
-	let l:cmd .= repeat('.', l:width)
+	let l:cmd .= (&list ?
+	\   escape(ingo#option#listchars#Render(l:char, {'tabWidth': l:width, 'fallback': {'tab': '^I'}}), '"\') :
+	\   repeat(' ', l:width)
+	\)
     endif
 
     if a:maxLength != 1 && l:column > s:endCol && &list
