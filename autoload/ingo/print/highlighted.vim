@@ -142,7 +142,7 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
 	if l:char ==# "\t" || (! empty(l:additionalSpecialCharacterExpr) && l:char =~# l:additionalSpecialCharacterExpr)
 	    let l:width = s:GetTabReplacement(ingo#mbyte#virtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
 	    let l:cmd .= (&list ?
-	    \   ingo#option#listchars#Render(l:char, {'tabWidth': l:width, 'fallback': {'tab': '^I'}, 'isTextAtStart': l:isLeadingSpace}) :
+	    \   escape(ingo#option#listchars#Render(l:char, {'tabWidth': l:width, 'fallback': {'tab': '^I'}, 'isTextAtStart': l:isLeadingSpace}), '"\') :
 	    \   repeat(' ', l:width)
 	    \)
 	elseif l:char ==# "\<CR>"
@@ -170,7 +170,7 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
     if a:maxLength != 1 && l:column > s:endCol && &list
 	let l:char = ingo#option#listchars#Render('', {'isTextAtEnd': 1})
 	if ! empty(l:char)
-	    let l:cmd .= '"|echohl SpecialKey|echon "' . l:char
+	    let l:cmd .= '"|echohl SpecialKey|echon "' . escape(l:char, '"\')
 	endif
     endif
 
