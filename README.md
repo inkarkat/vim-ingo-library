@@ -176,13 +176,8 @@ To uninstall, use the :RmVimball command.
 
 - Requires Vim 7.0 or higher.
 
-IDEAS
+CONTRIBUTING
 ------------------------------------------------------------------------------
-
-- ingo#print#highlighted#Line(): &lt;Tab&gt; are currently always rendered as
-  ......; maybe use the settings from 'listchars'.
-
-### CONTRIBUTING
 
 Report any bugs, send patches, or suggest features via the issue tracker at
 https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
@@ -222,6 +217,15 @@ HISTORY
 - ingo#area#frompattern#Get(): BUG: a:matchCount uninitialized
 - Add ingo/print/highlighted.vim module (formerly unpublished separate
   EchoLine.vim autoload script).
+- ingo#option#listchars#Render(): ENH: Add a:options.tabWidth.
+- ingo#option#listchars#Render(): CHG: Deprecate a:isTextAtEnd argument, use
+  a:options.isTextAtEnd now.
+- ingo#option#listchars#Render(): FIX: space rendering eclipses trail
+- ingo#option#listchars#Render(): ENH: Add a:options.isTextAtStart and render
+  lead listchars option value (since Vim 8.2.2454).
+- ingo#print#highlighted#Line(): Use 'listchars' to render tabs and spaces,
+  but now only if 'list' is on. Also support "nbsp", "lead", and "eol"
+  options.
 
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of

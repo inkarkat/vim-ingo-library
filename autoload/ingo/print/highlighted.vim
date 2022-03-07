@@ -7,6 +7,8 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 " Source: Based on ShowLine.vim (vimscript #381) by Gary Holloway
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! s:GetCharacter( line, column )
 "*******************************************************************************
@@ -56,7 +58,10 @@ function! s:GetAdditionalHighlightGroup( column )
 endfunction
 function! s:GetHighlighting( line, column )
     let l:group = s:GetAdditionalHighlightGroup(a:column)
-    return (empty(l:group) ? synIDattr(synID(a:line, a:column, 1), 'name') : l:group)
+    return (empty(l:group) ?
+    \	synIDattr(synID(a:line, a:column, 1), 'name') :
+    \	l:group
+    \)
 endfunction
 
 function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength, additionalHighlighting )
@@ -91,6 +96,8 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
     let l:line = getline(a:lineNum)
 
     let l:column = (a:startCol == 0 ? 1 : a:startCol)
+    let l:additionalSpecialCharacterExpr = (&list ? '^\%( \|\%xa0\|\%u202f\)' : '')
+    let l:isLeadingSpace = (l:column == 1)
 
     let s:virtStartCol = ingo#mbyte#virtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
     let s:endCol = (a:endCol == 0 ? strlen(l:line) : a:endCol)
@@ -105,9 +112,12 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
 "****D echomsg 'start at virtstartcol' s:virtStartCol
     while s:IsMoreToRead( l:column )
 	let l:char = s:GetCharacter(l:line, l:column)
+	if l:char !=# ' '
+	    let l:isLeadingSpace = 0
+	endif
 	let l:group = s:GetHighlighting(a:lineNum, l:column)
 
-	if l:char =~# '\%(\p\@![\x00-\xFF]\)'
+	if l:char =~# '\%(\p\@![\x00-\xFF]\)' || (! empty(l:additionalSpecialCharacterExpr) && l:char =~# l:additionalSpecialCharacterExpr)
 	    " Emulate the built-in highlighting of translated unprintable
 	    " characters here. The regexp also matches <CR> and <LF>, but no
 	    " non-ASCII multi-byte characters; the 'isprint' option is not
@@ -122,17 +132,19 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
 	    let l:prev_group = l:group
 	endif
 
-	" <Tab> characters are rendered so that:
-	" 1. The tab width is the same as in the buffer (even when the echoed
-	" position is shifted due to scrolling or a echo prefix).
-	" 2. It can be differentiated from a sequence of spaces.
+	" <Tab> characters are rendered so that the tab width is the same as in
+	" the buffer (even when the echoed position is shifted due to scrolling
+	" or a echo prefix).
 	"
 	" The :echo command observes embedded line breaks (in contrast to
 	" :echomsg), which would mess up a single-line message that contains
 	" embedded \n = <CR> = ^M or <LF> = ^@.
-	if l:char ==# "\t"
+	if l:char ==# "\t" || (! empty(l:additionalSpecialCharacterExpr) && l:char =~# l:additionalSpecialCharacterExpr)
 	    let l:width = s:GetTabReplacement(ingo#mbyte#virtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
-	    let l:cmd .= repeat('.', l:width)
+	    let l:cmd .= (&list ?
+	    \   escape(ingo#option#listchars#Render(l:char, {'tabWidth': l:width, 'fallback': {'tab': '^I'}, 'isTextAtStart': l:isLeadingSpace}), '"\') :
+	    \   repeat(' ', l:width)
+	    \)
 	elseif l:char ==# "\<CR>"
 	    let l:cmd .= '^M'
 	elseif l:char ==# "\<LF>"
@@ -152,7 +164,17 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
 	if empty(l:cmd)
 	    let l:cmd .= 'echon "'
 	endif
-	let l:cmd .= repeat('.', l:width)
+	let l:cmd .= (&list ?
+	\   escape(ingo#option#listchars#Render(l:char, {'tabWidth': l:width, 'fallback': {'tab': '^I'}}), '"\') :
+	\   repeat(' ', l:width)
+	\)
+    endif
+
+    if a:maxLength != 1 && l:column > s:endCol && &list
+	let l:char = ingo#option#listchars#Render('', {'isTextAtEnd': 1})
+	if ! empty(l:char)
+	    let l:cmd .= '"|echohl SpecialKey|echon "' . escape(l:char, '"\')
+	endif
     endif
 
     let l:cmd .= '"|echohl None'
@@ -204,4 +226,6 @@ function! ingo#print#highlighted#Line( lineNum, centerCol, prefix, additionalHig
     call ingo#print#highlighted#LinePart(a:lineNum, l:startCol, 0, l:maxLength, a:additionalHighlighting)
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
