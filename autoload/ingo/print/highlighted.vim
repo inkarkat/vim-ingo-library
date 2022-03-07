@@ -97,6 +97,7 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
 
     let l:column = (a:startCol == 0 ? 1 : a:startCol)
     let l:additionalSpecialCharacterExpr = (&list ? '^\%( \|\%xa0\|\%u202f\)' : '')
+    let l:isLeadingSpace = (l:column == 1)
 
     let s:virtStartCol = ingo#mbyte#virtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column)
     let s:endCol = (a:endCol == 0 ? strlen(l:line) : a:endCol)
@@ -111,6 +112,9 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
 "****D echomsg 'start at virtstartcol' s:virtStartCol
     while s:IsMoreToRead( l:column )
 	let l:char = s:GetCharacter(l:line, l:column)
+	if l:char !=# ' '
+	    let l:isLeadingSpace = 0
+	endif
 	let l:group = s:GetHighlighting(a:lineNum, l:column)
 
 	if l:char =~# '\%(\p\@![\x00-\xFF]\)' || (! empty(l:additionalSpecialCharacterExpr) && l:char =~# l:additionalSpecialCharacterExpr)
@@ -138,7 +142,7 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
 	if l:char ==# "\t" || (! empty(l:additionalSpecialCharacterExpr) && l:char =~# l:additionalSpecialCharacterExpr)
 	    let l:width = s:GetTabReplacement(ingo#mbyte#virtcol#GetVirtStartColOfCurrentCharacter(a:lineNum, l:column), &l:tabstop)
 	    let l:cmd .= (&list ?
-	    \   ingo#option#listchars#Render(l:char, {'tabWidth': l:width, 'fallback': {'tab': '^I'}}) :
+	    \   ingo#option#listchars#Render(l:char, {'tabWidth': l:width, 'fallback': {'tab': '^I'}, 'isTextAtStart': l:isLeadingSpace}) :
 	    \   repeat(' ', l:width)
 	    \)
 	elseif l:char ==# "\<CR>"
@@ -161,6 +165,13 @@ function! ingo#print#highlighted#LinePart( lineNum, startCol, endCol, maxLength,
 	    let l:cmd .= 'echon "'
 	endif
 	let l:cmd .= repeat('.', l:width)
+    endif
+
+    if a:maxLength != 1 && l:column > s:endCol && &list
+	let l:char = ingo#option#listchars#Render('', {'isTextAtEnd': 1})
+	if ! empty(l:char)
+	    let l:cmd .= '"|echohl SpecialKey|echon "' . l:char
+	endif
     endif
 
     let l:cmd .= '"|echohl None'
