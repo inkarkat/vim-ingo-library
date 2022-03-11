@@ -339,7 +339,7 @@ function! ingo#plugin#historyrecall#List( what, multiplier, register, ... )
 	elseif l:choice ==# '"'
 	    echon l:choice
 	    let l:choice = ingo#query#get#ValidChar({
-	    \   'validExpr': "[\<CR>" . l:validNamesAndRecalls . ']'
+	    \   'validExpr': "[\<CR>" . l:validNamesAndRecalls . ']',
 	    \   'isAllowDigraphs': 0,
 	    \})
 	    if empty(l:choice) || l:choice ==# "\<CR>"
