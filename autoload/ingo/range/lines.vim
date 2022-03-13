@@ -70,6 +70,12 @@ function! ingo#range#lines#Get( startLnum, endLnum, range, ... )
 "                               all (vs. only the next matching) ranges are
 "                               determined. Defaults to 1; pass 0 to only get
 "                               the next one.
+"   a:options.isKeepPatterns    Flag whether a pattern range will not affect the
+"                               search history (if :keeppatterns is supported);
+"                               didClobberSearchHistory will then always be 0.
+"                               Defaults to 1; pass 0 to have it added to the
+"                               search history and affect @/ within the
+"                               function.
 "   a:isGetAllRanges    Deprecated: Optional flag whether (for pattern ranges
 "                       like /.../), all (vs. only the next matching) ranges are
 "                       determined.
@@ -82,15 +88,20 @@ function! ingo#range#lines#Get( startLnum, endLnum, range, ... )
 "		    multiple elements if a /pattern/ range is used.
 "   endLnums        List of line numbers where a range ends.
 "   didClobberSearchHistory Flag whether a command was used that has added a
-"			    temporary pattern to the search history. If true,
+"			    temporary pattern to the search history, and
+"			    a:options.isKeepPatterns was not in effect. If true,
 "			    call histdel('search', -1) at the end of the client
 "			    function once.
 "******************************************************************************
+    let l:keeppatterns = matchstr(ingo#compat#commands#keeppatterns(), '^keeppatterns$')
     if a:0 && type(a:1) != type({})
 	let l:isGetAllRanges = a:1
     else
 	let l:options = (a:0 ? a:1 : {})
 	let l:isGetAllRanges = get(l:options, 'isGetAllRanges', 1)
+	if ! get(l:options, 'isKeepPatterns', 1)
+	    let l:keeppatterns = ''
+	endif
     endif
     let [l:startLnum, l:endLnum] = [ingo#range#NetStart(a:startLnum), ingo#range#NetEnd(a:endLnum)]
     let l:recordedLines = {}
@@ -116,10 +127,11 @@ function! ingo#range#lines#Get( startLnum, endLnum, range, ... )
 	endif
 
 	try
-	    execute printf('silent! %d,%dglobal %s call <SID>RecordLines(l:recordedLines, l:startLines, l:endLines, %d, %d)',
-	    \  l:startLnum, l:endLnum,
-	    \  l:searchRange,
-	    \  l:startLnum, l:endLnum
+	    execute printf('silent! %s %d,%dglobal %s call <SID>RecordLines(l:recordedLines, l:startLines, l:endLines, %d, %d)',
+	    \   l:keeppatterns,
+	    \   l:startLnum, l:endLnum,
+	    \   l:searchRange,
+	    \   l:startLnum, l:endLnum
 	    \)
 	finally
 	    let &l:foldenable = l:save_foldenable
@@ -127,13 +139,14 @@ function! ingo#range#lines#Get( startLnum, endLnum, range, ... )
     else
 	" For line number, marks, etc., we can just record them (limited to
 	" those that fall into the command's range).
-	execute printf('silent! %s call <SID>RecordLines(l:recordedLines, l:startLines, l:endLines, %d, %d)',
-	\  a:range,
-	\  l:startLnum, l:endLnum
+	execute printf('silent! %s %s call <SID>RecordLines(l:recordedLines, l:startLines, l:endLines, %d, %d)',
+	\   l:keeppatterns,
+	\   a:range,
+	\   l:startLnum, l:endLnum
 	\)
     endif
 
-    if @/ !=# l:save_search
+    if empty(l:keeppatterns) && @/ !=# l:save_search
 	let @/ = l:save_search
 	let l:didClobberSearchHistory = 1
     endif
