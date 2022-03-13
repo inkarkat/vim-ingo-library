@@ -241,6 +241,10 @@ HISTORY							*ingo-library-history*
 - ingo#print#highlighted#Line(): Use 'listchars' to render tabs and spaces,
   but now only if 'list' is on. Also support "nbsp", "lead", and "eol"
   options.
+- ingo#range#Get(): Don't clobber the search history.
+- ingo#range#lines#Get(): Allow a:options with fallback to the
+  old single a:isGetAllRanges flag and don't clobber the search history by
+  default, unless a:options.isKeepPatterns = 0.
 
 1.043	04-Feb-2022
 - Minor: Actually support no-argument form of
