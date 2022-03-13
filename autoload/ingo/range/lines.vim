@@ -8,30 +8,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.029.005	23-Dec-2016	ingo#range#lines#Get(): If the range is a
-"				backwards-looking ?{pattern}?, we need to
-"				attempt the match on any line with :global/^/...
-"				Else, the border behavior is inconsistent:
-"				ranges that extend the passed range at the
-"				bottom are (partially) included, but ranges that
-"				extend at the front would not be.
-"   1.029.004	07-Dec-2016	ingo#range#lines#Get(): A single
-"				(a:isGetAllRanges = 0) /.../ range already
-"				clobbers the last search pattern. Save and
-"				restore if necessary, and base
-"				didClobberSearchHistory on that check.
-"				ingo#range#lines#Get(): Drop the ^ anchor for
-"				the range check to also detect /.../ as the
-"				end of the range.
-"   1.023.003	26-Dec-2014	ENH: Add a:isGetAllRanges optional argument to
-"				ingo#range#lines#Get().
-"   1.022.002	23-Sep-2014	ingo#range#lines#Get() needs to consider and
-"				temporarily disable closed folds when resolving
-"				/{pattern}/ ranges.
-"   1.020.001	10-Jun-2014	file creation from
-"				autoload/PatternsOnText/Ranges.vim
 
 function! s:RecordLine( records, startLnum, endLnum )
     let l:lnum = line('.')
