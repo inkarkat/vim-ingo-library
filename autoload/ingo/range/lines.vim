@@ -4,7 +4,7 @@
 "   - ingo/cmdsargs/pattern.vim autoload script
 "   - ingo/range.vim autoload script
 "
-" Copyright: (C) 2014-2016 Ingo Karkat
+" Copyright: (C) 2014-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -66,8 +66,13 @@ function! ingo#range#lines#Get( startLnum, endLnum, range, ... )
 "   a:endLnum   Last line number to be considered.
 "   a:range     Range in any format supported by Vim, e.g. 'a,'b or
 "		/^fun/,/^endfun/
-"   a:isGetAllRanges    Optional flag whether (for pattern ranges like /.../),
-"			all (vs. only the next matching) ranges are determined.
+"   a:options.isGetAllRanges    Flag whether (for pattern ranges like /.../),
+"                               all (vs. only the next matching) ranges are
+"                               determined. Defaults to 1; pass 0 to only get
+"                               the next one.
+"   a:isGetAllRanges    Deprecated: Optional flag whether (for pattern ranges
+"                       like /.../), all (vs. only the next matching) ranges are
+"                       determined.
 "			Defaults to 1; pass 0 to only get the next one.
 "* RETURN VALUES:
 "   [recordedLnums, startLnums, endLnums, didClobberSearchHistory]
@@ -81,7 +86,12 @@ function! ingo#range#lines#Get( startLnum, endLnum, range, ... )
 "			    call histdel('search', -1) at the end of the client
 "			    function once.
 "******************************************************************************
-    let l:isGetAllRanges = (! a:0 || a:1)
+    if a:0 && type(a:1) != type({})
+	let l:isGetAllRanges = a:1
+    else
+	let l:options = (a:0 ? a:1 : {})
+	let l:isGetAllRanges = get(l:options, 'isGetAllRanges', 1)
+    endif
     let [l:startLnum, l:endLnum] = [ingo#range#NetStart(a:startLnum), ingo#range#NetEnd(a:endLnum)]
     let l:recordedLines = {}
     let l:startLines = []
