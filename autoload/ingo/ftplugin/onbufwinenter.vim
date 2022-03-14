@@ -2,16 +2,15 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2010-2013 Ingo Karkat
+" Copyright: (C) 2010-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.011.001	23-Jul-2013	file creation from ingointegration.vim.
+let s:save_cpo = &cpo
+set cpo&vim
 
 let s:autocmdCnt = 0
-function! ingo#ftplugin#onbufwinenter#Execute( command, ... )
+function! ingo#ftplugin#onbufwinenter#Execute( Action, ... )
 "******************************************************************************
 "* MOTIVATION:
 "   You want to execute a command from a ftplugin (e.g. "normal! gg0") that only
@@ -27,8 +26,8 @@ function! ingo#ftplugin#onbufwinenter#Execute( command, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:command	Ex command to be executed.
-"   a:when	Optional configuration of when a:command is executed.
+"   a:Action	Ex command or Funcref to be executed.
+"   a:when	Optional configuration of when a:Action is executed.
 "		By default, it is only executed on the BufWinEnter event, i.e.
 "		only when the buffer actually is being loaded. If you want to
 "		always execute it (and can live with it being potentially
@@ -39,14 +38,18 @@ function! ingo#ftplugin#onbufwinenter#Execute( command, ... )
 "   None.
 "******************************************************************************
     if a:0 && a:1 ==# 'always'
-	execute a:command
+	call ingo#actions#ExecuteOrFunc(a:Action)
     endif
 
     let s:autocmdCnt += 1
     let l:groupName = 'IngoLibraryOnBufWinEnter' . s:autocmdCnt
+    let l:actionCommand = (type(a:Action) == type(function('tr')) ?
+    \   printf('call call(%s, [])', string(a:Action)) :
+    \   'execute ' . string(a:Action)
+    \)
     execute 'augroup' l:groupName
 	autocmd!
-	execute 'autocmd BufWinEnter <buffer> execute' string(a:command) '| autocmd!' l:groupName '* <buffer>'
+	execute 'autocmd BufWinEnter <buffer>' l:actionCommand '| autocmd!' l:groupName '* <buffer>'
 	" Remove the run-once autocmd in case the this command was NOT set up
 	" during the loading of the buffer (but e.g. by a :setfiletype in an
 	" existing buffer), so that it doesn't linger and surprise the user
@@ -55,4 +58,6 @@ function! ingo#ftplugin#onbufwinenter#Execute( command, ... )
     augroup END
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
