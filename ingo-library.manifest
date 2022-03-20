@@ -51,6 +51,7 @@ autoload/ingo/compat/regexp.vim
 autoload/ingo/compat/shellcommand.vim
 autoload/ingo/compat/substitution.vim
 autoload/ingo/compat/window.vim
+autoload/ingo/convert.vim
 autoload/ingo/cursor.vim
 autoload/ingo/cursor/keep.vim
 autoload/ingo/cursor/move.vim
