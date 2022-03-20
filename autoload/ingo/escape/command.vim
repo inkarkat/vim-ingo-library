@@ -1,8 +1,6 @@
 " ingo/escape/command.vim: Additional escapings of Ex commands.
 "
 " DEPENDENCIES:
-"   - ingo/collections/fromsplit.vim autoload script
-"   - ingo/compat.vim autoload script
 "
 " Copyright: (C) 2013-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -15,6 +13,8 @@ function! ingo#escape#command#mapescape( command )
 "   Escape the Ex command a:command for use in the right-hand side of a mapping.
 "   If you want to redefine an existing mapping, use ingo#compat#maparg()
 "   instead; it already returns this in the correct format.
+"* SEE ALSO:
+"   - ingo#escape#mapping#keys() for the left-hand side (keys) of a mapping.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
