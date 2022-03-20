@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2021 Ingo Karkat
+" Copyright: (C) 2021-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -10,6 +10,7 @@
 function! ingo#escape#mapping#keys( keys ) abort
     let l:keys = a:keys
     let l:keys = substitute(l:keys, ' ', '<Space>', 'g')
+    let l:keys = substitute(l:keys, "\n", '<CR>', 'g')
     let l:keys = substitute(l:keys, '\', '<Bslash>', 'g')
     let l:keys = substitute(l:keys, '|', '<Bar>', 'g')
     return l:keys

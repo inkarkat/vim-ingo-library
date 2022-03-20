@@ -26,6 +26,7 @@ function! ingo#escape#command#mapescape( command )
 "******************************************************************************
     let l:command = a:command
     let l:command = substitute(l:command, '<', '<lt>', 'g')     " '<' may introduce a special-notation key; better escape them all.
+    let l:command = substitute(l:command, "\n", '<CR>', 'g')    " newlines must be escaped, or the map command will end prematurely.
     let l:command = substitute(l:command, '|', '<Bar>', 'g')    " '|' must be escaped, or the map command will end prematurely.
     return l:command
 endfunction
@@ -33,7 +34,8 @@ endfunction
 function! ingo#escape#command#mapunescape( command )
 "******************************************************************************
 "* PURPOSE:
-"   Unescape special mapping characters (<Bar>, <lt>) in a:command.
+"   Unescape special mapping characters (<CR>, <Enter>, <Bar>, <lt>) in
+"   a:command.
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None.
 "* EFFECTS / POSTCONDITIONS:
@@ -44,8 +46,9 @@ function! ingo#escape#command#mapunescape( command )
 "   a:command for use in a :map command.
 "******************************************************************************
     let l:command = a:command
-    let l:command = substitute(l:command, '<lt>', '<', 'g')
-    let l:command = substitute(l:command, '<Bar>', '|', 'g')
+    let l:command = substitute(l:command, '\c<lt>', '<', 'g')
+    let l:command = substitute(l:command, '\c<\%(CR\|Enter\)>', '\n', 'g')
+    let l:command = substitute(l:command, '\c<Bar>', '|', 'g')
     return l:command
 endfunction
 
