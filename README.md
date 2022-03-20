@@ -232,6 +232,9 @@ HISTORY
   default, unless a:options.isKeepPatterns = 0.
 - ingo#ftplugin#onbufwinenter#Execute(): ENH: Also allow Funcref a:Action.
 - ingo#ftplugin#onbufwinenter#Execute(): ENH: Add a:when = "delayed".
+- ingo#escape#command#map[un]escape(), ingo#escape#mapping#keys(): Also
+  convert between newline and &lt;CR&gt;.
+- Add ingo/convert.vim module with ingo#convert#ToSingleLineString().
 
 ##### 1.043   04-Feb-2022
 - Minor: Actually support no-argument form of
