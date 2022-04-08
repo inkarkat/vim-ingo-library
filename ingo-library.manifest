@@ -51,6 +51,7 @@ autoload/ingo/compat/regexp.vim
 autoload/ingo/compat/shellcommand.vim
 autoload/ingo/compat/substitution.vim
 autoload/ingo/compat/window.vim
+autoload/ingo/convert.vim
 autoload/ingo/cursor.vim
 autoload/ingo/cursor/keep.vim
 autoload/ingo/cursor/move.vim
@@ -61,6 +62,7 @@ autoload/ingo/dict.vim
 autoload/ingo/dict/count.vim
 autoload/ingo/dict/find.vim
 autoload/ingo/digest.vim
+autoload/ingo/digraph.vim
 autoload/ingo/encoding.vim
 autoload/ingo/err.vim
 autoload/ingo/escape.vim
@@ -128,6 +130,7 @@ autoload/ingo/plugin/cmd/withpattern.vim
 autoload/ingo/plugin/cmdcomplete.vim
 autoload/ingo/plugin/cmdcomplete/dirforaction.vim
 autoload/ingo/plugin/compiler.vim
+autoload/ingo/plugin/historyrecall.vim
 autoload/ingo/plugin/marks.vim
 autoload/ingo/plugin/persistence.vim
 autoload/ingo/plugin/register.vim
@@ -137,11 +140,13 @@ autoload/ingo/plugin/rendered/Subset.vim
 autoload/ingo/plugin/setting.vim
 autoload/ingo/pos.vim
 autoload/ingo/print.vim
+autoload/ingo/print/highlighted.vim
 autoload/ingo/query.vim
 autoload/ingo/query/confirm.vim
 autoload/ingo/query/file.vim
 autoload/ingo/query/fromlist.vim
 autoload/ingo/query/get.vim
+autoload/ingo/query/motion.vim
 autoload/ingo/query/recall.vim
 autoload/ingo/query/substitute.vim
 autoload/ingo/range.vim
@@ -184,6 +189,7 @@ autoload/ingo/str/frompattern.vim
 autoload/ingo/str/fromrange.vim
 autoload/ingo/str/join.vim
 autoload/ingo/str/list.vim
+autoload/ingo/str/remove.vim
 autoload/ingo/str/restricted.vim
 autoload/ingo/str/split.vim
 autoload/ingo/strdisplaywidth.vim
