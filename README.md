@@ -185,7 +185,7 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
-##### 1.044   RELEASEME
+##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
 - ENH: Allow to customize the insertion point of ingo#text#InsertHere() via
   g:IngoLibrary\_InsertHereStrategy.
