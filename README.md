@@ -185,6 +185,11 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 1.045   RELEASEME
+- ingo#query#fromlist#Query(): CHG: Beep and continue querying on invalid
+  accelerator key or number instead of returning -1; only &lt;Esc&gt; or Ctrl-C
+  abort.
+
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
 - ENH: Allow to customize the insertion point of ingo#text#InsertHere() via

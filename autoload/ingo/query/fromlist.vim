@@ -1,11 +1,6 @@
 " ingo/query/fromlist.vim: Functions for querying elements from a list.
 "
 " DEPENDENCIES:
-"   - ingo/compat.vim autoload script
-"   - ingo/query.vim autoload script
-"   - ingo/query/confirm.vim autoload script
-"   - ingo/query/get.vim autoload script
-"   - ingo/query/recall.vim autoload script
 "
 " Copyright: (C) 2014-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -28,8 +23,9 @@ function! ingo#query#fromlist#Query( what, list, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Query for one entry from a:list; elements can be selected by accelerator key
-"   or the number of the element. Supports "headless mode", i.e. bypassing the
-"   actual dialog so that no user intervention is necessary (in automated
+"   or the number of the element. Invalid inputs cause a beep and will continue
+"   querying; <Esc> or Ctrl-C aborts. Supports "headless mode", i.e. bypassing
+"   the actual dialog so that no user intervention is necessary (in automated
 "   tests).
 "* SEE ALSO:
 "   ingo#query#recall#Query() provides an alternative means to query one
@@ -54,72 +50,80 @@ function! ingo#query#fromlist#Query( what, list, ... )
     let l:accelerators = map(copy(l:confirmList), 'matchstr(v:val, "&\\zs.")')
     let l:list = ingo#query#fromlist#RenderList(l:confirmList, l:defaultIndex, '%d:')
 
-    let l:renderedQuestion = printf('Select %s via [count] or (l)etter: %s ?', a:what, join(l:list, ', '))
-    if ingo#compat#strdisplaywidth(l:renderedQuestion) + 3 > &columns
-	call ingo#query#Question(printf('Select %s via [count] or (l)etter:', a:what))
-	for l:listItem in ingo#query#fromlist#RenderList(l:confirmList, l:defaultIndex, '%3d: ')
-	    echo l:listItem
-	endfor
-    else
-	call ingo#query#Question(l:renderedQuestion)
-    endif
+    while 1
+	let l:renderedQuestion = printf('Select %s via [count] or (l)etter: %s ?', a:what, join(l:list, ', '))
+	if ingo#compat#strdisplaywidth(l:renderedQuestion) + 3 > &columns
+	    call ingo#query#Question(printf('Select %s via [count] or (l)etter:', a:what))
+	    for l:listItem in ingo#query#fromlist#RenderList(l:confirmList, l:defaultIndex, '%3d: ')
+		echo l:listItem
+	    endfor
+	else
+	    call ingo#query#Question(l:renderedQuestion)
+	endif
 
-    if exists('g:IngoLibrary_QueryChoices') && len(g:IngoLibrary_QueryChoices) > 0
-	" Headless mode: Bypass actual confirm so that no user intervention is
-	" necesary.
-	let l:plainChoices = map(copy(a:list), 'ingo#query#StripAccellerator(v:val)')
+	if exists('g:IngoLibrary_QueryChoices') && len(g:IngoLibrary_QueryChoices) > 0
+	    " Headless mode: Bypass actual confirm so that no user intervention is
+	    " necesary.
+	    let l:plainChoices = map(copy(a:list), 'ingo#query#StripAccellerator(v:val)')
 
-	" Return predefined choice.
-	let l:choice = remove(g:IngoLibrary_QueryChoices, 0)
-	return (type(l:choice) == type(0) ?
-	\   l:choice :
-	\   (l:choice == '' ?
-	\       0 :
-	\       index(l:plainChoices, l:choice)
-	\   )
-	\)
-    endif
+	    " Return predefined choice.
+	    let l:choice = remove(g:IngoLibrary_QueryChoices, 0)
+	    return (type(l:choice) == type(0) ?
+	    \   l:choice :
+	    \   (l:choice ==# '' ?
+	    \       0 :
+	    \       index(l:plainChoices, l:choice)
+	    \   )
+	    \)
+	endif
 
-    let l:maxNum = len(a:list)
-    let l:choice = ingo#query#get#Char()
-    let l:count = (empty(l:choice) ? -1 : index(l:accelerators, l:choice, 0, 1)) + 1
-    if l:count == 0 && l:choice =~# '^\d$'
-	let l:count = str2nr(l:choice)
-	if l:maxNum > 10 * l:count
-	    " Need to query more numbers to be able to address all choices.
-	    echon ' ' . l:count
+	let l:maxNum = len(a:list)
+	let l:choice = ingo#query#get#Char()
+	if empty(l:choice) || l:choice ==# "\<C-c>"
+	    redraw | echo ''
+	    return -1
+	endif
 
-	    let l:leadingZeroCnt = (l:choice ==# '0')
-	    while l:maxNum > 10 * l:count
-		let l:char = ingo#compat#getcharstr()
-		if l:char ==# "\<CR>"
-		    break
-		elseif l:char !~# ingo#regexp#Anchored('\d')
-		    redraw | echo ''
-		    return -1
-		endif
+	let l:count = index(l:accelerators, l:choice, 0, 1) + 1
+	if l:count == 0 && l:choice =~# '^\d$'
+	    let l:count = str2nr(l:choice)
+	    if l:maxNum > 10 * l:count
+		" Need to query more numbers to be able to address all choices.
+		echon ' ' . l:count
 
-		echon l:char
-		if l:char ==# '0' && l:count == 0
-		    let l:leadingZeroCnt += 1
-		    if l:leadingZeroCnt >= len(l:maxNum)
+		let l:leadingZeroCnt = (l:choice ==# '0')
+		while l:maxNum > 10 * l:count
+		    let l:char = ingo#compat#getcharstr()
+		    if l:char ==# "\<CR>"
+			break
+		    elseif l:char !~# ingo#regexp#Anchored('\d')
+			redraw | echo ''
 			return -1
 		    endif
-		else
-		    let l:count = 10 * l:count + str2nr(l:char)
-		    if l:leadingZeroCnt + len(l:count) >= len(l:maxNum)
-			break
-		    endif
-		endif
-	    endwhile
-	endif
-    endif
 
-    if l:count < 1 || l:count > l:maxNum
-	redraw | echo ''
-	return -1
-    endif
-    return l:count - 1
+		    echon l:char
+		    if l:char ==# '0' && l:count == 0
+			let l:leadingZeroCnt += 1
+			if l:leadingZeroCnt >= len(l:maxNum)
+			    return -1
+			endif
+		    else
+			let l:count = 10 * l:count + str2nr(l:char)
+			if l:leadingZeroCnt + len(l:count) >= len(l:maxNum)
+			    break
+			endif
+		    endif
+		endwhile
+	    endif
+	endif
+
+	if l:count > 0 && l:count <= l:maxNum
+	    return l:count - 1
+	else
+	    execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
+	    redraw
+	endif
+    endwhile
 endfunction
 
 function! ingo#query#fromlist#QueryAsText( what, list, ... )
