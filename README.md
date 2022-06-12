@@ -189,6 +189,7 @@ HISTORY
 - ingo#query#fromlist#Query(): CHG: Beep and continue querying on invalid
   accelerator key or number instead of returning -1; only &lt;Esc&gt; or Ctrl-C
   abort.
+- Add ingo/text/searchhighlights.vim module.
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().

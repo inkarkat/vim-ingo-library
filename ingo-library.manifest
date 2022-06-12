@@ -209,6 +209,7 @@ autoload/ingo/tabstops.vim
 autoload/ingo/text.vim
 autoload/ingo/text/frompattern.vim
 autoload/ingo/text/replace.vim
+autoload/ingo/text/searchhighlights.vim
 autoload/ingo/text/surroundings.vim
 autoload/ingo/text/surroundings/Lines.vim
 autoload/ingo/text/surroundings/Lines/Creator.vim
