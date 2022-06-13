@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2019 Ingo Karkat
+" Copyright: (C) 2013-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -31,13 +31,10 @@ function! ingo#query#confirm#AutoAccelerators( choices, ... )
 "******************************************************************************
     let l:isGui = (has('gui_running') && &guioptions !~# 'c')
     let l:defaultChoiceIdx = (a:0 ? a:1 - 1 : 0)
-    let l:usedAccelerators = filter(
-    \   map(
-    \       copy(a:choices),
-    \       'tolower(matchstr(v:val, "\\C&\\zs" . s:acceleratorPattern))',
-    \   ),
-    \   '! empty(v:val)'
-    \)
+    let l:usedAccelerators = ingo#list#NonEmpty(map(
+    \   copy(a:choices),
+    \   'tolower(matchstr(v:val, "\\C&\\zs" . s:acceleratorPattern))',
+    \   ))
 
     if ! l:isGui && l:defaultChoiceIdx >= 0 && a:choices[l:defaultChoiceIdx] !~# '&.'
 	" When no GUI dialog is used, the default choice automatically gets an
