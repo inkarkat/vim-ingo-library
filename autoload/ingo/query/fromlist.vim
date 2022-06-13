@@ -46,7 +46,7 @@ function! ingo#query#fromlist#Query( what, list, ... )
 "   Index of the chosen element of a:list, or -1 if the query was aborted.
 "******************************************************************************
     let l:defaultIndex = (a:0 ? a:1 : -1)
-    let l:confirmList = ingo#query#confirm#AutoAccelerators(copy(a:list), -1)
+    let l:confirmList = ingo#query#confirm#AutoAccelerators(copy(a:list), -1, '0123456789')
     let l:accelerators = map(copy(l:confirmList), 'matchstr(v:val, "&\\zs.")')
     let l:list = ingo#query#fromlist#RenderList(l:confirmList, l:defaultIndex, '%d:')
 
@@ -84,8 +84,7 @@ function! ingo#query#fromlist#Query( what, list, ... )
 	    return -1
 	endif
 
-	let l:count = index(l:accelerators, l:choice, 0, 1) + 1
-	if l:count == 0 && l:choice =~# '^\d$'
+	if l:choice =~# '^\d$'
 	    let l:count = str2nr(l:choice)
 	    if l:maxNum >= 10 * l:count
 		" Need to query more numbers to be able to address all choices.
@@ -115,6 +114,8 @@ function! ingo#query#fromlist#Query( what, list, ... )
 		    endif
 		endwhile
 	    endif
+	else
+	    let l:count = index(l:accelerators, l:choice, 0, 1) + 1
 	endif
 
 	if l:count > 0 && l:count <= l:maxNum

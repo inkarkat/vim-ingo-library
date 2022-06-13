@@ -194,6 +194,8 @@ HISTORY
   by number if it is the last
 - ingo#query#confirm#AutoAccelerators(): ENH: Add optional
   l:reservedAccelerators argument.
+- ingo#query#fromlist#Query(): BUG: Don't add accelerators for numbers, as
+  those interfere with the by-count selection.
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
