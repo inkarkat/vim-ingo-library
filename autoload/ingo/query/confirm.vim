@@ -26,12 +26,16 @@ function! ingo#query#confirm#AutoAccelerators( choices, ... )
 "		    assumed that this item does not need an accelerator (in the
 "		    GUI dialog). Pass -1 if there's no default (so that all
 "		    items get accelerators).
+"   a:reservedAccelerators
+"                   Optional String of alphanumeric characters that must not be
+"                   used as an accelerator.
 "* RETURN VALUES:
 "   Modified a:choices.
 "******************************************************************************
     let l:isGui = (has('gui_running') && &guioptions !~# 'c')
     let l:defaultChoiceIdx = (a:0 ? a:1 - 1 : 0)
-    let l:usedAccelerators = ingo#list#NonEmpty(map(
+    let l:usedAccelerators = (a:0 >= 2 ? split(a:2, '\zs') : [])
+    let l:usedAccelerators += ingo#list#NonEmpty(map(
     \   copy(a:choices),
     \   'tolower(matchstr(v:val, "\\C&\\zs" . s:acceleratorPattern))',
     \   ))

@@ -192,6 +192,8 @@ HISTORY
 - Add ingo/text/searchhighlights.vim module.
 - ingo#query#fromlist#Query(): BUG: 10th, 20th, etc. entry cannot be selected
   by number if it is the last
+- ingo#query#confirm#AutoAccelerators(): ENH: Add optional
+  l:reservedAccelerators argument.
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
