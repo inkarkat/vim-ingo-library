@@ -13,9 +13,11 @@ function! ingo#text#searchhighlights#GetForLine( lnum, column, pattern )
     call cursor(a:lnum, 1)
 
     let l:highlights = []
+    let l:startSearchFlags = 'c'
     while 1
-	let [l:lnum, l:startCol] = searchpos(a:pattern, '', a:lnum)
+	let [l:lnum, l:startCol] = searchpos(a:pattern, l:startSearchFlags, a:lnum)
 	let [l:lnum, l:endCol] = searchpos(a:pattern, 'cen', a:lnum)
+	let l:startSearchFlags = ''
 	if l:startCol == 0
 	    " No more matches in this line.
 	    break
