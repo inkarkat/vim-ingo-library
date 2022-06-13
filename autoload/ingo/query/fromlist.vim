@@ -87,12 +87,12 @@ function! ingo#query#fromlist#Query( what, list, ... )
 	let l:count = index(l:accelerators, l:choice, 0, 1) + 1
 	if l:count == 0 && l:choice =~# '^\d$'
 	    let l:count = str2nr(l:choice)
-	    if l:maxNum > 10 * l:count
+	    if l:maxNum >= 10 * l:count
 		" Need to query more numbers to be able to address all choices.
 		echon ' ' . l:count
 
 		let l:leadingZeroCnt = (l:choice ==# '0')
-		while l:maxNum > 10 * l:count
+		while l:maxNum >= 10 * l:count
 		    let l:char = ingo#compat#getcharstr()
 		    if l:char ==# "\<CR>"
 			break
