@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2015 Ingo Karkat
+" Copyright: (C) 2013-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -165,6 +165,37 @@ function! ingo#regexp#fromwildcard#AnchoredToPathBoundaries( ... )
     let l:prefix = printf('\%%(\^\|%s\@<=\)', l:pathSeparator)
     let l:suffix = printf('\%%(\$\|%s\@=\)', l:pathSeparator)
     return '\V' . escape(l:prefix . l:expr . l:suffix, l:additionalEscapeCharacters)
+endfunction
+function! ingo#regexp#fromwildcard#FileOrPath( ... ) abort
+"*******************************************************************************
+"* PURPOSE:
+"   Convert a shell-like a:wildcardExpr which may contain wildcards (?, *, **,
+"   [...]) into a regular expression for a complete file or a (sub)path anchored
+"   to path boundaries (like autocmd-pattern); i.e. a:wildcardExpr must match
+"   complete path components delimited by the a:pathSeparator or the start of
+"   the String.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:wildcardExpr  Text containing file wildcards.
+"   a:additionalEscapeCharacters    For use in the / command, add '/', for the
+"				    backward search command ?, add '?'. For
+"				    assignment to @/, always add '/', regardless
+"				    of the search direction; this is how Vim
+"				    escapes it, too. For use in search(), pass
+"				    nothing / omit the argument.
+"   a:pathSeparator Optional fixed value for the path separator, to use instead
+"		    of the platform's default one.
+"* RETURN VALUES:
+"   Regular expression for matching a:wildcardExpr.
+"*******************************************************************************
+    let [l:expr, l:additionalEscapeCharacters, l:pathSeparator] = call('s:Convert', a:000)
+    let l:pathSeparator = escape(l:pathSeparator, '\')
+
+    let l:prefix = printf('\%%(\^\|%s\@<=\)', l:pathSeparator)
+    return '\V' . escape(l:prefix . l:expr . '\$', l:additionalEscapeCharacters)
 endfunction
 
 function! ingo#regexp#fromwildcard#IsWildcardPathPattern( expr, ... )

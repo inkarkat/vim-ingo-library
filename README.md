@@ -196,6 +196,8 @@ HISTORY
   l:reservedAccelerators argument.
 - ingo#query#fromlist#Query(): BUG: Don't add accelerators for numbers, as
   those interfere with the by-count selection.
+- Add ingo#regexp#fromwildcard#FileOrPath() variant of
+  ingo#regexp#fromwildcard#AnchoredToPathBoundaries().
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
