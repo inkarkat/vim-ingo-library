@@ -199,6 +199,8 @@ HISTORY
 - Add ingo#regexp#fromwildcard#FileOrPath() variant of
   ingo#regexp#fromwildcard#AnchoredToPathBoundaries().
 - Add ingo/option/autochdir.vim module.
+- ingo#fs#path#{Canonizalize,Equals}(): Small fixes, support a:isResolveLinks
+  in the latter, too.
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
