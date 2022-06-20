@@ -198,6 +198,7 @@ HISTORY
   those interfere with the by-count selection.
 - Add ingo#regexp#fromwildcard#FileOrPath() variant of
   ingo#regexp#fromwildcard#AnchoredToPathBoundaries().
+- Add ingo/option/autochdir.vim module.
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().

@@ -1,11 +1,8 @@
 " ingo/actions/special.vim: Action execution within special environments.
 "
 " DEPENDENCIES:
-"   - ingo/actions.vim autoload script
-"   - ingo/compat.vim autoload script
-"   - ingo/workingdir.vim autoload script
 "
-" Copyright: (C) 2016-2018 Ingo Karkat
+" Copyright: (C) 2016-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -32,16 +29,11 @@ function! ingo#actions#special#NoAutoChdir( ... )
     " The 'autochdir' option adapts the CWD, so any (relative) filepath to the
     " filename in the other window would be omitted. Temporarily turn this off;
     " may be a little bit faster, too.
-    if exists('+autochdir')
-	let l:save_autochdir = &autochdir
-	set noautochdir
-    endif
+    let l:save_autochdir = ingo#option#autochdir#Disable()
     try
 	return call(function('ingo#actions#ExecuteOrFunc'), a:000)
     finally
-	if exists('l:save_autochdir')
-	    let &autochdir = l:save_autochdir
-	endif
+	call ingo#option#autochdir#Restore(l:save_autochdir)
 	if getcwd() !=# l:save_cwd
 	    execute l:chdirCommand ingo#compat#fnameescape(l:save_cwd)
 	endif

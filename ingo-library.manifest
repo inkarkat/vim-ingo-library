@@ -124,6 +124,7 @@ autoload/ingo/msg.vim
 autoload/ingo/nary.vim
 autoload/ingo/number.vim
 autoload/ingo/option.vim
+autoload/ingo/option/autochdir.vim
 autoload/ingo/option/listchars.vim
 autoload/ingo/os.vim
 autoload/ingo/plugin/cmd/withpattern.vim
