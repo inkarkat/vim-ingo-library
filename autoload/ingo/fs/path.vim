@@ -6,7 +6,7 @@
 "   - ingo/os.vim autoload script
 "   - ingo/fs/path/split.vim autoload script
 "
-" Copyright: (C) 2012-2020 Ingo Karkat
+" Copyright: (C) 2012-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -46,6 +46,11 @@ function! ingo#fs#path#Normalize( filespec, ... )
 
     return l:result
 endfunction
+function! s:Canonicalize( filespec, isResolveLinks ) abort
+    let l:absoluteFilespec = fnamemodify(a:filespec, ':p')  " Expand to absolute filespec before resolving; as this handles ~/, too.
+    let l:simplifiedFilespec = (a:isResolveLinks ? resolve(l:absoluteFilespec) : simplify(l:absoluteFilespec))
+    return ingo#fs#path#Normalize(l:simplifiedFilespec)
+endfunction
 function! ingo#fs#path#Canonicalize( filespec, ... )
 "******************************************************************************
 "* PURPOSE:
@@ -67,9 +72,7 @@ function! ingo#fs#path#Canonicalize( filespec, ... )
 "   Absolute a:filespec with uniform path separators and case, according to the
 "   platform.
 "******************************************************************************
-    let l:absoluteFilespec = fnamemodify(a:filespec, ':p')  " Expand to absolute filespec before resolving; as this handles ~/, too.
-    let l:simplifiedFilespec = (a:0 && a:1 ? resolve(l:absoluteFilespec) : simplify(l:absoluteFilespec))
-    let l:result = ingo#fs#path#Normalize(l:simplifiedFilespec)
+    let l:result = s:Canonicalize(a:filespec, (a:0 ? a:1 : 0))
     if ingo#fs#path#IsCaseInsensitive(l:result)
 	let l:result = tolower(l:result)
     endif
