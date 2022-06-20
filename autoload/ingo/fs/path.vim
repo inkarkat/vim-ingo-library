@@ -6,7 +6,7 @@
 "   - ingo/os.vim autoload script
 "   - ingo/fs/path/split.vim autoload script
 "
-" Copyright: (C) 2012-2020 Ingo Karkat
+" Copyright: (C) 2012-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -46,6 +46,18 @@ function! ingo#fs#path#Normalize( filespec, ... )
 
     return l:result
 endfunction
+function! s:Canonicalize( filespec, isResolveLinks ) abort
+    let l:absoluteFilespec = fnamemodify(a:filespec, ':p')  " Expand to absolute filespec before resolving; as this handles ~/, too.
+    let l:simplifiedFilespec = (a:isResolveLinks ? resolve(l:absoluteFilespec) : simplify(l:absoluteFilespec))
+    let l:normalizedFilespec = ingo#fs#path#Normalize(l:simplifiedFilespec)
+
+    let l:pathSeparator = ingo#fs#path#Separator()
+    if ingo#str#EndsWith(l:normalizedFilespec, l:pathSeparator) && l:normalizedFilespec !=# l:pathSeparator
+	let l:normalizedFilespec = strpart(l:normalizedFilespec, 0, len(l:normalizedFilespec) - len(l:pathSeparator))
+    endif
+
+    return l:normalizedFilespec
+endfunction
 function! ingo#fs#path#Canonicalize( filespec, ... )
 "******************************************************************************
 "* PURPOSE:
@@ -67,9 +79,7 @@ function! ingo#fs#path#Canonicalize( filespec, ... )
 "   Absolute a:filespec with uniform path separators and case, according to the
 "   platform.
 "******************************************************************************
-    let l:absoluteFilespec = fnamemodify(a:filespec, ':p')  " Expand to absolute filespec before resolving; as this handles ~/, too.
-    let l:simplifiedFilespec = (a:0 && a:1 ? resolve(l:absoluteFilespec) : simplify(l:absoluteFilespec))
-    let l:result = ingo#fs#path#Normalize(l:simplifiedFilespec)
+    let l:result = s:Canonicalize(a:filespec, (a:0 ? a:1 : 0))
     if ingo#fs#path#IsCaseInsensitive(l:result)
 	let l:result = tolower(l:result)
     endif
@@ -215,11 +225,27 @@ function! ingo#fs#path#IsCaseInsensitive( ... )
     return ingo#os#IsWinOrDos() " Note: Check based on path not yet implemented.
 endfunction
 
-function! ingo#fs#path#Equals( p1, p2 )
+function! ingo#fs#path#Equals( p1, p2, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Test whether a:p1 and a:p2 are identical.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:p1    Filespec.
+"   a:p2    Filespec.
+"   a:isResolveLinks    Flag whether to resolve shortcuts / symbolic links, too;
+"                       off by default.
+"* RETURN VALUES:
+"   1 if identical, 0 if not.
+"******************************************************************************
+    let l:isResolveLinks = (a:0 ? a:1 : 0)
     if ingo#fs#path#IsCaseInsensitive(a:p1) || ingo#fs#path#IsCaseInsensitive(a:p2)
-	return a:p1 ==? a:p2 || ingo#fs#path#Normalize(fnamemodify(a:p1, ':p')) ==? ingo#fs#path#Normalize(fnamemodify(a:p2, ':p'))
+	return a:p1 ==? a:p2 || s:Canonicalize(a:p1, l:isResolveLinks) ==? s:Canonicalize(a:p2, l:isResolveLinks)
     else
-	return a:p1 ==# a:p2 || ingo#fs#path#Normalize(fnamemodify(resolve(a:p1), ':p')) ==# ingo#fs#path#Normalize(fnamemodify(resolve(a:p2), ':p'))
+	return a:p1 ==# a:p2 || s:Canonicalize(a:p1, l:isResolveLinks) ==# s:Canonicalize(a:p2, l:isResolveLinks)
     endif
 endfunction
 
