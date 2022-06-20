@@ -1,9 +1,8 @@
 " ingo/buffer/scratch.vim: Functions for creating scratch buffers.
 "
 " DEPENDENCIES:
-"   - ingo/buffer/generate.vim autoload script
 "
-" Copyright: (C) 2009-2019 Ingo Karkat
+" Copyright: (C) 2009-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -52,8 +51,8 @@ function! ingo#buffer#scratch#Create( scratchDirspec, scratchFilename, scratchIs
 "			Pass a Funcref to build the scratch contents with it.
 "			Pass a List of lines to set the scratch buffer contents
 "			directly to the lines.
-"   a:windowOpenCommand	Ex command to open the scratch window, e.g. :vnew or
-"			:topleft new.
+"   a:windowOpenCommand	Ex command to open the window, e.g. "vnew" or
+"			"topleft new". Also supports "pedit".
 "   a:NextFilenameFuncref   Optional funcref that is invoked (with a:filename)
 "                           to generate file names for the generated buffer
 "                           should the desired one (a:filename) already exist

@@ -202,6 +202,8 @@ HISTORY
 - ingo#fs#path#{Canonizalize,Equals}(): Small fixes, support a:isResolveLinks
   in the latter, too.
 - Add ingo#window#preview#OpenNew().
+- ingo#buffer#{scratch,generate}#Create(): ENH: Support "pedit" as
+  a:windowOpenCommand.
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().

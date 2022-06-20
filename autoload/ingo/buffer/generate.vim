@@ -135,8 +135,8 @@ function! ingo#buffer#generate#Create( dirspec, filename, isFile, ContentsComman
 "			Pass a Funcref to build the buffer contents with it.
 "			Pass a List of lines to set the buffer contents directly
 "			to the lines.
-"   a:windowOpenCommand	Ex command to open the window, e.g. ":vnew" or
-"			":topleft new".
+"   a:windowOpenCommand	Ex command to open the window, e.g. "vnew" or
+"			"topleft new". Also supports "pedit".
 "   a:NextFilenameFuncref   Funcref that is invoked (with a:filename) to
 "			    generate file names for the generated buffer should
 "			    the desired one (a:filename) already exist but not
@@ -160,15 +160,20 @@ function! ingo#buffer#generate#Create( dirspec, filename, isFile, ContentsComman
 "****D echomsg '**** bufnr=' . l:bufnr 'winnr=' . l:winnr
     if l:winnr == -1
 	if l:bufnr == -1
-	    execute a:windowOpenCommand
+	    let l:windowOpenCommand = (a:windowOpenCommand ==# 'pedit' ? 'call ingo#window#preview#OpenNew()' : a:windowOpenCommand)
+	    execute l:windowOpenCommand
 	    " Note: The directory must already be changed here so that the :file
 	    " command can set the correct buffer filespec.
 	    call s:ChangeDir(a:dirspec)
 	    execute 'silent keepalt file' ingo#compat#fnameescape(a:filename)
 	    let l:status = 4
 	elseif getbufvar(l:bufnr, '&buftype') ==# ingo#buffer#generate#BufType(a:isFile)
-	    execute a:windowOpenCommand
-	    execute l:bufnr . 'buffer'
+	    if a:windowOpenCommand ==# 'pedit'
+		call ingo#window#preview#OpenBuffer(l:bufnr)
+	    else
+		execute a:windowOpenCommand
+		execute l:bufnr . 'buffer'
+	    endif
 	    let l:status = 3
 	else
 	    " A buffer with the filespec is already loaded, but it contains an
