@@ -49,7 +49,14 @@ endfunction
 function! s:Canonicalize( filespec, isResolveLinks ) abort
     let l:absoluteFilespec = fnamemodify(a:filespec, ':p')  " Expand to absolute filespec before resolving; as this handles ~/, too.
     let l:simplifiedFilespec = (a:isResolveLinks ? resolve(l:absoluteFilespec) : simplify(l:absoluteFilespec))
-    return ingo#fs#path#Normalize(l:simplifiedFilespec)
+    let l:normalizedFilespec = ingo#fs#path#Normalize(l:simplifiedFilespec)
+
+    let l:pathSeparator = ingo#fs#path#Separator()
+    if ingo#str#EndsWith(l:normalizedFilespec, l:pathSeparator) && l:normalizedFilespec !=# l:pathSeparator
+	let l:normalizedFilespec = strpart(l:normalizedFilespec, 0, len(l:normalizedFilespec) - len(l:pathSeparator))
+    endif
+
+    return l:normalizedFilespec
 endfunction
 function! ingo#fs#path#Canonicalize( filespec, ... )
 "******************************************************************************
