@@ -218,11 +218,27 @@ function! ingo#fs#path#IsCaseInsensitive( ... )
     return ingo#os#IsWinOrDos() " Note: Check based on path not yet implemented.
 endfunction
 
-function! ingo#fs#path#Equals( p1, p2 )
+function! ingo#fs#path#Equals( p1, p2, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Test whether a:p1 and a:p2 are identical.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:p1    Filespec.
+"   a:p2    Filespec.
+"   a:isResolveLinks    Flag whether to resolve shortcuts / symbolic links, too;
+"                       off by default.
+"* RETURN VALUES:
+"   1 if identical, 0 if not.
+"******************************************************************************
+    let l:isResolveLinks = (a:0 ? a:1 : 0)
     if ingo#fs#path#IsCaseInsensitive(a:p1) || ingo#fs#path#IsCaseInsensitive(a:p2)
-	return a:p1 ==? a:p2 || ingo#fs#path#Normalize(fnamemodify(a:p1, ':p')) ==? ingo#fs#path#Normalize(fnamemodify(a:p2, ':p'))
+	return a:p1 ==? a:p2 || s:Canonicalize(a:p1, l:isResolveLinks) ==? s:Canonicalize(a:p2, l:isResolveLinks)
     else
-	return a:p1 ==# a:p2 || ingo#fs#path#Normalize(fnamemodify(resolve(a:p1), ':p')) ==# ingo#fs#path#Normalize(fnamemodify(resolve(a:p2), ':p'))
+	return a:p1 ==# a:p2 || s:Canonicalize(a:p1, l:isResolveLinks) ==# s:Canonicalize(a:p2, l:isResolveLinks)
     endif
 endfunction
 
