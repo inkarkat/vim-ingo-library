@@ -201,6 +201,7 @@ HISTORY
 - Add ingo/option/autochdir.vim module.
 - ingo#fs#path#{Canonizalize,Equals}(): Small fixes, support a:isResolveLinks
   in the latter, too.
+- Add ingo#window#preview#OpenNew().
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().

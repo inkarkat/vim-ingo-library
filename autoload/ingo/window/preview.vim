@@ -2,34 +2,10 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2008-2016 Ingo Karkat
+" Copyright: (C) 2008-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.029.005	13-Dec-2016	BUG: Optional a:position argument to
-"				ingo#window#preview#SplitToPreview() is
-"				mistakenly truncated to [1:2]. Inline the
-"				l:cursor and l:bufnr variables; they are only
-"				used in the function call, anyway.
-"   1.021.004	06-Jul-2014	Support all imaginable argument variants of
-"				ingo#window#preview#OpenFilespec(), so that it
-"				can be used as a wrapper that encapsulates the
-"				g:previewwindowsplitmode config and the
-"				workaround for the absolute filespec due to the
-"				CWD.
-"   1.021.003	03-Jul-2014	Add ingo#window#preview#OpenFilespec(), a
-"				wrapper around :pedit that performs the
-"				fnameescape() and obeys the custom
-"				g:previewwindowsplitmode.
-"   1.020.002	02-Jun-2014	ENH: Allow passing optional a:tabnr to
-"				ingo#window#preview#IsPreviewWindowVisible().
-"				Factor out ingo#window#preview#OpenBuffer().
-"				CHG: Change optional a:cursor argument of
-"				ingo#window#preview#SplitToPreview() from
-"				4-tuple getpos()-style to [lnum, col]-style.
-"   1.004.001	08-Apr-2013	file creation from autoload/ingowindow.vim
 let s:save_cpo = &cpo
 set cpo&vim
 
@@ -60,6 +36,12 @@ function! ingo#window#preview#OpenBuffer( bufnr, ... )
     if a:0
 	call cursor(a:1)
     endif
+endfunction
+function! ingo#window#preview#OpenNew()
+    if ! &l:previewwindow
+	call ingo#window#preview#OpenPreview()
+    endif
+    keepalt hide enew
 endfunction
 function! ingo#window#preview#OpenFilespec( filespec, ... )
     " Load the passed filespec in the preview window.
