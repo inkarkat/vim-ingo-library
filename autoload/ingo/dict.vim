@@ -178,7 +178,7 @@ function! ingo#dict#AddMirrored( dict, ... )
     let l:isEnsureUniqueness = (a:0 && a:1)
     for [l:key, l:value] in (type(a:dict) == type({}) ? items(a:dict) : a:dict)
 	if l:isEnsureUniqueness
-	    if has_key(l:dict, l:value)
+	    if has_key(a:dict, l:value)
 		throw 'AddMirrored: ValueNotUnique: ' . l:value
 	    endif
 	endif
