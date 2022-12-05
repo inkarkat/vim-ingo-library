@@ -210,6 +210,7 @@ HISTORY
   passing optional target register.
 - ingo#subs#BraceCreation#FromList(): ENH: Add
   a:options.singleCharacterElementsInSquareBraces.
+- Add ingo#text#frompattern#GetNext().
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().

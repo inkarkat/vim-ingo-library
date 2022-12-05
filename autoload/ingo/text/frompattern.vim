@@ -233,4 +233,28 @@ function! s:PredicateCheck( Predicate, context, match, replacement, startPos, en
     return l:isAccepted
 endfunction
 
+
+function! ingo#text#frompattern#GetNext( pattern ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Extract the closest match of a:pattern from the cursor position, first
+"   looking forward and then wrapping around.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:pattern       Regular expression to search. 'ignorecase', 'smartcase' and
+"		    'magic' applies. When empty, the last search pattern |"/| is
+"		    used.
+"* RETURN VALUES:
+"   string text, or empty List if no match.
+"******************************************************************************
+    let l:startPos = searchpos(a:pattern, 'cnw')
+    if l:startPos == [0, 0] | return [] | endif
+    let l:endPos = searchpos(a:pattern, 'cenw')
+
+    return ingo#text#Get(l:startPos, l:endPos)
+endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
