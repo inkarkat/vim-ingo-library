@@ -211,6 +211,9 @@ HISTORY
 - ingo#subs#BraceCreation#FromList(): ENH: Add
   a:options.singleCharacterElementsInSquareBraces.
 - Add ingo#text#frompattern#GetNext().
+- ingo#regexp#comments#CommentToExpression(): BUG: The $ anchor was mistakenly
+  escaped, but the pattern is (normal) magic; special comment characters (like
+  "\*") are not properly escaped.
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
