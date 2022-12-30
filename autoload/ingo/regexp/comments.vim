@@ -4,7 +4,7 @@
 "   - ingo/option.vim autoload script
 "   - IndentCommentPrefix.vim plugin (optional integration)
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -34,7 +34,7 @@ function! ingo#regexp#comments#CommentToExpression( comment )
     " Will be joined to			>cular.
     " # This is text.			Will be joined to
     "					>This is spectacular.
-    return (l:flags =~# 'b' ? l:comment . '\%(\s\|\$\)\@=': l:comment)
+    return (l:flags =~# 'b' ? l:commentExpr . '\%(\s\|$\)\@=' : l:commentExpr)
 endfunction
 function! ingo#regexp#comments#FromSetting()
     if empty(&l:comments)
