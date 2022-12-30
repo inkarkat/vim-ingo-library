@@ -8,17 +8,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.030.004	27-Jan-2017	Add
-"				ingo#regexp#comments#GetFlexibleWhitespaceAndCommentPrefixPattern().
-"   1.020.003	03-Jun-2014	Use ingo#option#Split().
-"   1.013.002	12-Sep-2013	Avoid using \ze in
-"				ingo#regexp#comments#CommentToExpression(). It
-"				may be used in a larger expression that still
-"				wants to match after the prefix.
-"   1.009.001	18-Jun-2013	file creation from
-"				AdvancedJoiners/CommentJoin.vim
 
 function! ingo#regexp#comments#CommentToExpression( comment )
     let [l:flags, l:comment] = matchlist(a:comment, '\([^:]*\):\(.*\)')[1:2]
