@@ -22,9 +22,7 @@
 
 function! ingo#regexp#comments#CommentToExpression( comment )
     let [l:flags, l:comment] = matchlist(a:comment, '\([^:]*\):\(.*\)')[1:2]
-
-    " Mask backslash for "very nomagic" pattern.
-    let l:comment = escape(l:comment, '\')
+    let l:commentExpr = ingo#regexp#EscapeLiteralText(l:comment)
 
     " Observe when a blank is required after the comment string, but do not
     " include it in the match, so that it is preserved during the join.
