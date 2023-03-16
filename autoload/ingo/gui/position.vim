@@ -6,9 +6,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.011.001	19-Jul-2013	file creation
 
 if exists('*getwinpos')
     function! ingo#gui#position#Get() abort
