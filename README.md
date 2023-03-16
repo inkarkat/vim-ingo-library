@@ -214,6 +214,9 @@ HISTORY
 - ingo#regexp#comments#CommentToExpression(): BUG: The $ anchor was mistakenly
   escaped, but the pattern is (normal) magic; special comment characters (like
   "\*") are not properly escaped.
+- CHG: Minor: ingo#gui#position#Get() swap the first two returned elements (so
+  it's X-Y, too) and return numbers for elements 3 and 4. This shouldn't
+  matter to clients as the format is unspecified.
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
@@ -1282,7 +1285,7 @@ HISTORY
 - Started development of shared autoload functionality.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2009-2022 Ingo Karkat -
+Copyright: (C) 2009-2023 Ingo Karkat -
 Contains URL encoding / decoding algorithms written by Tim Pope. -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
