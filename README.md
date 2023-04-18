@@ -217,6 +217,8 @@ HISTORY
 - CHG: Minor: ingo#gui#position#Get() swap the first two returned elements (so
   it's X-Y, too) and return numbers for elements 3 and 4. This shouldn't
   matter to clients as the format is unspecified.
+- ingo#join#\*() with a:isKeepSpace = 0 are not affected by 'formatoptions' any
+  longer (and may be a bit faster).
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
