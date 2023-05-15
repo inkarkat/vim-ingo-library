@@ -29,6 +29,15 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+function! ingo#plugin#cmdcomplete#dirforaction#SetCompletionContext( CmdLine ) abort
+    let l:parse = ingo#cmdargs#command#Parse(a:CmdLine, '*')
+    if empty(l:parse)
+	let g:IngoLibrary_CmdCompleteDirForAction_Context = { 'bang': '', 'count': 0, 'mods': '' }
+    else
+	let [l:fullCommandUnderCursor, l:combiner, l:commandCommands, l:range, l:commandName, l:commandBang, l:commandDirectArgs, l:commandArgs] = l:parse
+	let g:IngoLibrary_CmdCompleteDirForAction_Context = { 'bang': l:commandBang, 'count': (l:range =~# '^\d\+$' ? str2nr(l:range) : 0), 'mods': l:commandCommands }
+    endif
+endfunction
 function! s:RemoveDirspec( filespec, dirspecs )
     for l:dirspec in a:dirspecs
 	if strpart(a:filespec, 0, strlen(l:dirspec)) ==# l:dirspec
@@ -54,7 +63,6 @@ function! s:ResolveDirspecs( dirspecs, ... )
     endif
 endfunction
 function! s:ResolveDirspecsToList( dirspecs ) abort
-    let g:IngoLibrary_CmdCompleteDirForAction_Context = {}
     try
 	return ingo#list#Make(s:ResolveDirspecs(a:dirspecs))
     catch /^Vim\%((\a\+)\)\=:E/
@@ -65,8 +73,6 @@ function! s:ResolveDirspecsToList( dirspecs ) abort
 	call ingo#msg#ErrorMsg(v:exception)
 	sleep 1 " Otherwise, the error isn't visible from inside the command-line completion function.
 	return []
-    finally
-	unlet! g:IngoLibrary_CmdCompleteDirForAction_Context
     endtry
 endfunction
 function! s:CompleteFiles( isReturnRawFilespecs, dirspecs, browsefilter, wildignore, isIncludeSubdirs, isAllowOtherDirs, CompleteFunctionHook, argLead )
@@ -443,10 +449,16 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
     let l:completeStrategy = (type(l:Action) == type('') && l:Action ==# 'chdir' ? 's:CompleteDirectories' : 's:CompleteFiles')
     execute
     \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:generatedCompleteFunctionName) .
+    \	"try\n" .
+    \	"    call ingo#plugin#cmdcomplete#dirforaction#SetCompletionContext(strpart(a:CmdLine, 0, a:CursorPos))\n" .
     \	printf("    return %s(0, %s, %s, %s, %d, %d, %s, a:ArgLead)\n",
     \       l:completeStrategy,
     \	    string(a:dirspecs), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs, l:isAllowOtherDirs, string(l:CompleteFunctionHook)
-    \	) .    'endfunction'
+    \	) .
+    \   "finally\n" .
+    \	"    unlet! g:IngoLibrary_CmdCompleteDirForAction_Context\n" .
+    \	"endtry\n" .
+    \	'endfunction'
 
     execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, <count>, ingo#compat#command#Mods(''<mods>''), %s, %s, %d, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
     \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'),
