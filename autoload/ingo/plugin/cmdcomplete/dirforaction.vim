@@ -22,7 +22,7 @@
 "   You can then use the new command with file completion:
 "	:BrowseTemp f<Tab> -> :BrowseTemp foo.txt
 "
-" Copyright: (C) 2009-2021 Ingo Karkat
+" Copyright: (C) 2009-2023 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -54,6 +54,7 @@ function! s:ResolveDirspecs( dirspecs, ... )
     endif
 endfunction
 function! s:ResolveDirspecsToList( dirspecs ) abort
+    let g:IngoLibrary_CmdCompleteDirForAction_Context = {}
     try
 	return ingo#list#Make(s:ResolveDirspecs(a:dirspecs))
     catch /^Vim\%((\a\+)\)\=:E/
@@ -64,6 +65,8 @@ function! s:ResolveDirspecsToList( dirspecs ) abort
 	call ingo#msg#ErrorMsg(v:exception)
 	sleep 1 " Otherwise, the error isn't visible from inside the command-line completion function.
 	return []
+    finally
+	unlet! g:IngoLibrary_CmdCompleteDirForAction_Context
     endtry
 endfunction
 function! s:CompleteFiles( isReturnRawFilespecs, dirspecs, browsefilter, wildignore, isIncludeSubdirs, isAllowOtherDirs, CompleteFunctionHook, argLead )
@@ -221,7 +224,7 @@ function! s:SuffixesSort( f1, f2 )
     endif
 endfunction
 
-function! s:Command( isBang, mods, Action, PostAction, isAllowOtherDirs, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspecs, filename )
+function! s:Command( isBang, count, mods, Action, PostAction, isAllowOtherDirs, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspecs, filename )
     try
 "****Dechomsg '****' a:isBang a:mods string(a:Action) string(a:PostAction) a:isAllowOtherDirs string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspecs) string(a:filename)
 
@@ -230,7 +233,7 @@ function! s:Command( isBang, mods, Action, PostAction, isAllowOtherDirs, Default
 "****D echomsg '****' string(l:filename) string(l:fileOptionsAndCommands)
 	" Set up a context object so that Funcrefs can have access to the
 	" information whether <bang> was given.
-	let g:IngoLibrary_CmdCompleteDirForAction_Context = { 'bang': a:isBang, 'mods': a:mods }
+	let g:IngoLibrary_CmdCompleteDirForAction_Context = { 'bang': a:isBang, 'count': a:count, 'mods': a:mods }
 
 	" l:filename comes from the custom command, and must be taken as is (the
 	" custom completion will have already escaped the completion).
@@ -352,9 +355,10 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
 "		dirspec(s).
 "
 "   a:parameters.commandAttributes
-"	    Optional :command {attr}, e.g. <buffer>, -bang, -range.
+"	    Optional :command {attr}, e.g. <buffer>, -bang, -count, -range.
 "	    Funcrefs can access the <bang> via
-"	    g:IngoLibrary_CmdCompleteDirForAction_Context.bang.
+"	    g:IngoLibrary_CmdCompleteDirForAction_Context.bang and the <count>
+"	    via g:IngoLibrary_CmdCompleteDirForAction_Context.count
 "   a:parameters.action
 "	    Ex command (e.g. 'edit', '<line1>read') to be invoked with the
 "	    completed filespec. Default is the :drop / :Drop command.
@@ -444,7 +448,7 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
     \	    string(a:dirspecs), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs, l:isAllowOtherDirs, string(l:CompleteFunctionHook)
     \	) .    'endfunction'
 
-    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, ingo#compat#command#Mods(''<mods>''), %s, %s, %d, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
+    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, <count>, ingo#compat#command#Mods(''<mods>''), %s, %s, %d, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
     \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'),
     \   l:completeFunctionName,
     \   l:commandAttributes,
