@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2020 Ingo Karkat
+" Copyright: (C) 2012-2023 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -65,7 +65,7 @@ function! ingo#cmdargs#command#Parse( commandLine, ... )
 "   a:directArgumentExpr    Regular expression for matching direct arguments.
 "			    Defaults to parsing of arbitrary direct arguments.
 "* RETURN VALUES:
-"   List of [fullCommandUnderCursor, combiner, range, commandCommands, commandName, commandBang, commandDirectArgs, commandArgs]
+"   List of [fullCommandUnderCursor, combiner, commandCommands, range, commandName, commandBang, commandDirectArgs, commandArgs]
 "   where:
 "	fullCommandUnderCursor  The entire command, potentially starting with
 "				"|" when there's a command chain.
