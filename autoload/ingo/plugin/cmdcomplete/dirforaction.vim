@@ -22,13 +22,22 @@
 "   You can then use the new command with file completion:
 "	:BrowseTemp f<Tab> -> :BrowseTemp foo.txt
 "
-" Copyright: (C) 2009-2021 Ingo Karkat
+" Copyright: (C) 2009-2023 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 let s:save_cpo = &cpo
 set cpo&vim
 
+function! ingo#plugin#cmdcomplete#dirforaction#SetCompletionContext( CmdLine ) abort
+    let l:parse = ingo#cmdargs#command#Parse(a:CmdLine, '*')
+    if empty(l:parse)
+	let g:IngoLibrary_CmdCompleteDirForAction_Context = { 'bang': '', 'count': 0, 'mods': '' }
+    else
+	let [l:fullCommandUnderCursor, l:combiner, l:commandCommands, l:range, l:commandName, l:commandBang, l:commandDirectArgs, l:commandArgs] = l:parse
+	let g:IngoLibrary_CmdCompleteDirForAction_Context = { 'bang': l:commandBang, 'count': (l:range =~# '^\d\+$' ? str2nr(l:range) : 0), 'mods': l:commandCommands }
+    endif
+endfunction
 function! s:RemoveDirspec( filespec, dirspecs )
     for l:dirspec in a:dirspecs
 	if strpart(a:filespec, 0, strlen(l:dirspec)) ==# l:dirspec
@@ -66,12 +75,13 @@ function! s:ResolveDirspecsToList( dirspecs ) abort
 	return []
     endtry
 endfunction
-function! s:CompleteFiles( isReturnRawFilespecs, dirspecs, browsefilter, wildignore, isIncludeSubdirs, isAllowOtherDirs, CompleteFunctionHook, argLead )
+function! s:CompleteFiles( isReturnRawFilespecs, dirspecs, Browsefilter, Wildignore, isIncludeSubdirs, isAllowOtherDirs, CompleteFunctionHook, argLead )
     let l:dirspecs = s:ResolveDirspecsToList(a:dirspecs)
-    let l:browsefilter = (empty(a:browsefilter) ? ['*'] : ingo#list#Make(a:browsefilter))
+    let l:browsefilters = (empty(a:Browsefilter) ? ['*'] : ingo#list#Make(a:Browsefilter))
     let l:save_wildignore = &wildignore
-    if type(a:wildignore) == type('')
-	let &wildignore = a:wildignore
+    let l:wildignoreValue = ingo#actions#ValueOrFunc(a:Wildignore)
+    if type(l:wildignoreValue) == type('')
+	let &wildignore = l:wildignoreValue
     endif
     try
 	let l:filespecs = []
@@ -113,22 +123,24 @@ function! s:CompleteFiles( isReturnRawFilespecs, dirspecs, browsefilter, wildign
 		" If there is a browsefilter, we need to add all directories
 		" separately, as most of them probably have been filtered away by
 		" the (file-based) a:browsefilter.
-		if ! empty(a:browsefilter)
+		if ! empty(a:Browsefilter)
 		    let l:dirspecWildcard = l:dirspec . a:argLead . '*' . ingo#fs#path#Separator()
 		    let l:filespecs += ingo#compat#glob(l:dirspecWildcard, 0, 1)
 		    let l:sourceCnt += 1
 		endif
 	    endif
 
-	    for l:filter in l:browsefilter
-		let l:filespecWildcard = l:dirspec . a:argLead . l:filter
-		let l:filespecs += ingo#compat#glob(l:filespecWildcard, 0, 1)
-		let l:sourceCnt += 1
+	    for l:Filter in l:browsefilters
+		for l:filter in ingo#list#Make(ingo#actions#ValueOrFunc(l:Filter))
+		    let l:filespecWildcard = l:dirspec . a:argLead . l:filter
+		    let l:filespecs += ingo#compat#glob(l:filespecWildcard, 0, 1)
+		    let l:sourceCnt += 1
+		endfor
 	    endfor
 	endfor
 
 	if a:isIncludeSubdirs || l:hasAbsoluteArgLead || l:isUpwards
-	    if empty(a:browsefilter)
+	    if empty(a:Browsefilter)
 		" glob() doesn't add a trailing path separator on directories
 		" unless the glob pattern has one at the end. Append the path
 		" separator here to be consistent with the alternative block
@@ -173,12 +185,12 @@ function! s:CompleteFiles( isReturnRawFilespecs, dirspecs, browsefilter, wildign
 	let &wildignore = l:save_wildignore
     endtry
 endfunction
-function! s:CompleteDirectories( isReturnRawFilespecs, dirspecs, browsefilter, wildignore, isIncludeSubdirs, isAllowOtherDirs, CompleteFunctionHook, argLead )
+function! s:CompleteDirectories( isReturnRawFilespecs, dirspecs, Browsefilter, Wildignore, isIncludeSubdirs, isAllowOtherDirs, CompleteFunctionHook, argLead )
     if ! a:isIncludeSubdirs && ! a:isAllowOtherDirs
 	return []   " No completion possible; only files from a:dirspec itself.
     endif
 
-    let l:filespecs = s:CompleteFiles(1, a:dirspecs, a:browsefilter, a:wildignore, a:isIncludeSubdirs, a:isAllowOtherDirs, a:CompleteFunctionHook, a:argLead)
+    let l:filespecs = s:CompleteFiles(1, a:dirspecs, a:Browsefilter, a:Wildignore, a:isIncludeSubdirs, a:isAllowOtherDirs, a:CompleteFunctionHook, a:argLead)
     call filter(l:filespecs, 'isdirectory(v:val)')
 
     if ! a:isReturnRawFilespecs
@@ -221,7 +233,7 @@ function! s:SuffixesSort( f1, f2 )
     endif
 endfunction
 
-function! s:Command( isBang, mods, Action, PostAction, isAllowOtherDirs, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspecs, filename )
+function! s:Command( isBang, count, mods, Action, PostAction, isAllowOtherDirs, DefaultFilename, FilenameProcessingFunction, FilespecProcessingFunction, dirspecs, filename )
     try
 "****Dechomsg '****' a:isBang a:mods string(a:Action) string(a:PostAction) a:isAllowOtherDirs string(a:DefaultFilename) string(a:FilenameProcessingFunction) string(a:FilespecProcessingFunction) string(a:dirspecs) string(a:filename)
 
@@ -230,7 +242,7 @@ function! s:Command( isBang, mods, Action, PostAction, isAllowOtherDirs, Default
 "****D echomsg '****' string(l:filename) string(l:fileOptionsAndCommands)
 	" Set up a context object so that Funcrefs can have access to the
 	" information whether <bang> was given.
-	let g:IngoLibrary_CmdCompleteDirForAction_Context = { 'bang': a:isBang, 'mods': a:mods }
+	let g:IngoLibrary_CmdCompleteDirForAction_Context = { 'bang': a:isBang, 'count': a:count, 'mods': a:mods }
 
 	" l:filename comes from the custom command, and must be taken as is (the
 	" custom completion will have already escaped the completion).
@@ -352,9 +364,10 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
 "		dirspec(s).
 "
 "   a:parameters.commandAttributes
-"	    Optional :command {attr}, e.g. <buffer>, -bang, -range.
+"	    Optional :command {attr}, e.g. <buffer>, -bang, -count, -range.
 "	    Funcrefs can access the <bang> via
-"	    g:IngoLibrary_CmdCompleteDirForAction_Context.bang.
+"	    g:IngoLibrary_CmdCompleteDirForAction_Context.bang and the <count>
+"	    via g:IngoLibrary_CmdCompleteDirForAction_Context.count
 "   a:parameters.action
 "	    Ex command (e.g. 'edit', '<line1>read') to be invoked with the
 "	    completed filespec. Default is the :drop / :Drop command.
@@ -373,12 +386,16 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
 "	    string to include all (non-hidden) files. Does not apply to
 "	    subdirectory names (but applies to the files inside the
 "	    subdirectories).
+"           Or [List of] Funcref[s] to a function that takes no arguments and
+"           returns the browsefilter(s).
 "   a:parameters.wildignore
 "	    Comma-separated list of file extensions to be ignored. This is
 "	    similar to a:parameters.browsefilter, but with inverted semantics,
 "	    only file extensions, and multiple possible values. Use empty string
 "	    to disable and pass 0 (the default) to keep the current global
 "	    'wildignore' setting.
+"           Or Funcref to a function that takes no arguments and returns the
+"           wildignore value.
 "   a:parameters.isIncludeSubdirs
 "	    Flag whether subdirectories will be included in the completion
 "	    matches. By default, only files in a:dirspecs itself will be offered.
@@ -423,8 +440,8 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
     let l:commandAttributes = get(a:parameters, 'commandAttributes', '')
     let l:Action = get(a:parameters, 'action', ((exists(':Drop') == 2) ? 'Drop' : 'drop'))
     let l:PostAction = get(a:parameters, 'postAction', '')
-    let l:browsefilter = get(a:parameters, 'browsefilter', '')
-    let l:wildignore = get(a:parameters, 'wildignore', 0)
+    let l:Browsefilter = get(a:parameters, 'browsefilter', '')
+    let l:Wildignore = get(a:parameters, 'wildignore', 0)
     let l:isNoDirspec = empty(a:dirspecs)
     let l:isIncludeSubdirs = get(a:parameters, 'isIncludeSubdirs', l:isNoDirspec)
     let l:isAllowOtherDirs = get(a:parameters, 'isAllowOtherDirs', l:isNoDirspec)
@@ -439,12 +456,18 @@ function! ingo#plugin#cmdcomplete#dirforaction#setup( command, dirspecs, paramet
     let l:completeStrategy = (type(l:Action) == type('') && l:Action ==# 'chdir' ? 's:CompleteDirectories' : 's:CompleteFiles')
     execute
     \	printf("function! %s(ArgLead, CmdLine, CursorPos)\n", l:generatedCompleteFunctionName) .
+    \	"try\n" .
+    \	"    call ingo#plugin#cmdcomplete#dirforaction#SetCompletionContext(strpart(a:CmdLine, 0, a:CursorPos))\n" .
     \	printf("    return %s(0, %s, %s, %s, %d, %d, %s, a:ArgLead)\n",
     \       l:completeStrategy,
-    \	    string(a:dirspecs), string(l:browsefilter), string(l:wildignore), l:isIncludeSubdirs, l:isAllowOtherDirs, string(l:CompleteFunctionHook)
-    \	) .    'endfunction'
+    \	    string(a:dirspecs), string(l:Browsefilter), string(l:Wildignore), l:isIncludeSubdirs, l:isAllowOtherDirs, string(l:CompleteFunctionHook)
+    \	) .
+    \   "finally\n" .
+    \	"    unlet! g:IngoLibrary_CmdCompleteDirForAction_Context\n" .
+    \	"endtry\n" .
+    \	'endfunction'
 
-    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, ingo#compat#command#Mods(''<mods>''), %s, %s, %d, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
+    execute printf('command! -bar -nargs=%s -complete=customlist,%s %s %s if ! <SID>Command(<bang>0, <count>, ingo#compat#command#Mods(''<mods>''), %s, %s, %d, %s, %s, %s, %s, <q-args>) | echoerr ingo#err#Get() | endif',
     \	(has_key(a:parameters, 'defaultFilename') ? '?' : '1'),
     \   l:completeFunctionName,
     \   l:commandAttributes,

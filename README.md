@@ -219,6 +219,9 @@ HISTORY
   matter to clients as the format is unspecified.
 - ingo#join#\*() with a:isKeepSpace = 0 are not affected by 'formatoptions' any
   longer (and may be a bit faster).
+- ingo#plugin#cmdcomplete#dirforaction#setup(): ENH: Allow passing of
+  'commandAttributes': '-count', Funcref for a:parameters.browsefilter and
+  a:parameters.wildignore
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
