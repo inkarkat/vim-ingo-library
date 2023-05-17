@@ -32,29 +32,33 @@ function! ingo#join#Lines( lnum, isKeepSpace, separator )
 	return 0
     endif
 
+    let l:literalSeparator = (empty(a:separator)
+    \   ? ''
+    \   : (a:separator ==# "\<C-v>\<C-j>"
+    \       ? nr2char(10)
+    \       : ingo#regexp#EscapeLiteralReplacement(a:separator, '/')
+    \   )
+    \)
+
     if a:isKeepSpace
-	let l:literalSeparator = (empty(a:separator)
-	\   ? ''
-	\   : (a:separator ==# "\<C-v>\<C-j>"
-	\       ? nr2char(10)
-	\       : ingo#regexp#EscapeLiteralReplacement(a:separator, '/')
-	\   )
-	\)
 	execute s:keeppatterns a:lnum . 'substitute/^\(.*\)\n\(.*\)$/\1' . l:literalSeparator . '\2/'
     else
 	let l:isFollowingOptionalWhitespaceLine = (getline(a:lnum + 1) =~# '^\s*$')
 	execute a:lnum . 'normal! J'
 
-	let l:changeJoiner = (empty(a:separator) ? '"_diw' : '"_ciw' . a:separator . "\<Esc>")
+	let l:changeJoiner = (empty(a:separator) ? '"_diw' : "\"_ciw\<C-v>\<C-@>\<Esc>")
 	" The J command inserts one space in place of the <EOL> unless there is
 	" trailing white space or the next line starts with a ')' or is empty.
 	" The whitespace will be handed by "ciw", but we need a special case
 	" for ')' and a following empty line.
 	if ! search('\%#\s\|\s\%#', 'bcW', line('.'))
-	    let l:changeJoiner = (empty(a:separator) ? '' : (l:isFollowingOptionalWhitespaceLine ? 'a' : 'i') . a:separator . "\<Esc>")
+	    let l:changeJoiner = (empty(a:separator) ? '' : (l:isFollowingOptionalWhitespaceLine ? 'a' : 'i') . "\<C-v>\<C-@>\<Esc>")
 	endif
 	if ! empty(l:changeJoiner)
 	    execute 'normal!' l:changeJoiner
+	endif
+	if ! empty(a:separator)
+	    execute s:keeppatterns a:lnum . 'substitute/^\(.*\)\%x00\(.*\)$/\1' . l:literalSeparator . '\2/e'
 	endif
     endif
     return 1
