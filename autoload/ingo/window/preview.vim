@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2008-2022 Ingo Karkat
+" Copyright: (C) 2008-2023 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -19,8 +19,29 @@ function! ingo#window#preview#OpenPreview( ... )
 	wincmd P
     catch /^Vim\%((\a\+)\)\=:E441:/
 	" Else, temporarily open a dummy file. (There's no :popen command.)
-	execute 'silent' (exists('g:previewwindowsplitmode') ? g:previewwindowsplitmode : '') (a:0 ? a:1 : '') 'pedit! +setlocal\ buftype=nofile\ bufhidden=wipe\ nobuflisted\ noswapfile [No\ Name]'
-	wincmd P
+	try
+	    execute 'silent' (exists('g:previewwindowsplitmode') ? g:previewwindowsplitmode : '') (a:0 ? a:1 : '') 'pedit! +setlocal\ buftype=nofile\ bufhidden=wipe\ nobuflisted\ noswapfile [No\ Name]'
+	    wincmd P
+	catch /^Vim\%((\a\+)\)\=:E36:/ " E36: Not enough room
+	    " :pedit likely splits above the current window, but (depending on
+	    " g:previewwindowsplitmode) it could split anywhere else. Try to
+	    " locate windows with too little height and enlarge them (to the
+	    " required minimum of 2 lines) until :pedit succeeds.
+	    for l:winNr in [winnr() - 1] + filter(range(1, winnr('$')), 'v:val != winnr() - 1')
+		try
+		    if winheight(l:winNr) > 1
+			continue " This window cannot be the problem.
+		    endif
+
+		    execute l:winNr . 'resize 2'
+		    execute 'silent' (exists('g:previewwindowsplitmode') ? g:previewwindowsplitmode : '') (a:0 ? a:1 : '') 'pedit! +setlocal\ buftype=nofile\ bufhidden=wipe\ nobuflisted\ noswapfile [No\ Name]'
+		    wincmd P
+		    return
+		catch /^Vim\%((\a\+)\)\=:E36:/ " E36: Not enough room
+		    continue
+		endtry
+	    endfor
+	endtry
     endtry
 endfunction
 function! ingo#window#preview#OpenBuffer( bufnr, ... )
