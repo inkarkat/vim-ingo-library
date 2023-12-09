@@ -224,6 +224,9 @@ HISTORY
   a:parameters.wildignore
 - BUG: ingo#join#\*() with a:isKeepSpace = 0 may expand a literal tab separator
   into space(s).
+- ENH: Add ingo#actions#EvaluateWithValOrFunc() variant of
+  ingo#actions#ExecuteWithValOrFunc(). This is useful for configurations that
+  can either be an expression (with optional v:val) or a Funcref.
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
