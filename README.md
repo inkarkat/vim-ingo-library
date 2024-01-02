@@ -227,6 +227,7 @@ HISTORY
 - ENH: Add ingo#actions#EvaluateWithValOrFunc() variant of
   ingo#actions#ExecuteWithValOrFunc(). This is useful for configurations that
   can either be an expression (with optional v:val) or a Funcref.
+- Add ingo#escape#EscapeExpr().
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
@@ -1295,7 +1296,7 @@ HISTORY
 - Started development of shared autoload functionality.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2009-2023 Ingo Karkat -
+Copyright: (C) 2009-2024 Ingo Karkat -
 Contains URL encoding / decoding algorithms written by Tim Pope. -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
