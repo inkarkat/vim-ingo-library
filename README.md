@@ -228,6 +228,8 @@ HISTORY
   ingo#actions#ExecuteWithValOrFunc(). This is useful for configurations that
   can either be an expression (with optional v:val) or a Funcref.
 - Add ingo#escape#EscapeExpr().
+- ingo#text#surroundings#SurroundWith\[SingleChar](): ENH: Support custom set
+  of [back, end] motions.
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().

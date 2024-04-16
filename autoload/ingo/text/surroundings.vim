@@ -184,7 +184,8 @@ function! ingo#text#surroundings#DoSurround( textBefore, textAfter )
     execute 'normal! "_s' . a:textBefore . "\<C-R>\<C-O>\"" . a:textAfter . "\<Esc>"
 endfunction
 function! ingo#text#surroundings#SurroundWith( selectionType, textBefore, textAfter )
-    if a:selectionType ==# 'z'
+    let l:isCustomSelectionType = type(a:selectionType) == type([])
+    if ! l:isCustomSelectionType && a:selectionType ==# 'z'
 	" This special selection type assumes that the surrounded text has
 	" already been captured in register z and replaced with a single
 	" character. It is necessary for the "surround with one typed character"
@@ -201,7 +202,7 @@ function! ingo#text#surroundings#SurroundWith( selectionType, textBefore, textAf
 	" The start of the change is already right, but the end is one after the
 	" trailing delimiter. Use the cursor position instead, it is right.
 	call setpos("']", getpos('.'))
-    elseif index(['v', 'char', 'line', 'block'], a:selectionType) != -1
+    elseif ! l:isCustomSelectionType && index(['v', 'char', 'line', 'block'], a:selectionType) != -1
 	if a:selectionType ==# 'char'
 	    silent! execute 'normal! g`[vg`]'. (&selection ==# 'exclusive' ? 'l' : '') . "\<Esc>"
 	elseif a:selectionType ==# 'line'
@@ -217,7 +218,12 @@ function! ingo#text#surroundings#SurroundWith( selectionType, textBefore, textAf
 	" trailing delimiter. Use the cursor position instead, it is right.
 	call setpos("']", getpos('.'))
     else
-	if a:selectionType ==# 'w'
+	let l:bang = '!'
+	if l:isCustomSelectionType
+	    " Custom set of [back, end] motions.
+	    let [l:backmotion, l:backendmotion] = a:selectionType
+	    let l:bang = ''
+	elseif a:selectionType ==# 'w'
 	    let l:backmotion = 'b'
 	    let l:backendmotion = 'e'
 	elseif a:selectionType ==# 'W'
@@ -229,10 +235,10 @@ function! ingo#text#surroundings#SurroundWith( selectionType, textBefore, textAf
 
 	let l:count = (v:count ? v:count : '')
 	let l:save_cursor = getpos('.')
-	execute 'normal! w' . l:backmotion . 'i' . a:textBefore . "\<Esc>"
+	execute 'normal' . l:bang . ' ' . 'w' . l:backmotion . 'i' . a:textBefore . "\<Esc>"
 	let l:begin_pos = getpos("'[")
 
-	execute 'normal!' l:count . l:backendmotion . 'a' . a:textAfter . "\<Esc>"
+	execute 'normal' . l:bang . ' ' . l:count . l:backendmotion . 'a' . a:textAfter . "\<Esc>"
 	let l:end_pos = getpos('.') " Use the cursor position; '] is one after the change.
 
 	" Adapt saved cursor position to consider inserted text.
