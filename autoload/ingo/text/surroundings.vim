@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2008-2022 Ingo Karkat
+" Copyright: (C) 2008-2024 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -14,8 +14,8 @@ endfunction
 
 " Helper: Search for a:expr a:count times.
 function! s:Search( expr, count, isBackward )
-    for i in range(1, a:count)
-	let l:lineNum = search( a:expr, (a:isBackward ? 'b' : '').'W' )
+    for l:i in range(1, a:count)
+	let l:lineNum = search(a:expr, (a:isBackward ? 'b' : '').'W')
 	if l:lineNum == 0
 	    return 0
 	endif
@@ -38,12 +38,12 @@ function! ingo#text#surroundings#ChangeEnclosedText( count, delimiterChar, isInn
     " count=1) and there are no or only newlines between the delimiters.
     " Once we're in Visual mode, at least the current char will be changed;
     " there is no 'null' selection possible.
-    if ! ( (search( '\%#' . l:literalDelimiterExpr . '\n*' . l:literalDelimiterExpr ) > 0) && a:count == 1 && a:isInner )
+    if ! ((search( '\%#' . l:literalDelimiterExpr . '\n*' . l:literalDelimiterExpr ) > 0) && a:count == 1 && a:isInner)
 	" Step right to consider the cursor position and search for leading
 	" delimiter to the left.
 	call ingo#cursor#move#Right()
 	if s:Search(l:literalDelimiterExpr, 1, 1) > 0
-	    if( a:isInner )
+	    if a:isInner
 		call ingo#cursor#move#Right()
 		normal! v
 		call ingo#cursor#move#Left()
@@ -56,7 +56,7 @@ function! ingo#text#surroundings#ChangeEnclosedText( count, delimiterChar, isInn
 	    " cursor position).
 	    call setpos('.', l:save_cursor)
 	    if s:Search(l:literalDelimiterExpr, a:count, 0) > 0
-		if( ! a:isInner )
+		if ! a:isInner
 		    call ingo#cursor#move#Right()
 		endif
 	    else
@@ -162,7 +162,7 @@ function! ingo#text#surroundings#RemoveDelimiters( count, leadingDelimiterPatter
 		" Mark the changed area.
 		call ingo#change#Set(getpos('.'), l:end_pos)
 	    else
-		throw "ASSERT: Trailing delimiter shouldn't vanish. "
+		throw "ASSERT: Trailing delimiter shouldn't vanish."
 	    endif
 	else
 	    call ingo#msg#WarningMsg('Leading ' . (a:0 ? a:1 : a:leadingDelimiterPattern) . ' not found')
@@ -224,16 +224,16 @@ function! ingo#text#surroundings#SurroundWith( selectionType, textBefore, textAf
 	    let l:backmotion = 'B'
 	    let l:backendmotion = 'E'
 	else
-	    throw "This selection type has not been implemented."
+	    throw 'This selection type has not been implemented.'
 	endif
 
 	let l:count = (v:count ? v:count : '')
 	let l:save_cursor = getpos('.')
-	execute 'normal! w' . l:backmotion . "i". a:textBefore . "\<Esc>"
+	execute 'normal! w' . l:backmotion . 'i' . a:textBefore . "\<Esc>"
 	let l:begin_pos = getpos("'[")
 
-	execute 'normal!' l:count . l:backendmotion . "a" . a:textAfter . "\<Esc>"
-	let l:end_pos = getpos(".") " Use the cursor position; '] is one after the change.
+	execute 'normal!' l:count . l:backendmotion . 'a' . a:textAfter . "\<Esc>"
+	let l:end_pos = getpos('.') " Use the cursor position; '] is one after the change.
 
 	" Adapt saved cursor position to consider inserted text.
 	let l:save_cursor[2] += strlen(a:textBefore)
@@ -245,7 +245,7 @@ function! ingo#text#surroundings#SurroundWith( selectionType, textBefore, textAf
 endfunction
 
 function! ingo#text#surroundings#SurroundWithSingleChar( selectionType, char )
-    call ingo#text#surroundings#SurroundWith( a:selectionType, a:char, a:char )
+    call ingo#text#surroundings#SurroundWith(a:selectionType, a:char, a:char)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
