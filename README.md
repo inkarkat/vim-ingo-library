@@ -230,6 +230,7 @@ HISTORY
 - Add ingo#escape#EscapeExpr().
 - ingo#text#surroundings#SurroundWith\[SingleChar](): ENH: Support custom set
   of [back, end] motions.
+- BUG: ingo#regexp#magic#Normalize('\\V[[a-S]]') only escapes the first [
 
 ##### 1.044   08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
