@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/folds.vim autoload script
 "
-" Copyright: (C) 2018 Ingo Karkat
+" Copyright: (C) 2018-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -49,7 +49,7 @@ function! s:MakeFoldStructureObject( foldRange )
 endfunction
 function! s:Insert( results, foldRange )
     for l:result in a:results
-	if s:IsInside(l:result.range, a:foldRange)
+	if a:foldRange[0] >= l:result.range[0] && a:foldRange[1] <= l:result.range[1]
 	    if ! s:Insert(l:result.folds, a:foldRange)
 		call add(l:result.folds, s:MakeFoldStructureObject(a:foldRange))
 	    endif
@@ -57,9 +57,6 @@ function! s:Insert( results, foldRange )
 	endif
     endfor
     return 0
-endfunction
-function! s:IsInside( resultRange, foldRange )
-    return a:foldRange[0] >= a:resultRange[0] && a:foldRange[1] <= a:resultRange[1]
 endfunction
 function! ingo#folds#containment#GetStructure( startLnum, endLnum, ... )
 "******************************************************************************

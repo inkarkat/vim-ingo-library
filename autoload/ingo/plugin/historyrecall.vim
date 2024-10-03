@@ -131,7 +131,7 @@ endfunction
 function! s:HasRegister( register ) abort
     return (a:register !=# ingo#register#Default())
 endfunction
-function! ingo#plugin#historyrecall#RecallRepeat( what, count, repeatCount, register )
+function! ingo#plugin#historyrecall#RecallRepeat( what, count, repeatCount, register, ... )
     let l:isOverriddenCount = (a:repeatCount > 0 && a:repeatCount != g:repeat_count)
     let l:isOverriddenRegister = (g:repeat_reg[1] !=# a:register)
 
@@ -139,13 +139,13 @@ function! ingo#plugin#historyrecall#RecallRepeat( what, count, repeatCount, regi
 	" Reset the count if the actual register differs from the original
 	" register, as count may be the last from history number or the
 	" multiplier.
-	return ingo#plugin#historyrecall#Recall(a:what, 1, 0, a:register)
+	return call('ingo#plugin#historyrecall#Recall', [a:what, 1, 0, a:register] + a:000)
     elseif l:isOverriddenCount
 	" An overriding count (without a register) selects the previous
 	" [count]'th history item for repeat.
-	return ingo#plugin#historyrecall#Recall(a:what, a:count, a:repeatCount, ingo#register#Default())
+	return call('ingo#plugin#historyrecall#Recall', [a:what, a:count, a:repeatCount, ingo#register#Default()] + a:000)
     else
-	return ingo#plugin#historyrecall#Recall(a:what, a:count, a:repeatCount, a:register)
+	return call('ingo#plugin#historyrecall#Recall', [a:what, a:count, a:repeatCount, a:register] + a:000)
     endif
 endfunction
 function! ingo#plugin#historyrecall#Recall( what, count, repeatCount, register, ... )

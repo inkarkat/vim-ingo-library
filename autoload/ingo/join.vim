@@ -2,18 +2,20 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2014-2020 Ingo Karkat
+" Copyright: (C) 2014-2023 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
+let s:keeppatterns = matchstr(ingo#compat#commands#keeppatterns(), '^keeppatterns$')
 function! ingo#join#Lines( lnum, isKeepSpace, separator )
 "******************************************************************************
 "* PURPOSE:
 "   Join a:lnum with the next line, putting a:separator in between (and
 "   optionally deleting any separating whitespace).
 "* ASSUMPTIONS / PRECONDITIONS:
-"   The 'formatoptions' option may affect the join, especially M, B, j.
+"   If a:isKeepSpace is false, the 'formatoptions' option may affect the join,
+"   especially M, B, j.
 "* EFFECTS / POSTCONDITIONS:
 "   Joins lines.
 "* INPUTS:
@@ -30,32 +32,33 @@ function! ingo#join#Lines( lnum, isKeepSpace, separator )
 	return 0
     endif
 
+    let l:literalSeparator = (empty(a:separator)
+    \   ? ''
+    \   : (a:separator ==# "\<C-v>\<C-j>"
+    \       ? nr2char(10)
+    \       : ingo#regexp#EscapeLiteralReplacement(a:separator, '/')
+    \   )
+    \)
+
     if a:isKeepSpace
-	let l:lineLen = len(getline(a:lnum))
-	execute a:lnum . 'join!'
-	if ! empty(a:separator)
-	    if len(getline(a:lnum)) == l:lineLen
-		" The next line was completely empty.
-		execute 'normal! A' . a:separator . "\<Esc>"
-	    else
-		call cursor(a:lnum, l:lineLen + 1)
-		execute 'normal! i' . a:separator . "\<Esc>"
-	    endif
-	endif
+	execute s:keeppatterns a:lnum . 'substitute/^\(.*\)\n\(.*\)$/\1' . l:literalSeparator . '\2/'
     else
 	let l:isFollowingOptionalWhitespaceLine = (getline(a:lnum + 1) =~# '^\s*$')
 	execute a:lnum . 'normal! J'
 
-	let l:changeJoiner = (empty(a:separator) ? '"_diw' : '"_ciw' . a:separator . "\<Esc>")
+	let l:changeJoiner = (empty(a:separator) ? '"_diw' : "\"_ciw\<C-v>\<C-@>\<Esc>")
 	" The J command inserts one space in place of the <EOL> unless there is
 	" trailing white space or the next line starts with a ')' or is empty.
 	" The whitespace will be handed by "ciw", but we need a special case
 	" for ')' and a following empty line.
 	if ! search('\%#\s\|\s\%#', 'bcW', line('.'))
-	    let l:changeJoiner = (empty(a:separator) ? '' : (l:isFollowingOptionalWhitespaceLine ? 'a' : 'i') . a:separator . "\<Esc>")
+	    let l:changeJoiner = (empty(a:separator) ? '' : (l:isFollowingOptionalWhitespaceLine ? 'a' : 'i') . "\<C-v>\<C-@>\<Esc>")
 	endif
 	if ! empty(l:changeJoiner)
 	    execute 'normal!' l:changeJoiner
+	endif
+	if ! empty(a:separator)
+	    execute s:keeppatterns a:lnum . 'substitute/^\(.*\)\%x00\(.*\)$/\1' . l:literalSeparator . '\2/e'
 	endif
     endif
     return 1
@@ -66,7 +69,8 @@ function! ingo#join#Ranges( isKeepSpace, startLnum, endLnum, separator, ranges )
 "* PURPOSE:
 "   Join each range of lines in a:ranges.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   The 'formatoptions' option may affect the join, especially M, B, j.
+"   If a:isKeepSpace is false, the 'formatoptions' option may affect the join,
+"   especially M, B, j.
 "* EFFECTS / POSTCONDITIONS:
 "   Joins lines.
 "* INPUTS:
@@ -108,7 +112,8 @@ function! ingo#join#Range( isKeepSpace, startLnum, endLnum, separator )
 "* PURPOSE:
 "   Join all lines in the a:startLnum, a:endLnum range.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   The 'formatoptions' option may affect the join, especially M, B, j.
+"   If a:isKeepSpace is false, the 'formatoptions' option may affect the join,
+"   especially M, B, j.
 "* EFFECTS / POSTCONDITIONS:
 "   Joins lines.
 "* INPUTS:
@@ -130,7 +135,8 @@ function! ingo#join#FoldedLines( isKeepSpace, startLnum, endLnum, separator )
 "* PURPOSE:
 "   Join all folded lines.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   The 'formatoptions' option may affect the join, especially M, B, j.
+"   If a:isKeepSpace is false, the 'formatoptions' option may affect the join,
+"   especially M, B, j.
 "* EFFECTS / POSTCONDITIONS:
 "   Joins lines.
 "* INPUTS:

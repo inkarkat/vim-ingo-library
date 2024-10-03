@@ -200,6 +200,53 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 ==============================================================================
 HISTORY							*ingo-library-history*
 
+1.045	03-Oct-2024
+- ingo#query#fromlist#Query(): CHG: Beep and continue querying on invalid
+  accelerator key or number instead of returning -1; only <Esc> or Ctrl-C
+  abort.
+- Add ingo/text/searchhighlights.vim module.
+- ingo#query#fromlist#Query(): BUG: 10th, 20th, etc. entry cannot be selected
+  by number if it is the last
+- ingo#query#confirm#AutoAccelerators(): ENH: Add optional
+  l:reservedAccelerators argument.
+- ingo#query#fromlist#Query(): BUG: Don't add accelerators for numbers, as
+  those interfere with the by-count selection.
+- Add ingo#regexp#fromwildcard#FileOrPath() variant of
+  ingo#regexp#fromwildcard#AnchoredToPathBoundaries().
+- Add ingo/option/autochdir.vim module.
+- ingo#fs#path#{Canonizalize,Equals}(): Small fixes, support a:isResolveLinks
+  in the latter, too.
+- Add ingo#window#preview#OpenNew().
+- ingo#buffer#{scratch,generate}#Create(): ENH: Support "pedit" as
+  a:windowOpenCommand.
+- ingo#plugin#historyrecall#RecallRepeat(): Also forward optional client
+  arguments to ingo#plugin#historyrecall#Recall().
+- ingo#plugin#register#Set(), ingo#plugin#register#PutContents(): ENH: Allow
+  passing optional target register.
+- ingo#subs#BraceCreation#FromList(): ENH: Add
+  a:options.singleCharacterElementsInSquareBraces.
+- Add ingo#text#frompattern#GetNext().
+- ingo#regexp#comments#CommentToExpression(): BUG: The $ anchor was mistakenly
+  escaped, but the pattern is (normal) magic; special comment characters (like
+  "*") are not properly escaped.
+- CHG: Minor: ingo#gui#position#Get() swap the first two returned elements (so
+  it's X-Y, too) and return numbers for elements 3 and 4. This shouldn't
+  matter to clients as the format is unspecified.
+- ingo#join#*() with a:isKeepSpace = 1 are not affected by 'formatoptions' any
+  longer (and may be a bit faster).
+- ingo#plugin#cmdcomplete#dirforaction#setup(): ENH: Allow passing of
+  'commandAttributes': '-count', Funcref for a:parameters.browsefilter and
+  a:parameters.wildignore
+- BUG: ingo#join#*() with a:isKeepSpace = 0 may expand a literal tab separator
+  into space(s).
+- ENH: Add ingo#actions#EvaluateWithValOrFunc() variant of
+  ingo#actions#ExecuteWithValOrFunc(). This is useful for configurations that
+  can either be an expression (with optional v:val) or a Funcref.
+- Add ingo#escape#EscapeExpr().
+- ingo#text#surroundings#SurroundWith[SingleChar](): ENH: Support custom set
+  of [back, end] motions.
+- BUG: ingo#regexp#magic#Normalize('\V[[a-S]]') only escapes the first [
+
 1.044	08-Apr-2022
 - Add ingo#cursor#IsBeyondEndOfLine() variant of ingo#cursor#IsAtEndOfLine().
 - ENH: Allow to customize the insertion point of ingo#text#InsertHere() via
@@ -1267,7 +1314,7 @@ First published version as separate shared library.
 Started development of shared autoload functionality.
 
 ==============================================================================
-Copyright: (C) 2009-2022 Ingo Karkat
+Copyright: (C) 2009-2024 Ingo Karkat
 Contains URL encoding / decoding algorithms written by Tim Pope.
 The VIM LICENSE applies to this plugin; see |copyright|.
 

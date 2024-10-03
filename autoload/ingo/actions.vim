@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2022 Ingo Karkat
+" Copyright: (C) 2012-2023 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -94,6 +94,32 @@ function! ingo#actions#EvaluateOrFunc( Action, ... )
 	return call(a:Action, a:000)
     else
 	return eval(a:Action)
+    endif
+endfunction
+function! ingo#actions#EvaluateWithValOrFunc( Action, ... ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Evaluate a:Action; a Funcref is passed all arguments, else each occurrence
+"   of "v:val" is replaced with the single argument / a List of the passed
+"   arguments and the result returned.
+"   Unlike ingo#actions#ExecuteWithValOrFunc(), you don't need to include
+"   :return in the a:Action expression here.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:Action    Either a Funcref or an expression to be :execute'd.
+"   a:arguments Value(s) to be passed to the a:Action Funcref or used for
+"		occurrences of "v:val" inside the a:Action expression. The v:val
+"		is inserted literally (as a Number, String, List, Dict)!
+"* RETURN VALUES:
+"   Result of evaluating a:Action.
+"******************************************************************************
+    if type(a:Action) == type(function('tr'))
+	return call(a:Action, a:000)
+    else
+	execute 'return' ingo#actions#RenderExCommandWithVal(a:Action, a:000)
     endif
 endfunction
 function! ingo#actions#EvaluateWithVal( expression, val )

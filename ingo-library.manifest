@@ -124,6 +124,7 @@ autoload/ingo/msg.vim
 autoload/ingo/nary.vim
 autoload/ingo/number.vim
 autoload/ingo/option.vim
+autoload/ingo/option/autochdir.vim
 autoload/ingo/option/listchars.vim
 autoload/ingo/os.vim
 autoload/ingo/plugin/cmd/withpattern.vim
@@ -209,6 +210,7 @@ autoload/ingo/tabstops.vim
 autoload/ingo/text.vim
 autoload/ingo/text/frompattern.vim
 autoload/ingo/text/replace.vim
+autoload/ingo/text/searchhighlights.vim
 autoload/ingo/text/surroundings.vim
 autoload/ingo/text/surroundings/Lines.vim
 autoload/ingo/text/surroundings/Lines/Creator.vim

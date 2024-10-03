@@ -1,13 +1,8 @@
 " ingo/subs/BraceCreation.vim: Condense multiple strings into a Brace Expression like in Bash.
 "
 " DEPENDENCIES:
-"   - ingo/collections.vim autoload script
-"   - ingo/compat.vim autoload script
-"   - ingo/list.vim autoload script
-"   - ingo/list/lcs.vim autoload script
-"   - ingo/list/sequence.vim autoload script
 "
-" Copyright: (C) 2017-2021 Ingo Karkat
+" Copyright: (C) 2017-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -62,13 +57,17 @@ function! ingo#subs#BraceCreation#FromList( list, ... )
 "		opportunities to extract multiple substrings are not taken.
 "   a:options.short
 "		Flag to enable all optimizations, i.e.
-"		optionalElementInSquareBraces and uniqueElements and
+"		optionalElementInSquareBraces,
+"		singleCharacterElementsInSquareBraces, uniqueElements and
 "		isIgnoreCase.
 "   a:options.optionalElementInSquareBraces
 "		Flag whether a single optional element is denoted as [elem]
 "		instead of {elem,} (or {,elem}, or even {,,elem,}; i.e. the
 "		bidirectional equivalence is lost, but the notation is more
 "		readable.
+"   a:options.singleCharacterElementsInSquareBraces
+"		Flag whether elements that are all just a single character (e.g.
+"		X, Y, Z) are denoted as [XYZ] instead of {X,Y,Z}.
 "   a:options.uniqueElements
 "		Flag whether duplicate elements are removed, so that only unique
 "		strings are contained in there.
@@ -82,9 +81,10 @@ function! ingo#subs#BraceCreation#FromList( list, ... )
 "******************************************************************************
     let l:options = (a:0 ? a:1 : {})
     if has_key(l:options, 'short')
-	if ! has_key(l:options, 'optionalElementInSquareBraces')    | let l:options.optionalElementInSquareBraces = 1 | endif
-	if ! has_key(l:options, 'uniqueElements')                   | let l:options.uniqueElements = 1 | endif
-	if ! has_key(l:options, 'isIgnoreCase')                     | let l:options.isIgnoreCase = 1 | endif
+	if ! has_key(l:options, 'optionalElementInSquareBraces')         | let l:options.optionalElementInSquareBraces = 1 | endif
+	if ! has_key(l:options, 'singleCharacterElementsInSquareBraces') | let l:options.singleCharacterElementsInSquareBraces = 1 | endif
+	if ! has_key(l:options, 'uniqueElements')                        | let l:options.uniqueElements = 1 | endif
+	if ! has_key(l:options, 'isIgnoreCase')                          | let l:options.isIgnoreCase = 1 | endif
     endif
 
     let [l:distinctLists, l:commons] = ingo#list#lcs#FindAllCommon(a:list, get(l:options, 'minimumCommonLength', 1), get(l:options, 'minimumDifferingLength', 0), get(l:options, 'isIgnoreCase', 0))
@@ -176,6 +176,11 @@ function! s:Create( options, distinctList, isWrap )
 	    let l:nonEmptyList = filter(copy(a:distinctList), '! empty(v:val)')
 	    if len(l:nonEmptyList) == 1
 		return [s:Wrap('[]', l:nonEmptyList[0]), 0]
+	    endif
+	endif
+	if get(a:options, 'singleCharacterElementsInSquareBraces', 0)
+	    if empty(filter(copy(a:distinctList), 'v:val !~# "^.$"'))
+		return [s:Wrap('[]', join(a:distinctList, '')), 0]
 	    endif
 	endif
 

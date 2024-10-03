@@ -5,7 +5,7 @@
 "   - ingo/collections/fromsplit.vim autoload script
 "   - ingo/regexp/collection.vim autoload script
 "
-" Copyright: (C) 2011-2018 Ingo Karkat
+" Copyright: (C) 2011-2024 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -45,11 +45,16 @@ let s:specialSearchCharacterExpressions = {
 \   'V': '\\',
 \}
 function! s:ConvertMagicnessOfFragment( fragment, sourceSpecialCharacterExpr, targetSpecialCharacterExpr )
-    let l:elements = ingo#collections#fromsplit#MapItemsAndSeparators(a:fragment, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\?' . ingo#regexp#collection#Expr({'isBarePattern': 1}),
-    \	printf('ingo#regexp#magic#ConvertMagicnessOfElement(v:val, %s, %s)', string(a:sourceSpecialCharacterExpr), string(a:targetSpecialCharacterExpr)),
-    \	printf('ingo#regexp#magic#ConvertMagicnessOfCollection(v:val, %s, %s)', string(a:sourceSpecialCharacterExpr), string(a:targetSpecialCharacterExpr))
-    \)
-    return join(l:elements, '')
+    if '[' =~# a:sourceSpecialCharacterExpr
+	" Collections need to be converted differently.
+	let l:elements = ingo#collections#fromsplit#MapItemsAndSeparators(a:fragment, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\?' . ingo#regexp#collection#Expr({'isBarePattern': 1}),
+	\	printf('ingo#regexp#magic#ConvertMagicnessOfElement(v:val, %s, %s)', string(a:sourceSpecialCharacterExpr), string(a:targetSpecialCharacterExpr)),
+	\	printf('ingo#regexp#magic#ConvertMagicnessOfCollection(v:val, %s, %s)', string(a:sourceSpecialCharacterExpr), string(a:targetSpecialCharacterExpr))
+	\)
+	return join(l:elements, '')
+    else
+	return ingo#regexp#magic#ConvertMagicnessOfElement(a:fragment, a:sourceSpecialCharacterExpr, a:targetSpecialCharacterExpr)
+    endif
 endfunction
 function! ingo#regexp#magic#ConvertMagicnessOfCollection( collection, sourceSpecialCharacterExpr, targetSpecialCharacterExpr )
     let l:isEscaped = (a:collection =~# '^\\\[')

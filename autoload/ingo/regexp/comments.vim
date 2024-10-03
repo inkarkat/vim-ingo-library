@@ -4,27 +4,14 @@
 "   - ingo/option.vim autoload script
 "   - IndentCommentPrefix.vim plugin (optional integration)
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.030.004	27-Jan-2017	Add
-"				ingo#regexp#comments#GetFlexibleWhitespaceAndCommentPrefixPattern().
-"   1.020.003	03-Jun-2014	Use ingo#option#Split().
-"   1.013.002	12-Sep-2013	Avoid using \ze in
-"				ingo#regexp#comments#CommentToExpression(). It
-"				may be used in a larger expression that still
-"				wants to match after the prefix.
-"   1.009.001	18-Jun-2013	file creation from
-"				AdvancedJoiners/CommentJoin.vim
 
 function! ingo#regexp#comments#CommentToExpression( comment )
     let [l:flags, l:comment] = matchlist(a:comment, '\([^:]*\):\(.*\)')[1:2]
-
-    " Mask backslash for "very nomagic" pattern.
-    let l:comment = escape(l:comment, '\')
+    let l:commentExpr = ingo#regexp#EscapeLiteralText(l:comment)
 
     " Observe when a blank is required after the comment string, but do not
     " include it in the match, so that it is preserved during the join.
@@ -34,7 +21,7 @@ function! ingo#regexp#comments#CommentToExpression( comment )
     " Will be joined to			>cular.
     " # This is text.			Will be joined to
     "					>This is spectacular.
-    return (l:flags =~# 'b' ? l:comment . '\%(\s\|\$\)\@=': l:comment)
+    return (l:flags =~# 'b' ? l:commentExpr . '\%(\s\|$\)\@=' : l:commentExpr)
 endfunction
 function! ingo#regexp#comments#FromSetting()
     if empty(&l:comments)

@@ -7,33 +7,35 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
-function! ingo#plugin#register#Set( contents, regtype )
+function! ingo#plugin#register#Set( contents, regtype, ... )
 "******************************************************************************
 "* PURPOSE:
-"   Set the contents of the specified (v:register) register. If the default
-"   register is used, also duplicate the contents to the system clipboard. If
-"   the last search register is used, also add the contents to the search
-"   history.
+"   Set the contents of the specified register. If the default register is used,
+"   also duplicate the contents to the system clipboard. If the last search
+"   register is used, also add the contents to the search history.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   - Target register is in v:register (as when triggered by a mapping).
+"   None.
 "* EFFECTS / POSTCONDITIONS:
 "   - Updates register(s).
 "* INPUTS:
 "   a:contents  Register contents to be written.
 "   a:regtype   Mode (char / line / block) as in setreg().
+"   a:register  Target register; defaults to v:register (as when triggered by a
+"               mapping).
 "* RETURN VALUES:
 "   None.
 "******************************************************************************
+    let l:register = (a:0 ? a:1 : v:register)
     try
-	call setreg(v:register, a:contents, a:regtype)
+	call setreg(l:register, a:contents, a:regtype)
 
-	if v:register ==# ingo#register#Default() && has('clipboard')
+	if l:register ==# ingo#register#Default() && has('clipboard')
 	    " Default to both default register _and_ system clipboard, as this
 	    " mapping is mostly used to make internal Vim registers (or the
 	    " current buffer's filespec) accessible outside of Vim, and it's
 	    " cumbersome to prefix the mapping with "+.
 	    call setreg('+', a:contents, a:regtype)
-	elseif v:register ==# '/'
+	elseif l:register ==# '/'
 	    call histadd('search', a:contents)
 	endif
     catch /^Vim\%((\a\+)\)\=:/
@@ -41,15 +43,15 @@ function! ingo#plugin#register#Set( contents, regtype )
     endtry
 endfunction
 let s:lastMoveSource = ''
-function! ingo#plugin#register#PutContents( source, contents, regtype, addendum )
+function! ingo#plugin#register#PutContents( source, contents, regtype, addendum, ... )
 "******************************************************************************
 "* PURPOSE:
-"   Put a:contents and a:addendum (with mode a:regtype) into the specified (via
-"   v:register) register. If the default register is used, also duplicate the
-"   contents to the system clipboard. If the last search register is used, also
-"   add the contents to the search history.
+"   Put a:contents and a:addendum (with mode a:regtype) into the specified
+"   register. If the default register is used, also duplicate the contents to
+"   the system clipboard. If the last search register is used, also add the
+"   contents to the search history.
 "* ASSUMPTIONS / PRECONDITIONS:
-"   - Target register is in v:register (as when triggered by a mapping).
+"   None.
 "* EFFECTS / POSTCONDITIONS:
 "   - Updates register(s).
 "   - Prints (possibly shortened) register contents.
@@ -62,6 +64,8 @@ function! ingo#plugin#register#PutContents( source, contents, regtype, addendum 
 "   a:regtype   Mode (char / line / block) as in setreg().
 "   a:addendum  Additional text that is appended to a:contents. If a List, only
 "               the first element is appended.
+"   a:register  Target register; defaults to v:register (as when triggered by a
+"               mapping).
 "* RETURN VALUES:
 "   0 if no register update happens; ingo#err#Get() has the error message then.
 "   1 if successful.
@@ -75,7 +79,7 @@ function! ingo#plugin#register#PutContents( source, contents, regtype, addendum 
 
     let s:lastMoveSource = a:source
     let l:completeContents = a:contents . (empty(a:addendum) ? '' : (type(a:addendum) == type([]) ? a:addendum[0] : a:addendum))
-    call ingo#plugin#register#Set(l:completeContents, a:regtype)
+    call call('ingo#plugin#register#Set', [l:completeContents, a:regtype] + a:000)
 
     " It's helpful to print the contents, but avoid the hit-enter prompt when
     " the contents are too long or contain newlines.

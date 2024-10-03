@@ -1,11 +1,8 @@
 " ingo/buffer/generate.vim: Functions for creating buffers.
 "
 " DEPENDENCIES:
-"   - ingo/compat.vim autoload script
-"   - ingo/escape/file.vim autoload script
-"   - ingo/fs/path.vim autoload script
 "
-" Copyright: (C) 2009-2019 Ingo Karkat
+" Copyright: (C) 2009-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -115,16 +112,16 @@ function! ingo#buffer#generate#Create( dirspec, filename, isFile, ContentsComman
 "   Creates or opens buffer and loads it in a window (as specified by
 "   a:windowOpenCommand) and activates that window.
 "* INPUTS:
-"   a:dirspec	        Local working directory for the buffer (important for :!
+"   a:dirspec		Local working directory for the buffer (important for :!
 "			commands). Pass empty string to maintain the current CWD
 "			as-is. Pass '.' to maintain the CWD but also fix it via
 "			:lcd. (Attention: ':set autochdir' will reset any CWD
 "			once the current window is left!)
 "			Pass the getcwd() output if maintaining the current CWD
 "			is important for a:ContentsCommand.
-"   a:filename	        The name for the buffer, so it can be saved via either
+"   a:filename		The name for the buffer, so it can be saved via either
 "			:w! or :w <newname>.
-"   a:isFile	        Flag whether the buffer should behave like a file (i.e.
+"   a:isFile		Flag whether the buffer should behave like a file (i.e.
 "			adapt to changes in the global CWD), or not. If false
 "			and a:dirspec is empty, there will be only one buffer
 "			with the same a:filename, regardless of the buffer's
@@ -138,8 +135,8 @@ function! ingo#buffer#generate#Create( dirspec, filename, isFile, ContentsComman
 "			Pass a Funcref to build the buffer contents with it.
 "			Pass a List of lines to set the buffer contents directly
 "			to the lines.
-"   a:windowOpenCommand	Ex command to open the window, e.g. ":vnew" or
-"			":topleft new".
+"   a:windowOpenCommand	Ex command to open the window, e.g. "vnew" or
+"			"topleft new". Also supports "pedit".
 "   a:NextFilenameFuncref   Funcref that is invoked (with a:filename) to
 "			    generate file names for the generated buffer should
 "			    the desired one (a:filename) already exist but not
@@ -163,15 +160,20 @@ function! ingo#buffer#generate#Create( dirspec, filename, isFile, ContentsComman
 "****D echomsg '**** bufnr=' . l:bufnr 'winnr=' . l:winnr
     if l:winnr == -1
 	if l:bufnr == -1
-	    execute a:windowOpenCommand
+	    let l:windowOpenCommand = (a:windowOpenCommand ==# 'pedit' ? 'call ingo#window#preview#OpenNew()' : a:windowOpenCommand)
+	    execute l:windowOpenCommand
 	    " Note: The directory must already be changed here so that the :file
 	    " command can set the correct buffer filespec.
 	    call s:ChangeDir(a:dirspec)
 	    execute 'silent keepalt file' ingo#compat#fnameescape(a:filename)
 	    let l:status = 4
 	elseif getbufvar(l:bufnr, '&buftype') ==# ingo#buffer#generate#BufType(a:isFile)
-	    execute a:windowOpenCommand
-	    execute l:bufnr . 'buffer'
+	    if a:windowOpenCommand ==# 'pedit'
+		call ingo#window#preview#OpenBuffer(l:bufnr)
+	    else
+		execute a:windowOpenCommand
+		execute l:bufnr . 'buffer'
+	    endif
 	    let l:status = 3
 	else
 	    " A buffer with the filespec is already loaded, but it contains an
