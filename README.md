@@ -185,7 +185,7 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
-##### 1.045   RELEASEME
+##### 1.045   03-Oct-2024
 - ingo#query#fromlist#Query(): CHG: Beep and continue querying on invalid
   accelerator key or number instead of returning -1; only &lt;Esc&gt; or Ctrl-C
   abort.
