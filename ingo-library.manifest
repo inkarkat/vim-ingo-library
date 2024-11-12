@@ -216,6 +216,7 @@ autoload/ingo/text/surroundings/Lines.vim
 autoload/ingo/text/surroundings/Lines/Creator.vim
 autoload/ingo/undo.vim
 autoload/ingo/units.vim
+autoload/ingo/version.vim
 autoload/ingo/view.vim
 autoload/ingo/window.vim
 autoload/ingo/window/adjacent.vim
