@@ -189,6 +189,7 @@ Note: Update version also in autoload/ingo/version.vim
 ##### 1.046   RELEASEME
 - ENH: Add ingo#version#Has() that allows plugins to assert a compatible
   ingo-library version and handle missing dependency gracefully.
+- Small fixes and API enhancements to ingo#query#fromlist#Query\[AsText]().
 
 ##### 1.045   03-Oct-2024
 - ingo#query#fromlist#Query(): CHG: Beep and continue querying on invalid

@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2014-2022 Ingo Karkat
+" Copyright: (C) 2014-2024 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -41,11 +41,24 @@ function! ingo#query#fromlist#Query( what, list, ... )
 "   a:what  Description of what is queried.
 "   a:list  List of elements. Accelerators can be preset by prefixing with "&".
 "   a:defaultIndex  Default element (which will be chosen via <Enter>); -1 for
-"		    no default.
+"		    no default. Or dict with elements:
+"		    "defaultIndex": Default element (on <Enter>)
+"		    "acceptSingle": Flag whether to directly return the index 0
+"				    of a single-element list without a query.
 "* RETURN VALUES:
-"   Index of the chosen element of a:list, or -1 if the query was aborted.
+"   Index of the chosen element of a:list, or -1 if the query was aborted or
+"   a:list is empty.
 "******************************************************************************
+    if empty(a:list)
+	return -1
+    endif
     let l:defaultIndex = (a:0 ? a:1 : -1)
+    if type(l:defaultIndex) == type({})
+	if get(l:defaultIndex, 'acceptSingle', 0) && len(a:list) == 1
+	    return 0
+	endif
+	let l:defaultIndex = get(l:defaultIndex, 'defaultIndex', -1)
+    endif
     let l:confirmList = ingo#query#confirm#AutoAccelerators(copy(a:list), -1, '0123456789')
     let l:accelerators = map(copy(l:confirmList), 'matchstr(v:val, "&\\zs.")')
     let l:list = ingo#query#fromlist#RenderList(l:confirmList, l:defaultIndex, '%d:')
@@ -114,6 +127,8 @@ function! ingo#query#fromlist#Query( what, list, ... )
 		    endif
 		endwhile
 	    endif
+	elseif l:choice ==# "\r" && l:defaultIndex >= 0 && l:defaultIndex < l:maxNum
+	    return l:defaultIndex
 	else
 	    let l:count = index(l:accelerators, l:choice, 0, 1) + 1
 	endif
@@ -148,11 +163,20 @@ function! ingo#query#fromlist#QueryAsText( what, list, ... )
 "   a:what  Description of what is queried.
 "   a:list  List of elements. Accelerators can be preset by prefixing with "&".
 "   a:defaultIndex  Default element (which will be chosen via <Enter>); -1 for
-"		    no default.
+"		    no default. Or dict with elements:
+"		    "defaultIndex": Default element (on <Enter>)
+"		    "acceptSingle": Flag whether to directly return the sole
+"				    element of a single-element list without a
+"				    query.
+"		    "emptyValue":   Value to return if the passed a:list is
+"				    empty.
 "* RETURN VALUES:
 "   Choice text without the shortcut key '&'. Empty string if the dialog was
 "   aborted.
 "******************************************************************************
+    if empty(a:list) && a:0 && has_key(a:1, 'emptyValue')
+	return a:1['emptyValue']
+    endif
     let l:index = call('ingo#query#fromlist#Query', [a:what, a:list] + a:000)
     return (l:index == -1 ? '' : a:list[l:index])
 endfunction
