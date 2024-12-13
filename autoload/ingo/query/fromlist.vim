@@ -168,10 +168,15 @@ function! ingo#query#fromlist#QueryAsText( what, list, ... )
 "		    "acceptSingle": Flag whether to directly return the sole
 "				    element of a single-element list without a
 "				    query.
+"		    "emptyValue":   Value to return if the passed a:list is
+"				    empty.
 "* RETURN VALUES:
 "   Choice text without the shortcut key '&'. Empty string if the dialog was
 "   aborted.
 "******************************************************************************
+    if empty(a:list) && a:0 && has_key(a:1, 'emptyValue')
+	return a:1['emptyValue']
+    endif
     let l:index = call('ingo#query#fromlist#Query', [a:what, a:list] + a:000)
     return (l:index == -1 ? '' : a:list[l:index])
 endfunction
