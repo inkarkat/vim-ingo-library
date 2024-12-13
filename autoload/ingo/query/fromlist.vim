@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2014-2022 Ingo Karkat
+" Copyright: (C) 2014-2024 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -43,8 +43,12 @@ function! ingo#query#fromlist#Query( what, list, ... )
 "   a:defaultIndex  Default element (which will be chosen via <Enter>); -1 for
 "		    no default.
 "* RETURN VALUES:
-"   Index of the chosen element of a:list, or -1 if the query was aborted.
+"   Index of the chosen element of a:list, or -1 if the query was aborted or
+"   a:list is empty.
 "******************************************************************************
+    if empty(a:list)
+	return -1
+    endif
     let l:defaultIndex = (a:0 ? a:1 : -1)
     let l:confirmList = ingo#query#confirm#AutoAccelerators(copy(a:list), -1, '0123456789')
     let l:accelerators = map(copy(l:confirmList), 'matchstr(v:val, "&\\zs.")')
