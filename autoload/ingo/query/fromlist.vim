@@ -118,6 +118,8 @@ function! ingo#query#fromlist#Query( what, list, ... )
 		    endif
 		endwhile
 	    endif
+	elseif l:choice ==# "\r" && l:defaultIndex >= 0 && l:defaultIndex < l:maxNum
+	    return l:defaultIndex
 	else
 	    let l:count = index(l:accelerators, l:choice, 0, 1) + 1
 	endif
