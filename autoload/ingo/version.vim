@@ -2,10 +2,12 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2024 Ingo Karkat
+" Copyright: (C) 2024-2025 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
+
+let s:version = '1.046'
 
 "******************************************************************************
 "* PURPOSE:
@@ -33,7 +35,7 @@
 "   endtry
 "******************************************************************************
 function! ingo#version#Has( wantedVersion ) abort
-    let l:currentVersion = split('1.046', '\.')
+    let l:currentVersion = split(s:version, '\.')
     let l:wantedVersion = split(a:wantedVersion, '\.')
     for l:i in range(len(l:currentVersion))
 	if l:i == 0 && str2nr(l:currentVersion[l:i]) != str2nr(get(l:wantedVersion, l:i, '0'))
