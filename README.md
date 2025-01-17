@@ -184,6 +184,12 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 
 HISTORY
 ------------------------------------------------------------------------------
+Note: Bump a new draft version also in autoload/ingo/version.vim
+
+##### 1.046   17-Jan-2025
+- ENH: Add ingo#version#Has() that allows plugins to assert a compatible
+  ingo-library version and handle missing dependency gracefully.
+- Small fixes and API enhancements to ingo#query#fromlist#Query\[AsText]().
 
 ##### 1.045   03-Oct-2024
 - ingo#query#fromlist#Query(): CHG: Beep and continue querying on invalid
@@ -1299,7 +1305,7 @@ HISTORY
 - Started development of shared autoload functionality.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2009-2024 Ingo Karkat -
+Copyright: (C) 2009-2025 Ingo Karkat -
 Contains URL encoding / decoding algorithms written by Tim Pope. -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
