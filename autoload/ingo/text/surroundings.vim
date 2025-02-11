@@ -2,15 +2,10 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2008-2024 Ingo Karkat
+" Copyright: (C) 2008-2025 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-
-" Helper: Make a:string a literal search expression.
-function! s:Literal( string )
-    return '\V' . escape(a:string, '\') . '\m'
-endfunction
 
 " Helper: Search for a:expr a:count times.
 function! s:Search( expr, count, isBackward )
@@ -30,19 +25,18 @@ endfunction
 " be across multiple lines or empty. If the cursor rests already ON a
 " delimiter, this one is taken as the first delimiter.
 " The flag 'isInner' determines whether the selection includes the delimiters.
-function! ingo#text#surroundings#ChangeEnclosedText( count, delimiterChar, isInner )
+function! ingo#text#surroundings#ChangeEnclosedText( count, delimiterCharExpr, isInner )
     let l:save_cursor = getpos('.')
-    let l:literalDelimiterExpr = s:Literal(a:delimiterChar)
 
     " Special case: select nothing (by doing nothing :-) when inner change (with
     " count=1) and there are no or only newlines between the delimiters.
     " Once we're in Visual mode, at least the current char will be changed;
     " there is no 'null' selection possible.
-    if ! ((search( '\%#' . l:literalDelimiterExpr . '\n*' . l:literalDelimiterExpr ) > 0) && a:count == 1 && a:isInner)
+    if ! ((search( '\%#' . a:delimiterCharExpr . '\n*' . a:delimiterCharExpr ) > 0) && a:count == 1 && a:isInner)
 	" Step right to consider the cursor position and search for leading
 	" delimiter to the left.
 	call ingo#cursor#move#Right()
-	if s:Search(l:literalDelimiterExpr, 1, 1) > 0
+	if s:Search(a:delimiterCharExpr, 1, 1) > 0
 	    if a:isInner
 		call ingo#cursor#move#Right()
 		normal! v
@@ -55,18 +49,18 @@ function! ingo#text#surroundings#ChangeEnclosedText( count, delimiterChar, isInn
 	    " trailing delimiter by searching to the right (from the original
 	    " cursor position).
 	    call setpos('.', l:save_cursor)
-	    if s:Search(l:literalDelimiterExpr, a:count, 0) > 0
+	    if s:Search(a:delimiterCharExpr, a:count, 0) > 0
 		if ! a:isInner
 		    call ingo#cursor#move#Right()
 		endif
 	    else
 		normal! v
 		call setpos('.', l:save_cursor)
-		call ingo#msg#WarningMsg('Trailing ' . a:delimiterChar . ' not found')
+		call ingo#msg#WarningMsg('Trailing ' . a:delimiterCharExpr . ' not found')
 	    endif
 	else
 	    call setpos('.', l:save_cursor)
-	    call ingo#msg#WarningMsg('Leading ' . a:delimiterChar . ' not found')
+	    call ingo#msg#WarningMsg('Leading ' . a:delimiterCharExpr . ' not found')
 	endif
     endif
 endfunction
@@ -75,20 +69,19 @@ endfunction
 " left and right. Text between delimiters can be across multiple lines or
 " empty and will not be touched. If the cursor rests already ON a delimiter,
 " this one is taken as the first delimiter.
-function! ingo#text#surroundings#RemoveSingleCharDelimiters( count, delimiterChar )
+function! ingo#text#surroundings#RemoveSingleCharDelimiters( count, delimiterCharExpr )
     " This is the simplest algorithm; first search left for the leading delimiter,
     " then (from the original cursor position) in the other direction for the
     " trailing one. If both are found, remove the trailing and then the
     " (memorized) lead delimiter.
     let l:save_cursor = getpos('.')
-    let l:literalDelimiterExpr = s:Literal(a:delimiterChar)
 
     " If the cursor rests already ON a delimiter, this one is taken as the first delimiter.
     call ingo#cursor#move#Right()
-    if s:Search(l:literalDelimiterExpr, 1, 1) > 0
+    if s:Search(a:delimiterCharExpr, 1, 1) > 0
 	let l:begin_cursor = getpos('.')
 	call setpos('.', l:save_cursor)
-	if s:Search(l:literalDelimiterExpr, a:count, 0) > 0
+	if s:Search(a:delimiterCharExpr, a:count, 0) > 0
 	    " Remove the trailing delimiter.
 	    normal! "_x
 
@@ -104,10 +97,10 @@ function! ingo#text#surroundings#RemoveSingleCharDelimiters( count, delimiterCha
 	    " Mark the changed area.
 	    call ingo#change#Set(getpos('.'), l:end_pos)
 	else
-	    call ingo#msg#WarningMsg('Trailing ' . a:delimiterChar . ' not found')
+	    call ingo#msg#WarningMsg('Trailing ' . a:delimiterCharExpr . ' not found')
 	endif
     else
-	call ingo#msg#WarningMsg('Leading ' . a:delimiterChar . ' not found')
+	call ingo#msg#WarningMsg('Leading ' . a:delimiterCharExpr . ' not found')
     endif
     call setpos('.', l:save_cursor)
 endfunction

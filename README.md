@@ -186,6 +186,11 @@ HISTORY
 ------------------------------------------------------------------------------
 Note: Bump a new draft version also in autoload/ingo/version.vim
 
+##### 1.047   RELEASEME
+- CHG: ingo#text#surroundings#ChangeEnclosedText() and
+  ingo#text#surroundings#RemoveSingleCharDelimiters() now take an
+  a:delimiterCharExpr instead of a literal a:delimiterChar.
+
 ##### 1.046   17-Jan-2025
 - ENH: Add ingo#version#Has() that allows plugins to assert a compatible
   ingo-library version and handle missing dependency gracefully.
