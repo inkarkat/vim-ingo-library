@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2019 Ingo Karkat
+" Copyright: (C) 2019-2025 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -37,6 +37,19 @@ else
 endif
 
 function! ingo#plugin#persistence#CanPersist( ... )
+"******************************************************************************
+"* PURPOSE:
+"   Test whether the Vim configuration allows the persistence of (properly
+"   named) variables.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:variableName  Optional name of the variable used for persistence.
+"* RETURN VALUES:
+"   1 if persistence is configured, else 0.
+"******************************************************************************
     return (index(split(&viminfo, ','), '!') != -1) && (! a:0 || a:1 =~# '^\u\L*$')
 endfunction
 
@@ -89,7 +102,7 @@ function! ingo#plugin#persistence#Add( variableName, ... )
 "   does not have the correct type for the number of arguments passed.
 "******************************************************************************
     if a:0 < 1 || a:0 > 2
-	throw "Add: Must pass [key, ] value"
+	throw 'Add: Must pass [key, ] value'
     endif
     let l:isList = (a:0 == 1)
 
@@ -98,7 +111,7 @@ function! ingo#plugin#persistence#Add( variableName, ... )
     if exists(l:globalVariableName)
 	let l:original = ingo#plugin#persistence#Load(a:variableName)
 	if type(l:original) != type(l:isList ? [] : {})
-	    throw "Add: Wrong variable type"
+	    throw 'Add: Wrong variable type'
 	endif
     else
 	let l:original = (l:isList ? [] : {})
