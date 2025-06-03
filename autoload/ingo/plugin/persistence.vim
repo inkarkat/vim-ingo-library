@@ -26,15 +26,9 @@ function! s:CompatibilityDeserialization( globalVariableName, targetType, rawVal
 	return a:rawValue
     endif
 endfunction
-if (v:version == 703 && has('patch030') || v:version > 703) && ! has_key(s:compatFor, 'viminfoBasicTypes')
-    function! s:CompatibilitySerialization( rawValue )
-	return a:rawValue
-    endfunction
-else
-    function! s:CompatibilitySerialization( rawValue )
-	return string(a:rawValue)
-    endfunction
-endif
+function! s:CompatibilitySerialization( rawValue )
+    return string(a:rawValue)
+endfunction
 
 function! s:GetPersistenceTypeFor( variableName ) abort
     if a:variableName =~# '^\u\L*$'
@@ -92,8 +86,11 @@ function! ingo#plugin#persistence#Store( variableName, value )
 
     if empty(a:value)
 	execute 'unlet!' l:globalVariableName
-    else
+    elseif (s:GetPersistenceTypeFor(a:variableName) ==# 'viminfo' && (v:version == 703 && has('patch030') || v:version > 703) && ! has_key(s:compatFor, 'viminfoBasicTypes'))
+    \   || (s:GetPersistenceTypeFor(a:variableName) ==# 'session' && ! has_key(s:compatFor, 'sessionBasicTypes'))
 	execute 'let' l:globalVariableName '= s:CompatibilitySerialization(a:value)'
+    else
+	execute 'let' l:globalVariableName '= a:value'
     endif
 
     return ingo#plugin#persistence#CanPersist(a:variableName)
