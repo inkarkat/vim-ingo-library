@@ -51,7 +51,14 @@ function! ingo#plugin#persistence#CanPersist( ... )
 "   1 if persistence is configured, else 0.
 "******************************************************************************
     let l:isViminfoPersistence = (index(split(&viminfo, ','), '!') != -1)
-    return l:isViminfoPersistence && (! a:0 || a:1 =~# '^\u\L*$')
+    let l:isSessionPersistence = (index(split(&sessionoptions, ','), 'globals') != -1)
+
+    if a:0
+	return (l:isViminfoPersistence && a:1 =~# '^\u\L*$')
+	\   || (l:isSessionPersistence && a:1 =~# '^\u.*\l')
+    else
+	return l:isViminfoPersistence || l:isSessionPersistence
+    endif
 endfunction
 
 function! ingo#plugin#persistence#Store( variableName, value )
@@ -195,7 +202,11 @@ function! ingo#plugin#persistence#Load( variableName, ... )
     elseif a:0
 	return a:1
     else
-	throw printf('Load: Nothing stored under %s%s', l:globalVariableName, (ingo#plugin#persistence#CanPersist(a:variableName) ? '' : ', and persistence not ' . (ingo#plugin#persistence#CanPersist() ? 'possible for that name' : 'configured')))
+	throw printf('Load: Nothing stored under %s%s', l:globalVariableName,
+	\   ingo#plugin#persistence#CanPersist(a:variableName)
+	\       ? ''
+	\       : ', and persistence not ' . (a:variableName =~# '^\u' ? 'configured' : 'possible for that name')
+	\)
     endif
 endfunction
 
