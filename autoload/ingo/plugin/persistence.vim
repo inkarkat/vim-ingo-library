@@ -210,7 +210,7 @@ function! ingo#plugin#persistence#Load( variableName, ... )
     endif
 endfunction
 
-function! ingo#plugin#persistence#QueryYesNo( question )
+function! ingo#plugin#persistence#QueryYesNo( question, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Ask the user whether a:question should be accepted or declined, with
@@ -222,12 +222,13 @@ function! ingo#plugin#persistence#QueryYesNo( question )
 "   Queries user via confirm().
 "* INPUTS:
 "   a:question  Text to be shown to the user.
+"   a:variableName  Optional name of the variable used for persistence.
 "* RETURN VALUES:
 "   One of "Yes", "No", "Always", "Never", "Forever", "Never ever", or empty
 "   string if the dialog was aborted.
 "******************************************************************************
     let l:choices = ['&Yes', '&No', '&Always', 'Ne&ver' ]
-    if ingo#plugin#persistence#CanPersist()
+    if call('ingo#plugin#persistence#CanPersist', a:000)
 	let l:choices += ['&Forever', 'Never &ever']
     endif
 
