@@ -50,7 +50,8 @@ function! ingo#plugin#persistence#CanPersist( ... )
 "* RETURN VALUES:
 "   1 if persistence is configured, else 0.
 "******************************************************************************
-    return (index(split(&viminfo, ','), '!') != -1) && (! a:0 || a:1 =~# '^\u\L*$')
+    let l:isViminfoPersistence = (index(split(&viminfo, ','), '!') != -1)
+    return l:isViminfoPersistence && (! a:0 || a:1 =~# '^\u\L*$')
 endfunction
 
 function! ingo#plugin#persistence#Store( variableName, value )
