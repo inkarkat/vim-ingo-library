@@ -52,17 +52,24 @@ function! ingo#plugin#persistence#CanPersist( ... )
 "* INPUTS:
 "   a:variableName  Optional name of the variable used for persistence.
 "* RETURN VALUES:
-"   1 if persistence is configured, else 0.
+"   3 if persistence is configured for both viminfo and :mksession
+"   2 if persistence is configured for :mksession but not viminfo
+"   1 if persistence is configured for viminfo but not :mksession
+"   0 else
 "******************************************************************************
-    let l:isViminfoPersistence = (index(split(&viminfo, ','), '!') != -1)
-    let l:isSessionPersistence = (index(split(&sessionoptions, ','), 'globals') != -1)
+    let l:isViminfoPersistence = (index(split(&viminfo, ','), '!') == -1 ? 0 : 1)
+    let l:isSessionPersistence = (index(split(&sessionoptions, ','), 'globals') == -1 ? 0 : 2)
 
     if a:0
-	return (l:isViminfoPersistence && s:GetPersistenceTypeFor(a:1) ==# 'viminfo')
-	\   || (l:isSessionPersistence && s:GetPersistenceTypeFor(a:1) ==# 'session')
-    else
-	return l:isViminfoPersistence || l:isSessionPersistence
+	if l:isViminfoPersistence && s:GetPersistenceTypeFor(a:1) !=# 'viminfo'
+	    let l:isViminfoPersistence = 0
+	endif
+	if l:isSessionPersistence && s:GetPersistenceTypeFor(a:1) !=# 'session'
+	    let l:isSessionPersistence = 0
+	endif
     endif
+
+    return l:isViminfoPersistence + l:isSessionPersistence
 endfunction
 
 function! ingo#plugin#persistence#Store( variableName, value )
