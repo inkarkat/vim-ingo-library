@@ -36,6 +36,16 @@ else
     endfunction
 endif
 
+function! s:GetPersistenceTypeFor( variableName ) abort
+    if a:variableName =~# '^\u\L*$'
+	return 'viminfo'
+    elseif a:variableName =~# '^\u.*\l'
+	return 'session'
+    else
+	return ''
+    endif
+endfunction
+
 function! ingo#plugin#persistence#CanPersist( ... )
 "******************************************************************************
 "* PURPOSE:
@@ -54,8 +64,8 @@ function! ingo#plugin#persistence#CanPersist( ... )
     let l:isSessionPersistence = (index(split(&sessionoptions, ','), 'globals') != -1)
 
     if a:0
-	return (l:isViminfoPersistence && a:1 =~# '^\u\L*$')
-	\   || (l:isSessionPersistence && a:1 =~# '^\u.*\l')
+	return (l:isViminfoPersistence && s:GetPersistenceTypeFor(a:1) ==# 'viminfo')
+	\   || (l:isSessionPersistence && s:GetPersistenceTypeFor(a:1) ==# 'session')
     else
 	return l:isViminfoPersistence || l:isSessionPersistence
     endif
@@ -205,7 +215,7 @@ function! ingo#plugin#persistence#Load( variableName, ... )
 	throw printf('Load: Nothing stored under %s%s', l:globalVariableName,
 	\   ingo#plugin#persistence#CanPersist(a:variableName)
 	\       ? ''
-	\       : ', and persistence not ' . (a:variableName =~# '^\u' ? 'configured' : 'possible for that name')
+	\       : ', and persistence not ' . (empty(s:GetPersistenceTypeFor(a:variableName)) ? 'possible for that name' : 'configured')
 	\)
     endif
 endfunction
