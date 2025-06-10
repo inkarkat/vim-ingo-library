@@ -186,7 +186,7 @@ HISTORY
 ------------------------------------------------------------------------------
 Note: Bump a new draft version also in autoload/ingo/version.vim
 
-##### 1.047   RELEASEME
+##### 1.047   10-Jun-2025
 - CHG: ingo#text#surroundings#ChangeEnclosedText() and
   ingo#text#surroundings#RemoveSingleCharDelimiters() now take an
   a:delimiterCharExpr instead of a literal a:delimiterChar.
