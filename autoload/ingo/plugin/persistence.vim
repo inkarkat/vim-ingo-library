@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2019 Ingo Karkat
+" Copyright: (C) 2019-2025 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -26,18 +26,50 @@ function! s:CompatibilityDeserialization( globalVariableName, targetType, rawVal
 	return a:rawValue
     endif
 endfunction
-if (v:version == 703 && has('patch030') || v:version > 703) && ! has_key(s:compatFor, 'viminfoBasicTypes')
-    function! s:CompatibilitySerialization( rawValue )
-	return a:rawValue
-    endfunction
-else
-    function! s:CompatibilitySerialization( rawValue )
-	return string(a:rawValue)
-    endfunction
-endif
+function! s:CompatibilitySerialization( rawValue )
+    return string(a:rawValue)
+endfunction
+
+function! s:GetPersistenceTypeFor( variableName ) abort
+    if a:variableName =~# '^\u\L*$'
+	return 'viminfo'
+    elseif a:variableName =~# '^\u.*\l'
+	return 'session'
+    else
+	return ''
+    endif
+endfunction
 
 function! ingo#plugin#persistence#CanPersist( ... )
-    return (index(split(&viminfo, ','), '!') != -1) && (! a:0 || a:1 =~# '^\u\L*$')
+"******************************************************************************
+"* PURPOSE:
+"   Test whether the Vim configuration allows the persistence of (properly
+"   named) variables.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:variableName  Optional name of the variable used for persistence.
+"* RETURN VALUES:
+"   3 if persistence is configured for both viminfo and :mksession
+"   2 if persistence is configured for :mksession but not viminfo
+"   1 if persistence is configured for viminfo but not :mksession
+"   0 else
+"******************************************************************************
+    let l:isViminfoPersistence = (index(split(&viminfo, ','), '!') == -1 ? 0 : 1)
+    let l:isSessionPersistence = (index(split(&sessionoptions, ','), 'globals') == -1 ? 0 : 2)
+
+    if a:0
+	if l:isViminfoPersistence && s:GetPersistenceTypeFor(a:1) !=# 'viminfo'
+	    let l:isViminfoPersistence = 0
+	endif
+	if l:isSessionPersistence && s:GetPersistenceTypeFor(a:1) !=# 'session'
+	    let l:isSessionPersistence = 0
+	endif
+    endif
+
+    return l:isViminfoPersistence + l:isSessionPersistence
 endfunction
 
 function! ingo#plugin#persistence#Store( variableName, value )
@@ -61,8 +93,11 @@ function! ingo#plugin#persistence#Store( variableName, value )
 
     if empty(a:value)
 	execute 'unlet!' l:globalVariableName
-    else
+    elseif (s:GetPersistenceTypeFor(a:variableName) ==# 'viminfo' && (v:version == 703 && has('patch030') || v:version > 703) && ! has_key(s:compatFor, 'viminfoBasicTypes'))
+    \   || (s:GetPersistenceTypeFor(a:variableName) ==# 'session' && ! has_key(s:compatFor, 'sessionBasicTypes'))
 	execute 'let' l:globalVariableName '= s:CompatibilitySerialization(a:value)'
+    else
+	execute 'let' l:globalVariableName '= a:value'
     endif
 
     return ingo#plugin#persistence#CanPersist(a:variableName)
@@ -89,7 +124,7 @@ function! ingo#plugin#persistence#Add( variableName, ... )
 "   does not have the correct type for the number of arguments passed.
 "******************************************************************************
     if a:0 < 1 || a:0 > 2
-	throw "Add: Must pass [key, ] value"
+	throw 'Add: Must pass [key, ] value'
     endif
     let l:isList = (a:0 == 1)
 
@@ -98,7 +133,7 @@ function! ingo#plugin#persistence#Add( variableName, ... )
     if exists(l:globalVariableName)
 	let l:original = ingo#plugin#persistence#Load(a:variableName)
 	if type(l:original) != type(l:isList ? [] : {})
-	    throw "Add: Wrong variable type"
+	    throw 'Add: Wrong variable type'
 	endif
     else
 	let l:original = (l:isList ? [] : {})
@@ -181,11 +216,15 @@ function! ingo#plugin#persistence#Load( variableName, ... )
     elseif a:0
 	return a:1
     else
-	throw printf('Load: Nothing stored under %s%s', l:globalVariableName, (ingo#plugin#persistence#CanPersist(a:variableName) ? '' : ', and persistence not ' . (ingo#plugin#persistence#CanPersist() ? 'possible for that name' : 'configured')))
+	throw printf('Load: Nothing stored under %s%s', l:globalVariableName,
+	\   ingo#plugin#persistence#CanPersist(a:variableName)
+	\       ? ''
+	\       : ', and persistence not ' . (empty(s:GetPersistenceTypeFor(a:variableName)) ? 'possible for that name' : 'configured')
+	\)
     endif
 endfunction
 
-function! ingo#plugin#persistence#QueryYesNo( question )
+function! ingo#plugin#persistence#QueryYesNo( question, ... )
 "******************************************************************************
 "* PURPOSE:
 "   Ask the user whether a:question should be accepted or declined, with
@@ -197,12 +236,13 @@ function! ingo#plugin#persistence#QueryYesNo( question )
 "   Queries user via confirm().
 "* INPUTS:
 "   a:question  Text to be shown to the user.
+"   a:variableName  Optional name of the variable used for persistence.
 "* RETURN VALUES:
 "   One of "Yes", "No", "Always", "Never", "Forever", "Never ever", or empty
 "   string if the dialog was aborted.
 "******************************************************************************
     let l:choices = ['&Yes', '&No', '&Always', 'Ne&ver' ]
-    if ingo#plugin#persistence#CanPersist()
+    if call('ingo#plugin#persistence#CanPersist', a:000)
 	let l:choices += ['&Forever', 'Never &ever']
     endif
 
