@@ -201,6 +201,9 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY							*ingo-library-history*
 Note: Bump a new draft version also in autoload/ingo/version.vim
 
+1.048	RELEASEME
+- ENH: Add ingo#text#{InsertNewLine{,Above,Below},ReplaceLine}Here().
+
 1.047	10-Jun-2025
 - CHG: ingo#text#surroundings#ChangeEnclosedText() and
   ingo#text#surroundings#RemoveSingleCharDelimiters() now take an
@@ -1329,7 +1332,7 @@ First published version as separate shared library.
 Started development of shared autoload functionality.
 
 ==============================================================================
-Copyright: (C) 2009-2025 Ingo Karkat
+Copyright: (C) 2009-2026 Ingo Karkat
 Contains URL encoding / decoding algorithms written by Tim Pope.
 The VIM LICENSE applies to this plugin; see |copyright|.
 
