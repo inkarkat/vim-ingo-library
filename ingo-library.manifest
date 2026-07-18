@@ -47,6 +47,7 @@ autoload/ingo/compat.vim
 autoload/ingo/compat/command.vim
 autoload/ingo/compat/commands.vim
 autoload/ingo/compat/complete.vim
+autoload/ingo/compat/fixes.vim
 autoload/ingo/compat/regexp.vim
 autoload/ingo/compat/shellcommand.vim
 autoload/ingo/compat/substitution.vim

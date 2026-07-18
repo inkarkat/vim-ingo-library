@@ -2,15 +2,12 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2020 Ingo Karkat
+" Copyright: (C) 2011-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.013.002	05-Sep-2013	Also avoid clobbering the last change ('.') in
-"				ingo#selection#Get() when 'cpo' contains "y".
-"   1.006.001	24-May-2013	file creation from ingointegration.vim.
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! ingo#selection#Get()
 "******************************************************************************
@@ -127,4 +124,22 @@ function! ingo#selection#GetExclusiveEndPos() abort
     endif
 endfunction
 
+function! ingo#selection#VisualReselect( ... ) abort
+    let l:options = (a:0 ? a:1 : {})
+    let l:keys = printf('%s%dv%s%s',
+    \	get(l:options, 'prefix', ''),
+    \	get(l:options, 'count', 1),
+    \	(ingo#compat#fixes#IsExclusiveSelectionVisualReselectOffByOne() ? ' ' : ''),
+    \	get(l:options, 'suffix', '')
+    \)
+
+    if get(l:options, 'expr', 0)
+	return l:keys
+    else
+	execute get(l:options, 'prefixCommands', '') 'normal!' l:keys
+    endif
+endfunction
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
