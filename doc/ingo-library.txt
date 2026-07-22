@@ -205,6 +205,7 @@ Note: Bump a new draft version also in autoload/ingo/version.vim
 - ENH: Add ingo#text#{InsertNewLine{,Above,Below},ReplaceLine}Here().
 - ENH: Add ingo#compat#fixes#IsExclusiveSelectionVisualReselectOffByOne() and
   ingo#selection#VisualReselect().
+- ENH: Add ingo/wildignore.vim module.
 
 1.047	10-Jun-2025
 - CHG: ingo#text#surroundings#ChangeEnclosedText() and
