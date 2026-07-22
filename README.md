@@ -191,6 +191,7 @@ Note: Bump a new draft version also in autoload/ingo/version.vim
 - ENH: Add ingo#compat#fixes#IsExclusiveSelectionVisualReselectOffByOne() and
   ingo#selection#VisualReselect().
 - ENH: Add ingo/wildignore.vim module.
+- ENH: Add ingo/search module.
 
 ##### 1.047   10-Jun-2025
 - CHG: ingo#text#surroundings#ChangeEnclosedText() and
