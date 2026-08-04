@@ -2,14 +2,10 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2012-2019 Ingo Karkat
+" Copyright: (C) 2012-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.003.002	26-Mar-2013	Move to ingo-library.
-"	001	17-Oct-2012	file creation
 
 if v:version < 702 || ! has('reltime')
 function! ingo#search#timelimited#GetSearchArguments( timeout )
@@ -48,7 +44,7 @@ function! ingo#search#timelimited#FirstPatternThatMatchesInBuffer( patterns, ...
 "   or empty String.
 "******************************************************************************
     for l:pattern in a:patterns
-	if call('ingo#search#timelimited#search', [l:pattern, 'cnw'] + a:000)
+	if call('ingo#search#timelimited#IsBufferContains', [l:pattern] + a:000)
 	    return l:pattern
 	endif
     endfor

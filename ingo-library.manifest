@@ -47,6 +47,7 @@ autoload/ingo/compat.vim
 autoload/ingo/compat/command.vim
 autoload/ingo/compat/commands.vim
 autoload/ingo/compat/complete.vim
+autoload/ingo/compat/fixes.vim
 autoload/ingo/compat/regexp.vim
 autoload/ingo/compat/shellcommand.vim
 autoload/ingo/compat/substitution.vim
@@ -175,6 +176,7 @@ autoload/ingo/regexp/virtcols.vim
 autoload/ingo/register.vim
 autoload/ingo/register/accumulate.vim
 autoload/ingo/register/pending.vim
+autoload/ingo/search.vim
 autoload/ingo/search/buffer.vim
 autoload/ingo/search/pattern.vim
 autoload/ingo/search/timelimited.vim
@@ -218,6 +220,7 @@ autoload/ingo/undo.vim
 autoload/ingo/units.vim
 autoload/ingo/version.vim
 autoload/ingo/view.vim
+autoload/ingo/wildignore.vim
 autoload/ingo/window.vim
 autoload/ingo/window/adjacent.vim
 autoload/ingo/window/cmdwin.vim

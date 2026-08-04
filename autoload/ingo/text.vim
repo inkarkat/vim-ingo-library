@@ -5,7 +5,7 @@
 "   - ingo/pos.vim autoload script
 "   - ingo/regexp/virtcols.vim autoload script
 "
-" Copyright: (C) 2012-2022 Ingo Karkat
+" Copyright: (C) 2012-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -266,6 +266,71 @@ function! ingo#text#InsertHere( text ) abort
 "******************************************************************************
     let l:insertCommand = (ingo#text#IsInsert(g:IngoLibrary_InsertHereStrategy) ? 'i' : 'a')
     execute 'normal!' l:insertCommand . a:text . "\<C-\>\<C-n>"
+endfunction
+
+function! ingo#text#InsertNewLineHere( mode, line, ... )
+"******************************************************************************
+"* PURPOSE:
+"   Insert a new line below the current line containing a:line.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   Changes the current buffer and cursor position.
+"* INPUTS:
+"   a:mode  Determines where the new line is inserted:
+"           'o': below the current line
+"           'O': above the current line
+"           'cc': replacing the current line, store former contents in default
+"                 register
+"           '"_cc": replacing the current line without storing former contents
+"   a:line  Text for the new line; this is inserted as typed (so it can contain
+"           cursor movements like "\<Up>"). No comment leader will be added.
+"   a:options.additionalNormalModeCommands
+"           Additional commands to be executed after the insertion, in normal
+"           mode.
+"   a:options.isDisableAutoindent
+"           Flag whether the automatic indenting in the buffer should be
+"           disabled for the line insertion. By default, auto-indenting takes
+"           place as configured.
+"* RETURN VALUES:
+"   1 on success; 0 on failure.
+"******************************************************************************
+    let l:options = (a:0 ? a:1 : {})
+    let l:additionalNormalModeCommands = get(l:options, 'additionalNormalModeCommands', '')
+    let l:isDisableAutoindent = get(l:options, 'isDisableAutoindent', 0)
+
+    if l:isDisableAutoindent
+	" ":set paste" avoids automatic insert of comment leader, and also disables
+	" automatic indenting.
+	set paste
+    else
+	" Insert the comment line without automatic insert of comment leader, but at
+	" the current indent.
+	let l:save_formatoptions = &formatoptions
+	set formatoptions-=o
+    endif
+
+    try
+	execute 'normal! zv' . a:mode . a:line . "\<C-\>\<C-n>" . l:additionalNormalModeCommands
+	return 1
+    finally
+	if l:isDisableAutoindent
+	    set nopaste
+	else
+	    let &formatoptions = l:save_formatoptions
+	endif
+    endtry
+
+    return 0
+endfunction
+function! ingo#text#InsertNewLineAboveHere( ... )
+    return call('ingo#text#InsertNewLineHere', ['O'] + a:000)
+endfunction
+function! ingo#text#InsertNewLineBelowHere( ... )
+    return call('ingo#text#InsertNewLineHere', ['o'] + a:000)
+endfunction
+function! ingo#text#ReplaceLineHere( ... )
+    return call('ingo#text#InsertNewLineHere', ['"_cc'] + a:000)
 endfunction
 
 function! ingo#text#Replace( pos, len, replacement, ... )

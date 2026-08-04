@@ -2,12 +2,12 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2024-2025 Ingo Karkat
+" Copyright: (C) 2024-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
-let s:version = '1.047'
+let s:version = '1.048'
 
 "******************************************************************************
 "* PURPOSE:
