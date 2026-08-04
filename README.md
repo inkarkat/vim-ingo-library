@@ -186,7 +186,7 @@ HISTORY
 ------------------------------------------------------------------------------
 Note: Bump a new draft version also in autoload/ingo/version.vim
 
-##### 1.048   RELEASEME
+##### 1.048   04-Aug-2026
 - ENH: Add ingo#text#{InsertNewLine{,Above,Below},ReplaceLine}Here().
 - ENH: Add ingo#compat#fixes#IsExclusiveSelectionVisualReselectOffByOne() and
   ingo#selection#VisualReselect().
