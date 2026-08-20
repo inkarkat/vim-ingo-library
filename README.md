@@ -175,6 +175,8 @@ To uninstall, use the :RmVimball command.
 ### DEPENDENCIES
 
 - Requires Vim 7.0 or higher.
+- Requires Rndm.vim (https://drchip.org/astronaut/vim/#RNDM, part of
+  ([vimscript #551](http://www.vim.org/scripts/script.php?script_id=551))) for ingo#compat#rand().
 
 CONTRIBUTING
 ------------------------------------------------------------------------------
@@ -185,6 +187,9 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 Note: Bump a new draft version also in autoload/ingo/version.vim
+
+##### 1.049   RELEASEME
+- ENH: Add ingo#compat#rand().
 
 ##### 1.048   04-Aug-2026
 - ENH: Add ingo#text#{InsertNewLine{,Above,Below},ReplaceLine}Here().
