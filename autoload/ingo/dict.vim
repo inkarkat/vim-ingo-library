@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2022 Ingo Karkat
+" Copyright: (C) 2013-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -183,6 +183,26 @@ function! ingo#dict#AddMirrored( dict, ... )
 	    endif
 	endif
 	let a:dict[l:value] = l:key
+    endfor
+    return a:dict
+endfunction
+
+function! ingo#dict#Unlet( dict, ... ) abort
+"******************************************************************************
+"* PURPOSE:
+"   Remove each a:item in a:dict.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:dict  Dictionary to be modified.
+"   a:item  Key(s) to be removed from a:dict. Non-existing keys are ignored.
+"* RETURN VALUES:
+"   The modified a:dict.
+"******************************************************************************
+    for l:key in a:000
+	unlet! a:dict[l:key]
     endfor
     return a:dict
 endfunction
