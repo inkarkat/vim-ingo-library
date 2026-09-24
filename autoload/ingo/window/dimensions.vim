@@ -76,15 +76,21 @@ function! ingo#window#dimensions#GetNumberWidth( isGetAbsoluteNumberWidth )
 endfunction
 
 if has('signs')
-    function! s:HasBufferActiveSigns() abort
-	redir => l:signsOutput
-	    silent execute 'sign place' (v:version == 801 && has('patch614') || v:version > 801 ? 'group=*' : '') 'buffer=' . bufnr('')
-	redir END
+    if exists('*sign_getplaced')
+	function! s:HasBufferActiveSigns() abort
+	    return ! empty(get(get(sign_getplaced('', {'group': '*'}), 0, {}), 'signs'))
+	endfunction
+    else
+	function! s:HasBufferActiveSigns() abort
+	    redir => l:signsOutput
+		silent execute 'sign place' (v:version == 801 && has('patch614') || v:version > 801 ? 'group=*' : '') 'buffer=' . bufnr('')
+	    redir END
 
-	" The ':sign place' output contains two header lines.
-	" The sign column is fixed at two columns.
-	return (len(split(l:signsOutput, "\n")) > 2)
-    endfunction
+	    " The ':sign place' output contains two header lines.
+	    " The sign column is fixed at two columns.
+	    return (len(split(l:signsOutput, "\n")) > 2)
+	endfunction
+    endif
 else
     function! s:HasBufferActiveSigns() abort
 	return 0
