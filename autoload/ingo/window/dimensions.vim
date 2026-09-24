@@ -75,6 +75,22 @@ function! ingo#window#dimensions#GetNumberWidth( isGetAbsoluteNumberWidth )
     endif
 endfunction
 
+if has('signs')
+    function! s:HasBufferActiveSigns() abort
+	redir => l:signsOutput
+	    silent execute 'sign place' (v:version == 801 && has('patch614') || v:version > 801 ? 'group=*' : '') 'buffer=' . bufnr('')
+	redir END
+
+	" The ':sign place' output contains two header lines.
+	" The sign column is fixed at two columns.
+	return (len(split(l:signsOutput, "\n")) > 2)
+    endfunction
+else
+    function! s:HasBufferActiveSigns() abort
+	return 0
+    endfunction
+endif
+
 " Determine the number of virtual columns of the current window that are not
 " used for displaying buffer contents, but contain window decoration like line
 " numbers, fold column and signs.
@@ -86,16 +102,8 @@ function! ingo#window#dimensions#WindowDecorationColumns()
 	let l:decorationColumns += &l:foldcolumn
     endif
 
-    if has('signs')
-	redir => l:signsOutput
-	    silent execute 'sign place' (v:version == 801 && has('patch614') || v:version > 801 ? 'group=*' : '') 'buffer=' . bufnr('')
-	redir END
-
-	" The ':sign place' output contains two header lines.
-	" The sign column is fixed at two columns.
-	if len(split(l:signsOutput, "\n")) > 2
-	    let l:decorationColumns += 2
-	endif
+    if s:HasBufferActiveSigns()
+	let l:decorationColumns += 2
     endif
 
     return l:decorationColumns
