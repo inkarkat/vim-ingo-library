@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/folds.vim autoload script
 "
-" Copyright: (C) 2008-2013 Ingo Karkat
+" Copyright: (C) 2008-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -88,7 +88,7 @@ function! ingo#window#dimensions#WindowDecorationColumns()
 
     if has('signs')
 	redir => l:signsOutput
-	silent execute 'sign place buffer=' . bufnr('')
+	    silent execute 'sign place' (v:version == 801 && has('patch614') || v:version > 801 ? 'group=*' : '') 'buffer=' . bufnr('')
 	redir END
 
 	" The ':sign place' output contains two header lines.
