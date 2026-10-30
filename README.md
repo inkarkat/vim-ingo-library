@@ -193,6 +193,9 @@ Note: Bump a new draft version also in autoload/ingo/version.vim
 - ENH: Add ingo#dict#Unlet().
 - ingo#window#dimensions#WindowDecorationColumns(): Adapt: Vim 8.1.0614 has
   introduced signs groups
+- ingo#window#preview#OpenPreview(): Improve restore of minimized windows and
+  add special case for g:previewwindowsplitmode containing :topleft or
+  :TopLeft
 
 ##### 1.048   04-Aug-2026
 - ENH: Add ingo#text#{InsertNewLine{,Above,Below},ReplaceLine}Here().
