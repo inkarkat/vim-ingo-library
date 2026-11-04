@@ -188,7 +188,7 @@ HISTORY
 ------------------------------------------------------------------------------
 Note: Bump a new draft version also in autoload/ingo/version.vim
 
-##### 1.049   RELEASEME
+##### 1.049   04-Nov-2026
 - ENH: Add ingo#compat#rand().
 - ENH: Add ingo#dict#Unlet().
 - ingo#window#dimensions#WindowDecorationColumns(): Adapt: Vim 8.1.0614 has
