@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2008-2023 Ingo Karkat
+" Copyright: (C) 2008-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -27,7 +27,11 @@ function! ingo#window#preview#OpenPreview( ... )
 	    " g:previewwindowsplitmode) it could split anywhere else. Try to
 	    " locate windows with too little height and enlarge them (to the
 	    " required minimum of 2 lines) until :pedit succeeds.
-	    for l:winNr in [winnr() - 1] + filter(range(1, winnr('$')), 'v:val != winnr() - 1')
+	    let l:candidateWinNrs = (exists('g:previewwindowsplitmode') ? g:previewwindowsplitmode : '') ==? 'topleft'
+	    \   ? range(1, winnr('$'))
+	    \   : [winnr() - 1] + filter(range(1, winnr('$')), 'v:val != winnr() - 1')
+	    let l:originalWinHeights = ingo#dict#FromKeys(l:candidateWinNrs, function('winheight'))
+	    for l:winNr in l:candidateWinNrs
 		try
 		    if winheight(l:winNr) > 1
 			continue " This window cannot be the problem.
@@ -35,7 +39,17 @@ function! ingo#window#preview#OpenPreview( ... )
 
 		    execute l:winNr . 'resize 2'
 		    execute 'silent' (exists('g:previewwindowsplitmode') ? g:previewwindowsplitmode : '') (a:0 ? a:1 : '') 'pedit! +setlocal\ buftype=nofile\ bufhidden=wipe\ nobuflisted\ noswapfile [No\ Name]'
+
+		    let l:previewWinNr = winnr()
 		    wincmd P
+
+		    for l:winNr in l:candidateWinNrs
+			let l:adaptedWinNr = l:winNr + (l:winNr > l:previewWinNr ? 1 : 0)
+			if l:originalWinHeights[l:winNr] <= 1 && winheight(l:adaptedWinNr) != l:originalWinHeights[l:winNr]
+			    execute l:adaptedWinNr . 'resize' . l:originalWinHeights[l:winNr]
+			endif
+		    endfor
+
 		    return
 		catch /^Vim\%((\a\+)\)\=:E36:/ " E36: Not enough room
 		    continue

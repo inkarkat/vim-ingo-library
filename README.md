@@ -175,6 +175,8 @@ To uninstall, use the :RmVimball command.
 ### DEPENDENCIES
 
 - Requires Vim 7.0 or higher.
+- Requires Rndm.vim (https://drchip.org/astronaut/vim/#RNDM, part of
+  ([vimscript #551](http://www.vim.org/scripts/script.php?script_id=551))) for ingo#compat#rand().
 
 CONTRIBUTING
 ------------------------------------------------------------------------------
@@ -185,6 +187,15 @@ https://github.com/inkarkat/vim-ingo-library/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 Note: Bump a new draft version also in autoload/ingo/version.vim
+
+##### 1.049   04-Nov-2026
+- ENH: Add ingo#compat#rand().
+- ENH: Add ingo#dict#Unlet().
+- ingo#window#dimensions#WindowDecorationColumns(): Adapt: Vim 8.1.0614 has
+  introduced signs groups
+- ingo#window#preview#OpenPreview(): Improve restore of minimized windows and
+  add special case for g:previewwindowsplitmode containing :topleft or
+  :TopLeft
 
 ##### 1.048   04-Aug-2026
 - ENH: Add ingo#text#{InsertNewLine{,Above,Below},ReplaceLine}Here().
