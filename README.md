@@ -188,6 +188,10 @@ HISTORY
 ------------------------------------------------------------------------------
 Note: Bump a new draft version also in autoload/ingo/version.vim
 
+##### 1.050   RELEASEME
+- BUG: IndentConsistencyCopy's |Add to quickfix| gives "E776: No location
+  list" due to a wrong comparison in s:QuickfixCmd().
+
 ##### 1.049   04-Nov-2026
 - ENH: Add ingo#compat#rand().
 - ENH: Add ingo#dict#Unlet().

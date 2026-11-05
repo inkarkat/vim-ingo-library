@@ -7,7 +7,7 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
-let s:version = '1.049'
+let s:version = '1.050'
 
 "******************************************************************************
 "* PURPOSE:

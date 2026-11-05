@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2010-2020 Ingo Karkat
+" Copyright: (C) 2010-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -188,7 +188,7 @@ function! ingo#window#quickfix#GetPrefix( quickfixType ) abort
 endfunction
 function! s:QuickfixCmd( what, quickfixType, actionName ) abort
     if a:actionName =~# '^\[[lL]\]'
-	let l:actionName = (ingo#window#quickfix#GetPrefix(a:quickfixType) == 1 ? '' : a:actionName[1]) . a:actionName[3:]
+	let l:actionName = (a:quickfixType == 1 ? '' : a:actionName[1]) . a:actionName[3:]
     elseif a:actionName =~# '^\u'
 	let l:actionName = toupper(ingo#window#quickfix#GetPrefix(a:quickfixType)) . a:actionName
     else
