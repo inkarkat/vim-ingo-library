@@ -1,35 +1,11 @@
 " ingo/subst/pairs.vim: Function to substitute wildcard=replacement pairs.
 "
 " DEPENDENCIES:
-"   - ingo/fs/path.vim autoload script
-"   - ingo/regexp/fromwildcard.vim autoload script
 "
-" Copyright: (C) 2014-2015 Ingo Karkat
+" Copyright: (C) 2014-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.025.004	18-May-2015	ingo#subst#pairs#Substitute() and
-"				ingo#subst#pairs#Split(): Only canonicalize path
-"				separators in {replacement} on demand, via
-"				additional a:isCanonicalizeReplacement argument.
-"				Some clients may not need iterative replacement,
-"				and treat the wildcard as a convenient
-"				regexp-shorthand, not overly filesystem-related.
-"   1.025.003	01-May-2015	ingo#subst#pairs#Substitute(): Canonicalize path
-"				separators in {replacement}, too. This is
-"				important to match further pairs, too, as the
-"				pattern is always in canonical form, so the
-"				replacement has to be, too.
-"				ENH: Allow passing to
-"				ingo#subst#pairs#Substitute() [wildcard,
-"				replacement] Lists instead of
-"				{wildcard}={replacement} Strings, too.
-"   1.016.002	17-Jan-2014	Change s:pairPattern so that the first, not the
-"				last = is used as the pair delimiter.
-"   1.016.001	16-Jan-2014	file creation from
-"				autoload/EditSimilar/Substitute.vim
 
 let s:pairPattern = '\(^[^=]\+\)=\(.*$\)'
 function! s:SplitPair( pair, isCanonicalizeReplacement )
