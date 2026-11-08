@@ -8,7 +8,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
 let s:pairPattern = '\(^[^=]\+\)=\(.*$\)'
-function! s:SplitPair( pair, isCanonicalizeReplacement )
+function! s:SplitPair( pair, ... ) abort
+    let l:options = (a:0 ? a:1 : {})
+    let l:PatternTransformer = get(l:options, 'PatternTransformer', '')
+    let l:ReplacementTransformer = get(l:options, 'ReplacementTransformer', '')
+
     if type(a:pair) == type([])
 	let [l:from, l:to] = a:pair
     else
@@ -17,11 +21,39 @@ function! s:SplitPair( pair, isCanonicalizeReplacement )
 	endif
 	let [l:from, l:to] = matchlist(a:pair, s:pairPattern)[1:2]
     endif
-    return [ingo#regexp#fromwildcard#Convert(l:from), (a:isCanonicalizeReplacement ? ingo#fs#path#Normalize(l:to) : l:to)]
+
+    let l:pattern = ingo#regexp#fromwildcard#Convert(l:from)
+    if ! empty(l:PatternTransformer)
+	let l:pattern = call(l:PatternTransformer, [l:from, l:pattern])
+    endif
+    let l:replacement = l:to
+    if ! empty(l:ReplacementTransformer)
+	let l:replacement = call(l:ReplacementTransformer, [l:replacement])
+    endif
+
+    return [l:pattern, l:replacement]
 endfunction
 function! ingo#subst#pairs#Split( pairs, ... )
-    let l:isCanonicalizeReplacement = (a:0 ? a:1 : 0)
-    return map(a:pairs, 's:SplitPair(v:val, l:isCanonicalizeReplacement)')
+"******************************************************************************
+"* PURPOSE:
+"   Split {wildcard}={replacement} pairs into their regexp and replacement
+"   parts.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None.
+"* EFFECTS / POSTCONDITIONS:
+"   None.
+"* INPUTS:
+"   a:pairs: List of {wildcard}={replacement} pairs.
+"   a:options.PatternTransformer:   Optional function to transform the wildcard;
+"                                   invoked with the original wildcard and
+"                                   converted pattern.
+"   a:options.ReplacementTransformer:   Optional function to transform the
+"                                       replacement; invoked with the
+"                                       replacement.
+"* RETURN VALUES:
+"   List of [pattern, replacement] pairs.
+"******************************************************************************
+    return map(a:pairs, 'call("s:SplitPair", [v:val] + a:000)')
 endfunction
 function! ingo#subst#pairs#Substitute( text, pairs, ... )
 "******************************************************************************
@@ -46,12 +78,12 @@ function! ingo#subst#pairs#Substitute( text, pairs, ... )
 "   List of [replacement, failedPairs], where failedPairs is a subset of
 "   a:pairs.
 "******************************************************************************
-    let l:isCanonicalizeReplacement = (a:0 ? a:1 : 0)
+    let l:splitOptions = (a:0 && a:1 ? {'ReplacementTransformer': function('ingo#fs#path#Normalize')} : {})
     let l:replacement = a:text
     let l:failedPairs = []
 
     for l:pair in a:pairs
-	let [l:from, l:to] = s:SplitPair(l:pair, l:isCanonicalizeReplacement)
+	let [l:from, l:to] = s:SplitPair(l:pair, l:splitOptions)
 	let l:beforeReplacement = l:replacement
 	let l:replacement = substitute(l:replacement, l:from, escape(l:to, '\&~'), 'g')
 	if l:replacement ==# l:beforeReplacement
