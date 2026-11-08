@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2022 Ingo Karkat
+" Copyright: (C) 2013-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -132,7 +132,7 @@ function! ingo#regexp#fromwildcard#Convert( ... )
 "   Regular expression for matching a:wildcardExpr.
 "*******************************************************************************
     let [l:expr, l:additionalEscapeCharacters, l:pathSeparator] = call('s:Convert', a:000)
-    return '\V' . escape(l:expr, l:additionalEscapeCharacters)
+    return '\V' . escape(l:expr, l:additionalEscapeCharacters) . '\m'
 endfunction
 function! ingo#regexp#fromwildcard#AnchoredToPathBoundaries( ... )
 "*******************************************************************************
@@ -164,7 +164,7 @@ function! ingo#regexp#fromwildcard#AnchoredToPathBoundaries( ... )
 
     let l:prefix = printf('\%%(\^\|%s\@<=\)', l:pathSeparator)
     let l:suffix = printf('\%%(\$\|%s\@=\)', l:pathSeparator)
-    return '\V' . escape(l:prefix . l:expr . l:suffix, l:additionalEscapeCharacters)
+    return '\V' . escape(l:prefix . l:expr . l:suffix, l:additionalEscapeCharacters) . '\m'
 endfunction
 function! ingo#regexp#fromwildcard#FileOrPath( ... ) abort
 "*******************************************************************************
