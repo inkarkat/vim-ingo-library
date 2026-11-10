@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2010-2022 Ingo Karkat
+" Copyright: (C) 2010-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -84,9 +84,9 @@ function! ingo#regexp#MakeWholeWordSearch( text, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:text  Text / pattern to be searched for. Note that this isn't escaped in any form;
-"	    you probably want to escape backslashes beforehand and use \V "very
-"	    nomagic" on the result.
+"   a:text  Text / pattern to be searched for. Note that this isn't escaped in
+"           any form; you probably want to pass
+"           ingo#regexp#EscapeLiteralText(a:text) as a second argument.
 "   a:pattern   If passed, this is adapted according to what a:text is about.
 "		Useful if the pattern has already been so warped (e.g. by
 "		enclosing in /\(...\|...\)/) that word boundary detection on the
@@ -127,9 +127,9 @@ function! ingo#regexp#MakeWholeWORDSearch( text, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:text  Text / pattern to be searched for. Note that this isn't escaped in any form;
-"	    you probably want to escape backslashes beforehand and use \V "very
-"	    nomagic" on the result.
+"   a:text  Text / pattern to be searched for. Note that this isn't escaped in
+"           any form; you probably want to pass
+"           ingo#regexp#EscapeLiteralText(a:text) as a second argument.
 "   a:pattern   If passed, this is adapted according to what a:text is about.
 "		Useful if the pattern has already been so warped (e.g. by
 "		enclosing in /\(...\|...\)/) that word boundary detection on the
@@ -158,9 +158,9 @@ function! ingo#regexp#MakeWholeWordOrWORDSearch( text, ... )
 "* EFFECTS / POSTCONDITIONS:
 "   None.
 "* INPUTS:
-"   a:text  Text / pattern to be searched for. Note that this isn't escaped in any form;
-"	    you probably want to escape backslashes beforehand and use \V "very
-"	    nomagic" on the result.
+"   a:text  Text / pattern to be searched for. Note that this isn't escaped in
+"           any form; you probably want to pass
+"           ingo#regexp#EscapeLiteralText(a:text) as a second argument.
 "   a:pattern   If passed, this is adapted according to what a:text is about.
 "		Useful if the pattern has already been so warped (e.g. by
 "		enclosing in /\(...\|...\)/) that word boundary detection on the
