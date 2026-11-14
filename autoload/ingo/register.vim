@@ -2,13 +2,13 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2013-2022 Ingo Karkat
+" Copyright: (C) 2013-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
 function! ingo#register#All()
-    return '[-a-zA-Z0-9":.%#=*+~/]'
+    return '[-a-zA-Z0-9":.%#=*+~_/]'
 endfunction
 function! ingo#register#Writable()
     return '[-a-zA-Z0-9"*+_/]'
