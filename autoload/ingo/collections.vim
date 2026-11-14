@@ -2,10 +2,14 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011-2021 Ingo Karkat
+" Copyright: (C) 2011-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
+
+function! ingo#collections#IsCollection( list ) abort
+    return (type(a:list) == type([]) || type(a:list) == type({}))
+endfunction
 
 function! ingo#collections#ToDict( list, ... )
 "******************************************************************************
